@@ -36,8 +36,8 @@ public class TngpEventPolling {
   public void pollAllTopics() {
     System.out.println("########### POLL default-task-queue-log");
     poll(0); // 0 = default-task-queue-log
-    System.out.println("########### POLL default-wf-definition-log");
-    poll(1); // 1 = default-wf-definition-log
+//    System.out.println("########### POLL default-wf-definition-log");
+//    poll(1); // 1 = default-wf-definition-log
     System.out.println("########### POLL default-wf-instance-log");
     poll(2); // 2 = default-wf-instance-log
   }
@@ -51,6 +51,7 @@ public class TngpEventPolling {
 
     
     for (Event evt : eventsBatch.getEvents()) {
+      System.out.println(evt.getPosition());
       // Adjust log pointer for next query
       if (evt.getPosition()>=startPosition) {
         startPosition = evt.getPosition()+1;
@@ -75,41 +76,49 @@ public class TngpEventPolling {
           BpmnProcessEventDecoder decoder = new BpmnProcessEventDecoder() //
             .wrap(evt.getRawBuffer(), 0 + headerDecoder.encodedLength(), headerDecoder.blockLength(), headerDecoder.version());          
           handle(decoder);
+          break;
         }
         case BpmnActivityEventDecoder.TEMPLATE_ID: {
           BpmnActivityEventDecoder decoder = new BpmnActivityEventDecoder() //
             .wrap(evt.getRawBuffer(), 0 + headerDecoder.encodedLength(), headerDecoder.blockLength(), headerDecoder.version());          
           handle(decoder);
+          break;
         }
         case BpmnFlowElementEventDecoder.TEMPLATE_ID: {
           BpmnFlowElementEventDecoder decoder = new BpmnFlowElementEventDecoder() //
               .wrap(evt.getRawBuffer(), 0 + headerDecoder.encodedLength(), headerDecoder.blockLength(), headerDecoder.version());          
             handle(decoder);
+            break;
         }
         case TaskInstanceDecoder.TEMPLATE_ID: {
           TaskInstanceDecoder decoder = new TaskInstanceDecoder() //
               .wrap(evt.getRawBuffer(), 0 + headerDecoder.encodedLength(), headerDecoder.blockLength(), headerDecoder.version());          
           handle(decoder);
+          break;
         }
         case WorkflowInstanceRequestDecoder.TEMPLATE_ID: {
           WorkflowInstanceRequestDecoder decoder = new WorkflowInstanceRequestDecoder() //
               .wrap(evt.getRawBuffer(), 0 + headerDecoder.encodedLength(), headerDecoder.blockLength(), headerDecoder.version());          
           handle(decoder);
+          break;
         }
         case ActivityInstanceRequestDecoder.TEMPLATE_ID: {
           ActivityInstanceRequestDecoder decoder = new ActivityInstanceRequestDecoder() //
               .wrap(evt.getRawBuffer(), 0 + headerDecoder.encodedLength(), headerDecoder.blockLength(), headerDecoder.version());          
           handle(decoder);
+          break;
         }
         case TaskInstanceRequestDecoder.TEMPLATE_ID: {
           TaskInstanceRequestDecoder decoder = new TaskInstanceRequestDecoder() //
               .wrap(evt.getRawBuffer(), 0 + headerDecoder.encodedLength(), headerDecoder.blockLength(), headerDecoder.version());          
           handle(decoder);
+          break;
         }
         case CreateTaskRequestDecoder.TEMPLATE_ID: {
           CreateTaskRequestDecoder decoder = new CreateTaskRequestDecoder() //
               .wrap(evt.getRawBuffer(), 0 + headerDecoder.encodedLength(), headerDecoder.blockLength(), headerDecoder.version());          
           handle(decoder);
+          break;
         }
         }
 
@@ -136,6 +145,10 @@ public class TngpEventPolling {
 
   private void handle(BpmnProcessEventDecoder decoder) {
     System.out.println(decoder);
+    System.out.println("DefId: " + decoder.wfDefinitionId());
+    System.out.println("InstanceId: " + decoder.wfInstanceId());
+    
+    System.out.println("key: " + decoder.key()); // identifier for "local state machine" / compare to primary key
   }
 
   private void handle(WorkflowInstanceRequestDecoder decoder) {
