@@ -7,39 +7,39 @@ import javax.annotation.PreDestroy;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 
+import org.camunda.tngp.client.ClientProperties;
 import org.camunda.tngp.client.TngpClient;
 
 @Startup
 @Singleton
 public class TngpStarter {
 
-  private TngpClient client;
-  
+  // private TngpClient client;
+
   private TngpEventPolling eventPolling;
 
   @PostConstruct
   public void init() {
-    // Properties clientProperties = new Properties();
-    // clientProperties.put(ClientProperties.BROKER_CONTACTPOINT,
-    // "127.0.0.1:51015");
-
-    client = TngpClient.create(new Properties());
-    client.connect();
-    
-    eventPolling = new TngpEventPolling(client);
+    eventPolling = new TngpEventPolling();
     eventPolling.start();
   }
-      
-  
-//  @Produces
-//  public TngpClient client() {
-//    return client;
-//  }
-  
+
   @PreDestroy
   public void close() {
     eventPolling.stop();
-    client.disconnect();
-    client.close();
+  }
+
+  public void connectTngpClient(String connectionString) {
+    Properties clientProperties = new Properties();
+    clientProperties.put(ClientProperties.BROKER_CONTACTPOINT, connectionString);
+
+    TngpClient client = TngpClient.create(clientProperties);
+
+    eventPolling.connectTngpClient(client);
+  }
+
+  public void disconnectTngpClient(String connectionString) {
+    // TODO
+//    eventPolling.disconnectTngpClient(client);
   }
 }

@@ -24,6 +24,13 @@
 			<version>${tngp.version}</version>
 		</dependency>
 
+		<!-- Dependency to allow starting the broker embedded -->
+		<dependency>
+			<groupId>org.camunda.tngp</groupId>
+			<artifactId>tngp-broker-core</artifactId>
+			<version>${tngp.version}</version>
+		</dependency>
+
 		<dependency>
 			<!-- Bootstrap for styling via Webjars project -->
 			<groupId>org.webjars</groupId>
@@ -63,5 +70,10 @@
 			</plugin>
 		</plugins>
 	</build>
-
+	<repositories>
+		<repository>
+			<id>camunda-private</id>
+			<url>https://app.camunda.com/nexus/content/groups/private/</url>
+		</repository>
+	</repositories>
 </project>

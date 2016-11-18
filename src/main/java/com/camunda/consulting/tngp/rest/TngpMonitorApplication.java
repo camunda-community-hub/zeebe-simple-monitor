@@ -1,4 +1,4 @@
-package com.camunda.consulting.tngp;
+package com.camunda.consulting.tngp.rest;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;

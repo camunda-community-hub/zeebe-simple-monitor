@@ -1,5 +1,8 @@
 package com.camunda.consulting.tngp.listener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.camunda.tngp.client.TngpClient;
 import org.camunda.tngp.client.event.Event;
 import org.camunda.tngp.client.event.EventsBatch;
@@ -17,32 +20,44 @@ import org.camunda.tngp.protocol.log.TaskInstanceRequestDecoder;
 import org.camunda.tngp.protocol.log.WorkflowInstanceRequestDecoder;
 import org.camunda.tngp.protocol.taskqueue.MessageHeaderDecoder;
 
-import com.camunda.consulting.tngp.WorkflowDefinitionResource;
 import com.camunda.consulting.tngp.dto.WorkflowDefinitionDto;
+import com.camunda.consulting.tngp.rest.WorkflowDefinitionResource;
 
 public class TngpEventPolling {
 
-  protected static final long POLLING_DELAY = 100;
+  protected static final long POLLING_DELAY = 500;
   
-  private TngpClient tngpClient;
+  private List<TngpClient> tngpClients = new ArrayList<TngpClient>();
   private long startPosition = 0;
   
-  public TngpEventPolling(TngpClient tngpClient) {
-    this.tngpClient = tngpClient;
+  public void connectTngpClient(TngpClient client) {
+    client.connect();
+    tngpClients.add(client);    
+  }
+  public void disconnectTngpClient(TngpClient client) {
+    tngpClients.remove(client);    
+    client.disconnect();
+    client.close();
   }
 
   private boolean isRunning = false;
 
-  public void pollAllTopics() {
-    System.out.println("########### POLL default-task-queue-log");
-    poll(0); // 0 = default-task-queue-log
-//    System.out.println("########### POLL default-wf-definition-log");
-//    poll(1); // 1 = default-wf-definition-log
-    System.out.println("########### POLL default-wf-instance-log");
-    poll(2); // 2 = default-wf-instance-log
+  public void pollAllTopicsForAllClients() {
+    for (TngpClient tngpClient : tngpClients) {      
+      pollAllTopics(tngpClient);
+    }
   }
   
-  public void poll(int topicId) {
+  public void pollAllTopics(TngpClient tngpClient) {
+//    System.out.println("########### POLL default-task-queue-log");
+    poll(tngpClient, 0); // 0 = default-task-queue-log
+//    System.out.println("########### POLL default-wf-definition-log");
+//    poll(1); // 1 = default-wf-definition-log
+//    System.out.println("########### POLL default-wf-instance-log");
+    poll(tngpClient, 2); // 2 = default-wf-instance-log
+  }
+  
+  public void poll(TngpClient tngpClient, int topicId) {
     EventsBatch eventsBatch = tngpClient.events().poll() //
         .startPosition(startPosition) //
         .maxEvents(100) // Integer.MAX_VALUE
@@ -193,7 +208,7 @@ public class TngpEventPolling {
       public void run() {
         while (isRunning) {
 
-          pollAllTopics();
+          pollAllTopicsForAllClients();
           
           try {
             Thread.sleep(POLLING_DELAY);

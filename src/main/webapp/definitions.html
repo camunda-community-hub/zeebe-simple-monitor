@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset=utf-8>
+  <meta http-equiv=X-UA-Compatible content="IE=edge">
+  <meta name=viewport content="width=device-width,initial-scale=1">
+
+  <title> TNGP Monitor </title>
+
+  <script type="text/javascript" src="webjars/jquery/1.9.0/jquery.js"></script>
+
+  <script type="text/javascript" src="./app.js"></script>
+  <link rel="stylesheet" href="./app.css">
+
+  <script src="./vendor/prism.js"></script>
+  <link rel="stylesheet" href="./vendor/prism.css">
+
+
+  <link rel="stylesheet" href="./css/styles.min.css">
+
+  <!-- <link rel=apple-touch-icon href="./img/apple-touch-icon.png"> -->
+  <link rel=icon href="./img/favicon.ico">
+
+
+  <style type="text/css">
+pre.scaffolding {
+  line-height: 1;
+}
+em.optional:before,
+em.optional:after {
+  display: inline;
+  color: #666;
+}
+em.optional:before {
+  content: '[';
+}
+em.optional:after {
+  content: ']';
+}
+  </style>
+</head>
+<body>
+  <header class="cam-brand-header">
+    <!-- depending on your layout, you may want to use the `.container-fluid` class instead below -->
+    <div class="container-fluid">
+      <a class="navbar-brand" href="./index.html" title="TNGP Monitor">
+        <span class="brand-logo"></span>
+        <span class="brand-name">TNGP Monitor</span>
+      </a>
+
+      <!-- this is intended for the site navigation -->
+      <nav class="sections-menu"><ul>
+        <li><a href="./index.html">Configuration</a></li>
+        <li class="active"><a href="./definitions.html">Workflow Definitions</a></li>
+        <li><a href="./instances.html">Workflow Instances</a></li>
+        <li><a href="./logs.html">Logs</a></li>
+        <li><a href="./search.html">Search</a></li>
+      </ul></nav>
+    </div>
+  </header>
+
+  <div class="page-body container-fluid">
+    <section class="page-section">
+      <header>
+        <h1>Workflow Definitions</h1>
+
+        <p>
+          Inspect deployed BPMN workflow definitions within connected TNGP brokers.
+        </p>
+      </header>
+
+     <div class="row">
+        <div class="col-md-2">
+          <h2>List</h2>
+          <table class="table table-striped">
+            <thead>
+              <th>Workflow</th>
+              <th>Running</th>
+            </thead>
+            <tr>
+              <td class="tngp-table-selected"><a href="#">Simple (V1)</a></td>
+              <td class="tngp-table-selected">0</td>
+            </tr>
+            <tr>
+              <td><a href="#">Simple (V2)</a></td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td><a href="#">Order Management (v1)</a></td>
+              <td>138</td>
+            </tr>
+            <tr>
+              <td><a href="#">Invoice (V1)</a></td>
+              <td>20k</td>
+            </tr>
+          </table>
+      </div>
+      <div class="col-md-8">
+        <h2>Selected</h2>
+        <div id="diagramCanvas" class="bpmn-io-viewer-height"></div>
+
+      <script>
+  $(document).ready(function() {  
+    init(); 
+  });
+            </script>        
+      </div>
+      <div class="col-md-2">
+        <h2>Information</h2>
+          <table class="table table-striped">
+            <tr>
+              <td>Name</td>
+              <td>Simple</td>
+            </tr>
+            <tr>
+              <td>Version</td>
+              <td>2</td>
+            </tr>
+            <tr>
+              <td>Some additional info</td>
+              <td>xxx</td>
+            </tr>
+          </table>
+      </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="cam-brand-footer">
+    <div class="container-fluid">
+      <div class="col-xs-8">
+        <!-- whatever you want -->
+      </div>
+      <div class="text-right col-xs-4">
+        &copy; Camunda services GmbH 2016, All Rights Reserved
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
