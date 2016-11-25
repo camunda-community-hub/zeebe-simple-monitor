@@ -18,7 +18,7 @@ import org.camunda.tngp.protocol.log.CreateTaskRequestDecoder;
 import org.camunda.tngp.protocol.log.TaskInstanceDecoder;
 import org.camunda.tngp.protocol.log.TaskInstanceRequestDecoder;
 import org.camunda.tngp.protocol.log.WorkflowInstanceRequestDecoder;
-import org.camunda.tngp.protocol.taskqueue.MessageHeaderDecoder;
+import org.camunda.tngp.protocol.log.MessageHeaderDecoder;
 
 import com.camunda.consulting.tngp.dto.WorkflowDefinitionDto;
 import com.camunda.consulting.tngp.rest.WorkflowDefinitionResource;
