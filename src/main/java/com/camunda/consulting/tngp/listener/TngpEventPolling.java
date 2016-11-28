@@ -1,7 +1,7 @@
 package com.camunda.consulting.tngp.listener;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.camunda.tngp.client.TngpClient;
 import org.camunda.tngp.client.event.Event;
@@ -15,35 +15,44 @@ import org.camunda.tngp.protocol.log.BpmnActivityEventDecoder;
 import org.camunda.tngp.protocol.log.BpmnFlowElementEventDecoder;
 import org.camunda.tngp.protocol.log.BpmnProcessEventDecoder;
 import org.camunda.tngp.protocol.log.CreateTaskRequestDecoder;
+import org.camunda.tngp.protocol.log.MessageHeaderDecoder;
 import org.camunda.tngp.protocol.log.TaskInstanceDecoder;
 import org.camunda.tngp.protocol.log.TaskInstanceRequestDecoder;
 import org.camunda.tngp.protocol.log.WorkflowInstanceRequestDecoder;
-import org.camunda.tngp.protocol.log.MessageHeaderDecoder;
 
 import com.camunda.consulting.tngp.dto.WorkflowDefinitionDto;
+import com.camunda.consulting.tngp.dto.WorkflowInstanceDto;
+import com.camunda.consulting.tngp.rest.BrokerResource;
 import com.camunda.consulting.tngp.rest.WorkflowDefinitionResource;
+import com.camunda.consulting.tngp.rest.WorkflowInstanceResource;
 
 public class TngpEventPolling {
 
   protected static final long POLLING_DELAY = 500;
   
-  private List<TngpClient> tngpClients = new ArrayList<TngpClient>();
-  private long startPosition = 0;
+  private Map<TngpClient, Map<Integer, Long>> tngpClients = new HashMap<TngpClient, Map<Integer, Long>>();
   
   public void connectTngpClient(TngpClient client) {
     client.connect();
-    tngpClients.add(client);    
+    HashMap<Integer, Long> positions = new HashMap<Integer, Long>();
+    positions.put(0, 0l);
+    positions.put(1, 0l);
+    positions.put(2, 0l);
+    tngpClients.put(client, positions);
   }
+
   public void disconnectTngpClient(TngpClient client) {
     tngpClients.remove(client);    
     client.disconnect();
     client.close();
+    
+    WorkflowDefinitionResource.removeBrokerData(client);
   }
 
   private boolean isRunning = false;
 
   public void pollAllTopicsForAllClients() {
-    for (TngpClient tngpClient : tngpClients) {      
+    for (TngpClient tngpClient : tngpClients.keySet()) {            
       pollAllTopics(tngpClient);
     }
   }
@@ -52,12 +61,17 @@ public class TngpEventPolling {
 //    System.out.println("########### POLL default-task-queue-log");
     poll(tngpClient, 0); // 0 = default-task-queue-log
 //    System.out.println("########### POLL default-wf-definition-log");
-//    poll(1); // 1 = default-wf-definition-log
+    poll(tngpClient, 1); // 1 = default-wf-definition-log
 //    System.out.println("########### POLL default-wf-instance-log");
-    poll(tngpClient, 2); // 2 = default-wf-instance-log
+//    poll(tngpClient, 2); // 2 = default-wf-instance-log
   }
   
   public void poll(TngpClient tngpClient, int topicId) {
+    long startPosition = 0;
+    if (tngpClients!=null && tngpClients.containsKey(tngpClient)) {      
+      startPosition = tngpClients.get(tngpClient).get(topicId);
+    }
+    
     EventsBatch eventsBatch = tngpClient.events().poll() //
         .startPosition(startPosition) //
         .maxEvents(100) // Integer.MAX_VALUE
@@ -70,11 +84,14 @@ public class TngpEventPolling {
       // Adjust log pointer for next query
       if (evt.getPosition()>=startPosition) {
         startPosition = evt.getPosition()+1;
+        if (tngpClients!=null && tngpClients.containsKey(tngpClient)) {      
+          tngpClients.get(tngpClient).put(topicId, startPosition);
+        }
       }
       
       // Events already parsed in Client Lib
       if (evt instanceof WorkflowDefinitionEventImpl) {
-        handle((WorkflowDefinitionEventImpl)evt);        
+        handle(tngpClient, (WorkflowDefinitionEventImpl)evt);        
       }
       else if (evt instanceof TaskInstanceEventImpl) {
         handle((TaskInstanceEventImpl)evt);        
@@ -102,7 +119,7 @@ public class TngpEventPolling {
         case BpmnFlowElementEventDecoder.TEMPLATE_ID: {
           BpmnFlowElementEventDecoder decoder = new BpmnFlowElementEventDecoder() //
               .wrap(evt.getRawBuffer(), 0 + headerDecoder.encodedLength(), headerDecoder.blockLength(), headerDecoder.version());          
-            handle(decoder);
+            handle(tngpClient, decoder);
             break;
         }
         case TaskInstanceDecoder.TEMPLATE_ID: {
@@ -114,7 +131,7 @@ public class TngpEventPolling {
         case WorkflowInstanceRequestDecoder.TEMPLATE_ID: {
           WorkflowInstanceRequestDecoder decoder = new WorkflowInstanceRequestDecoder() //
               .wrap(evt.getRawBuffer(), 0 + headerDecoder.encodedLength(), headerDecoder.blockLength(), headerDecoder.version());          
-          handle(decoder);
+          handle(tngpClient, decoder);
           break;
         }
         case ActivityInstanceRequestDecoder.TEMPLATE_ID: {
@@ -166,19 +183,20 @@ public class TngpEventPolling {
     System.out.println("key: " + decoder.key()); // identifier for "local state machine" / compare to primary key
   }
 
-  private void handle(WorkflowInstanceRequestDecoder decoder) {
+  private void handle(TngpClient client, WorkflowInstanceRequestDecoder decoder) {
     System.out.println(decoder);
+    WorkflowInstanceResource.add(client, WorkflowInstanceDto.from(decoder));
   }
 
   private void handle(TaskInstanceDecoder decoder) {
     System.out.println(decoder);
   }
 
-  private void handle(BpmnFlowElementEventDecoder decoder) {
+  private void handle(TngpClient client, BpmnFlowElementEventDecoder decoder) {
     System.out.println(decoder);
-    System.out.println("Instance: " + decoder.wfInstanceId());
-    System.out.println("Definition: " + decoder.wfDefinitionId());
-    System.out.println("Flow Element: " +  decoder.flowElementIdString());
+    
+    WorkflowInstanceDto instance = WorkflowInstanceResource.findInstance(decoder.wfInstanceId());
+    instance.addActivity(decoder.flowElementIdString(), decoder.payload());
   }
 
   private void handle(BpmnActivityEventDecoder decoder) {
@@ -192,9 +210,10 @@ public class TngpEventPolling {
     System.out.println(evt);
   }
 
-  private void handle(WorkflowDefinitionEventImpl evt) {
+  private void handle(TngpClient client, WorkflowDefinitionEventImpl evt) {
     System.out.println(evt);
-    WorkflowDefinitionResource.definitions.add(
+    WorkflowDefinitionResource.add(
+        client,
         WorkflowDefinitionDto.from(evt));
   }
   

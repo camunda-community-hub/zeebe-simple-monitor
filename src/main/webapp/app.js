@@ -1,11 +1,24 @@
-let restAccess = "api/";
-let brokers = [
-	{
+var viewer = null;
+var container = null;
+
+//let restAccess = "api/";
+let restAccess = "http://localhost:8080/camunda-tngp-monitor/api/";
+let brokers = [];
+
+var workflowDefinitions;
+var selectedWorkflowDefinition;
+
+var workflowInstances;
+var selectedWorkflowInstance;
+
+
+/*
+{
 		name: 'default',
 		connectionString: '127.0.0.1:51015',
 		state: 'disconnected'		
 	}
-];
+	*/
 
 function startEmbeddedBroker() {
 			$.ajax({
@@ -51,7 +64,7 @@ function brokerConnect(connectionString) {
 		             //dataType: 'json',
 		             success: function (result) {
 		             	var broker = brokers.filter(function( broker ) { return broker.connectionString == connectionString; })[0];
-		             	broker.state = 'connected';
+		             	broker.connected = true;
 					    renderBrokerTable();		
 		             },
 		             error: function (xhr, ajaxOptions, thrownError) {
@@ -69,7 +82,7 @@ function brokerDisconnect(connectionString) {
 		             //dataType: 'json',
 		             success: function (result) {
 		             	var broker = brokers.filter(function( broker ) { return broker.connectionString == connectionString; })[0];
-		             	broker.state = 'disconnected';
+		             	broker.connected = false;
 					    renderBrokerTable();		
 		             },
 		             error: function (xhr, ajaxOptions, thrownError) {
@@ -84,28 +97,69 @@ function renderBrokerTable() {
 	$("#brokerTable > tbody").html("");
 	for (index = brokers.length-1; index >= 0; --index) {
 		var broker = brokers[index];
-		if (broker.state=='connected') {
+		if (broker.connected) {
 			$('#brokerTable tbody').append("<tr><td>"+broker.name+"</td><td>"+broker.connectionString+"</td><td><span class='label label-success'>connected</span></td><td><a onclick='brokerDisconnect(\""+broker.connectionString+"\")'>disconnect</a></td></tr>");
 		} else {
 			$('#brokerTable tbody').append("<tr><td>"+broker.name+"</td><td>"+broker.connectionString+"</td><td>disconnected</td><td><a onclick='brokerConnect(\""+broker.connectionString+"\")'>connect</a></td></tr>");
 		}
 	}
+	if (brokers && brokers.length > 0 && brokers[0].connected) {
+		$('#brokerGlobalInfo').html('<a><span class="label label-success">connected</span></a>');
+	} else {
+		$('#brokerGlobalInfo').html('<a onclick="brokerConnect(\'127.0.0.1:51015\')"><span class="label label-danger">Not connected. Klick to connect default.</span></a>')	;	
+	}
 }	
 
-function init() {
-	renderBrokerTable();
-	
-			var BpmnViewer = window.BpmnJS;
-			var viewer = new BpmnViewer({container: '#diagramCanvas', width: '100%', height: '100%'});
+function initBroker() {
+	loadBrokers();
+}
 
-			var container = $('#js-drop-zone');
+function loadBrokers() {
+	$.get(restAccess + 'broker/', function(brokerList) {
+		brokers = brokerList;
+		renderBrokerTable();
+	});
+}
 
-			$.get(restAccess + 'workflow-definition/', function(workflowDefinitions) {
-			//$.get('webjars/simple.bpmn', function(workflowDefinitions) {
-				console.log(workflowDefinitions)
-				for (let index = 0; index < workflowDefinitions.length; ++index) {
-					if (index==0) {
-						viewer.importXML(workflowDefinitions[index].resource, function(err) {
+
+function initDefinitions() {	
+	loadBrokers();
+	loadWorkflowDefinitions();
+}
+
+function loadWorkflowDefinitions() {
+	$.get(restAccess + 'workflow-definition/', function(result) {
+	    workflowDefinitions = result;
+	    renderWorkflowDefinitionTable();
+	    if (workflowDefinitions && workflowDefinitions.length>0) {
+	    	selectedWorkflowDefinition = workflowDefinitions[0];
+	    } else {
+	    	selectedWorkflowDefinition = null;
+	    }
+	    renderSelectedWorkflowDefinition();
+	});			
+}
+
+function renderWorkflowDefinitionTable() {
+	$("#workflowDefinitionTable > tbody").html("");
+	for (index = workflowDefinitions.length-1; index >= 0; --index) {
+		var def = workflowDefinitions[index];
+		$('#workflowDefinitionTable tbody').append("<tr><td><a onclick='selectWorkflowDefinition("+index+")'>"+def.key + "(" + def.id + ")" +"</a></td></tr>");
+	}
+}	
+
+function selectWorkflowDefinition(index) {
+	selectedWorkflowDefinition = workflowDefinitions[index];
+	renderSelectedWorkflowDefinition();
+}
+
+function renderSelectedWorkflowDefinition() {
+	if (selectedWorkflowDefinition) {
+		$('#workflowDefinitionId').html(selectedWorkflowDefinition.id);
+		$('#workflowDefinitionName').html(selectedWorkflowDefinition.key);
+		$('#workflowDefinitionVersion').text('');
+		$('#workflowDefinitionInfo').text('');
+						viewer.importXML(selectedWorkflowDefinition.resource, function(err) {
 							if (err) {
 								console.log('error rendering', err);
 							} else {
@@ -117,14 +171,70 @@ function init() {
 
 								// zoom to fit full viewport
 								canvas.zoom('fit-viewport');
-							    
 							}
 						});
-					}
-				}
+    }
+}
 
-			});			
+function initWorkflowInstances() {	
+	loadBrokers();
+	loadWorkflowInstances();
+}
+
+function loadWorkflowInstances() {
+	$.get(restAccess + 'workflow-instance/', function(result) {
+	    workflowInstances = result;
+	    renderWorkflowInstanceTable();
+
+	    if (workflowInstances && workflowInstances.length>0) {
+	    	selectedWorkflowInstance = workflowInstances[0];
+	    } else {
+	    	selectedWorkflowInstance = null;
+	    }
+	    renderSelectedWorkflowInstance();
+	});			
+}
+
+function renderWorkflowInstanceTable() {
+	$("#workflowInstanceTable > tbody").html("");
+	for (index = workflowInstances.length-1; index >= 0; --index) {
+		var def = workflowInstances[index];
+		$('#workflowInstanceTable tbody').append(
+			"<tr><td><a onclick='selectWorkflowInstance("+index+")'>"+def.id +"</a></td><td>"+def.workflowDefinitionKey+"</td></tr>");
 	}
+}	
+
+function selectWorkflowInstance(index) {
+	selectedWorkflowInstance = workflowInstances[index];
+	renderSelectedWorkflowInstance();
+}
+
+function renderSelectedWorkflowInstance() {
+	if (selectedWorkflowInstance) {
+		console.log(selectedWorkflowInstance);
+		$('#workflowInstanceId').html(selectedWorkflowInstance.workflowInstanceId);
+		$('#workflowDefinitionId').html(selectedWorkflowInstance.workflowDefinitionId);
+		$('#workflowDefinitionKey').html(selectedWorkflowInstance.workflowDefinitionKey);
+		$('#payload').text(selectedWorkflowInstance.payload);
+		$('#workflowInstanceInfo').text('');
+		$.get(restAccess + 'workflow-definition/' + selectedWorkflowInstance.workflowDefinitionId, function(result) {
+			viewer.importXML(result.resource, function(err) {
+							if (err) {
+								console.log('error rendering', err);
+							} else {
+								var canvas = viewer.get('canvas');
+								var overlays = viewer.get('overlays');
+
+								container.removeClass('with-error')
+										 .addClass('with-diagram');
+
+								// zoom to fit full viewport
+								canvas.zoom('fit-viewport');
+							}
+			});
+		});
+    }
+}
 	
 	function addMarkerForActivities(canvas, actInstTree) {
 		if (actInstTree.childTransitionInstances.length==0 && actInstTree.childActivityInstances.length==0) {

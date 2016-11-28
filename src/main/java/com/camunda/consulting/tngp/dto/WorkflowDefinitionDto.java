@@ -4,6 +4,7 @@ import org.camunda.tngp.client.event.impl.dto.WorkflowDefinitionEventImpl;
 
 public class WorkflowDefinitionDto {
 
+  private String broker;
   private String resource;
   private String key;
   private long id;
@@ -43,6 +44,14 @@ public class WorkflowDefinitionDto {
   @Override
   public String toString() {
     return "WorkflowDefinitionDto [resource=" + resource + ", key=" + key + ", id=" + id + "]";
+  }
+
+  public String getBroker() {
+    return broker;
+  }
+
+  public void setBroker(String broker) {
+    this.broker = broker;
   }
 
 }

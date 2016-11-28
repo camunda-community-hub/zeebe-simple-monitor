@@ -9,8 +9,15 @@
 
   <script type="text/javascript" src="webjars/jquery/1.9.0/jquery.js"></script>
 
-  <script type="text/javascript" src="app.js"></script>
+  <!-- bpmn-js viewer -->
+  <script type="text/javascript" src="webjars/bpmn-js/0.16.0/dist/bpmn-navigated-viewer.js"></script>
+  <link type="text/css" rel="stylesheet" href="webjars/bpmn-js/0.16.0/dist/assets/diagram-js.css" />
+  <link type="text/css" rel="stylesheet" href="webjars/bpmn-js/0.16.0/dist/assets/bpmn-font/css/bpmn-embedded.css" />
+  <link type="text/css" rel="stylesheet" href="./css/modeler.css" />
+
+  <script type="text/javascript" src="./app.js"></script>
   <link rel="stylesheet" href="./app.css">
+
   <script src="./vendor/prism.js"></script>
   <link rel="stylesheet" href="./vendor/prism.css">
 
@@ -19,13 +26,6 @@
 
   <!-- <link rel=apple-touch-icon href="./img/apple-touch-icon.png"> -->
   <link rel=icon href="./img/favicon.ico">
-
-
-  <!-- bpmn-js viewer -->
-  <script type="text/javascript" src="webjars/bpmn-js/0.16.0/dist/bpmn-navigated-viewer.js"></script>
-  <link type="text/css" rel="stylesheet" href="webjars/bpmn-js/0.16.0/dist/assets/diagram-js.css" />
-  <link type="text/css" rel="stylesheet" href="webjars/bpmn-js/0.16.0/dist/assets/bpmn-font/css/bpmn-embedded.css" />
-  <link type="text/css" rel="stylesheet" href="./css/modeler.css" />
 
 
   <style type="text/css">
@@ -46,7 +46,7 @@ em.optional:after {
   </style>
 </head>
 <body>
- <header class="cam-brand-header">
+  <header class="cam-brand-header">
     <!-- depending on your layout, you may want to use the `.container-fluid` class instead below -->
     <div class="container-fluid">
       <a class="navbar-brand" href="./index.html" title="TNGP Monitor">
@@ -57,75 +57,76 @@ em.optional:after {
       <!-- this is intended for the site navigation -->
       <nav class="sections-menu"><ul>
         <li><a href="./index.html">Configuration</a></li>
-        <li class="active"><a href="./definitions.html">Workflow Definitions</a></li>
-        <li><a href="./instances.html">Workflow Instances</a></li>
+        <li><a href="./definitions.html">Workflow Definitions</a></li>
+        <li class="active"><a href="./instances.html">Workflow Instances</a></li>
         <li><a href="./logs.html">Logs</a></li>
         <li><a href="./search.html">Search</a></li>
       </ul></nav>
+
+      <nav class="app-menu">
+        <ul>
+          <li id="brokerGlobalInfo">
+            <!--<a href=""><span id="defaultBrokerState" class="btn btn-danger">Not connected. Klick to connect default.</span></a>-->
+          </li>
+        </ul>
+      </nav>
     </div>
   </header>
 
   <div class="page-body container-fluid">
     <section class="page-section">
       <header>
-        <h1>Workflow Definitions</h1>
+        <h1>Workflow Instances</h1>
 
         <p>
-          Inspect deployed BPMN workflow definitions within connected TNGP brokers.
+          Inspect running workflow instances of connected TNGP brokers.
         </p>
       </header>
-    </section>
-    <section class="page-section">
-      <div class="row">
+
+     <div class="row">
         <div class="col-md-2">
-          <h2>List</h2>
-          <table class="table table-striped">
+          <h2>All</h2>
+          <table id="workflowInstanceTable" class="table table-striped">
             <thead>
+              <th>Id</th>
               <th>Workflow</th>
-              <th>Running</th>
             </thead>
             <tr>
-              <td class="tngp-table-selected"><a href="#">Simple (V1)</a></td>
-              <td class="tngp-table-selected">0</td>
+              <td class="tngp-table-selected"><a href="#">7</a></td>
+              <td class="tngp-table-selected">Simple (V1)</td>
             </tr>
             <tr>
-              <td><a href="#">Simple (V2)</a></td>
-              <td>0</td>
-            </tr>
-            <tr>
-              <td><a href="#">Order Management (v1)</a></td>
-              <td>138</td>
-            </tr>
-            <tr>
-              <td><a href="#">Invoice (V1)</a></td>
-              <td>20k</td>
-            </tr>
+              <td><a href="#">13</a></td>
+              <td>Simple (V2)</td>
+            </tr>            
           </table>
       </div>
       <div class="col-md-8">
         <h2>Selected</h2>
-        <div id="diagramCanvas" class="bpmn-io-viewer-height"></div>
-
-      <script>
-  $(document).ready(function() {  
-    init(); 
-  });
-            </script>        
+        <div id="diagramCanvas" class="bpmn-io-viewer-height"></div>     
       </div>
       <div class="col-md-2">
-        <h2>Information</h2>
+        <h2>Info</h2>
           <table class="table table-striped">
             <tr>
-              <td>Name</td>
-              <td>Simple</td>
+              <td>Id</td>
+              <td id="workflowInstanceId">4711</td>
             </tr>
             <tr>
-              <td>Version</td>
-              <td>2</td>
+              <td>Workflow Definition Id</td>
+              <td id="workflowDefinitionId">123</td>
+            </tr>
+            <tr>
+              <td>Workflow Definition Key</td>
+              <td id="workflowDefinitionKey">Simple</td>
+            </tr>
+            <tr>
+              <td>Payload</td>
+              <td id="payload">{"key": 2}</td>
             </tr>
             <tr>
               <td>Some additional info</td>
-              <td>xxx</td>
+              <td id="workflowInstanceInfo">xxx</td>
             </tr>
           </table>
       </div>
@@ -143,5 +144,16 @@ em.optional:after {
       </div>
     </div>
   </footer>
+
+  <script>
+  $(document).ready(function() {  
+    initWorkflowInstances();
+
+     
+    var BpmnViewer = window.BpmnJS;
+    viewer = new BpmnViewer({container: '#diagramCanvas', width: '100%', height: '100%'});
+    container = $('#js-drop-zone');    
+  });
+  </script>   
 </body>
 </html>
