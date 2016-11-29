@@ -69,6 +69,13 @@ em.optional:after {
         </p>
       </header>
 
+      <div id="errorPanel" style="display: none;">
+          <div  class="alert alert-danger" style="margin-top: 25px;" role="alert">
+                  <button type="button" class="close"  aria-label="Close" onclick="ackError()"><span aria-hidden="true">&times;</span></button>
+                  <strong>Error:</strong> <span id="errorText"></span>
+          </div>
+      </div>  
+      
       <h2>Built-in broker</h2>
       <p>Start a broker embedded within this web application with <a href="#">default configuration</a>.</p>
       <p id="btnBrokerStart">

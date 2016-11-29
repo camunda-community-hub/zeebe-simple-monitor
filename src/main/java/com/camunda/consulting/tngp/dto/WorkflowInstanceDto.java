@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.tngp.client.event.impl.dto.WorkflowDefinitionEventImpl;
+import org.camunda.tngp.protocol.log.BpmnProcessEventDecoder;
 import org.camunda.tngp.protocol.log.WorkflowInstanceRequestDecoder;
 
 public class WorkflowInstanceDto {
@@ -14,26 +15,9 @@ public class WorkflowInstanceDto {
   private String workflowDefinitionKey;
 
   private String payload;
-  private List<String> activities = new ArrayList<String>();
-//  private List<String> endedActivities = new ArrayList<String>();
-  
-  public static WorkflowInstanceDto from(WorkflowInstanceRequestDecoder decoder) {
-    WorkflowInstanceDto dto = new WorkflowInstanceDto();
+  private List<String> runningActivities = new ArrayList<String>();
+  private List<String> endedActivities = new ArrayList<String>();
     
-    dto.id = decoder.wfInstanceId();
-//    dto.workflowDefinitionId = decoder.wfDefinitionId();
-//    dto.workflowDefinitionKey = decoder.wfDefinitionKey();
-    dto.workflowDefinitionId = 1;
-    dto.workflowDefinitionKey = "simple";
-    dto.payload = decoder.payload();    
-
-    return dto;
-  }
-  
-  public void addActivity(String flowElementIdString, String payload2) {
-    activities.add(flowElementIdString);
-  }
-  
   public String getBroker() {
     return broker;
   }
@@ -54,17 +38,47 @@ public class WorkflowInstanceDto {
     return id;
   }
 
-  public List<String> getActivities() {
-    return activities;
-  }
-
-
   public long getWorkflowDefinitionId() {
     return workflowDefinitionId;
   }
 
   public String getWorkflowDefinitionKey() {
     return workflowDefinitionKey;
+  }
+
+  public void setId(long id) {
+    this.id = id;
+  }
+
+  public void setWorkflowDefinitionId(long workflowDefinitionId) {
+    this.workflowDefinitionId = workflowDefinitionId;
+  }
+
+  public void setWorkflowDefinitionKey(String workflowDefinitionKey) {
+    this.workflowDefinitionKey = workflowDefinitionKey;
+  }
+
+  public List<String> getRunningActivities() {
+    return runningActivities;
+  }
+
+  public void setRunningActivities(List<String> runningActivities) {
+    this.runningActivities = runningActivities;
+  }
+
+  public List<String> getEndedActivities() {
+    return endedActivities;
+  }
+
+  public void setEndedActivities(List<String> endedActivities) {
+    this.endedActivities = endedActivities;
+  }
+
+
+  @Override
+  public String toString() {
+    return "WorkflowInstanceDto [id=" + id + ", workflowDefinitionId=" + workflowDefinitionId + ", workflowDefinitionKey=" + workflowDefinitionKey + ", broker="
+        + broker + ", runningActivities=" + runningActivities + ", endedActivities=" + endedActivities + ", payload=" + payload + "]";
   }
 
  

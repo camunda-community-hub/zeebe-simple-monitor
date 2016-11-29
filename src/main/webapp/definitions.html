@@ -83,6 +83,13 @@ em.optional:after {
         </p>
       </header>
 
+      <div id="errorPanel" style="display: none;">
+          <div  class="alert alert-danger" style="margin-top: 25px;" role="alert">
+                  <button type="button" class="close"  aria-label="Close" onclick="ackError()"><span aria-hidden="true">&times;</span></button>
+                  <strong>Error:</strong> <span id="errorText"></span>
+          </div>
+      </div>  
+
      <div class="row">
         <div class="col-md-2">
           <h2>All</h2>
@@ -108,6 +115,15 @@ em.optional:after {
               <td>20k</td>
             </tr>
           </table>
+          <div>
+             <h2>Deploy</h2>
+             <p>
+                        <input id="documentToUpload" name="Dokument hochladen" type="file" multiple="multiple" accept=".bpmn20.xml, .bpmn, .cmmn11.xml, .cmmn10.xml, .cmmn, .dmn11.xml, .dmn, .xml" />
+                      </p></div>
+                      <div><p>
+                         <a href="#" onclick="uploadModels()" class="btn btn-primary">Upload</a> <!-- <span class="glyphicon glyphicon-cloud-upload" style="font-size: 5em;"> -->
+             </p>
+          </div>          
       </div>
       <div class="col-md-8">
         <h2>Selected</h2>

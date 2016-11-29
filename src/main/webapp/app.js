@@ -33,6 +33,7 @@ function startEmbeddedBroker() {
 		             },
 		             error: function (xhr, ajaxOptions, thrownError) {
 		             	console.log(thrownError);
+		             	showError(xhr.responseJSON.message);
 		             },
 		             crossDomain: true,
 		    });				
@@ -50,6 +51,7 @@ function stopEmbeddedBroker() {
 		             },
 		             error: function (xhr, ajaxOptions, thrownError) {
 		             	console.log(thrownError);
+		             	showError(xhr.responseJSON.message);
 		             },
 		             crossDomain: true,
 		    });				
@@ -69,6 +71,7 @@ function brokerConnect(connectionString) {
 		             },
 		             error: function (xhr, ajaxOptions, thrownError) {
 		             	console.log(thrownError);
+		             	showError(xhr.responseJSON.message);
 		             },
 		             crossDomain: true,
 		    });				
@@ -87,6 +90,7 @@ function brokerDisconnect(connectionString) {
 		             },
 		             error: function (xhr, ajaxOptions, thrownError) {
 		             	console.log(thrownError);
+		             	showError(xhr.responseJSON.message);
 		             },
 		             crossDomain: true,
 		    });		
@@ -162,6 +166,7 @@ function renderSelectedWorkflowDefinition() {
 						viewer.importXML(selectedWorkflowDefinition.resource, function(err) {
 							if (err) {
 								console.log('error rendering', err);
+				             	showError(err);
 							} else {
 								var canvas = viewer.get('canvas');
 								var overlays = viewer.get('overlays');
@@ -212,7 +217,7 @@ function selectWorkflowInstance(index) {
 function renderSelectedWorkflowInstance() {
 	if (selectedWorkflowInstance) {
 		console.log(selectedWorkflowInstance);
-		$('#workflowInstanceId').html(selectedWorkflowInstance.workflowInstanceId);
+		$('#workflowInstanceId').html(selectedWorkflowInstance.id);
 		$('#workflowDefinitionId').html(selectedWorkflowInstance.workflowDefinitionId);
 		$('#workflowDefinitionKey').html(selectedWorkflowInstance.workflowDefinitionKey);
 		$('#payload').text(selectedWorkflowInstance.payload);
@@ -221,6 +226,7 @@ function renderSelectedWorkflowInstance() {
 			viewer.importXML(result.resource, function(err) {
 							if (err) {
 								console.log('error rendering', err);
+				             	showError(err);
 							} else {
 								var canvas = viewer.get('canvas');
 								var overlays = viewer.get('overlays');
@@ -230,19 +236,110 @@ function renderSelectedWorkflowInstance() {
 
 								// zoom to fit full viewport
 								canvas.zoom('fit-viewport');
+
+								addBpmnOverlays(canvas, overlays, selectedWorkflowInstance);
 							}
 			});
 		});
     }
 }
+
+function showError(errorText) {
+	$("#errorText").html(errorText);
+	$("#errorPanel").show();
+}
+function ackError() {
+	$("#errorPanel").hide();
+}
+
+
+
+
+function uploadModels() {
+  	
+	var fileUpload = $('#documentToUpload').get(0);
+
+	var filesToUpload = {
+		broker: brokers[0].connectionString, 
+		files: []
+	} 
+
+	var processUploadedFile = function(fileUpload, index) {
+		return function(e) {
+		            var binary = '';
+		            var bytes = new Uint8Array( e.target.result );
+		            var len = bytes.byteLength;
+		            for (var j = 0; j < len; j++) {
+		                binary += String.fromCharCode( bytes[ j ] );
+		            }
+
+		            var currentFile = {
+		            	filename: fileUpload.files[index].name,
+		            	mimeType: fileUpload.files[index].type,
+		            	content:  btoa(binary)
+		            }
+
+		            filesToUpload.files.push(currentFile);
+
+		            // if all files are processed - do the upload
+		            if (filesToUpload.files.length == fileUpload.files.length) {
+		            	uploadFiles();
+		            }
+		};
+	}
+
+    // read all selected files
+	if(typeof FileReader === 'function' && fileUpload.files.length > 0) {
+		for (index = 0; index < fileUpload.files.length; ++index) {	  
+
+		    var reader = new FileReader();
+		    reader.onloadend = processUploadedFile(fileUpload, index);
+            reader.readAsArrayBuffer(fileUpload.files[index]);
+        }
+    }
+	    
+	var uploadFiles = function() {
+	    $.ajax({
+	             type : 'POST',
+	             url: restAccess + 'workflow-definition/',
+	             data:  JSON.stringify(filesToUpload),
+	             contentType: 'application/json; charset=utf-8',
+	             dataType: 'json',
+	             success: function (result) {
+	             	window.location.reload();
+	             },
+	             crossDomain: true,
+	    });
+	}; 
+      
+    
+}
 	
-	function addMarkerForActivities(canvas, actInstTree) {
+function addBpmnOverlays(canvas, overlays, workflowInstance) {
+	
+        for (index = 0; index < workflowInstance.endedActivities.length; ++index) {
+        	console.log(workflowInstance.endedActivities[index]);
+				overlays.add(workflowInstance.endedActivities[index], {
+				  position: {
+				    top: 0,
+				    left: 0
+				  },
+				  html: '<div class="bpmn-badge"><span class="glyphicon glyphicon-ok"></span></div>'
+				});
+		}
+        for (index = 0; index < workflowInstance.runningActivities.length; ++index) {
+        	console.log(workflowInstance.runningActivities[index]);
+        	canvas.addMarker(workflowInstance.runningActivities[index], 'highlight');
+		}
+}	
+
+	function addMarkerForActivities(canvas, workflowInstance) {
 		if (actInstTree.childTransitionInstances.length==0 && actInstTree.childActivityInstances.length==0) {
 			canvas.addMarker(actInstTree.activityId, 'highlight');	
 		}
 		else {
 			for (index=0; index < actInstTree.childTransitionInstances.length; ++index) {
-				canvas.addMarker(actInstTree.childTransitionInstances[index].activityId, 'highlight');	
+					
 			}
 			for (index=0; index < actInstTree.childActivityInstances.length; ++index) {
 			    // add recursively

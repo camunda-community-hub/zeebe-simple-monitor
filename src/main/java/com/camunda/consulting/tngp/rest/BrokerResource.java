@@ -43,6 +43,15 @@ public class BrokerResource {
     return null;
   }
 
+  public static BrokerConnectionDto getBrokerConnection(String connectionString) {
+    for (BrokerConnectionDto current : brokerConnections) {
+      if (current.getConnectionString().equals(connectionString)) {
+        return current;
+      }
+    }
+    return null;
+  }
+
   @GET
   public List<BrokerConnectionDto> getBrokerConnections() {
     return brokerConnections;

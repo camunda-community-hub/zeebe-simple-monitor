@@ -107,13 +107,13 @@ public class TngpEventPolling {
         case BpmnProcessEventDecoder.TEMPLATE_ID: {
           BpmnProcessEventDecoder decoder = new BpmnProcessEventDecoder() //
             .wrap(evt.getRawBuffer(), 0 + headerDecoder.encodedLength(), headerDecoder.blockLength(), headerDecoder.version());          
-          handle(decoder);
+          handle(tngpClient, decoder);
           break;
         }
         case BpmnActivityEventDecoder.TEMPLATE_ID: {
           BpmnActivityEventDecoder decoder = new BpmnActivityEventDecoder() //
             .wrap(evt.getRawBuffer(), 0 + headerDecoder.encodedLength(), headerDecoder.blockLength(), headerDecoder.version());          
-          handle(decoder);
+          handle(tngpClient, decoder);
           break;
         }
         case BpmnFlowElementEventDecoder.TEMPLATE_ID: {
@@ -175,17 +175,29 @@ public class TngpEventPolling {
     System.out.println(decoder);
   }
 
-  private void handle(BpmnProcessEventDecoder decoder) {
-    System.out.println(decoder);
-    System.out.println("DefId: " + decoder.wfDefinitionId());
-    System.out.println("InstanceId: " + decoder.wfInstanceId());
+  private void handle(TngpClient client, BpmnProcessEventDecoder decoder) {
+    System.out.println(decoder);   
+//    System.out.println("key: " + decoder.key()); // identifier for "local state machine" / compare to primary key
     
-    System.out.println("key: " + decoder.key()); // identifier for "local state machine" / compare to primary key
+    long key=decoder.key();
+    int event=decoder.event();
+    long wfDefinitionId=decoder.wfDefinitionId();
+    long wfInstanceId=decoder.wfInstanceId();
+    int initialElementId=decoder.initialElementId();
+    long bpmnBranchKey=decoder.bpmnBranchKey();
+    
+    WorkflowInstanceDto dto = new WorkflowInstanceDto();
+    
+    dto.setId(wfInstanceId);
+    dto.setWorkflowDefinitionId(wfDefinitionId);
+//    dto.workflowDefinitionKey = decoder.key;
+   
+    WorkflowInstanceResource.add(client, dto);
+
   }
 
   private void handle(TngpClient client, WorkflowInstanceRequestDecoder decoder) {
     System.out.println(decoder);
-    WorkflowInstanceResource.add(client, WorkflowInstanceDto.from(decoder));
   }
 
   private void handle(TaskInstanceDecoder decoder) {
@@ -195,15 +207,48 @@ public class TngpEventPolling {
   private void handle(TngpClient client, BpmnFlowElementEventDecoder decoder) {
     System.out.println(decoder);
     
-    WorkflowInstanceDto instance = WorkflowInstanceResource.findInstance(decoder.wfInstanceId());
-    instance.addActivity(decoder.flowElementIdString(), decoder.payload());
+    long key=decoder.key();
+    int event=decoder.event();
+    long wfDefinitionId=decoder.wfDefinitionId();
+    long wfInstanceId=decoder.wfInstanceId();
+    int flowElementId=decoder.flowElementId();
+    long bpmnBranchKey=decoder.bpmnBranchKey();
+    String flowElementIdString=decoder.flowElementIdString();
+    String payload=decoder.payload();
+    
+    // flow elements which are not activities might be interesting for history
+    WorkflowInstanceResource.addActivityEnded(client, 
+        wfInstanceId,
+        flowElementIdString,
+        payload);          
   }
 
-  private void handle(BpmnActivityEventDecoder decoder) {
+  private void handle(TngpClient client, BpmnActivityEventDecoder decoder) {
     System.out.println(decoder);
-    System.out.println("Instance: " + decoder.wfInstanceId());
-    System.out.println("Definition: " + decoder.wfDefinitionId());
-    System.out.println("Flow Element: " +  decoder.flowElementIdString());
+    
+    long key = decoder.key();
+    int event=decoder.event();
+    long wfDefinitionId=decoder.wfDefinitionId();
+    long wfInstanceId=decoder.wfInstanceId();
+    int flowElementId=decoder.flowElementId();
+    int taskQueueId=decoder.taskQueueId();
+    long bpmnBranchKey=decoder.bpmnBranchKey();
+    String taskType=decoder.taskType();
+    String flowElementIdString=decoder.flowElementIdString();
+    String payload=decoder.payload();
+
+    if (event==200) { // created, see https://github.com/camunda-tngp/compact-graph-bpmn/blob/master/src/main/resources/schema.xml
+      WorkflowInstanceResource.addActivityStarted(client, 
+          wfInstanceId, 
+          flowElementIdString, 
+          payload);
+      
+    } else if (event==201) { // completed
+      WorkflowInstanceResource.addActivityEnded(client, 
+          wfInstanceId,
+          flowElementIdString,
+          payload);      
+    }
   }
 
   private void handle(TaskInstanceEventImpl evt) {

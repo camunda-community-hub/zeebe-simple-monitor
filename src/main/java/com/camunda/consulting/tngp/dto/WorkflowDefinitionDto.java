@@ -43,7 +43,7 @@ public class WorkflowDefinitionDto {
 
   @Override
   public String toString() {
-    return "WorkflowDefinitionDto [resource=" + resource + ", key=" + key + ", id=" + id + "]";
+    return "WorkflowDefinitionDto [key=" + key + ", id=" + id + "]";
   }
 
   public String getBroker() {

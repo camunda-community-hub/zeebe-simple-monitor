@@ -37,11 +37,49 @@ public class WorkflowInstanceResource {
   }
 
   public static void add(TngpClient client, WorkflowInstanceDto instance) {
+    WorkflowInstanceDto existingInstance = findInstance(instance.getId());
+    if (existingInstance!=null) {
+      // TODO: Check
+      // Activities might have been added earlier on - as e.g. a start event must be finished before a worklfow instance get started
+      instance.getRunningActivities().addAll(existingInstance.getRunningActivities());
+      instance.getEndedActivities().addAll(existingInstance.getEndedActivities());
+      instances.remove(existingInstance);
+    }
+    fillInBroker(client, instance);
+    instances.add(instance);    
+  }
+  
+  private static WorkflowInstanceDto getOrCreateWorkflowInstanceDto(TngpClient client, long wfInstanceId) {
+    WorkflowInstanceDto instance = findInstance(wfInstanceId);
+    if (instance==null) {
+      instance = new WorkflowInstanceDto();
+      instance.setId(wfInstanceId);
+      fillInBroker(client, instance);
+      instances.add(instance);
+    }
+    return instance;
+  }
+  
+  public static void addActivityStarted(TngpClient client, long wfInstanceId, String flowElementIdString, String payload) {
+    WorkflowInstanceDto instance = getOrCreateWorkflowInstanceDto(client, wfInstanceId);
+    
+    instance.getRunningActivities().add(flowElementIdString);
+    instance.setPayload(payload);  
+  }
+  public static void addActivityEnded(TngpClient client, long wfInstanceId, String flowElementIdString, String payload) {
+    WorkflowInstanceDto instance = getOrCreateWorkflowInstanceDto(client, wfInstanceId);
+    
+    instance.getRunningActivities().remove(flowElementIdString); // TODO: This does not work with MI like constructs
+    instance.getEndedActivities().add(flowElementIdString);
+    instance.setPayload(payload);  
+  }
+
+  
+  private static void fillInBroker(TngpClient client, WorkflowInstanceDto instance) {
     BrokerConnectionDto brokerConnection = BrokerResource.getBrokerConnection(client);
     if (brokerConnection!=null) {
       instance.setBroker(brokerConnection.getConnectionString());
     }
-    instances.add(instance);    
   }
   
   public static WorkflowInstanceDto findInstance(long id) {
@@ -52,4 +90,8 @@ public class WorkflowInstanceResource {
     } 
     return null;
   }
+
+
+
+  
 }

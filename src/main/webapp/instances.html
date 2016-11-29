@@ -44,6 +44,39 @@ em.optional:after {
   content: ']';
 }
   </style>
+
+<style type="text/css">
+  .djs-container .highlight .djs-outline {
+     stroke-width: 2px important;
+     stroke: #08c !important;
+     fill: rgba(82,180,21,0.35) !important;
+  }
+  .djs-container .highlight .djs-visual>:nth-child(1) {
+     fill: rgba(82,180,21,0.35) !important;
+  }
+  .bpmn-badge {
+      display: inline-block;
+      min-width: 10px;
+      padding: 3px 7px;
+      font-size: 12px;
+      font-weight: bold;
+      color: #fff;
+      line-height: 1;
+      vertical-align: baseline;
+      white-space: nowrap;
+      text-align: center;
+      background-color: #777;
+      border-radius: 10px;
+    
+    font-size: 12px;
+      border-width: 1px;
+      border-style: solid;
+      background-color: #52b415; // bpmn.io #610000 // camunda
+      border-color: #143d52;
+      color: #143d52;
+    } 
+  </style>
+
 </head>
 <body>
   <header class="cam-brand-header">
@@ -82,6 +115,13 @@ em.optional:after {
           Inspect running workflow instances of connected TNGP brokers.
         </p>
       </header>
+
+      <div id="errorPanel" style="display: none;">
+          <div  class="alert alert-danger" style="margin-top: 25px;" role="alert">
+                  <button type="button" class="close"  aria-label="Close" onclick="ackError()"><span aria-hidden="true">&times;</span></button>
+                  <strong>Error:</strong> <span id="errorText"></span>
+          </div>
+      </div>  
 
      <div class="row">
         <div class="col-md-2">
@@ -149,7 +189,7 @@ em.optional:after {
   $(document).ready(function() {  
     initWorkflowInstances();
 
-     
+
     var BpmnViewer = window.BpmnJS;
     viewer = new BpmnViewer({container: '#diagramCanvas', width: '100%', height: '100%'});
     container = $('#js-drop-zone');    
