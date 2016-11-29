@@ -125,7 +125,10 @@ em.optional:after {
 
      <div class="row">
         <div class="col-md-2">
-          <h2>All</h2>
+          <h2>
+            List 
+            <a onclick="refresh()" class="btn btn-default"><span class="glyphicon glyphicon-refresh" ></span></a>            
+          </h2>
           <table id="workflowInstanceTable" class="table table-striped">
             <thead>
               <th>Id</th>
@@ -142,7 +145,10 @@ em.optional:after {
           </table>
       </div>
       <div class="col-md-8">
-        <h2>Selected</h2>
+          <h2>
+            Selected 
+            <a onclick="refresh()" class="btn btn-default"><span class="glyphicon glyphicon-refresh" ></span></a>            
+          </h2>
         <div id="diagramCanvas" class="bpmn-io-viewer-height"></div>     
       </div>
       <div class="col-md-2">
@@ -151,6 +157,10 @@ em.optional:after {
             <tr>
               <td>Id</td>
               <td id="workflowInstanceId">4711</td>
+            </tr>
+            <tr>
+              <td>Running?</td>
+              <td id="workflowRunning"></td>
             </tr>
             <tr>
               <td>Workflow Definition Id</td>
@@ -187,7 +197,7 @@ em.optional:after {
 
   <script>
   $(document).ready(function() {  
-    initWorkflowInstances();
+    init('instance');
 
 
     var BpmnViewer = window.BpmnJS;

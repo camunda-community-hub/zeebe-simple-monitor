@@ -186,14 +186,17 @@ public class TngpEventPolling {
     int initialElementId=decoder.initialElementId();
     long bpmnBranchKey=decoder.bpmnBranchKey();
     
-    WorkflowInstanceDto dto = new WorkflowInstanceDto();
-    
-    dto.setId(wfInstanceId);
-    dto.setWorkflowDefinitionId(wfDefinitionId);
-//    dto.workflowDefinitionKey = decoder.key;
-   
-    WorkflowInstanceResource.add(client, dto);
-
+    if (event==0) { // created, see https://github.com/camunda-tngp/compact-graph-bpmn/blob/master/src/main/resources/schema.xml#L58
+      WorkflowInstanceDto dto = new WorkflowInstanceDto();
+      
+      dto.setId(wfInstanceId);
+      dto.setWorkflowDefinitionId(wfDefinitionId);
+//      dto.workflowDefinitionKey = decoder.key;
+     
+      WorkflowInstanceResource.add(client, dto);
+    }else if (event==1) { // completed
+      WorkflowInstanceResource.setEnded(client, wfInstanceId);      
+    }
   }
 
   private void handle(TngpClient client, WorkflowInstanceRequestDecoder decoder) {

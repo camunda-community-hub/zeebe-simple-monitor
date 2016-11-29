@@ -8,6 +8,9 @@ public class WorkflowDefinitionDto {
   private String resource;
   private String key;
   private long id;
+  
+  private long countRunning;
+  private long countEnded;
 
   public static WorkflowDefinitionDto from(WorkflowDefinitionEventImpl workflowDefinitionEvent) {
     WorkflowDefinitionDto dto = new WorkflowDefinitionDto();
@@ -41,10 +44,6 @@ public class WorkflowDefinitionDto {
     this.id = id;
   }
 
-  @Override
-  public String toString() {
-    return "WorkflowDefinitionDto [key=" + key + ", id=" + id + "]";
-  }
 
   public String getBroker() {
     return broker;
@@ -52,6 +51,27 @@ public class WorkflowDefinitionDto {
 
   public void setBroker(String broker) {
     this.broker = broker;
+  }
+
+  public long getCountRunning() {
+    return countRunning;
+  }
+
+  public void setCountRunning(long countRunning) {
+    this.countRunning = countRunning;
+  }
+
+  public long getCountEnded() {
+    return countEnded;
+  }
+
+  public void setCountEnded(long countEnded) {
+    this.countEnded = countEnded;
+  }
+
+  @Override
+  public String toString() {
+    return "WorkflowDefinitionDto [key=" + key + ", broker=" + broker + ", id=" + id + ", countRunning=" + countRunning + ", countEnded=" + countEnded + "]";
   }
 
 }

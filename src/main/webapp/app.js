@@ -10,7 +10,7 @@ var selectedWorkflowDefinition;
 
 var workflowInstances;
 var selectedWorkflowInstance;
-
+var currentPage;
 
 /*
 {
@@ -67,7 +67,8 @@ function brokerConnect(connectionString) {
 		             success: function (result) {
 		             	var broker = brokers.filter(function( broker ) { return broker.connectionString == connectionString; })[0];
 		             	broker.connected = true;
-					    renderBrokerTable();		
+					    renderBrokerTable();
+					    refresh();		
 		             },
 		             error: function (xhr, ajaxOptions, thrownError) {
 		             	console.log(thrownError);
@@ -86,7 +87,8 @@ function brokerDisconnect(connectionString) {
 		             success: function (result) {
 		             	var broker = brokers.filter(function( broker ) { return broker.connectionString == connectionString; })[0];
 		             	broker.connected = false;
-					    renderBrokerTable();		
+					    renderBrokerTable();
+					    refresh();
 		             },
 		             error: function (xhr, ajaxOptions, thrownError) {
 		             	console.log(thrownError);
@@ -112,10 +114,23 @@ function renderBrokerTable() {
 	} else {
 		$('#brokerGlobalInfo').html('<a onclick="brokerConnect(\'127.0.0.1:51015\')"><span class="label label-danger">Not connected. Klick to connect default.</span></a>')	;	
 	}
-}	
+}
 
-function initBroker() {
-	loadBrokers();
+function init(page) {	
+	currentPage = page;
+	refresh();
+}
+
+function refresh() {
+	if (currentPage=='broker') {
+		loadBrokers();
+	} else if (currentPage=='definition') {
+		loadBrokers();
+		loadWorkflowDefinitions();		
+	} else if (currentPage=="instance") {
+		loadBrokers();
+		loadWorkflowInstances();		
+	}
 }
 
 function loadBrokers() {
@@ -125,21 +140,13 @@ function loadBrokers() {
 	});
 }
 
-
-function initDefinitions() {	
-	loadBrokers();
-	loadWorkflowDefinitions();
-}
-
 function loadWorkflowDefinitions() {
 	$.get(restAccess + 'workflow-definition/', function(result) {
 	    workflowDefinitions = result;
-	    renderWorkflowDefinitionTable();
-	    if (workflowDefinitions && workflowDefinitions.length>0) {
+	    if (!selectedWorkflowDefinition && workflowDefinitions && workflowDefinitions.length>0) {
 	    	selectedWorkflowDefinition = workflowDefinitions[0];
-	    } else {
-	    	selectedWorkflowDefinition = null;
 	    }
+	    renderWorkflowDefinitionTable();
 	    renderSelectedWorkflowDefinition();
 	});			
 }
@@ -148,7 +155,11 @@ function renderWorkflowDefinitionTable() {
 	$("#workflowDefinitionTable > tbody").html("");
 	for (index = workflowDefinitions.length-1; index >= 0; --index) {
 		var def = workflowDefinitions[index];
-		$('#workflowDefinitionTable tbody').append("<tr><td><a onclick='selectWorkflowDefinition("+index+")'>"+def.key + "(" + def.id + ")" +"</a></td></tr>");
+		var selectedClass = '';
+		if (selectedWorkflowDefinition && def.id==selectedWorkflowDefinition.id) {
+			selectedClass ='class="tngp-table-selected"';
+		}
+		$('#workflowDefinitionTable tbody').append("<tr><td "+selectedClass+"><a onclick='selectWorkflowDefinition("+index+")'>"+def.key + "(" + def.id + ")" +"</a></td><td "+selectedClass+">"+def.countRunning+"</td></tr>");
 	}
 }	
 
@@ -163,6 +174,10 @@ function renderSelectedWorkflowDefinition() {
 		$('#workflowDefinitionName').html(selectedWorkflowDefinition.key);
 		$('#workflowDefinitionVersion').text('');
 		$('#workflowDefinitionInfo').text('');
+
+		$('#countRunning').text(selectedWorkflowDefinition.countRunning);
+		$('#countEnded').text(selectedWorkflowDefinition.countEnded);
+
 						viewer.importXML(selectedWorkflowDefinition.resource, function(err) {
 							if (err) {
 								console.log('error rendering', err);
@@ -181,21 +196,33 @@ function renderSelectedWorkflowDefinition() {
     }
 }
 
-function initWorkflowInstances() {	
-	loadBrokers();
-	loadWorkflowInstances();
+function startWorkflowInstance() {
+	console.log(selectedWorkflowDefinition);
+	if (selectedWorkflowDefinition) {
+		$.ajax({
+	             type : 'PUT',
+	             url: restAccess + 'workflow-definition/' + selectedWorkflowDefinition.broker + "/" + selectedWorkflowDefinition.id,
+	             data:  JSON.stringify( $('#payload').val() ),
+	             contentType: 'application/json; charset=utf-8',
+	             success: function (result) {
+	             	console.log("STARTED");
+	             	setTimeout(function() {
+    					refresh();
+					}, 1000);
+	             },
+	             crossDomain: true,
+	    });
+	}
 }
 
 function loadWorkflowInstances() {
 	$.get(restAccess + 'workflow-instance/', function(result) {
 	    workflowInstances = result;
-	    renderWorkflowInstanceTable();
-
-	    if (workflowInstances && workflowInstances.length>0) {
+	    if (!selectedWorkflowInstance && workflowInstances && workflowInstances.length>0) {
 	    	selectedWorkflowInstance = workflowInstances[0];
-	    } else {
-	    	selectedWorkflowInstance = null;
 	    }
+
+	    renderWorkflowInstanceTable();
 	    renderSelectedWorkflowInstance();
 	});			
 }
@@ -204,20 +231,26 @@ function renderWorkflowInstanceTable() {
 	$("#workflowInstanceTable > tbody").html("");
 	for (index = workflowInstances.length-1; index >= 0; --index) {
 		var def = workflowInstances[index];
+		var selectedClass = '';
+		if (selectedWorkflowInstance && def.id==selectedWorkflowInstance.id) {
+			selectedClass ='class="tngp-table-selected"';
+		}
 		$('#workflowInstanceTable tbody').append(
-			"<tr><td><a onclick='selectWorkflowInstance("+index+")'>"+def.id +"</a></td><td>"+def.workflowDefinitionKey+"</td></tr>");
+			"<tr><td "+selectedClass+"><a onclick='selectWorkflowInstance("+index+")'>"+def.id +"</a></td><td "+selectedClass+">"+def.workflowDefinitionKey+"</td></tr>");
 	}
 }	
 
 function selectWorkflowInstance(index) {
 	selectedWorkflowInstance = workflowInstances[index];
+	renderWorkflowInstanceTable(); // set selected could be done with less overhead - but this is quick for now
 	renderSelectedWorkflowInstance();
 }
 
 function renderSelectedWorkflowInstance() {
 	if (selectedWorkflowInstance) {
-		console.log(selectedWorkflowInstance);
 		$('#workflowInstanceId').html(selectedWorkflowInstance.id);
+		$('#workflowRunning').html(!selectedWorkflowInstance.ended);
+
 		$('#workflowDefinitionId').html(selectedWorkflowInstance.workflowDefinitionId);
 		$('#workflowDefinitionKey').html(selectedWorkflowInstance.workflowDefinitionKey);
 		$('#payload').text(selectedWorkflowInstance.payload);
@@ -304,9 +337,10 @@ function uploadModels() {
 	             url: restAccess + 'workflow-definition/',
 	             data:  JSON.stringify(filesToUpload),
 	             contentType: 'application/json; charset=utf-8',
-	             dataType: 'json',
 	             success: function (result) {
-	             	window.location.reload();
+	             	setTimeout(function() {
+    					refresh();
+					}, 1000);
 	             },
 	             crossDomain: true,
 	    });
@@ -318,7 +352,6 @@ function uploadModels() {
 function addBpmnOverlays(canvas, overlays, workflowInstance) {
 	
         for (index = 0; index < workflowInstance.endedActivities.length; ++index) {
-        	console.log(workflowInstance.endedActivities[index]);
 				overlays.add(workflowInstance.endedActivities[index], {
 				  position: {
 				    top: 0,
@@ -328,48 +361,6 @@ function addBpmnOverlays(canvas, overlays, workflowInstance) {
 				});
 		}
         for (index = 0; index < workflowInstance.runningActivities.length; ++index) {
-        	console.log(workflowInstance.runningActivities[index]);
         	canvas.addMarker(workflowInstance.runningActivities[index], 'highlight');
 		}
 }	
-
-	function addMarkerForActivities(canvas, workflowInstance) {
-		if (actInstTree.childTransitionInstances.length==0 && actInstTree.childActivityInstances.length==0) {
-			canvas.addMarker(actInstTree.activityId, 'highlight');	
-		}
-		else {
-			for (index=0; index < actInstTree.childTransitionInstances.length; ++index) {
-					
-			}
-			for (index=0; index < actInstTree.childActivityInstances.length; ++index) {
-			    // add recursively
-				addMarkerForActivities(canvas, actInstTree.childActivityInstances[index]);	
-			}
-		}
-	}
-	
-	function addHistoryInfoOverlay(overlays, actInstList) {
-	
-       for (index = 0; index < actInstList.length; ++index) {
-			var calledPiLink = '';
-			var finished = '';
-			if (actInstList[index].endTime) {
-				finished = '<i class="icon-ok icon-white"></i>';
-			}
-			if (actInstList[index].calledCaseInstanceId) {
-				calledPiLink = '<a href="cmmn.html?caseInstanceId=' + actInstList[index].calledCaseInstanceId + '"><i class="icon-circle-arrow-right icon-white"></i></a>';
-			}		
-			if (actInstList[index].calledProcessInstanceId) {
-				calledPiLink = '<a href="bpmn.html?processInstanceId=' + actInstList[index].calledProcessInstanceId + '"><i class="icon-circle-arrow-right icon-white"></i></a>';
-			}
-			if (finished || calledPiLink) {
-				overlays.add(actInstList[index].activityId, {
-				  position: {
-				    top: 0,
-				    right: 0
-				  },
-				  html: '<div class="bpmn-badge">'+ finished + calledPiLink+'</div>'
-				});
-			}					        
-       }
-	}

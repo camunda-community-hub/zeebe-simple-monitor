@@ -92,7 +92,21 @@ em.optional:after {
 
      <div class="row">
         <div class="col-md-2">
-          <h2>All</h2>
+          <h2>Deploy</h2>
+          <div>
+             <p>
+                        <input id="documentToUpload" name="Dokument hochladen" type="file" multiple="multiple" accept=".bpmn20.xml, .bpmn, .xml" 
+                        style="font-size: x-small;"/>
+                      </p></div>
+                      <div><p>
+                         <a href="#" onclick="uploadModels()" class="btn btn-primary">Deploy new definition</a> <!-- <span class="glyphicon glyphicon-cloud-upload" style="font-size: 5em;"> -->
+             </p>
+          </div>       
+
+          <h2>
+            List
+            <a onclick="refresh()" class="btn btn-default"><span class="glyphicon glyphicon-refresh" ></span></a>            
+          </h2>
           <table id="workflowDefinitionTable" class="table table-striped">
             <thead>
               <th>Workflow</th>
@@ -115,21 +129,23 @@ em.optional:after {
               <td>20k</td>
             </tr>
           </table>
-          <div>
-             <h2>Deploy</h2>
-             <p>
-                        <input id="documentToUpload" name="Dokument hochladen" type="file" multiple="multiple" accept=".bpmn20.xml, .bpmn, .cmmn11.xml, .cmmn10.xml, .cmmn, .dmn11.xml, .dmn, .xml" />
-                      </p></div>
-                      <div><p>
-                         <a href="#" onclick="uploadModels()" class="btn btn-primary">Upload</a> <!-- <span class="glyphicon glyphicon-cloud-upload" style="font-size: 5em;"> -->
-             </p>
-          </div>          
+             
       </div>
       <div class="col-md-8">
-        <h2>Selected</h2>
+          <h2>
+            Selected 
+            <a onclick="refresh()" class="btn btn-default"><span class="glyphicon glyphicon-refresh" ></span></a>            
+          </h2>
         <div id="diagramCanvas" class="bpmn-io-viewer-height"></div>     
       </div>
       <div class="col-md-2">
+        <h2>Start</h2>
+            <div><p>Payload (JSON): 
+                <textarea  id="payload" style="font-size: smaller;"></textarea>
+            </p></div>
+            <div><p>
+                <a href="#" onclick="startWorkflowInstance()" class="btn btn-primary">Start new instance</a>
+            </p></div> 
         <h2>Info</h2>
           <table class="table table-striped">
             <tr>
@@ -142,7 +158,15 @@ em.optional:after {
             </tr>
             <tr>
               <td>Version</td>
-              <td id="workflowDefinitionId">2</td>
+              <td id="workflowDefinitionVersion">2</td>
+            </tr>
+            <tr>
+              <td><b># running</b> instances</td>
+              <td id="countRunning">0</td>
+            </tr>
+            <tr>
+              <td><b># ended</b> instances</td>
+              <td id="countEnded">0</td>
             </tr>
             <tr>
               <td>Some additional info</td>
@@ -167,7 +191,8 @@ em.optional:after {
 
   <script>
   $(document).ready(function() {  
-    initDefinitions(); 
+    init('definition');
+
     var BpmnViewer = window.BpmnJS;
     viewer = new BpmnViewer({container: '#diagramCanvas', width: '100%', height: '100%'});
     container = $('#js-drop-zone');    

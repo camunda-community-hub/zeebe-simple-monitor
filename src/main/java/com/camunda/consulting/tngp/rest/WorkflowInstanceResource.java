@@ -1,7 +1,9 @@
 package com.camunda.consulting.tngp.rest;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -46,9 +48,40 @@ public class WorkflowInstanceResource {
       instances.remove(existingInstance);
     }
     fillInBroker(client, instance);
-    instances.add(instance);    
+    instances.add(instance);
+    
+    adjustCounters();
+  }
+
+  public static void setEnded(TngpClient client, long workflowInstanceId) {
+    WorkflowInstanceDto workflowInstance = findInstance(workflowInstanceId);
+    workflowInstance.setEnded(true);
+    adjustCounters();
   }
   
+  private static void adjustCounters() {
+    HashMap<Long, Long[]> countForWfDefinitionId = new HashMap<Long, Long[]>();
+    for (WorkflowInstanceDto workflowInstanceDto : instances) {
+      long id = workflowInstanceDto.getWorkflowDefinitionId();
+      boolean ended = workflowInstanceDto.isEnded();
+      
+      if (!countForWfDefinitionId.containsKey(id)) {
+        countForWfDefinitionId.put(id, new Long[]{0l, 0l});
+      }
+      
+      Long[] counts = countForWfDefinitionId.get(id);
+      if (ended) {
+        counts[1]++;
+      } else {
+        counts[0]++;
+      }
+      countForWfDefinitionId.put(id, counts);      
+    }
+    for (Entry<Long, Long[]> count : countForWfDefinitionId.entrySet()) {
+      WorkflowDefinitionResource.setCount(count.getKey(), count.getValue()[0], count.getValue()[1]);
+    }
+  }
+
   private static WorkflowInstanceDto getOrCreateWorkflowInstanceDto(TngpClient client, long wfInstanceId) {
     WorkflowInstanceDto instance = findInstance(wfInstanceId);
     if (instance==null) {

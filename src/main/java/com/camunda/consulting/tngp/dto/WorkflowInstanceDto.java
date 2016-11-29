@@ -13,6 +13,7 @@ public class WorkflowInstanceDto {
   private long id;
   private long workflowDefinitionId;
   private String workflowDefinitionKey;
+  private boolean ended=false;
 
   private String payload;
   private List<String> runningActivities = new ArrayList<String>();
@@ -79,6 +80,14 @@ public class WorkflowInstanceDto {
   public String toString() {
     return "WorkflowInstanceDto [id=" + id + ", workflowDefinitionId=" + workflowDefinitionId + ", workflowDefinitionKey=" + workflowDefinitionKey + ", broker="
         + broker + ", runningActivities=" + runningActivities + ", endedActivities=" + endedActivities + ", payload=" + payload + "]";
+  }
+
+  public boolean isEnded() {
+    return ended;
+  }
+
+  public void setEnded(boolean ended) {
+    this.ended = ended;
   }
 
  

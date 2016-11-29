@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -42,6 +43,17 @@ public class WorkflowDefinitionResource {
     return findInstance(id);
   }
 
+  @PUT
+  @Path("{broker}/{id}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public void startWorkflowInstance(@PathParam("id") long id, @PathParam("broker") String brokerConnection, String payload) {
+    TngpClient client = BrokerResource.getBrokerConnection(brokerConnection).getClient();
+    client.workflows().start()
+      .workflowDefinitionId(id)
+      .payload(payload)
+      .execute();
+  }
+  
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   public void uploadModel(DeploymentDto deployment) throws UnsupportedEncodingException {
@@ -76,6 +88,12 @@ public class WorkflowDefinitionResource {
     definitions.add(definition);
   }
 
+  public static void setCount(long workflowDefinitionId, long countRunning, long countEnded) {
+    WorkflowDefinitionDto workflowDefinitionDto = findInstance(workflowDefinitionId);
+    workflowDefinitionDto.setCountRunning(countRunning);
+    workflowDefinitionDto.setCountEnded(countEnded);
+  }
+ 
   public static WorkflowDefinitionDto findInstance(long id) {
     for (WorkflowDefinitionDto dto : definitions) {
       if (dto.getId() == id) {
@@ -84,4 +102,6 @@ public class WorkflowDefinitionResource {
     }
     return null;
   }
+
+ 
 }
