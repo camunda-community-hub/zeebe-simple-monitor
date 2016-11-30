@@ -193,7 +193,7 @@ public class TngpEventPolling {
       dto.setWorkflowDefinitionId(wfDefinitionId);
 //      dto.workflowDefinitionKey = decoder.key;
      
-      WorkflowInstanceResource.add(client, dto);
+      WorkflowInstanceResource.newWorkflowInstanceStarted(client, dto);
     }else if (event==1) { // completed
       WorkflowInstanceResource.setEnded(client, wfInstanceId);      
     }

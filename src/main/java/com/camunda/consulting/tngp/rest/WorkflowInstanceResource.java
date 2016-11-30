@@ -38,7 +38,7 @@ public class WorkflowInstanceResource {
     }
   }
 
-  public static void add(TngpClient client, WorkflowInstanceDto instance) {
+  public static void newWorkflowInstanceStarted(TngpClient client, WorkflowInstanceDto instance) {
     WorkflowInstanceDto existingInstance = findInstance(instance.getId());
     if (existingInstance!=null) {
       // TODO: Check
@@ -48,10 +48,12 @@ public class WorkflowInstanceResource {
       instances.remove(existingInstance);
     }
     fillInBroker(client, instance);
+    fillInWorkflowDefinition(client, instance);
     instances.add(instance);
     
     adjustCounters();
   }
+
 
   public static void setEnded(TngpClient client, long workflowInstanceId) {
     WorkflowInstanceDto workflowInstance = findInstance(workflowInstanceId);
@@ -114,6 +116,14 @@ public class WorkflowInstanceResource {
       instance.setBroker(brokerConnection.getConnectionString());
     }
   }
+  
+  private static void fillInWorkflowDefinition(TngpClient client, WorkflowInstanceDto instance) {
+    WorkflowDefinitionDto workflowDefinitionDto = WorkflowDefinitionResource.findInstance(instance.getWorkflowDefinitionId());
+    if (workflowDefinitionDto!=null) {
+      instance.setWorkflowDefinitionKey(workflowDefinitionDto.getKey());
+    }
+    
+  }  
   
   public static WorkflowInstanceDto findInstance(long id) {
     for (WorkflowInstanceDto dto : instances) {
