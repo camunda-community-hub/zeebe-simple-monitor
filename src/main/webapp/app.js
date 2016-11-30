@@ -4,6 +4,7 @@ var container = null;
 //let restAccess = "api/";
 let restAccess = "http://localhost:8080/camunda-tngp-monitor/api/";
 let brokers = [];
+let brokerLogs = {};
 
 var workflowDefinitions;
 var selectedWorkflowDefinition;
@@ -130,6 +131,9 @@ function refresh() {
 	} else if (currentPage=="instance") {
 		loadBrokers();
 		loadWorkflowInstances();		
+	} else if (currentPage=="logs") {
+		loadBrokers();
+		loadBrokerLogs();		
 	}
 }
 
@@ -139,6 +143,14 @@ function loadBrokers() {
 		renderBrokerTable();
 	});
 }
+
+function loadBrokerLogs() {
+	$.get(restAccess + 'broker/log', function(logs) {
+		brokerLogs = logs;
+		renderBrokerLogsTable();
+	});
+}
+
 
 function loadWorkflowDefinitions() {
 	$.get(restAccess + 'workflow-definition/', function(result) {
@@ -276,6 +288,23 @@ function renderSelectedWorkflowInstance() {
 		});
     }
 }
+
+
+
+function renderBrokerLogsTable() {
+	$("#brokerLogsTable > tbody").html("");
+	for (var broker in brokerLogs) {
+	    var logs = brokerLogs[broker];
+		for (index = logs.length-1; index >= 0; --index) {
+			var log = logs[index];
+			$('#brokerLogsTable tbody').append("<tr><td>"+broker+"</td><td>"+log+"</td></tr>");
+		}
+	}
+}
+
+
+
+
 
 function showError(errorText) {
 	$("#errorText").html(errorText);

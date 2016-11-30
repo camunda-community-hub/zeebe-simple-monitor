@@ -17,6 +17,9 @@ public class TngMonitorSysout {
 
     eventPolling.pollAllTopics(client);
     
+    eventPolling.getEvents(client).forEach(System.out::println);
+    
+    
     System.out.println("################### Definitions:");
     System.out.println(WorkflowDefinitionResource.definitions);
     System.out.println("################### Instances:");

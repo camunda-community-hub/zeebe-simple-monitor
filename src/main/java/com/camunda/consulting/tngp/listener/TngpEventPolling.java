@@ -1,6 +1,8 @@
 package com.camunda.consulting.tngp.listener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.camunda.tngp.client.TngpClient;
@@ -20,6 +22,7 @@ import org.camunda.tngp.protocol.log.TaskInstanceDecoder;
 import org.camunda.tngp.protocol.log.TaskInstanceRequestDecoder;
 import org.camunda.tngp.protocol.log.WorkflowInstanceRequestDecoder;
 
+import com.camunda.consulting.tngp.dto.BrokerConnectionDto;
 import com.camunda.consulting.tngp.dto.WorkflowDefinitionDto;
 import com.camunda.consulting.tngp.dto.WorkflowInstanceDto;
 import com.camunda.consulting.tngp.rest.BrokerResource;
@@ -32,6 +35,26 @@ public class TngpEventPolling {
   
   private Map<TngpClient, Map<Integer, Long>> tngpClients = new HashMap<TngpClient, Map<Integer, Long>>();
   
+  public static Map<String, List<String>> events = new HashMap<String, List<String>>();
+  
+  private String getBrokerName(TngpClient client) {
+    BrokerConnectionDto connection = BrokerResource.getBrokerConnection(client);
+    if (connection!=null) {
+      return connection.getConnectionString();
+    } else {
+      return "default";
+    }
+  }
+  
+  public List<String> getEvents(TngpClient client) {
+    List<String> list = events.get(getBrokerName(client));
+    if (list==null) {
+      list = new ArrayList<>();
+      events.put(getBrokerName(client), list);
+    }
+    return list;
+  }
+  
   public void connectTngpClient(TngpClient client) {
     client.connect();
     HashMap<Integer, Long> positions = new HashMap<Integer, Long>();
@@ -39,6 +62,7 @@ public class TngpEventPolling {
     positions.put(1, 0l);
     positions.put(2, 0l);
     tngpClients.put(client, positions);
+    events.put(getBrokerName(client), new ArrayList<>());
   }
 
   public void disconnectTngpClient(TngpClient client) {
@@ -47,6 +71,7 @@ public class TngpEventPolling {
     client.close();
     
     WorkflowDefinitionResource.removeBrokerData(client);
+    events.remove(getBrokerName(client));
   }
 
   private boolean isRunning = false;
@@ -80,7 +105,6 @@ public class TngpEventPolling {
 
     
     for (Event evt : eventsBatch.getEvents()) {
-      System.out.println(evt.getPosition());
       // Adjust log pointer for next query
       if (evt.getPosition()>=startPosition) {
         startPosition = evt.getPosition()+1;
@@ -94,10 +118,10 @@ public class TngpEventPolling {
         handle(tngpClient, (WorkflowDefinitionEventImpl)evt);        
       }
       else if (evt instanceof TaskInstanceEventImpl) {
-        handle((TaskInstanceEventImpl)evt);        
+        handle(tngpClient, (TaskInstanceEventImpl)evt);        
       }
       else if (evt instanceof WorkflowDefinitionRequestEventImpl) {
-        handle((WorkflowDefinitionRequestEventImpl)evt);        
+        handle(tngpClient, (WorkflowDefinitionRequestEventImpl)evt);        
       }
       // Events not yet parsed in client lib, decode ourselves
       else if (evt instanceof UnknownEvent) {
@@ -125,7 +149,7 @@ public class TngpEventPolling {
         case TaskInstanceDecoder.TEMPLATE_ID: {
           TaskInstanceDecoder decoder = new TaskInstanceDecoder() //
               .wrap(evt.getRawBuffer(), 0 + headerDecoder.encodedLength(), headerDecoder.blockLength(), headerDecoder.version());          
-          handle(decoder);
+          handle(tngpClient, decoder);
           break;
         }
         case WorkflowInstanceRequestDecoder.TEMPLATE_ID: {
@@ -137,19 +161,19 @@ public class TngpEventPolling {
         case ActivityInstanceRequestDecoder.TEMPLATE_ID: {
           ActivityInstanceRequestDecoder decoder = new ActivityInstanceRequestDecoder() //
               .wrap(evt.getRawBuffer(), 0 + headerDecoder.encodedLength(), headerDecoder.blockLength(), headerDecoder.version());          
-          handle(decoder);
+          handle(tngpClient, decoder);
           break;
         }
         case TaskInstanceRequestDecoder.TEMPLATE_ID: {
           TaskInstanceRequestDecoder decoder = new TaskInstanceRequestDecoder() //
               .wrap(evt.getRawBuffer(), 0 + headerDecoder.encodedLength(), headerDecoder.blockLength(), headerDecoder.version());          
-          handle(decoder);
+          handle(tngpClient, decoder);
           break;
         }
         case CreateTaskRequestDecoder.TEMPLATE_ID: {
           CreateTaskRequestDecoder decoder = new CreateTaskRequestDecoder() //
               .wrap(evt.getRawBuffer(), 0 + headerDecoder.encodedLength(), headerDecoder.blockLength(), headerDecoder.version());          
-          handle(decoder);
+          handle(tngpClient, decoder);
           break;
         }
         }
@@ -163,23 +187,22 @@ public class TngpEventPolling {
 
 
 
-  private void handle(CreateTaskRequestDecoder decoder) {
-    System.out.println(decoder);
+  private void handle(TngpClient client, CreateTaskRequestDecoder decoder) {
+    getEvents(client).add(decoder.toString());
   }
 
-  private void handle(TaskInstanceRequestDecoder decoder) {
-    System.out.println(decoder);
+  private void handle(TngpClient client, TaskInstanceRequestDecoder decoder) {
+    getEvents(client).add(decoder.toString());
   }
 
-  private void handle(ActivityInstanceRequestDecoder decoder) {
-    System.out.println(decoder);
+  private void handle(TngpClient client, ActivityInstanceRequestDecoder decoder) {
+    getEvents(client).add(decoder.toString());
   }
 
   private void handle(TngpClient client, BpmnProcessEventDecoder decoder) {
-    System.out.println(decoder);   
-//    System.out.println("key: " + decoder.key()); // identifier for "local state machine" / compare to primary key
+    getEvents(client).add(decoder.toString());
     
-    long key=decoder.key();
+    long key=decoder.key(); // identifier for "local state machine" / compare to primary key
     int event=decoder.event();
     long wfDefinitionId=decoder.wfDefinitionId();
     long wfInstanceId=decoder.wfInstanceId();
@@ -200,15 +223,15 @@ public class TngpEventPolling {
   }
 
   private void handle(TngpClient client, WorkflowInstanceRequestDecoder decoder) {
-    System.out.println(decoder);
+    getEvents(client).add(decoder.toString());
   }
 
-  private void handle(TaskInstanceDecoder decoder) {
-    System.out.println(decoder);
+  private void handle(TngpClient client, TaskInstanceDecoder decoder) {
+    getEvents(client).add(decoder.toString());
   }
 
   private void handle(TngpClient client, BpmnFlowElementEventDecoder decoder) {
-    System.out.println(decoder);
+    getEvents(client).add(decoder.toString());
     
     long key=decoder.key();
     int event=decoder.event();
@@ -227,7 +250,7 @@ public class TngpEventPolling {
   }
 
   private void handle(TngpClient client, BpmnActivityEventDecoder decoder) {
-    System.out.println(decoder);
+    getEvents(client).add(decoder.toString());
     
     long key = decoder.key();
     int event=decoder.event();
@@ -254,19 +277,19 @@ public class TngpEventPolling {
     }
   }
 
-  private void handle(TaskInstanceEventImpl evt) {
-    System.out.println(evt);
+  private void handle(TngpClient client, TaskInstanceEventImpl evt) {
+    getEvents(client).add(evt.toString());
   }
 
   private void handle(TngpClient client, WorkflowDefinitionEventImpl evt) {
-    System.out.println(evt);
+    getEvents(client).add(evt.toString());
     WorkflowDefinitionResource.add(
         client,
         WorkflowDefinitionDto.from(evt));
   }
   
-  private void handle(WorkflowDefinitionRequestEventImpl evt) {
-    System.out.println(evt);
+  private void handle(TngpClient client, WorkflowDefinitionRequestEventImpl evt) {
+    getEvents(client).add(evt.toString());
   }
   
   public void start() {

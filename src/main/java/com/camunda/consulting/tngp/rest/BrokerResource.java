@@ -1,12 +1,9 @@
 package com.camunda.consulting.tngp.rest;
 
 import java.io.InputStream;
-import java.text.spi.BreakIteratorProvider;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
@@ -15,6 +12,7 @@ import javax.ejb.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.camunda.tngp.broker.Broker;
@@ -52,6 +50,12 @@ public class BrokerResource {
     return null;
   }
 
+  @Path("log")
+  @GET
+  public Map<String, List<String>> getLogs() {
+    return TngpEventPolling.events;
+  }
+  
   @GET
   public List<BrokerConnectionDto> getBrokerConnections() {
     return brokerConnections;
