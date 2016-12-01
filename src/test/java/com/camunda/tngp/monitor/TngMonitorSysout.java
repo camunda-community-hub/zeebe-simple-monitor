@@ -17,7 +17,10 @@ public class TngMonitorSysout {
 
     eventPolling.pollAllTopics(client);
     
-    eventPolling.getEvents(client).forEach(System.out::println);
+    eventPolling.getEvents(client).forEach( (k,v) -> {  
+        System.out.println("TopicId " + k + " ------------"); 
+        v.forEach(System.out::println);
+    });
     
     
     System.out.println("################### Definitions:");

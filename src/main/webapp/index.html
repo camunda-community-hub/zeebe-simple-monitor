@@ -106,17 +106,13 @@ em.optional:after {
       </div>
       <div class="col-md-4">
         <h2>Add Broker</h2>
-        <form>
+        
           <div class="form-group">
-            <label for="exampleInputEmail1">Adress</label>
-            <input type="text" class="form-control" id="exampleInputEmail1" placeholder="localhost">
-          </div>
-          <div class="form-group">
-            <label for="exampleInputPassword1">Port</label>
-            <input type="text" class="form-control" id="exampleInputPassword1" placeholder="xxx">
-          </div>     
-          <button  class="btn btn-default">Add</button> 
-        </form>
+            <label for="exampleInputEmail1">Connection</label>
+            <input type="text" class="form-control" id="brokerConnection" placeholder="localhost:51015">
+          </div>          
+          <button  class="btn btn-primary" onclick="addBroker()">Add broker</button> 
+        
       </div>
     </section>
   </div>

@@ -66,12 +66,11 @@ function brokerConnect(connectionString) {
 		             contentType: 'application/text; charset=utf-8',
 		             //dataType: 'json',
 		             success: function (result) {
-		             	var broker = brokers.filter(function( broker ) { return broker.connectionString == connectionString; })[0];
-		             	broker.connected = true;
-					    renderBrokerTable();
+					    loadBrokers();
 					    refresh();		
 		             },
 		             error: function (xhr, ajaxOptions, thrownError) {
+		             	console.log(xhr);
 		             	console.log(thrownError);
 		             	showError(xhr.responseJSON.message);
 		             },
@@ -86,10 +85,8 @@ function brokerDisconnect(connectionString) {
 		             contentType: 'application/text; charset=utf-8',
 		             //dataType: 'json',
 		             success: function (result) {
-		             	var broker = brokers.filter(function( broker ) { return broker.connectionString == connectionString; })[0];
-		             	broker.connected = false;
-					    renderBrokerTable();
-					    refresh();
+					    loadBrokers();
+					    refresh();		
 		             },
 		             error: function (xhr, ajaxOptions, thrownError) {
 		             	console.log(thrownError);
@@ -135,6 +132,11 @@ function refresh() {
 		loadBrokers();
 		loadBrokerLogs();		
 	}
+}
+
+function addBroker() {
+	brokerConnect( $('#brokerConnection').val() );
+	$('#brokerConnection').text('');
 }
 
 function loadBrokers() {
@@ -294,10 +296,13 @@ function renderSelectedWorkflowInstance() {
 function renderBrokerLogsTable() {
 	$("#brokerLogsTable > tbody").html("");
 	for (var broker in brokerLogs) {
-	    var logs = brokerLogs[broker];
-		for (index = logs.length-1; index >= 0; --index) {
-			var log = logs[index];
-			$('#brokerLogsTable tbody').append("<tr><td>"+broker+"</td><td>"+log+"</td></tr>");
+	    var topics = brokerLogs[broker];
+		for (var topic in topics) {
+		    var logs = topics[topic];
+			for (index = logs.length-1; index >= 0; --index) {
+				var log = logs[index];
+				$('#brokerLogsTable tbody').append("<tr><td>"+broker+"</td><td>"+topic+"</td><td>"+log+"</td></tr>");
+			}
 		}
 	}
 }

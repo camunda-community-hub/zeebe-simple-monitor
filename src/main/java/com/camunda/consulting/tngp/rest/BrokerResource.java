@@ -52,7 +52,7 @@ public class BrokerResource {
 
   @Path("log")
   @GET
-  public Map<String, List<String>> getLogs() {
+  public Map<String, Map<Integer, List<String>>> getLogs() {
     return TngpEventPolling.events;
   }
   
@@ -86,12 +86,18 @@ public class BrokerResource {
     TngpClient client = TngpClient.create(clientProperties);
     newConnection.setClient(client);
     newConnection.setConnected(true);
+
+    try {
+      eventPolling.connectTngpClient(client);
+      System.out.println("Connected new client " + newConnection);
+    } catch (Exception ex) {
+      newConnection.setConnected(false);
+      System.out.println("Could not connect to broker " + newConnection);
+      ex.printStackTrace();
+    }
     
-    eventPolling.connectTngpClient(client);
     
-    System.out.println("Connected new client " + newConnection);
-    
-    return newConnection;
+    return newConnection; 
   }
 
   @POST
