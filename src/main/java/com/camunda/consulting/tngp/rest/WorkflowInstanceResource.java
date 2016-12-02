@@ -99,14 +99,18 @@ public class WorkflowInstanceResource {
     WorkflowInstanceDto instance = getOrCreateWorkflowInstanceDto(client, wfInstanceId);
     
     instance.getRunningActivities().add(flowElementIdString);
-    instance.setPayload(payload);  
+    if (payload!=null && !"".equals(payload)) { // Payload is empty for a lot of elements (e.g. Sequence Flow) at the moment
+       instance.setPayload(payload);
+    }
   }
   public static void addActivityEnded(TngpClient client, long wfInstanceId, String flowElementIdString, String payload) {
     WorkflowInstanceDto instance = getOrCreateWorkflowInstanceDto(client, wfInstanceId);
     
     instance.getRunningActivities().remove(flowElementIdString); // TODO: This does not work with MI like constructs
     instance.getEndedActivities().add(flowElementIdString);
-    instance.setPayload(payload);  
+    if (payload!=null && !"".equals(payload)) {
+      instance.setPayload(payload);
+    }
   }
 
   

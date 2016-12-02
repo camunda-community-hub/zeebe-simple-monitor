@@ -175,6 +175,13 @@ function renderWorkflowDefinitionTable() {
 		}
 		$('#workflowDefinitionTable tbody').append("<tr><td "+selectedClass+"><a onclick='selectWorkflowDefinition("+index+")'>"+def.key + "(" + def.id + ")" +"</a></td><td "+selectedClass+">"+def.countRunning+"</td></tr>");
 	}
+
+    // add brokers to selected broker dropdown
+	$('#selectedBrokerDropdown').empty();
+	for (index = brokers.length-1; index >= 0; --index) {
+		console.log(brokers[index].connectionString);
+		$("#selectedBrokerDropdown").append('<option>'+brokers[index].connectionString+'</option>');
+	}	
 }	
 
 function selectWorkflowDefinition(index) {
@@ -187,7 +194,7 @@ function renderSelectedWorkflowDefinition() {
 		$('#workflowDefinitionId').html(selectedWorkflowDefinition.id);
 		$('#workflowDefinitionName').html(selectedWorkflowDefinition.key);
 		$('#workflowDefinitionVersion').text('');
-		$('#workflowDefinitionInfo').text('');
+		$('#workflowDefinitionBroker').text(selectedWorkflowDefinition.broker);
 
 		$('#countRunning').text(selectedWorkflowDefinition.countRunning);
 		$('#countEnded').text(selectedWorkflowDefinition.countEnded);
@@ -263,11 +270,19 @@ function selectWorkflowInstance(index) {
 function renderSelectedWorkflowInstance() {
 	if (selectedWorkflowInstance) {
 		$('#workflowInstanceId').html(selectedWorkflowInstance.id);
-		$('#workflowRunning').html(!selectedWorkflowInstance.ended);
+		if (selectedWorkflowInstance.ended) {
+			$('#workflowRunning').html("Ended");
+		} else {
+			$('#workflowRunning').html("Running");
+		}
 
 		$('#workflowDefinitionId').html(selectedWorkflowInstance.workflowDefinitionId);
 		$('#workflowDefinitionKey').html(selectedWorkflowInstance.workflowDefinitionKey);
-		$('#payload').text(selectedWorkflowInstance.payload);
+		$('#payload').html(
+			JSON.stringify(
+				JSON.parse(selectedWorkflowInstance.payload), undefined, 2
+			));
+
 		$('#workflowInstanceInfo').text('');
 		$.get(restAccess + 'workflow-definition/' + selectedWorkflowInstance.workflowDefinitionId, function(result) {
 			viewer.importXML(result.resource, function(err) {
@@ -327,7 +342,7 @@ function uploadModels() {
 	var fileUpload = $('#documentToUpload').get(0);
 
 	var filesToUpload = {
-		broker: brokers[0].connectionString, 
+		broker: $('#selectedBrokerDropdown').val(), 
 		files: []
 	} 
 

@@ -92,17 +92,6 @@ em.optional:after {
 
      <div class="row">
         <div class="col-md-2">
-          <h2>Deploy</h2>
-          <div>
-             <p>
-                        <input id="documentToUpload" name="Dokument hochladen" type="file" multiple="multiple" accept=".bpmn20.xml, .bpmn, .xml" 
-                        style="font-size: x-small;"/>
-                      </p></div>
-                      <div><p>
-                         <a href="#" onclick="uploadModels()" class="btn btn-primary">Deploy new definition</a> <!-- <span class="glyphicon glyphicon-cloud-upload" style="font-size: 5em;"> -->
-             </p>
-          </div>       
-
           <h2>
             List
             <a onclick="refresh()" class="btn btn-default"><span class="glyphicon glyphicon-refresh" ></span></a>            
@@ -117,6 +106,19 @@ em.optional:after {
               <td class="tngp-table-selected"></td>
             </tr>            
           </table>
+
+          <h2>Deploy</h2>
+          <div><p>
+                        <input id="documentToUpload" name="Dokument hochladen" type="file" multiple="multiple" accept=".bpmn20.xml, .bpmn, .xml" 
+                        style="font-size: x-small;"/>
+          </p></div>
+          <div><p>
+              <select id="selectedBrokerDropdown" size="1"> 
+              </select>
+          </p></div>
+          <div><p>
+                         <a href="#" onclick="uploadModels()" class="btn btn-primary">Deploy new definition</a> <!-- <span class="glyphicon glyphicon-cloud-upload" style="font-size: 5em;"> -->
+          </p></div>       
              
       </div>
       <div class="col-md-8">
@@ -127,13 +129,6 @@ em.optional:after {
         <div id="diagramCanvas" class="bpmn-io-viewer-height"></div>     
       </div>
       <div class="col-md-2">
-        <h2>Start</h2>
-            <div><p>Payload (JSON): 
-                <textarea  id="payload" style="font-size: smaller;"></textarea>
-            </p></div>
-            <div><p>
-                <a href="#" onclick="startWorkflowInstance()" class="btn btn-primary">Start new instance</a>
-            </p></div> 
         <h2>Info</h2>
           <table class="table table-striped">
             <tr>
@@ -157,10 +152,19 @@ em.optional:after {
               <td id="countEnded"></td>
             </tr>
             <tr>
-              <td>Some additional info</td>
-              <td id="workflowDefinitionInfo"></td>
+              <td>Broker</td>
+              <td id="workflowDefinitionBroker"></td>
             </tr>
           </table>
+
+        <h2>Start</h2>
+            <div><p>Payload (JSON): 
+                <textarea  id="payload" style="font-size: smaller;"></textarea>
+            </p></div>
+            <div><p>
+                <a href="#" onclick="startWorkflowInstance()" class="btn btn-primary">Start new instance</a>
+            </p></div> 
+
       </div>
       </div>
     </section>

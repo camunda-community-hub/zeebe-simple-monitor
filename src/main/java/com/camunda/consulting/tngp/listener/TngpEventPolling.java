@@ -92,12 +92,8 @@ public class TngpEventPolling {
   }
   
   public void pollAllTopics(TngpClient tngpClient) {
-//    System.out.println("########### POLL default-task-queue-log");
-    poll(tngpClient, 0); // 0 = default-task-queue-log
-//    System.out.println("########### POLL default-wf-definition-log");
-    poll(tngpClient, 1); // 1 = default-wf-definition-log
-//    System.out.println("########### POLL default-wf-instance-log");
-//    poll(tngpClient, 2); // 2 = default-wf-instance-log
+    poll(tngpClient, 1); // 1 = workflow-log
+    poll(tngpClient, 0); // 0 = task-log
   }
   
   public void poll(TngpClient tngpClient, int topicId) {
