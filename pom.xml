@@ -95,11 +95,11 @@
 	<distributionManagement>
 		<snapshotRepository>
 			<id>camunda-nexus</id>
-			<url>https://app.camunda.com/nexus/content/repositories/camunda-consulting-snapshots/</url>
+			<url>https://app.camunda.com/nexus/content/repositories/camunda-consulting-private-snapshots/</url>
 		</snapshotRepository>
 		<repository>
 			<id>camunda-nexus</id>
-			<url>https://app.camunda.com/nexus/content/repositories/camunda-consulting/</url>
+			<url>https://app.camunda.com/nexus/content/repositories/camunda-consulting-private/</url>
 		</repository>
 	</distributionManagement>	
 </project>
