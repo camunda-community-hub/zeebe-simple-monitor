@@ -11,7 +11,7 @@
   
 	<groupId>com.camunda.consulting</groupId>
 	<artifactId>camunda-tngp-monitor</artifactId>
-	<version>0.1.0-alpha</version>
+	<version>0.1.1-SNAPSHOT</version>
 
 	<packaging>war</packaging>
 
@@ -88,7 +88,7 @@
 		<url>https://github.com/camunda-consulting/camunda-tngp-monitor</url>
 		<connection>scm:git:git@github.com:camunda-consulting/camunda-tngp-monitor.git</connection>
 		<developerConnection>scm:git:git@github.com:camunda-consulting/camunda-tngp-monitor.git</developerConnection>
-		<tag>0.1.0-alpha</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<distributionManagement>
