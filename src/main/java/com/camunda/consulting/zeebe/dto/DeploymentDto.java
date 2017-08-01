@@ -1,4 +1,4 @@
-package com.camunda.consulting.tngp.dto;
+package com.camunda.consulting.zeebe.dto;
 
 import java.util.List;
 

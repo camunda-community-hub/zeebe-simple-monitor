@@ -1,33 +1,31 @@
-package com.camunda.consulting.tngp.rest;
+package com.camunda.consulting.zeebe.rest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import org.camunda.tngp.client.TngpClient;
+import com.camunda.consulting.zeebe.dto.BrokerConnectionDto;
+import com.camunda.consulting.zeebe.dto.WorkflowDefinitionDto;
+import com.camunda.consulting.zeebe.dto.WorkflowInstanceDto;
 
-import com.camunda.consulting.tngp.dto.BrokerConnectionDto;
-import com.camunda.consulting.tngp.dto.WorkflowDefinitionDto;
-import com.camunda.consulting.tngp.dto.WorkflowInstanceDto;
+import io.zeebe.client.ZeebeClient;
 
-@Path("workflow-instance")
-@Produces("application/json")
+@RestController
+@RequestMapping("/api/workflow-instance")
 public class WorkflowInstanceResource {
   
   public static List<WorkflowInstanceDto> instances = new ArrayList<>();
   
-  @GET
+  @RequestMapping("/")
   public List<WorkflowInstanceDto> getWorkflowInstances() {
     return instances;
   }
   
-  public static void removeBrokerData(TngpClient client) {
+  public static void removeBrokerData(ZeebeClient client) {
     BrokerConnectionDto brokerConnection = BrokerResource.getBrokerConnection(client); 
     ArrayList<WorkflowInstanceDto> copy = new ArrayList<WorkflowInstanceDto>(instances);
     instances = new ArrayList<WorkflowInstanceDto>();
@@ -38,7 +36,7 @@ public class WorkflowInstanceResource {
     }
   }
 
-  public static void newWorkflowInstanceStarted(TngpClient client, WorkflowInstanceDto instance) {
+  public static void newWorkflowInstanceStarted(ZeebeClient client, WorkflowInstanceDto instance) {
     WorkflowInstanceDto existingInstance = findInstance(instance.getId());
     if (existingInstance!=null) {
       // TODO: Check
@@ -55,16 +53,16 @@ public class WorkflowInstanceResource {
   }
 
 
-  public static void setEnded(TngpClient client, long workflowInstanceId) {
+  public static void setEnded(ZeebeClient client, long workflowInstanceId) {
     WorkflowInstanceDto workflowInstance = findInstance(workflowInstanceId);
     workflowInstance.setEnded(true);
     adjustCounters();
   }
   
   private static void adjustCounters() {
-    HashMap<Long, Long[]> countForWfDefinitionId = new HashMap<Long, Long[]>();
+    HashMap<String, Long[]> countForWfDefinitionId = new HashMap<String, Long[]>();
     for (WorkflowInstanceDto workflowInstanceDto : instances) {
-      long id = workflowInstanceDto.getWorkflowDefinitionId();
+      String id = workflowInstanceDto.getWorkflowDefinitionUuid();
       boolean ended = workflowInstanceDto.isEnded();
       
       if (!countForWfDefinitionId.containsKey(id)) {
@@ -79,12 +77,12 @@ public class WorkflowInstanceResource {
       }
       countForWfDefinitionId.put(id, counts);      
     }
-    for (Entry<Long, Long[]> count : countForWfDefinitionId.entrySet()) {
+    for (Entry<String, Long[]> count : countForWfDefinitionId.entrySet()) {
       WorkflowDefinitionResource.setCount(count.getKey(), count.getValue()[0], count.getValue()[1]);
     }
   }
 
-  private static WorkflowInstanceDto getOrCreateWorkflowInstanceDto(TngpClient client, long wfInstanceId) {
+  private static WorkflowInstanceDto getOrCreateWorkflowInstanceDto(ZeebeClient client, long wfInstanceId) {
     WorkflowInstanceDto instance = findInstance(wfInstanceId);
     if (instance==null) {
       instance = new WorkflowInstanceDto();
@@ -95,7 +93,7 @@ public class WorkflowInstanceResource {
     return instance;
   }
   
-  public static void addActivityStarted(TngpClient client, long wfInstanceId, String flowElementIdString, String payload) {
+  public static void addActivityStarted(ZeebeClient client, long wfInstanceId, String flowElementIdString, String payload) {
     WorkflowInstanceDto instance = getOrCreateWorkflowInstanceDto(client, wfInstanceId);
     
     instance.getRunningActivities().add(flowElementIdString);
@@ -103,7 +101,7 @@ public class WorkflowInstanceResource {
        instance.setPayload(payload);
     }
   }
-  public static void addActivityEnded(TngpClient client, long wfInstanceId, String flowElementIdString, String payload) {
+  public static void addActivityEnded(ZeebeClient client, long wfInstanceId, String flowElementIdString, String payload) {
     WorkflowInstanceDto instance = getOrCreateWorkflowInstanceDto(client, wfInstanceId);
     
     instance.getRunningActivities().remove(flowElementIdString); // TODO: This does not work with MI like constructs
@@ -114,17 +112,19 @@ public class WorkflowInstanceResource {
   }
 
   
-  private static void fillInBroker(TngpClient client, WorkflowInstanceDto instance) {
+  private static void fillInBroker(ZeebeClient client, WorkflowInstanceDto instance) {
     BrokerConnectionDto brokerConnection = BrokerResource.getBrokerConnection(client);
     if (brokerConnection!=null) {
       instance.setBroker(brokerConnection.getConnectionString());
     }
   }
   
-  private static void fillInWorkflowDefinition(TngpClient client, WorkflowInstanceDto instance) {
-    WorkflowDefinitionDto workflowDefinitionDto = WorkflowDefinitionResource.findInstance(instance.getWorkflowDefinitionId());
+  private static void fillInWorkflowDefinition(ZeebeClient client, WorkflowInstanceDto instance) {
+    WorkflowDefinitionDto workflowDefinitionDto = WorkflowDefinitionResource.findInstance(instance.getWorkflowDefinitionKey(), instance.getWorkflowDefinitionVersion());
     if (workflowDefinitionDto!=null) {
+      instance.setWorkflowDefinitionUuid(workflowDefinitionDto.getUuid());
       instance.setWorkflowDefinitionKey(workflowDefinitionDto.getKey());
+      instance.setWorkflowDefinitionVersion(workflowDefinitionDto.getVersion());
     }
     
   }  

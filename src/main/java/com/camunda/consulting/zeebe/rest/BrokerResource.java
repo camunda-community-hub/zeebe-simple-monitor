@@ -1,4 +1,4 @@
-package com.camunda.consulting.tngp.rest;
+package com.camunda.consulting.zeebe.rest;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -6,33 +6,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.ejb.Singleton;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-import org.camunda.tngp.broker.Broker;
-import org.camunda.tngp.client.ClientProperties;
-import org.camunda.tngp.client.TngpClient;
+import com.camunda.consulting.zeebe.dto.BrokerConnectionDto;
+import com.camunda.consulting.zeebe.listener.ZeebeListener;
 
-import com.camunda.consulting.tngp.dto.BrokerConnectionDto;
-import com.camunda.consulting.tngp.listener.TngpEventPolling;
+import io.zeebe.broker.Broker;
+import io.zeebe.client.ClientProperties;
+import io.zeebe.client.ZeebeClient;
 
-@Path("broker")
-@Produces("application/json")
-@Singleton
+@RestController
+@RequestMapping("/api/broker")
 public class BrokerResource {
 
-  private TngpEventPolling eventPolling;
+  private static ZeebeListener zeebeListener = new ZeebeListener();
   private static List<BrokerConnectionDto> brokerConnections = new ArrayList<BrokerConnectionDto>();
 
-  private Broker embeddedBroker;
+  private static Broker embeddedBroker;
+  
+  static {
+    brokerConnections.add(new BrokerConnectionDto("", "127.0.0.1:51015", false, null));
+  }
 
-  public static BrokerConnectionDto getBrokerConnection(TngpClient client) {
+  public static BrokerConnectionDto getBrokerConnection(ZeebeClient client) {
     for (BrokerConnectionDto current : brokerConnections) {
       if (current.getClient() == client) {
         return current;
@@ -50,20 +49,18 @@ public class BrokerResource {
     return null;
   }
 
-  @Path("log")
-  @GET
+  @RequestMapping("/log")
   public Map<String, Map<Integer, List<String>>> getLogs() {
-    return TngpEventPolling.events;
+    return ZeebeListener.events;
   }
   
-  @GET
+  @RequestMapping("/")
   public List<BrokerConnectionDto> getBrokerConnections() {
     return brokerConnections;
   }
 
-  @POST
-  @Path("connect")
-  public BrokerConnectionDto connect(String connectionString) {
+  @RequestMapping(path="/connect", method=RequestMethod.POST)
+  public BrokerConnectionDto connect( @RequestBody String connectionString) {
     BrokerConnectionDto newConnection = null;
     for (BrokerConnectionDto brokerConnectionDto : brokerConnections) {
       if (brokerConnectionDto.getConnectionString().equals(connectionString)
@@ -83,12 +80,14 @@ public class BrokerResource {
     Properties clientProperties = new Properties();
     clientProperties.put(ClientProperties.BROKER_CONTACTPOINT, connectionString);
 
-    TngpClient client = TngpClient.create(clientProperties);
+    ZeebeClient client = ZeebeClient.create(clientProperties);
+    client.connect();
+    
     newConnection.setClient(client);
     newConnection.setConnected(true);
 
     try {
-      eventPolling.connectTngpClient(client);
+      zeebeListener.connectTngpClient(client);
       System.out.println("Connected new client " + newConnection);
     } catch (Exception ex) {
       newConnection.setConnected(false);
@@ -100,12 +99,11 @@ public class BrokerResource {
     return newConnection; 
   }
 
-  @POST
-  @Path("disconnect")
+  @RequestMapping(path="/disconnect", method=RequestMethod.POST)
   public BrokerConnectionDto disconnect(String connectionString) {
     for (BrokerConnectionDto brokerConnectionDto : brokerConnections) {
       if (brokerConnectionDto.getConnectionString().equals(connectionString)) {
-        eventPolling.disconnectTngpClient(brokerConnectionDto.getClient());
+        zeebeListener.disconnectTngpClient(brokerConnectionDto.getClient());
         brokerConnectionDto.setConnected(false);
         return brokerConnectionDto;
       }
@@ -113,27 +111,18 @@ public class BrokerResource {
     return null;
   }
 
-  @PostConstruct
-  public void init() {
-    eventPolling = new TngpEventPolling();
-    eventPolling.start();
-    
-    brokerConnections.add(new BrokerConnectionDto("", "127.0.0.1:51015", false, null));
-  }
 
-  @POST
-  @Path("embedded/start")
+  
+  @RequestMapping(path="/embedded/start", method=RequestMethod.POST)  
   public void startEmbeddedBroker() {
     if (embeddedBroker!=null) {
       return; 
     }
-    InputStream config = BrokerResource.class.getResourceAsStream("/tngp.cfg.toml");
+    InputStream config = BrokerResource.class.getResourceAsStream("/zeebe.cfg.toml");
     embeddedBroker = new Broker(config);
   }
 
-  @POST
-  @Path("embedded/stop")
-  public void stopEmbeddedBroker() {
+  @RequestMapping(path="/embedded/stop", method=RequestMethod.POST)  public void stopEmbeddedBroker() {
     if (embeddedBroker==null) {
       return; 
     }
@@ -141,13 +130,5 @@ public class BrokerResource {
     embeddedBroker = null;
   }
 
-  @PreDestroy
-  public void cleanup() {
-    eventPolling.stop();
-
-    if (embeddedBroker != null) {
-      embeddedBroker.close();
-      embeddedBroker = null;
-    }
-  }
+ 
 }

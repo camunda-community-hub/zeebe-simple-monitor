@@ -1,8 +1,8 @@
 var viewer = null;
 var container = null;
 
-//let restAccess = "api/";
-let restAccess = "http://localhost:8080/camunda-tngp-monitor/api/";
+let restAccess = "api/";
+//let restAccess = "http://localhost:8080/camunda-tngp-monitor/api/";
 let brokers = [];
 let brokerLogs = {};
 
@@ -191,9 +191,9 @@ function selectWorkflowDefinition(index) {
 
 function renderSelectedWorkflowDefinition() {
 	if (selectedWorkflowDefinition) {
-		$('#workflowDefinitionId').html(selectedWorkflowDefinition.id);
+		$('#workflowDefinitionKey').html(selectedWorkflowDefinition.key);
 		$('#workflowDefinitionName').html(selectedWorkflowDefinition.key);
-		$('#workflowDefinitionVersion').text('');
+		$('#workflowDefinitionVersion').text(selectedWorkflowDefinition.version);
 		$('#workflowDefinitionBroker').text(selectedWorkflowDefinition.broker);
 
 		$('#countRunning').text(selectedWorkflowDefinition.countRunning);
@@ -222,7 +222,7 @@ function startWorkflowInstance() {
 	if (selectedWorkflowDefinition) {
 		$.ajax({
 	             type : 'PUT',
-	             url: restAccess + 'workflow-definition/' + selectedWorkflowDefinition.broker + "/" + selectedWorkflowDefinition.id,
+	             url: restAccess + 'workflow-definition/' + selectedWorkflowDefinition.broker + "/" + selectedWorkflowDefinition.key + "/" + selectedWorkflowDefinition.version,
 	             data:  JSON.stringify( $('#payload').val() ),
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
@@ -276,7 +276,7 @@ function renderSelectedWorkflowInstance() {
 			$('#workflowRunning').html("Running");
 		}
 
-		$('#workflowDefinitionId').html(selectedWorkflowInstance.workflowDefinitionId);
+		$('#workflowDefinitionUuid').html(selectedWorkflowInstance.workflowDefinitionUuid);
 		$('#workflowDefinitionKey').html(selectedWorkflowInstance.workflowDefinitionKey);
 		$('#payload').html(
 			JSON.stringify(
@@ -284,7 +284,7 @@ function renderSelectedWorkflowInstance() {
 			));
 
 		$('#workflowInstanceInfo').text('');
-		$.get(restAccess + 'workflow-definition/' + selectedWorkflowInstance.workflowDefinitionId, function(result) {
+		$.get(restAccess + 'workflow-definition/' + selectedWorkflowInstance.workflowDefinitionKey + '/' + selectedWorkflowInstance.workflowDefinitionVersion, function(result) {
 			viewer.importXML(result.resource, function(err) {
 							if (err) {
 								console.log('error rendering', err);
