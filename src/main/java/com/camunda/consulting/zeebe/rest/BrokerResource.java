@@ -1,6 +1,5 @@
 package com.camunda.consulting.zeebe.rest;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.camunda.consulting.zeebe.dto.BrokerConnectionDto;
 import com.camunda.consulting.zeebe.listener.ZeebeListener;
 
-import io.zeebe.broker.Broker;
 import io.zeebe.client.ClientProperties;
 import io.zeebe.client.ZeebeClient;
 
@@ -25,7 +23,7 @@ public class BrokerResource {
   private static ZeebeListener zeebeListener = new ZeebeListener();
   private static List<BrokerConnectionDto> brokerConnections = new ArrayList<BrokerConnectionDto>();
 
-  private static Broker embeddedBroker;
+//  private static Broker embeddedBroker;
   
   static {
     brokerConnections.add(new BrokerConnectionDto("", "127.0.0.1:51015", false, null));
@@ -113,22 +111,22 @@ public class BrokerResource {
 
 
   
-  @RequestMapping(path="/embedded/start", method=RequestMethod.POST)  
-  public void startEmbeddedBroker() {
-    if (embeddedBroker!=null) {
-      return; 
-    }
-    InputStream config = BrokerResource.class.getResourceAsStream("/zeebe.cfg.toml");
-    embeddedBroker = new Broker(config);
-  }
-
-  @RequestMapping(path="/embedded/stop", method=RequestMethod.POST)  public void stopEmbeddedBroker() {
-    if (embeddedBroker==null) {
-      return; 
-    }
-    embeddedBroker.close();
-    embeddedBroker = null;
-  }
+//  @RequestMapping(path="/embedded/start", method=RequestMethod.POST)  
+//  public void startEmbeddedBroker() {
+//    if (embeddedBroker!=null) {
+//      return; 
+//    }
+//    InputStream config = BrokerResource.class.getResourceAsStream("/zeebe.cfg.toml");
+//    embeddedBroker = new Broker(config);
+//  }
+//
+//  @RequestMapping(path="/embedded/stop", method=RequestMethod.POST)  public void stopEmbeddedBroker() {
+//    if (embeddedBroker==null) {
+//      return; 
+//    }
+//    embeddedBroker.close();
+//    embeddedBroker = null;
+//  }
 
  
 }

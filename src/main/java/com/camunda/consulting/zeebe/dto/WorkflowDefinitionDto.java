@@ -1,41 +1,42 @@
 package com.camunda.consulting.zeebe.dto;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import javax.json.JsonObject;
+import io.zeebe.client.event.WorkflowDefinition;
+import io.zeebe.client.workflow.impl.DeploymentEventImpl;
 
 public class WorkflowDefinitionDto {
 
   private String broker;
   private String resource;
-  
+
   /**
    * Generate random uuid for unique identification of workflow definition
    */
   private String uuid = UUID.randomUUID().toString();
-  
+
   private String key;
   private int version;
-  
+
   private long countRunning;
   private long countEnded;
 
-  public static List<WorkflowDefinitionDto> from(JsonObject jsonEvent) {
+  public static List<WorkflowDefinitionDto> from(DeploymentEventImpl deploymentEvent) {
     ArrayList<WorkflowDefinitionDto> result = new ArrayList<WorkflowDefinitionDto>();
-    
-    for (int i = 0; i < jsonEvent.getJsonArray("deployedWorkflows").size(); i++) {
-      JsonObject workflowJson = jsonEvent.getJsonArray("deployedWorkflows").getJsonObject(i);
+
+    for (WorkflowDefinition workflowDefinition : deploymentEvent.getDeployedWorkflows()) {
       WorkflowDefinitionDto dto = new WorkflowDefinitionDto();
-      
-      dto.setVersion(workflowJson.getInt("version"));
-      dto.setKey(workflowJson.getString("bpmnProcessId"));
-      dto.setResource(jsonEvent.getString("bpmnXml"));
+
+      dto.setVersion(workflowDefinition.getVersion());
+      dto.setKey(workflowDefinition.getBpmnProcessId());
+      dto.setResource(new String(deploymentEvent.getBpmnXml(), StandardCharsets.UTF_8));
       result.add(dto);
     }
-    
-    return result;    
+
+    return result;
   }
 
   public String getResource() {
@@ -61,7 +62,6 @@ public class WorkflowDefinitionDto {
   public void setVersion(int version) {
     this.version = version;
   }
-
 
   public String getBroker() {
     return broker;
@@ -89,7 +89,8 @@ public class WorkflowDefinitionDto {
 
   @Override
   public String toString() {
-    return "WorkflowDefinitionDto [key=" + key + ", broker=" + broker + ", version=" + version + ", countRunning=" + countRunning + ", countEnded=" + countEnded + "]";
+    return "WorkflowDefinitionDto [key=" + key + ", broker=" + broker + ", version=" + version + ", countRunning=" + countRunning + ", countEnded=" + countEnded
+        + "]";
   }
 
   public String getUuid() {

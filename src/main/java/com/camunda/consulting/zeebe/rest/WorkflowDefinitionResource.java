@@ -39,7 +39,7 @@ public class WorkflowDefinitionResource {
   @RequestMapping(path="/{broker}/{id}", method=RequestMethod.PUT)
   public void startWorkflowInstance(@PathVariable("id") String id, @PathVariable("broker") String brokerConnection, String payload) {
     ZeebeClient client = BrokerResource.getBrokerConnection(brokerConnection).getClient();
-    client.workflowTopic(Constants.DEFAULT_TOPIC, Constants.DEFAULT_PARTITION).create()
+    client.workflows().create(Constants.DEFAULT_TOPIC)
       .bpmnProcessId(id)
       .payload(payload)
       .execute();
@@ -50,8 +50,8 @@ public class WorkflowDefinitionResource {
     ZeebeClient client = BrokerResource.getBrokerConnection(deployment.getBroker()).getClient();    
 
     for (FileDto file : deployment.getFiles()) {
-      client.workflowTopic(Constants.DEFAULT_TOPIC, Constants.DEFAULT_PARTITION) //
-          .deploy() //
+      client.workflows() //
+          .deploy(Constants.DEFAULT_TOPIC) //
           .resourceStream(new ByteArrayInputStream(file.getContent()))
           .execute();
     }
@@ -68,6 +68,12 @@ public class WorkflowDefinitionResource {
     }
   }
 
+  public static void add(ZeebeClient client, WorkflowDefinitionDto newDefinition) {
+    BrokerConnectionDto brokerConnection = BrokerResource.getBrokerConnection(client);
+    newDefinition.setBroker(brokerConnection.getConnectionString());
+    definitions.add(newDefinition);
+  }
+  
   public static void addAll(ZeebeClient client, List<WorkflowDefinitionDto> newDefinitions) {
     BrokerConnectionDto brokerConnection = BrokerResource.getBrokerConnection(client);
     if (brokerConnection != null) {

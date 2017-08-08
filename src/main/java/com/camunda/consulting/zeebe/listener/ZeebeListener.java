@@ -1,14 +1,9 @@
 package com.camunda.consulting.zeebe.listener;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
 
 import com.camunda.consulting.zeebe.Constants;
 import com.camunda.consulting.zeebe.dto.BrokerConnectionDto;
@@ -17,16 +12,16 @@ import com.camunda.consulting.zeebe.dto.WorkflowInstanceDto;
 import com.camunda.consulting.zeebe.rest.BrokerResource;
 import com.camunda.consulting.zeebe.rest.WorkflowDefinitionResource;
 import com.camunda.consulting.zeebe.rest.WorkflowInstanceResource;
+import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.zeebe.client.ZeebeClient;
+import io.zeebe.client.event.EventMetadata;
 import io.zeebe.client.event.TopicEventType;
-import io.zeebe.client.event.impl.TopicEventImpl;
 import io.zeebe.client.impl.data.MsgPackConverter;
 import io.zeebe.client.impl.data.MsgPackMapper;
-import io.zeebe.client.task.impl.TaskEvent;
-import io.zeebe.client.task.impl.subscription.TaskImpl;
-import io.zeebe.client.workflow.impl.WorkflowInstanceEvent;
+import io.zeebe.client.workflow.impl.DeploymentEventImpl;
+import io.zeebe.client.workflow.impl.WorkflowInstanceEventImpl;
 
 
 public class ZeebeListener {
@@ -76,41 +71,46 @@ public class ZeebeListener {
   
   public void connectTngpClient(ZeebeClient client) {
     System.out.println("Opening subscription");
-    client.topic(Constants.DEFAULT_TOPIC, Constants.DEFAULT_PARTITION)
-        .newSubscription()
+    
+    final ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.setInjectableValues(new InjectableValues.Std().addValue(MsgPackConverter.class, new MsgPackConverter()));
+    
+    client.topics()
+        .newSubscription(Constants.DEFAULT_TOPIC)
         .startAtHeadOfTopic().forcedStart()
         .name("zeebe-simple-monitor")
-        .handler((meta, event) ->
+        .handler((event) ->
         {
-            System.out.println(String.format(">>> [topic: %d, position: %d, key: %d, type: %s]\n%s\n===",
-                    meta.getPartitionId(),
-                    meta.getEventPosition(),
-                    meta.getEventKey(),
-                    meta.getEventType(),
-                    event.getJson()));
+          final EventMetadata metadata = event.getMetadata();
+          System.out.println(String.format(">>> [topic: %d, position: %d, key: %d, type: %s]\n%s\n===",
+                  metadata.getPartitionId(),
+                  metadata.getPosition(),
+                  metadata.getKey(),
+                  metadata.getType(),
+                  event.getJson()));
             
-            JsonReader jsonReader = Json.createReader(new StringReader(event.getJson()));
-            JsonObject eventJson = jsonReader.readObject();
-
-            String eventType = eventJson.getString("eventType", null);            
-            
-            if (TopicEventType.WORKFLOW_INSTANCE.equals(meta.getEventType())) {              
-              if ("WORKFLOW_INSTANCE_CREATED".equals(eventType)) {                
-                final WorkflowInstanceEvent workflowInstanceEvent = msgPackMapper.convert(((TopicEventImpl)event).getAsMsgPack(), WorkflowInstanceEvent.class);
-
-                WorkflowInstanceResource.newWorkflowInstanceStarted(
-                    client, 
-                    WorkflowInstanceDto.from(workflowInstanceEvent));
-                System.out.println("Workflow instance started");
-              }              
+            if (TopicEventType.WORKFLOW_INSTANCE.equals(event.getMetadata().getType())) {   
+                final WorkflowInstanceEventImpl workflowInstanceEvent = objectMapper.readValue(event.getJson(), WorkflowInstanceEventImpl.class);                
+                workflowInstanceEvent.updateMetadata(event.getMetadata());
+                if ("WORKFLOW_INSTANCE_CREATED".equals(workflowInstanceEvent.getState())) {
+                  WorkflowInstanceResource.newWorkflowInstanceStarted(
+                      client, 
+                      WorkflowInstanceDto.from(workflowInstanceEvent));
+                  System.out.println("Workflow instance started");
+                }              
             }
-            if (meta.getEventType()==null) {
-              if ("DEPLOYMENT_CREATED".equals(eventType)) {                
-                WorkflowDefinitionResource.addAll(client, WorkflowDefinitionDto.from(eventJson));
+            if (TopicEventType.DEPLOYMENT.equals(event.getMetadata().getType())) {              
+              final DeploymentEventImpl deploymentEvent = objectMapper.readValue(event.getJson(), DeploymentEventImpl.class);                
+              deploymentEvent.updateMetadata(event.getMetadata());
+              // Feebdack: Expose constant in Client API
+              //if (DeploymentState.DEPLOYMENT_CREATED.equals(eventState)) {                
+              if ("DEPLOYMENT_CREATED".equals(deploymentEvent.getState())) {                
+                WorkflowDefinitionResource.addAll(client, WorkflowDefinitionDto.from(deploymentEvent));
                 System.out.println("Workflow deployed");
               }
               
             }
+            // TODO: add more vents
 //            WorkflowInstanceResource.setEnded(client, workflowInstanceId);
 //            WorkflowInstanceResource.addActivityEnded(client, wfInstanceId, flowElementIdString, payload);
 //            WorkflowInstanceResource.addActivityStarted(client, wfInstanceId, flowElementIdString, payload);

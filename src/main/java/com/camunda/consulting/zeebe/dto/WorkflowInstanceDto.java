@@ -6,7 +6,7 @@ import java.util.List;
 import javax.json.JsonObject;
 
 import io.zeebe.client.impl.data.MsgPackConverter;
-import io.zeebe.client.workflow.impl.WorkflowInstanceEvent;
+import io.zeebe.client.workflow.impl.WorkflowInstanceEventImpl;
 
 public class WorkflowInstanceDto {
 
@@ -26,30 +26,18 @@ public class WorkflowInstanceDto {
   private List<String> endedActivities = new ArrayList<String>();
 
 
-  public static WorkflowInstanceDto from(WorkflowInstanceEvent workflowInstanceEvent) {
+  public static WorkflowInstanceDto from(WorkflowInstanceEventImpl workflowInstanceEvent) {
     WorkflowInstanceDto dto = new WorkflowInstanceDto();
     
     dto.setWorkflowDefinitionKey(workflowInstanceEvent.getBpmnProcessId());
     dto.setWorkflowDefinitionVersion(workflowInstanceEvent.getVersion());
     dto.setId(workflowInstanceEvent.getWorkflowInstanceKey());
     
-    dto.setPayload(msgPackConverter.convertToJson(workflowInstanceEvent.getPayload()));
+    dto.setPayload(workflowInstanceEvent.getPayload());
 
     return dto;
   }
   
-  public static WorkflowInstanceDto from(JsonObject eventJson) {
-    WorkflowInstanceDto dto = new WorkflowInstanceDto();
-      
-      dto.setWorkflowDefinitionKey(eventJson.getString("bpmnProcessId"));
-      dto.setWorkflowDefinitionVersion(eventJson.getInt("version"));
-      dto.setId(eventJson.getInt("workflowInstanceKey"));
-
-//      dto.setPayload(msgPackConverter.convertToJson(eventJson.get("payload")));
-    
-    return dto;    
-  }
-
   public String getBroker() {
     return broker;
   }
