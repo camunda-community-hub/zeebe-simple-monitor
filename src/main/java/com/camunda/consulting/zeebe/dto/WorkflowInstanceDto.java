@@ -3,10 +3,8 @@ package com.camunda.consulting.zeebe.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.json.JsonObject;
-
+import io.zeebe.client.event.WorkflowInstanceEvent;
 import io.zeebe.client.impl.data.MsgPackConverter;
-import io.zeebe.client.workflow.impl.WorkflowInstanceEventImpl;
 
 public class WorkflowInstanceDto {
 
@@ -25,8 +23,10 @@ public class WorkflowInstanceDto {
   private List<String> runningActivities = new ArrayList<String>();
   private List<String> endedActivities = new ArrayList<String>();
 
+  private List<IncidentDto> incidents = new ArrayList<IncidentDto>();
 
-  public static WorkflowInstanceDto from(WorkflowInstanceEventImpl workflowInstanceEvent) {
+
+  public static WorkflowInstanceDto from(WorkflowInstanceEvent workflowInstanceEvent) {
     WorkflowInstanceDto dto = new WorkflowInstanceDto();
     
     dto.setWorkflowDefinitionKey(workflowInstanceEvent.getBpmnProcessId());
@@ -114,6 +114,10 @@ public class WorkflowInstanceDto {
 
   public void setWorkflowDefinitionVersion(int workflowDefinitionVersion) {
     this.workflowDefinitionVersion = workflowDefinitionVersion;
+  }
+
+  public List<IncidentDto> getIncidents() {
+    return this.incidents;
   }
 
 

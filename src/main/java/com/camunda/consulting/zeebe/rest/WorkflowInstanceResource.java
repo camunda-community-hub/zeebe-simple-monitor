@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.camunda.consulting.zeebe.dto.BrokerConnectionDto;
+import com.camunda.consulting.zeebe.dto.IncidentDto;
 import com.camunda.consulting.zeebe.dto.WorkflowDefinitionDto;
 import com.camunda.consulting.zeebe.dto.WorkflowInstanceDto;
 
@@ -58,7 +59,15 @@ public class WorkflowInstanceResource {
     workflowInstance.setEnded(true);
     adjustCounters();
   }
+
+  public static void setCanceled(ZeebeClient client, long workflowInstanceId) {
+    WorkflowInstanceDto workflowInstance = findInstance(workflowInstanceId);
+    // TODO: Implement differntly
+    workflowInstance.setEnded(true);
+    adjustCounters();
+  }
   
+
   private static void adjustCounters() {
     HashMap<String, Long[]> countForWfDefinitionId = new HashMap<String, Long[]>();
     for (WorkflowInstanceDto workflowInstanceDto : instances) {
@@ -111,7 +120,11 @@ public class WorkflowInstanceResource {
     }
   }
 
-  
+  public static void addIncident(ZeebeClient client, long workflowInstanceKey, String activityId, String errorType, String errorMessage) {
+    WorkflowInstanceDto instance = getOrCreateWorkflowInstanceDto(client, workflowInstanceKey);    
+    instance.getIncidents().add(new IncidentDto(activityId, errorType, errorMessage)); 
+  }
+    
   private static void fillInBroker(ZeebeClient client, WorkflowInstanceDto instance) {
     BrokerConnectionDto brokerConnection = BrokerResource.getBrokerConnection(client);
     if (brokerConnection!=null) {
@@ -137,8 +150,5 @@ public class WorkflowInstanceResource {
     } 
     return null;
   }
-
-
-
   
 }

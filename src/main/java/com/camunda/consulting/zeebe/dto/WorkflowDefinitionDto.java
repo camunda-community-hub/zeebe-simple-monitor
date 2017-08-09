@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import io.zeebe.client.event.WorkflowDefinition;
+import io.zeebe.client.event.WorkflowEvent;
 import io.zeebe.client.workflow.impl.DeploymentEventImpl;
 
 public class WorkflowDefinitionDto {
@@ -23,6 +24,17 @@ public class WorkflowDefinitionDto {
 
   private long countRunning;
   private long countEnded;
+
+
+  public static WorkflowDefinitionDto from(WorkflowEvent event) {
+    WorkflowDefinitionDto dto = new WorkflowDefinitionDto();
+
+    dto.setVersion(event.getVersion());
+    dto.setKey(event.getBpmnProcessId());
+    dto.setResource(event.getBpmnXml());
+    
+    return dto;
+  }
 
   public static List<WorkflowDefinitionDto> from(DeploymentEventImpl deploymentEvent) {
     ArrayList<WorkflowDefinitionDto> result = new ArrayList<WorkflowDefinitionDto>();

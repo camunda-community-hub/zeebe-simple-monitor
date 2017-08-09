@@ -282,6 +282,8 @@ function renderSelectedWorkflowInstance() {
 			JSON.stringify(
 				JSON.parse(selectedWorkflowInstance.payload), undefined, 2
 			));
+		
+		renderIncidentsTable();
 
 		$('#workflowInstanceInfo').text('');
 		$.get(restAccess + 'workflow-definition/' + selectedWorkflowInstance.workflowDefinitionKey + '/' + selectedWorkflowInstance.workflowDefinitionVersion, function(result) {
@@ -306,7 +308,14 @@ function renderSelectedWorkflowInstance() {
     }
 }
 
-
+function renderIncidentsTable() {
+	$("#incidentsTable > tbody").html("");
+	for (index = 0; index < selectedWorkflowInstance.incidents.length; ++index) {
+		var incident = selectedWorkflowInstance.incidents[index];
+		console.log(incident);
+		$('#incidentsTable tbody').append("<tr><td>"+incident.errorType+"</td><td>"+incident.errorMessage+"</td></tr>");
+	}
+}
 
 function renderBrokerLogsTable() {
 	$("#brokerLogsTable > tbody").html("");
