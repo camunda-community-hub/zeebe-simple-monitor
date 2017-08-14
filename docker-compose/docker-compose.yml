@@ -3,6 +3,8 @@ version: '2'
 services:
   zeebe:
     image: camunda/zeebe:0.1.0
+    volumes:
+        - ./zeebe.cfg.toml:/usr/local/zeebe/conf/zeebe.cfg.toml
     ports:
       - "51015:51015"
       - "51016:51016"
