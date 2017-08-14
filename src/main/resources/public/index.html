@@ -7,7 +7,7 @@
 
   <title> Zeebe Simple Monitor </title>
 
-  <script type="text/javascript" src="webjars/jquery/1.9.0/jquery.js"></script>
+  <script src="/webjars/jquery/jquery.min.js"></script>
 
   <script type="text/javascript" src="./app.js"></script>
   <link rel="stylesheet" href="./app.css">
@@ -66,7 +66,7 @@ em.optional:after {
         <h1>Broker Configuration</h1>
 
         <p>
-          Connect to one or more TNGP brokers in your network
+          Connect to one or more Zeebe brokers in your network
         </p>
       </header>
 
@@ -108,6 +108,13 @@ em.optional:after {
           </table>
       </div>
       <div class="col-md-4">
+        <h2>Reset local data</h2>
+
+        Reset all local data. This is interesting whenever you cleanup the broker and local client data might not match Zeebe data any more. As all state is reconstructed via the Zeebe logs, you don't loose anything.
+
+          <button  class="btn" onclick="cleanupData()">Delete all local data</button> 
+
+
         <h2>Add Broker</h2>
         
           <div class="form-group">

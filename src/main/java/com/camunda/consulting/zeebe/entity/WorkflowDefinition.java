@@ -1,54 +1,47 @@
-package com.camunda.consulting.zeebe.dto;
+package com.camunda.consulting.zeebe.entity;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-import io.zeebe.client.event.WorkflowDefinition;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Transient;
+
 import io.zeebe.client.event.WorkflowEvent;
-import io.zeebe.client.workflow.impl.DeploymentEventImpl;
 
-public class WorkflowDefinitionDto {
-
-  private String broker;
-  private String resource;
+@Entity
+public class WorkflowDefinition {
 
   /**
    * Generate random uuid for unique identification of workflow definition
    */
+  @Id
   private String uuid = UUID.randomUUID().toString();
 
   private String key;
   private int version;
 
+  @OneToOne
+  private Broker broker;
+
+  @Column(length = 100000)
+  private String resource;
+
+  @Transient
   private long countRunning;
+  
+  @Transient
   private long countEnded;
 
-
-  public static WorkflowDefinitionDto from(WorkflowEvent event) {
-    WorkflowDefinitionDto dto = new WorkflowDefinitionDto();
+  public static WorkflowDefinition from(WorkflowEvent event) {
+    WorkflowDefinition dto = new WorkflowDefinition();
 
     dto.setVersion(event.getVersion());
     dto.setKey(event.getBpmnProcessId());
     dto.setResource(event.getBpmnXml());
     
     return dto;
-  }
-
-  public static List<WorkflowDefinitionDto> from(DeploymentEventImpl deploymentEvent) {
-    ArrayList<WorkflowDefinitionDto> result = new ArrayList<WorkflowDefinitionDto>();
-
-    for (WorkflowDefinition workflowDefinition : deploymentEvent.getDeployedWorkflows()) {
-      WorkflowDefinitionDto dto = new WorkflowDefinitionDto();
-
-      dto.setVersion(workflowDefinition.getVersion());
-      dto.setKey(workflowDefinition.getBpmnProcessId());
-      dto.setResource(new String(deploymentEvent.getBpmnXml(), StandardCharsets.UTF_8));
-      result.add(dto);
-    }
-
-    return result;
   }
 
   public String getResource() {
@@ -75,11 +68,11 @@ public class WorkflowDefinitionDto {
     this.version = version;
   }
 
-  public String getBroker() {
+  public Broker getBroker() {
     return broker;
   }
 
-  public void setBroker(String broker) {
+  public void setBroker(Broker broker) {
     this.broker = broker;
   }
 

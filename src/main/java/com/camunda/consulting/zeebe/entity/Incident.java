@@ -1,15 +1,24 @@
-package com.camunda.consulting.zeebe.dto;
+package com.camunda.consulting.zeebe.entity;
 
-public class IncidentDto {
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity
+public class Incident {
+  
+  @Id
+  @GeneratedValue
+  private long id;
 
   private String activityId;
   private String errorType;
   private String errorMessage;
   
-  public IncidentDto() {    
+  public Incident() {    
   }
 
-  public IncidentDto(String activityId, String errorType, String errorMessage) {
+  public Incident(String activityId, String errorType, String errorMessage) {
     this.activityId = activityId;
     this.errorType = errorType;
     this.errorMessage = errorMessage;

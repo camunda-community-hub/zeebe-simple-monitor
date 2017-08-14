@@ -1,132 +1,88 @@
 package com.camunda.consulting.zeebe.rest;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.camunda.consulting.zeebe.dto.BrokerConnectionDto;
-import com.camunda.consulting.zeebe.listener.ZeebeListener;
+import com.camunda.consulting.zeebe.entity.Broker;
+import com.camunda.consulting.zeebe.entity.LoggedEvent;
+import com.camunda.consulting.zeebe.repository.BrokerRepository;
+import com.camunda.consulting.zeebe.repository.LoggedEventRepository;
+import com.camunda.consulting.zeebe.zeebe.ZeebeConnectionDto;
+import com.camunda.consulting.zeebe.zeebe.ZeebeConnections;
 
-import io.zeebe.client.ClientProperties;
-import io.zeebe.client.ZeebeClient;
-
+@Component
 @RestController
 @RequestMapping("/api/broker")
 public class BrokerResource {
-
-  private static ZeebeListener zeebeListener = new ZeebeListener();
-  private static List<BrokerConnectionDto> brokerConnections = new ArrayList<BrokerConnectionDto>();
-
-//  private static Broker embeddedBroker;
   
-  static {
-    brokerConnections.add(new BrokerConnectionDto("", "127.0.0.1:51015", false, null));
-  }
+  @Autowired
+  private LoggedEventRepository loggedEventRepository;
+  
+  @Autowired
+  private BrokerRepository brokerRepository;
+  
+  @Autowired
+  private ZeebeConnections zeebeConnections;
 
-  public static BrokerConnectionDto getBrokerConnection(ZeebeClient client) {
-    for (BrokerConnectionDto current : brokerConnections) {
-      if (current.getClient() == client) {
-        return current;
+  @PostConstruct
+  public void init(){
+      if (brokerRepository.findOne("127.0.0.1:51015")==null) {
+        Broker broker = new Broker("", "127.0.0.1:51015");
+        brokerRepository.save(broker);
+        zeebeConnections.connect(broker);
       }
-    }
-    return null;
-  }
-
-  public static BrokerConnectionDto getBrokerConnection(String connectionString) {
-    for (BrokerConnectionDto current : brokerConnections) {
-      if (current.getConnectionString().equals(connectionString)) {
-        return current;
-      }
-    }
-    return null;
   }
 
   @RequestMapping("/log")
-  public Map<String, Map<Integer, List<String>>> getLogs() {
-    return ZeebeListener.events;
+  public Iterable<LoggedEvent> getLogs() {
+    return loggedEventRepository.findAll();
   }
   
   @RequestMapping("/")
-  public List<BrokerConnectionDto> getBrokerConnections() {
-    return brokerConnections;
+  public List<ZeebeConnectionDto> getBrokerConnections() {
+    return zeebeConnections.getConnectionDtoList();
   }
 
   @RequestMapping(path="/connect", method=RequestMethod.POST)
-  public BrokerConnectionDto connect( @RequestBody String connectionString) {
-    BrokerConnectionDto newConnection = null;
-    for (BrokerConnectionDto brokerConnectionDto : brokerConnections) {
-      if (brokerConnectionDto.getConnectionString().equals(connectionString)
-          && brokerConnectionDto.isConnected()) {
-        return brokerConnectionDto; // no duplicate connection
-      }
-      if (brokerConnectionDto.getConnectionString().equals(connectionString)
-          && !brokerConnectionDto.isConnected()) {
-        newConnection = brokerConnectionDto; // no duplicate connection
-      }
-    }
-    if (newConnection==null) {
-      newConnection = new BrokerConnectionDto("", connectionString, true, null);
-      brokerConnections.add(newConnection);      
-    }
-
-    Properties clientProperties = new Properties();
-    clientProperties.put(ClientProperties.BROKER_CONTACTPOINT, connectionString);
-
-    ZeebeClient client = ZeebeClient.create(clientProperties);
-    client.connect();
-    
-    newConnection.setClient(client);
-    newConnection.setConnected(true);
-
-    try {
-      zeebeListener.connectTngpClient(client);
-      System.out.println("Connected new client " + newConnection);
-    } catch (Exception ex) {
-      newConnection.setConnected(false);
-      System.out.println("Could not connect to broker " + newConnection);
-      ex.printStackTrace();
+  public ZeebeConnectionDto connect( @RequestBody String connectionString) {
+    Broker broker = brokerRepository.findOne(connectionString);
+    if (broker==null) {
+      broker = new Broker(null, connectionString); // TODO: Add names to UI
+      brokerRepository.save(broker);
     }
     
+    if (!zeebeConnections.isConnected(broker)) {
+      zeebeConnections.connect(broker);
+    }
     
-    return newConnection; 
+    return zeebeConnections.getConnectionDto(broker); 
   }
 
   @RequestMapping(path="/disconnect", method=RequestMethod.POST)
-  public BrokerConnectionDto disconnect(String connectionString) {
-    for (BrokerConnectionDto brokerConnectionDto : brokerConnections) {
-      if (brokerConnectionDto.getConnectionString().equals(connectionString)) {
-        zeebeListener.disconnectTngpClient(brokerConnectionDto.getClient());
-        brokerConnectionDto.setConnected(false);
-        return brokerConnectionDto;
+  public ZeebeConnectionDto disconnect(@RequestBody String connectionString) {
+    Broker broker = brokerRepository.findOne(connectionString);
+    if (broker!=null) {
+      if (zeebeConnections.isConnected(broker)) {
+        zeebeConnections.disconnect(broker);
       }
+      return zeebeConnections.getConnectionDto(broker); 
     }
     return null;
   }
 
-
   
-//  @RequestMapping(path="/embedded/start", method=RequestMethod.POST)  
-//  public void startEmbeddedBroker() {
-//    if (embeddedBroker!=null) {
-//      return; 
-//    }
-//    InputStream config = BrokerResource.class.getResourceAsStream("/zeebe.cfg.toml");
-//    embeddedBroker = new Broker(config);
-//  }
-//
-//  @RequestMapping(path="/embedded/stop", method=RequestMethod.POST)  public void stopEmbeddedBroker() {
-//    if (embeddedBroker==null) {
-//      return; 
-//    }
-//    embeddedBroker.close();
-//    embeddedBroker = null;
-//  }
+  @RequestMapping(path="/cleanup", method=RequestMethod.POST)
+  public void cleanup() {
+    // TODO: Cleanup for only one broker?
+      zeebeConnections.deleteAllData();
+  }
 
- 
 }

@@ -26,6 +26,19 @@
 		<version.java>1.8</version.java>
 	</properties>
 
+
+	<dependencyManagement>
+		<dependencies>
+
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${spring.boot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>io.zeebe</groupId>
@@ -33,17 +46,22 @@
 			<version>${zeebe.version}</version>
 		</dependency>
 
-		<!-- Dependency to allow starting the broker embedded
-		<dependency>
-			<groupId>io.zeebe</groupId>
-			<artifactId>zeebe-broker-core</artifactId>
-			<version>${zeebe.version}</version>
-		</dependency>
-		-->	
+		<!-- Dependency to allow starting the broker embedded <dependency> <groupId>io.zeebe</groupId> 
+			<artifactId>zeebe-broker-core</artifactId> <version>${zeebe.version}</version> 
+			</dependency> -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-			<version>${spring.boot.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish</groupId>
@@ -53,12 +71,16 @@
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>webjars-locator</artifactId>
-			<version>0.32-1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>bootstrap</artifactId>
-			<version>2.3.2</version>
+			<version>3.3.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>jquery</artifactId>
+			<version>3.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.webjars.bower</groupId>
@@ -76,14 +98,8 @@
 			</plugin>
 		</plugins>
 	</build>
-<!-- 
-	<repositories>
-		<repository>
-			<id>camunda-private</id>
-			<url>https://app.camunda.com/nexus/content/groups/private/</url>
-		</repository>
-	</repositories>
- -->
+	<!-- <repositories> <repository> <id>camunda-private</id> <url>https://app.camunda.com/nexus/content/groups/private/</url> 
+		</repository> </repositories> -->
 	<scm>
 		<url>https://github.com/camunda-consulting/zeebe-simple-monitor</url>
 		<connection>scm:git:git@github.com:camunda-consulting/zeebe-simple-monitor.git</connection>

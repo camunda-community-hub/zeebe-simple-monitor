@@ -1,17 +1,28 @@
-package com.camunda.consulting.zeebe.dto;
+package com.camunda.consulting.zeebe.entity;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
 import io.zeebe.client.event.WorkflowInstanceEvent;
-import io.zeebe.client.impl.data.MsgPackConverter;
 
-public class WorkflowInstanceDto {
+@Entity
+public class WorkflowInstance {
 
-  public static final MsgPackConverter msgPackConverter = new MsgPackConverter();
-  
-  private String broker;
+  @Id
   private long id;
+
+  @OneToOne
+  private Broker broker;
   private String workflowDefinitionUuid;
 
   private String workflowDefinitionKey;
@@ -20,29 +31,55 @@ public class WorkflowInstanceDto {
   private boolean ended = false;
 
   private String payload;
+  
+  @LazyCollection(LazyCollectionOption.FALSE)  
+  @ElementCollection  
   private List<String> runningActivities = new ArrayList<String>();
+  
+  @LazyCollection(LazyCollectionOption.FALSE)
+  @ElementCollection
   private List<String> endedActivities = new ArrayList<String>();
 
-  private List<IncidentDto> incidents = new ArrayList<IncidentDto>();
+  @LazyCollection(LazyCollectionOption.FALSE)
+  @OneToMany(cascade=CascadeType.ALL)
+  private List<Incident> incidents = new ArrayList<Incident>();
 
+  public static WorkflowInstance from(WorkflowInstanceEvent workflowInstanceEvent) {
+    WorkflowInstance dto = new WorkflowInstance();
 
-  public static WorkflowInstanceDto from(WorkflowInstanceEvent workflowInstanceEvent) {
-    WorkflowInstanceDto dto = new WorkflowInstanceDto();
-    
     dto.setWorkflowDefinitionKey(workflowInstanceEvent.getBpmnProcessId());
     dto.setWorkflowDefinitionVersion(workflowInstanceEvent.getVersion());
     dto.setId(workflowInstanceEvent.getWorkflowInstanceKey());
-    
+
     dto.setPayload(workflowInstanceEvent.getPayload());
 
     return dto;
   }
-  
-  public String getBroker() {
+
+  public WorkflowInstance activityStarted(String activityId, String newPayload) {
+    // TODO: Add own activity entity to also allow for loops & co
+    runningActivities.add(activityId);
+    setPayload(newPayload);
+    return this;
+  }
+
+  public WorkflowInstance activityEnded(String activityId, String newPayload) {
+    runningActivities.remove(activityId);
+    endedActivities.add(activityId);
+    setPayload(newPayload);
+    return this;
+  }
+
+  public WorkflowInstance incidentOccured(Incident incident) {
+    this.incidents.add(incident);
+    return this;
+  }
+
+  public Broker getBroker() {
     return broker;
   }
 
-  public void setBroker(String broker) {
+  public void setBroker(Broker broker) {
     this.broker = broker;
   }
 
@@ -51,7 +88,9 @@ public class WorkflowInstanceDto {
   }
 
   public void setPayload(String payload) {
-    this.payload = payload;
+    if (payload!=null && payload.length()>0) {
+      this.payload = payload;
+    }
   }
 
   public long getId() {
@@ -82,8 +121,9 @@ public class WorkflowInstanceDto {
     return ended;
   }
 
-  public void setEnded(boolean ended) {
+  public WorkflowInstance setEnded(boolean ended) {
     this.ended = ended;
+    return this;
   }
 
   public String getWorkflowDefinitionUuid() {
@@ -116,9 +156,8 @@ public class WorkflowInstanceDto {
     this.workflowDefinitionVersion = workflowDefinitionVersion;
   }
 
-  public List<IncidentDto> getIncidents() {
+  public List<Incident> getIncidents() {
     return this.incidents;
   }
-
 
 }

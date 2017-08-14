@@ -21,42 +21,22 @@ var currentPage;
 	}
 	*/
 
-function startEmbeddedBroker() {
+function cleanupData() {
 			$.ajax({
 		             type : 'POST',
-		             url: restAccess + 'broker/embedded/start',
-		             //data: connectionString,
-		             //contentType: 'application/text; charset=utf-8',
-		             //dataType: 'json',
+		             url: restAccess + 'broker/cleanup',
 		             success: function (result) {
-		             	$('#btnBrokerStart').hide(); $('#btnBrokerStop').show();
-		             	brokerConnect('127.0.0.1:51015');
+					    loadBrokers();
+					    refresh();		
 		             },
 		             error: function (xhr, ajaxOptions, thrownError) {
+		             	console.log(xhr);
 		             	console.log(thrownError);
 		             	showError(xhr.responseJSON.message);
 		             },
 		             crossDomain: true,
 		    });				
-}	
-function stopEmbeddedBroker() {
-			$.ajax({
-		             type : 'POST',
-		             url: restAccess + 'broker/embedded/stop',
-		             //data: connectionString,
-		             //contentType: 'application/text; charset=utf-8',
-		             //dataType: 'json',
-		             success: function (result) {
-		             	brokerDisconnect('127.0.0.1:51015');
-		             	$('#btnBrokerStart').show(); $('#btnBrokerStop').hide();
-		             },
-		             error: function (xhr, ajaxOptions, thrownError) {
-		             	console.log(thrownError);
-		             	showError(xhr.responseJSON.message);
-		             },
-		             crossDomain: true,
-		    });				
-}	
+}
 
 function brokerConnect(connectionString) {
 			$.ajax({
@@ -99,15 +79,17 @@ function brokerDisconnect(connectionString) {
 
 function renderBrokerTable() {
 	$("#brokerTable > tbody").html("");
-	for (index = brokers.length-1; index >= 0; --index) {
-		var broker = brokers[index];
-		if (broker.connected) {
-			$('#brokerTable tbody').append("<tr><td>"+broker.name+"</td><td>"+broker.connectionString+"</td><td><span class='label label-success'>connected</span></td><td><a onclick='brokerDisconnect(\""+broker.connectionString+"\")'>disconnect</a></td></tr>");
+	var atLeastOneBrokerConnected = false;
+	for (index = brokerConnections.length-1; index >= 0; --index) {
+		var brokerConnection = brokerConnections[index];
+		if (brokerConnection.connected) {
+			$('#brokerTable tbody').append("<tr><td>"+brokerConnection.broker.name+"</td><td>"+brokerConnection.broker.connectionString+"</td><td><span class='label label-success'>connected</span></td><td><a onclick='brokerDisconnect(\""+brokerConnection.broker.connectionString+"\")'>disconnect</a></td></tr>");
+			atLeastOneBrokerConnected = true;
 		} else {
-			$('#brokerTable tbody').append("<tr><td>"+broker.name+"</td><td>"+broker.connectionString+"</td><td>disconnected</td><td><a onclick='brokerConnect(\""+broker.connectionString+"\")'>connect</a></td></tr>");
+			$('#brokerTable tbody').append("<tr><td>"+brokerConnection.broker.name+"</td><td>"+brokerConnection.broker.connectionString+"</td><td>disconnected</td><td><a onclick='brokerConnect(\""+brokerConnection.broker.connectionString+"\")'>connect</a></td></tr>");
 		}
 	}
-	if (brokers && brokers.length > 0 && brokers[0].connected) {
+	if (atLeastOneBrokerConnected) {
 		$('#brokerGlobalInfo').html('<a><span class="label label-success">connected</span></a>');
 	} else {
 		$('#brokerGlobalInfo').html('<a onclick="brokerConnect(\'127.0.0.1:51015\')"><span class="label label-danger">Not connected. Klick to connect default.</span></a>')	;	
@@ -141,7 +123,7 @@ function addBroker() {
 
 function loadBrokers() {
 	$.get(restAccess + 'broker/', function(brokerList) {
-		brokers = brokerList;
+		brokerConnections = brokerList;
 		renderBrokerTable();
 	});
 }
@@ -173,7 +155,7 @@ function renderWorkflowDefinitionTable() {
 		if (selectedWorkflowDefinition && def.id==selectedWorkflowDefinition.id) {
 			selectedClass ='class="tngp-table-selected"';
 		}
-		$('#workflowDefinitionTable tbody').append("<tr><td "+selectedClass+"><a onclick='selectWorkflowDefinition("+index+")'>"+def.key + "(" + def.id + ")" +"</a></td><td "+selectedClass+">"+def.countRunning+"</td></tr>");
+		$('#workflowDefinitionTable tbody').append("<tr><td "+selectedClass+"><a onclick='selectWorkflowDefinition("+index+")'>"+def.key + "(" + def.version + ")" +"</a></td><td "+selectedClass+">"+def.countRunning+"</td></tr>");
 	}
 
     // add brokers to selected broker dropdown
@@ -194,7 +176,7 @@ function renderSelectedWorkflowDefinition() {
 		$('#workflowDefinitionKey').html(selectedWorkflowDefinition.key);
 		$('#workflowDefinitionName').html(selectedWorkflowDefinition.key);
 		$('#workflowDefinitionVersion').text(selectedWorkflowDefinition.version);
-		$('#workflowDefinitionBroker').text(selectedWorkflowDefinition.broker);
+		$('#workflowDefinitionBroker').text(selectedWorkflowDefinition.broker.connectionString);
 
 		$('#countRunning').text(selectedWorkflowDefinition.countRunning);
 		$('#countEnded').text(selectedWorkflowDefinition.countEnded);
@@ -286,7 +268,7 @@ function renderSelectedWorkflowInstance() {
 		renderIncidentsTable();
 
 		$('#workflowInstanceInfo').text('');
-		$.get(restAccess + 'workflow-definition/' + selectedWorkflowInstance.workflowDefinitionKey + '/' + selectedWorkflowInstance.workflowDefinitionVersion, function(result) {
+		$.get(restAccess + 'workflow-definition/' + selectedWorkflowInstance.broker.connectionString + '/' + selectedWorkflowInstance.workflowDefinitionKey + '/' + selectedWorkflowInstance.workflowDefinitionVersion, function(result) {
 			viewer.importXML(result.resource, function(err) {
 							if (err) {
 								console.log('error rendering', err);
@@ -312,23 +294,29 @@ function renderIncidentsTable() {
 	$("#incidentsTable > tbody").html("");
 	for (index = 0; index < selectedWorkflowInstance.incidents.length; ++index) {
 		var incident = selectedWorkflowInstance.incidents[index];
-		console.log(incident);
 		$('#incidentsTable tbody').append("<tr><td>"+incident.errorType+"</td><td>"+incident.errorMessage+"</td></tr>");
 	}
 }
 
 function renderBrokerLogsTable() {
 	$("#brokerLogsTable > tbody").html("");
-	for (var broker in brokerLogs) {
-	    var topics = brokerLogs[broker];
-		for (var topic in topics) {
-		    var logs = topics[topic];
-			for (index = logs.length-1; index >= 0; --index) {
-				var log = logs[index];
-				$('#brokerLogsTable tbody').append("<tr><td>"+broker+"</td><td>"+topic+"</td><td>"+log+"</td></tr>");
+
+			for (index = brokerLogs.length-1; index >= 0; --index) {
+
+
+				var loggedEvent = brokerLogs[index];
+				$('#brokerLogsTable tbody').append(
+					"<tr><td>"+loggedEvent.broker.connectionString+"</td>"
+					+"<td>"+loggedEvent.eventType+"</td>"
+					+"<td>"+loggedEvent.state+"</td>"
+					+"<td>"+loggedEvent.partitionId+"</td>"
+					+"<td>"+loggedEvent.position+"</td>"
+					+"<td>"+loggedEvent.key+"</td>"
+					+"<td>"
+			        + '<a label="Details" data-toggle="collapse" data-target="#payload'+index+'" class="btn btn-default table-row-btn"><span class="glyphicon glyphicon-eye-open"></span></a>'
+			        +"<div class=\"collapse\" id=\"payload"+ index + "\"><pre>"+JSON.stringify(loggedEvent.payload, null, 2)+"</pre></div></td></tr>");
+
 			}
-		}
-	}
 }
 
 
