@@ -68,7 +68,7 @@ public class ZeebeConnections {
     openConnections.put(broker.getConnectionString(), client);
 
     // TODO: Think about the use case when connecting to various brokers on localhost
-    String clientName = UUID.randomUUID().toString(); // "zeebe-simple-monitor";
+    String clientName = UUID.randomUUID().toString().substring(0, 31); // "zeebe-simple-monitor";
 
     client.topics().newSubscription(Constants.DEFAULT_TOPIC) //
         .startAtHeadOfTopic() //
