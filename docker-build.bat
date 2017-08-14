@@ -1,0 +1,1 @@
+docker build -t camcon/zeebe-simple-monitor .

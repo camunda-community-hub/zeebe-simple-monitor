@@ -100,7 +100,6 @@ function renderBrokerDropdown() {
     // add brokers to selected broker dropdown
 	$('#selectedBrokerDropdown').empty();
 	for (index = brokerConnections.length-1; index >= 0; --index) {
-		console.log(brokerConnections[index]);
 		$("#selectedBrokerDropdown").append('<option>'+brokerConnections[index].broker.connectionString+'</option>');
 	}	
 }

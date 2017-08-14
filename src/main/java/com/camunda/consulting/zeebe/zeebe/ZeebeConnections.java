@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.json.Json;
 
@@ -67,9 +68,10 @@ public class ZeebeConnections {
     openConnections.put(broker.getConnectionString(), client);
 
     // TODO: Think about the use case when connecting to various brokers on localhost
-    String clientName = "zeebe-simple-monitor";
+    String clientName = UUID.randomUUID().toString(); // "zeebe-simple-monitor";
 
-    client.topics().newSubscription(Constants.DEFAULT_TOPIC).startAtHeadOfTopic() //
+    client.topics().newSubscription(Constants.DEFAULT_TOPIC) //
+        .startAtHeadOfTopic() //
         .forcedStart() //
         .name(clientName).incidentEventHandler((event) -> {
           if ("CREATED".equals(event.getState())) {

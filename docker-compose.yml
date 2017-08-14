@@ -1,0 +1,21 @@
+version: '2'
+
+services:
+  zeebe:
+    image: camunda/zeebe:0.1.0
+    ports:
+      - "51015:51015"
+      - "51016:51016"
+      - "51017:51017"
+  monitor:
+    image: camcon/zeebe-simple-monitor:latest
+    ports:
+      - "9000:8080"
+  docker_compose_ui:
+    image: francescou/docker-compose-ui:1.3.0
+    ports:
+        - 5000:5000
+    working_dir: /opt/docker-compose-projects/
+    volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - .:/opt/docker-compose-projects/poc-allianz-2fa
