@@ -7,7 +7,7 @@ This Spring Boot application can connect to [Zeebe](https://zeebe.io) and regist
 
 ![screenshot](docs/screen-workflow-definition.png)
 
-![screenshot](docs/screen-workflow-instances.png.png)
+![screenshot](docs/screen-workflow-instances.png)
 
 You can connect to Zeebe brokers if you can reach them via network.
 
