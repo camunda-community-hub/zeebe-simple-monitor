@@ -56,11 +56,17 @@ public class WorkflowDefinitionResource {
     return fillWorkflowInstanceCount(workflowDefinitionRepository.findByBrokerConnectionStringAndKeyAndVersion(broker, key, version));
   }
 
-  @RequestMapping(path="/{broker}/{id}", method=RequestMethod.PUT)
-  public void startWorkflowInstance(@PathVariable("id") String id, @PathVariable("broker") String brokerConnection, String payload) {
+  @RequestMapping(path="/{broker}/{key}/{version}", method=RequestMethod.PUT)
+  public void startWorkflowInstance(@PathVariable("broker") String brokerConnection, @PathVariable("key") String key, @PathVariable("version") int version, @RequestBody String payload) {
+    
+    // TODO: Check if we can better extract that via SSpring MVC
+    payload = payload.replace("\\\"", "\"");
+    payload = payload.substring(1, payload.length()-1);
+    
     connections.getZeebeClient(brokerConnection).workflows() //
       .create(Constants.DEFAULT_TOPIC)
-      .bpmnProcessId(id)
+      .bpmnProcessId(key)
+      .version(version)
       .payload(payload)
       .execute();
   }

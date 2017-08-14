@@ -96,6 +96,15 @@ function renderBrokerTable() {
 	}
 }
 
+function renderBrokerDropdown() {
+    // add brokers to selected broker dropdown
+	$('#selectedBrokerDropdown').empty();
+	for (index = brokerConnections.length-1; index >= 0; --index) {
+		console.log(brokerConnections[index]);
+		$("#selectedBrokerDropdown").append('<option>'+brokerConnections[index].broker.connectionString+'</option>');
+	}	
+}
+
 function init(page) {	
 	currentPage = page;
 	refresh();
@@ -125,6 +134,7 @@ function loadBrokers() {
 	$.get(restAccess + 'broker/', function(brokerList) {
 		brokerConnections = brokerList;
 		renderBrokerTable();
+		renderBrokerDropdown();
 	});
 }
 
@@ -157,13 +167,6 @@ function renderWorkflowDefinitionTable() {
 		}
 		$('#workflowDefinitionTable tbody').append("<tr><td "+selectedClass+"><a onclick='selectWorkflowDefinition("+index+")'>"+def.key + "(" + def.version + ")" +"</a></td><td "+selectedClass+">"+def.countRunning+"</td></tr>");
 	}
-
-    // add brokers to selected broker dropdown
-	$('#selectedBrokerDropdown').empty();
-	for (index = brokers.length-1; index >= 0; --index) {
-		console.log(brokers[index].connectionString);
-		$("#selectedBrokerDropdown").append('<option>'+brokers[index].connectionString+'</option>');
-	}	
 }	
 
 function selectWorkflowDefinition(index) {
@@ -202,9 +205,10 @@ function renderSelectedWorkflowDefinition() {
 function startWorkflowInstance() {
 	console.log(selectedWorkflowDefinition);
 	if (selectedWorkflowDefinition) {
+		console.log(JSON.stringify( $('#payload').val() ));
 		$.ajax({
 	             type : 'PUT',
-	             url: restAccess + 'workflow-definition/' + selectedWorkflowDefinition.broker + "/" + selectedWorkflowDefinition.key + "/" + selectedWorkflowDefinition.version,
+	             url: restAccess + 'workflow-definition/' + selectedWorkflowDefinition.broker.connectionString + "/" + selectedWorkflowDefinition.key + "/" + selectedWorkflowDefinition.version,
 	             data:  JSON.stringify( $('#payload').val() ),
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {

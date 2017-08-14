@@ -32,14 +32,14 @@ public class BrokerResource {
   @Autowired
   private ZeebeConnections zeebeConnections;
 
-  @PostConstruct
-  public void init(){
-      if (brokerRepository.findOne("127.0.0.1:51015")==null) {
-        Broker broker = new Broker("", "127.0.0.1:51015");
-        brokerRepository.save(broker);
-        zeebeConnections.connect(broker);
-      }
-  }
+//  @PostConstruct
+//  public void init(){
+//      if (brokerRepository.findOne("127.0.0.1:51015")==null) {
+//        Broker broker = new Broker("", "127.0.0.1:51015");
+//        brokerRepository.save(broker);
+//        zeebeConnections.connect(broker);
+//      }
+//  }
 
   @RequestMapping("/log")
   public Iterable<LoggedEvent> getLogs() {
