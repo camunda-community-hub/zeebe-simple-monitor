@@ -1,1 +1,1 @@
-docker build -t camcon/zeebe-simple-monitor .
+docker build -t docker.consulting.camunda.com/zeebe-simple-monitor .
