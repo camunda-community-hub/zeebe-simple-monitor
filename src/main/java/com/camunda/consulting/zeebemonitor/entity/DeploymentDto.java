@@ -1,4 +1,4 @@
-package com.camunda.consulting.zeebe.entity;
+package com.camunda.consulting.zeebemonitor.entity;
 
 import java.util.List;
 

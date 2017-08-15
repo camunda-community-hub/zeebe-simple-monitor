@@ -1,6 +1,6 @@
-package com.camunda.consulting.zeebe.zeebe;
+package com.camunda.consulting.zeebemonitor.zeebe;
 
-import com.camunda.consulting.zeebe.entity.Broker;
+import com.camunda.consulting.zeebemonitor.entity.Broker;
 
 public class ZeebeConnectionDto {
 

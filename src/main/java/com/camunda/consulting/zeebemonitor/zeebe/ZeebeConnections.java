@@ -1,4 +1,4 @@
-package com.camunda.consulting.zeebe.zeebe;
+package com.camunda.consulting.zeebemonitor.zeebe;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -13,16 +13,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.ApplicationScope;
 
-import com.camunda.consulting.zeebe.Constants;
-import com.camunda.consulting.zeebe.entity.Broker;
-import com.camunda.consulting.zeebe.entity.Incident;
-import com.camunda.consulting.zeebe.entity.LoggedEvent;
-import com.camunda.consulting.zeebe.entity.WorkflowDefinition;
-import com.camunda.consulting.zeebe.entity.WorkflowInstance;
-import com.camunda.consulting.zeebe.repository.BrokerRepository;
-import com.camunda.consulting.zeebe.repository.LoggedEventRepository;
-import com.camunda.consulting.zeebe.repository.WorkflowDefinitionRepository;
-import com.camunda.consulting.zeebe.repository.WorkflowInstanceRepository;
+import com.camunda.consulting.zeebemonitor.Constants;
+import com.camunda.consulting.zeebemonitor.entity.Broker;
+import com.camunda.consulting.zeebemonitor.entity.Incident;
+import com.camunda.consulting.zeebemonitor.entity.LoggedEvent;
+import com.camunda.consulting.zeebemonitor.entity.WorkflowDefinition;
+import com.camunda.consulting.zeebemonitor.entity.WorkflowInstance;
+import com.camunda.consulting.zeebemonitor.repository.BrokerRepository;
+import com.camunda.consulting.zeebemonitor.repository.LoggedEventRepository;
+import com.camunda.consulting.zeebemonitor.repository.WorkflowDefinitionRepository;
+import com.camunda.consulting.zeebemonitor.repository.WorkflowInstanceRepository;
 
 import io.zeebe.client.ClientProperties;
 import io.zeebe.client.ZeebeClient;

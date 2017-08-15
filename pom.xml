@@ -87,8 +87,12 @@
 			<artifactId>bpmn-js</artifactId>
 			<version>0.19.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
-
 
 	<build>
 		<finalName>${project.name}</finalName>
@@ -107,7 +111,7 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<!-- <repositories> <repository> <id>camunda-private</id> <url>https://app.camunda.com/nexus/content/groups/private/</url> 
 		</repository> </repositories> -->
 	<scm>

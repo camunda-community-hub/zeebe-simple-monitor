@@ -1,11 +1,12 @@
-package com.camunda.consulting.zeebe.repository;
+package com.camunda.consulting.zeebemonitor.repository;
 
 import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.jpa.repository.Query;
 
-import com.camunda.consulting.zeebe.entity.WorkflowInstance;
+import com.camunda.consulting.zeebemonitor.entity.WorkflowInstance;
+
+import org.springframework.data.jpa.repository.Query;
 
 
 public interface WorkflowInstanceRepository extends CrudRepository<WorkflowInstance, Long> {

@@ -1,8 +1,8 @@
-package com.camunda.consulting.zeebe.repository;
+package com.camunda.consulting.zeebemonitor.repository;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.camunda.consulting.zeebe.entity.WorkflowDefinition;
+import com.camunda.consulting.zeebemonitor.entity.WorkflowDefinition;
 
 public interface WorkflowDefinitionRepository extends CrudRepository<WorkflowDefinition, String> {
 

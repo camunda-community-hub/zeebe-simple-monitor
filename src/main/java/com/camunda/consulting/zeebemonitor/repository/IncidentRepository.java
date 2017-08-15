@@ -1,8 +1,8 @@
-package com.camunda.consulting.zeebe.repository;
+package com.camunda.consulting.zeebemonitor.repository;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.camunda.consulting.zeebe.entity.Incident;
+import com.camunda.consulting.zeebemonitor.entity.Incident;
 
 public interface IncidentRepository extends CrudRepository<Incident, Long> {
 

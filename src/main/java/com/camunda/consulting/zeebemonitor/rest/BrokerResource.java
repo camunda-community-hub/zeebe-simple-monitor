@@ -1,4 +1,4 @@
-package com.camunda.consulting.zeebe.rest;
+package com.camunda.consulting.zeebemonitor.rest;
 
 import java.util.List;
 
@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.camunda.consulting.zeebe.entity.Broker;
-import com.camunda.consulting.zeebe.entity.LoggedEvent;
-import com.camunda.consulting.zeebe.repository.BrokerRepository;
-import com.camunda.consulting.zeebe.repository.LoggedEventRepository;
-import com.camunda.consulting.zeebe.zeebe.ZeebeConnectionDto;
-import com.camunda.consulting.zeebe.zeebe.ZeebeConnections;
+import com.camunda.consulting.zeebemonitor.entity.Broker;
+import com.camunda.consulting.zeebemonitor.entity.LoggedEvent;
+import com.camunda.consulting.zeebemonitor.repository.BrokerRepository;
+import com.camunda.consulting.zeebemonitor.repository.LoggedEventRepository;
+import com.camunda.consulting.zeebemonitor.zeebe.ZeebeConnectionDto;
+import com.camunda.consulting.zeebemonitor.zeebe.ZeebeConnections;
 
 @Component
 @RestController

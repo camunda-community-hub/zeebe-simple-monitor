@@ -1,8 +1,8 @@
-package com.camunda.consulting.zeebe.repository;
+package com.camunda.consulting.zeebemonitor.repository;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.camunda.consulting.zeebe.entity.LoggedEvent;
+import com.camunda.consulting.zeebemonitor.entity.LoggedEvent;
 
 public interface LoggedEventRepository extends CrudRepository<LoggedEvent, Long> {
 

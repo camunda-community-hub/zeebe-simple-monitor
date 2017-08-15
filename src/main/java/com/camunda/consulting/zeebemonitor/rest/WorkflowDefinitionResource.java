@@ -1,4 +1,4 @@
-package com.camunda.consulting.zeebe.rest;
+package com.camunda.consulting.zeebemonitor.rest;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.camunda.consulting.zeebe.Constants;
-import com.camunda.consulting.zeebe.entity.DeploymentDto;
-import com.camunda.consulting.zeebe.entity.FileDto;
-import com.camunda.consulting.zeebe.entity.WorkflowDefinition;
-import com.camunda.consulting.zeebe.repository.WorkflowDefinitionRepository;
-import com.camunda.consulting.zeebe.repository.WorkflowInstanceRepository;
-import com.camunda.consulting.zeebe.zeebe.ZeebeConnections;
+import com.camunda.consulting.zeebemonitor.Constants;
+import com.camunda.consulting.zeebemonitor.entity.DeploymentDto;
+import com.camunda.consulting.zeebemonitor.entity.FileDto;
+import com.camunda.consulting.zeebemonitor.entity.WorkflowDefinition;
+import com.camunda.consulting.zeebemonitor.repository.WorkflowDefinitionRepository;
+import com.camunda.consulting.zeebemonitor.repository.WorkflowInstanceRepository;
+import com.camunda.consulting.zeebemonitor.zeebe.ZeebeConnections;
 
 import io.zeebe.client.WorkflowsClient;
 

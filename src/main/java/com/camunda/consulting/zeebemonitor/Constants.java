@@ -1,4 +1,4 @@
-package com.camunda.consulting.zeebe;
+package com.camunda.consulting.zeebemonitor;
 
 public class Constants {
   
