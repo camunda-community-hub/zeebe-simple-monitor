@@ -43,17 +43,17 @@ public class ZeebeConnections {
   /**
    * broker connectionString -> ZeebeClirnt
    */
-  private Map<String, ZeebeClient> openConnections = new HashMap<String, ZeebeClient>();
+  private Map<String, ZeebeClient> openConnections = new HashMap<>();
 
   public ArrayList<ZeebeConnectionDto> getConnectionDtoList() {
     Iterable<Broker> allBrokers = brokerRepository.findAll();
-    ArrayList<ZeebeConnectionDto> result = new ArrayList<ZeebeConnectionDto>();
+    ArrayList<ZeebeConnectionDto> result = new ArrayList<>();
     for (Broker broker : allBrokers) {
       result.add(getConnectionDto(broker));
     }
-    return result;    
+    return result;
   }
-  
+
   public ZeebeConnectionDto getConnectionDto(Broker broker) {
     return new ZeebeConnectionDto(broker, isConnected(broker));
   }
@@ -64,16 +64,18 @@ public class ZeebeConnections {
 
     ZeebeClient client = ZeebeClient.create(clientProperties);
     client.connect();
-    
+
     openConnections.put(broker.getConnectionString(), client);
 
     // TODO: Think about the use case when connecting to various brokers on localhost
-    String clientName = UUID.randomUUID().toString().substring(0, 31); // "zeebe-simple-monitor";
+    String clientName = "zeebe-simple-monitor";
+    String typedSubscriptionName = clientName + "-typed";
+    String untypedSubscriptionName = clientName + "-untyped";
 
     client.topics().newSubscription(Constants.DEFAULT_TOPIC) //
         .startAtHeadOfTopic() //
         .forcedStart() //
-        .name(clientName).incidentEventHandler((event) -> {
+        .name(typedSubscriptionName).incidentEventHandler((event) -> {
           if ("CREATED".equals(event.getState())) {
             workflowInstanceIncidentOccured(broker, event.getWorkflowInstanceKey(), event.getActivityId(), event.getErrorType(), event.getErrorMessage());
           }
@@ -106,19 +108,27 @@ public class ZeebeConnections {
           if ("CREATED".equals(event.getState())) {
             workflowDefinitionDeployed(broker, WorkflowDefinition.from(event));
           }
-        }).handler((event) -> {
-
-          String state = Json.createReader(new StringReader(event.getJson())).readObject().getString("state");
-          loggedEventRepository.save(new LoggedEvent( //
-              broker, //
-              event.getMetadata().getPartitionId(), //
-              event.getMetadata().getPosition(), //
-              event.getMetadata().getKey(), //
-              event.getMetadata().getType().toString(), //
-              // event.getState(), // WAIT FOR
-              // https://github.com/zeebe-io/zeebe/issues/367
-              state, event.getJson()));
         }).open();
+
+    client.topics().newSubscription(Constants.DEFAULT_TOPIC)
+        .startAtHeadOfTopic()
+        .forcedStart()
+        .name(untypedSubscriptionName)
+        .handler((event) ->
+        {
+            String state = Json.createReader(new StringReader(event.getJson())).readObject().getString("state");
+            loggedEventRepository.save(new LoggedEvent( //
+                broker, //
+                event.getMetadata().getPartitionId(), //
+                event.getMetadata().getPosition(), //
+                event.getMetadata().getKey(), //
+                event.getMetadata().getType().toString(), //
+                // event.getState(), // WAIT FOR
+                // https://github.com/zeebe-io/zeebe/issues/367
+                state, event.getJson()));
+          })
+        .open();
+
     return client;
   }
 
@@ -165,7 +175,7 @@ public class ZeebeConnections {
 
     client.disconnect();
     client.close();
-    
+
     openConnections.remove(broker.getConnectionString());
   }
 
@@ -175,11 +185,11 @@ public class ZeebeConnections {
       client.close();
     }
     openConnections = new HashMap<>();
-    
+
     workflowInstanceRepository.deleteAll();
     workflowDefinitionRepository.deleteAll();
     loggedEventRepository.deleteAll();
-    brokerRepository.deleteAll();    
+    brokerRepository.deleteAll();
   }
 
   public ZeebeClient getZeebeClient(String brokerConnectionString) {

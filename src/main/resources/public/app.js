@@ -306,8 +306,9 @@ function renderBrokerLogsTable() {
 
 			for (index = brokerLogs.length-1; index >= 0; --index) {
 
-
 				var loggedEvent = brokerLogs[index];
+                var payload = JSON.parse(loggedEvent.payload);
+                
 				$('#brokerLogsTable tbody').append(
 					"<tr><td>"+loggedEvent.broker.connectionString+"</td>"
 					+"<td>"+loggedEvent.eventType+"</td>"
@@ -317,7 +318,7 @@ function renderBrokerLogsTable() {
 					+"<td>"+loggedEvent.key+"</td>"
 					+"<td>"
 			        + '<a label="Details" data-toggle="collapse" data-target="#payload'+index+'" class="btn btn-default table-row-btn"><span class="glyphicon glyphicon-eye-open"></span></a>'
-			        +"<div class=\"collapse\" id=\"payload"+ index + "\"><pre>"+JSON.stringify(loggedEvent.payload, null, 2)+"</pre></div></td></tr>");
+			        +"<div class=\"collapse\" id=\"payload"+ index + "\"><pre>"+JSON.stringify(payload, null, 2)+"</pre></div></td></tr>");
 
 			}
 }

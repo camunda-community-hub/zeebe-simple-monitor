@@ -15,7 +15,7 @@ public class LoggedEvent {
   @Id
   @GeneratedValue
   private Long id;
-  
+
   @OneToOne
   private Broker broker;
 
@@ -31,9 +31,9 @@ public class LoggedEvent {
   private String eventType;
 
   private String state;
-  
+
   public LoggedEvent() {}
-  
+
   public LoggedEvent(Broker broker, int partitionId, long position, long key, String eventType, String state, String eventPayload) {
     this.broker = broker;
     this.partitionId = partitionId;
@@ -41,16 +41,16 @@ public class LoggedEvent {
     this.key = key;
     this.eventType = eventType;
     this.state = state;
-    
+
     if (eventPayload!=null && eventPayload.length()>=20000) {
       eventPayload = eventPayload.substring(0, 19999);
     }
-        
+
     this.eventPayload = eventPayload;
   }
-  
-  public JsonObject getPayload() {
-    return Json.createReader(new StringReader(eventPayload)).readObject();// ;
+
+  public String getPayload() {
+    return eventPayload;
   }
 
   public Long getId() {
@@ -68,7 +68,7 @@ public class LoggedEvent {
   public void setBroker(Broker broker) {
     this.broker = broker;
   }
-  
+
   public String getEventPayload() {
     return eventPayload;
   }
@@ -93,6 +93,6 @@ public class LoggedEvent {
     return state;
   }
 
-  
+
 
 }

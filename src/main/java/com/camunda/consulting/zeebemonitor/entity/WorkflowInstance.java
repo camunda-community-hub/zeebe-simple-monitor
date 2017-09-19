@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -30,19 +31,20 @@ public class WorkflowInstance {
 
   private boolean ended = false;
 
+  @Column(length = 20000)
   private String payload;
-  
-  @LazyCollection(LazyCollectionOption.FALSE)  
-  @ElementCollection  
-  private List<String> runningActivities = new ArrayList<String>();
-  
+
   @LazyCollection(LazyCollectionOption.FALSE)
   @ElementCollection
-  private List<String> endedActivities = new ArrayList<String>();
+  private List<String> runningActivities = new ArrayList<>();
+
+  @LazyCollection(LazyCollectionOption.FALSE)
+  @ElementCollection
+  private List<String> endedActivities = new ArrayList<>();
 
   @LazyCollection(LazyCollectionOption.FALSE)
   @OneToMany(cascade=CascadeType.ALL)
-  private List<Incident> incidents = new ArrayList<Incident>();
+  private List<Incident> incidents = new ArrayList<>();
 
   public static WorkflowInstance from(WorkflowInstanceEvent workflowInstanceEvent) {
     WorkflowInstance dto = new WorkflowInstance();
