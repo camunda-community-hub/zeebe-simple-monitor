@@ -50,10 +50,9 @@ function brokerConnect(connectionString) {
 					    refresh();		
 		             },
 		             error: function (xhr, ajaxOptions, thrownError) {
-		             	console.log(xhr);
-		             	console.log(thrownError);
-		             	showError(xhr.responseJSON.message);
+		            	 showErrorResonse(xhr, ajaxOptions, thrownError);
 		             },
+		             timeout: 5000,
 		             crossDomain: true,
 		    });				
 }	
@@ -69,9 +68,9 @@ function brokerDisconnect(connectionString) {
 					    refresh();		
 		             },
 		             error: function (xhr, ajaxOptions, thrownError) {
-		             	console.log(thrownError);
-		             	showError(xhr.responseJSON.message);
+		            	 showErrorResonse(xhr, ajaxOptions, thrownError);
 		             },
+		             timeout: 5000,
 		             crossDomain: true,
 		    });		
 }	
@@ -92,7 +91,7 @@ function renderBrokerTable() {
 	if (atLeastOneBrokerConnected) {
 		$('#brokerGlobalInfo').html('<a><span class="label label-success">connected</span></a>');
 	} else {
-		$('#brokerGlobalInfo').html('<a onclick="brokerConnect(\'127.0.0.1:51015\')"><span class="label label-danger">Not connected. Klick to connect default.</span></a>')	;	
+		$('#brokerGlobalInfo').html('<a onclick="brokerConnect(\'127.0.0.1:51015\')"><span class="label label-danger">Not connected. Click to connect default.</span></a>')	;	
 	}
 }
 
@@ -149,7 +148,7 @@ function loadWorkflowDefinitions() {
 	$.get(restAccess + 'workflow-definition/', function(result) {
 	    workflowDefinitions = result;
 	    if (!selectedWorkflowDefinition && workflowDefinitions && workflowDefinitions.length>0) {
-	    	selectedWorkflowDefinition = workflowDefinitions[0];
+	    	selectedWorkflowDefinition = workflowDefinitions[workflowDefinitions.length - 1];
 	    }
 	    renderWorkflowDefinitionTable();
 	    renderSelectedWorkflowDefinition();
@@ -161,7 +160,7 @@ function renderWorkflowDefinitionTable() {
 	for (index = workflowDefinitions.length-1; index >= 0; --index) {
 		var def = workflowDefinitions[index];
 		var selectedClass = '';
-		if (selectedWorkflowDefinition && def.id==selectedWorkflowDefinition.id) {
+		if (selectedWorkflowDefinition && def.key==selectedWorkflowDefinition.key && def.version==selectedWorkflowDefinition.version) {
 			selectedClass ='class="tngp-table-selected"';
 		}
 		$('#workflowDefinitionTable tbody').append("<tr><td "+selectedClass+"><a onclick='selectWorkflowDefinition("+index+")'>"+def.key + "(" + def.version + ")" +"</a></td><td "+selectedClass+">"+def.countRunning+"</td></tr>");
@@ -170,6 +169,8 @@ function renderWorkflowDefinitionTable() {
 
 function selectWorkflowDefinition(index) {
 	selectedWorkflowDefinition = workflowDefinitions[index];
+	
+	renderWorkflowDefinitionTable(); // set selected could be done with less overhead - but this is quick for now
 	renderSelectedWorkflowDefinition();
 }
 
@@ -208,7 +209,7 @@ function startWorkflowInstance() {
 		$.ajax({
 	             type : 'PUT',
 	             url: restAccess + 'workflow-definition/' + selectedWorkflowDefinition.broker.connectionString + "/" + selectedWorkflowDefinition.key + "/" + selectedWorkflowDefinition.version,
-	             data:  JSON.stringify( $('#payload').val() ),
+	             data:  $('#payload').val(),
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
 	             	console.log("STARTED");
@@ -216,6 +217,10 @@ function startWorkflowInstance() {
     					refresh();
 					}, 1000);
 	             },
+	             error: function (xhr, ajaxOptions, thrownError) {
+	            	 showErrorResonse(xhr, ajaxOptions, thrownError);
+	             },
+            	 timeout: 5000,
 	             crossDomain: true,
 	    });
 	}
@@ -224,9 +229,20 @@ function startWorkflowInstance() {
 function loadWorkflowInstances() {
 	$.get(restAccess + 'workflow-instance/', function(result) {
 	    workflowInstances = result;
-	    if (!selectedWorkflowInstance && workflowInstances && workflowInstances.length>0) {
-	    	selectedWorkflowInstance = workflowInstances[0];
+	    if (workflowInstances && workflowInstances.length>0) {
+	    	
+	      var index = -1
+	      if (selectedWorkflowInstance) {
+	    	index = workflowInstances.findIndex(function(wf) { return wf.id == selectedWorkflowInstance.id});  
+	      }	      
+	      if (index < 0) {
+	        index = workflowInstances.length - 1
+	      }
+	      selectedWorkflowInstance = workflowInstances[index]
 	    }
+	    else {
+	      selectedWorkflowInstance = null
+	    }	    	
 
 	    renderWorkflowInstanceTable();
 	    renderSelectedWorkflowInstance();
@@ -248,12 +264,14 @@ function renderWorkflowInstanceTable() {
 
 function selectWorkflowInstance(index) {
 	selectedWorkflowInstance = workflowInstances[index];
+	
 	renderWorkflowInstanceTable(); // set selected could be done with less overhead - but this is quick for now
 	renderSelectedWorkflowInstance();
 }
 
 function renderSelectedWorkflowInstance() {
 	if (selectedWorkflowInstance) {
+		
 		$('#workflowInstanceId').html(selectedWorkflowInstance.id);
 		if (selectedWorkflowInstance.ended) {
 			$('#workflowRunning').html("Ended");
@@ -263,7 +281,7 @@ function renderSelectedWorkflowInstance() {
 
 		$('#workflowDefinitionUuid').html(selectedWorkflowInstance.workflowDefinitionUuid);
 		$('#workflowDefinitionKey').html(selectedWorkflowInstance.workflowDefinitionKey);
-		$('#payload').html(
+		$('#payload').val(
 			JSON.stringify(
 				JSON.parse(selectedWorkflowInstance.payload), undefined, 2
 			));
@@ -279,6 +297,7 @@ function renderSelectedWorkflowInstance() {
 							} else {
 								var canvas = viewer.get('canvas');
 								var overlays = viewer.get('overlays');
+								var injector = viewer.get('injector');
 
 								container.removeClass('with-error')
 										 .addClass('with-diagram');
@@ -287,6 +306,7 @@ function renderSelectedWorkflowInstance() {
 								canvas.zoom('fit-viewport');
 
 								addBpmnOverlays(canvas, overlays, selectedWorkflowInstance);
+								markSequenceFlows(injector, selectedWorkflowInstance);
 							}
 			});
 		});
@@ -335,7 +355,14 @@ function ackError() {
 	$("#errorPanel").hide();
 }
 
-
+function showErrorResonse(xhr, ajaxOptions, thrownError) {
+	if (xhr.responseJSON) {
+		showError(xhr.responseJSON.message);
+	}
+	else {
+		showError(thrownError);
+	}	
+}
 
 
 function uploadModels() {
@@ -389,9 +416,14 @@ function uploadModels() {
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
 	             	setTimeout(function() {
+	             		selectedWorkflowDefinition = null;
     					refresh();
 					}, 1000);
 	             },
+	             error: function (xhr, ajaxOptions, thrownError) {
+	            	 showErrorResonse(xhr, ajaxOptions, thrownError);
+	             },
+            	 timeout: 5000,
 	             crossDomain: true,
 	    });
 	}; 
@@ -400,6 +432,10 @@ function uploadModels() {
 }
 	
 function addBpmnOverlays(canvas, overlays, workflowInstance) {
+	
+		for (index = 0; index < workflowInstance.runningActivities.length; ++index) {
+	    	canvas.addMarker(workflowInstance.runningActivities[index], 'highlight');
+		}
 	
         for (index = 0; index < workflowInstance.endedActivities.length; ++index) {
 				overlays.add(workflowInstance.endedActivities[index], {
@@ -410,7 +446,81 @@ function addBpmnOverlays(canvas, overlays, workflowInstance) {
 				  html: '<div class="bpmn-badge"><span class="glyphicon glyphicon-ok"></span></div>'
 				});
 		}
-        for (index = 0; index < workflowInstance.runningActivities.length; ++index) {
-        	canvas.addMarker(workflowInstance.runningActivities[index], 'highlight');
-		}
+        
+        for (index = 0; index < workflowInstance.incidents.length; ++index) {
+			overlays.add(workflowInstance.incidents[index].activityId, {
+			  position: {
+			    top: 0,
+			    left: 0
+			  },
+			  html: '<div class="bpmn-badge error"><span class="glyphicon glyphicon glyphicon-flash"></span></div>'
+			});			
+        }
 }	
+
+function markSequenceFlows(injector, workflowInstance) {
+	
+	var elementRegistry = injector.get('elementRegistry'),
+		graphicsFactory = injector.get('graphicsFactory');
+	
+	var takenSequenceFlows = workflowInstance.takenSequenceFlows.map(function(id) {
+		return elementRegistry.get(id);
+	});
+	
+	takenSequenceFlows.forEach(function(sequenceFlow) {
+		var gfx = elementRegistry.getGraphics(sequenceFlow);
+		
+		colorSequenceFlow(graphicsFactory, sequenceFlow, gfx, '#52b415');
+	});
+}
+
+function colorSequenceFlow(graphicsFactory, sequenceFlow, gfx, color) {
+	var businessObject = sequenceFlow.businessObject,
+		di = businessObject.di;
+	
+	di.set('stroke', color);
+	di.set('fill', color);
+	
+	graphicsFactory.update('connection', sequenceFlow, gfx);
+}
+
+function updatePayload() {
+	if (selectedWorkflowInstance) {
+		$.ajax({
+	             type : 'PUT',
+	             url: restAccess + 'workflow-instance/' + selectedWorkflowInstance.id + "/update-payload",
+	             data:  $('#payload').val(),
+	             contentType: 'application/json; charset=utf-8',
+	             success: function (result) {
+	             	setTimeout(function() {
+    					refresh();
+					}, 1000);
+	             },
+	             error: function (xhr, ajaxOptions, thrownError) {
+	            	 showErrorResonse(xhr, ajaxOptions, thrownError);
+	             },
+            	 timeout: 5000,
+	             crossDomain: true,
+	    });
+	}
+}
+
+function cancelWorkflowInstance() {
+	if (selectedWorkflowInstance) {
+		$.ajax({
+	             type : 'DELETE',
+	             url: restAccess + 'workflow-instance/' + selectedWorkflowInstance.id,
+	             contentType: 'application/json; charset=utf-8',
+	             success: function (result) {
+	             	setTimeout(function() {
+    					refresh();
+					}, 1000);
+	             },
+	             error: function (xhr, ajaxOptions, thrownError) {
+	            	 showErrorResonse(xhr, ajaxOptions, thrownError);
+	             },
+            	 timeout: 5000,
+	             crossDomain: true,
+	    });
+	}
+}

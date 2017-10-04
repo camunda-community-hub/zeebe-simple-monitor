@@ -1,24 +1,16 @@
 package com.camunda.consulting.zeebemonitor.rest;
 
-import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.camunda.consulting.zeebemonitor.Constants;
-import com.camunda.consulting.zeebemonitor.entity.DeploymentDto;
-import com.camunda.consulting.zeebemonitor.entity.FileDto;
-import com.camunda.consulting.zeebemonitor.entity.WorkflowDefinition;
+import com.camunda.consulting.zeebemonitor.entity.*;
 import com.camunda.consulting.zeebemonitor.repository.WorkflowDefinitionRepository;
 import com.camunda.consulting.zeebemonitor.repository.WorkflowInstanceRepository;
 import com.camunda.consulting.zeebemonitor.zeebe.ZeebeConnections;
-
 import io.zeebe.client.WorkflowsClient;
+import io.zeebe.client.event.ResourceType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path="/api/workflow-definition")
@@ -58,11 +50,7 @@ public class WorkflowDefinitionResource {
 
   @RequestMapping(path="/{broker}/{key}/{version}", method=RequestMethod.PUT)
   public void startWorkflowInstance(@PathVariable("broker") String brokerConnection, @PathVariable("key") String key, @PathVariable("version") int version, @RequestBody String payload) {
-    
-    // TODO: Check if we can better extract that via SSpring MVC
-    payload = payload.replace("\\\"", "\"");
-    payload = payload.substring(1, payload.length()-1);
-    
+
     connections.getZeebeClient(brokerConnection).workflows() //
       .create(Constants.DEFAULT_TOPIC)
       .bpmnProcessId(key)
@@ -70,16 +58,29 @@ public class WorkflowDefinitionResource {
       .payload(payload)
       .execute();
   }
-  
+
   @RequestMapping(path="/", method=RequestMethod.POST)
   public void uploadModel(@RequestBody DeploymentDto deployment) throws UnsupportedEncodingException {
-    WorkflowsClient workflows = connections.getZeebeClient(deployment.getBroker()).workflows();    
+    WorkflowsClient workflows = connections.getZeebeClient(deployment.getBroker()).workflows();
     for (FileDto file : deployment.getFiles()) {
       workflows //
-          .deploy(Constants.DEFAULT_TOPIC) //
-          .resourceStream(new ByteArrayInputStream(file.getContent()))
-          .execute();
+        .deploy(Constants.DEFAULT_TOPIC) //
+        .resourceBytes(file.getContent(), getResourceType(file))
+        .execute();
     }
   }
- 
+
+  private ResourceType getResourceType(FileDto file)
+  {
+    final String fileName = file.getFilename().toLowerCase();
+    if (fileName.endsWith(".yaml") || fileName.endsWith(".yml"))
+    {
+      return ResourceType.YAML_WORKFLOW;
+    }
+    else
+    {
+      return ResourceType.BPMN_XML;
+    }
+  }
+
 }

@@ -3,18 +3,11 @@ package com.camunda.consulting.zeebemonitor.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
+import javax.persistence.*;
 
 import io.zeebe.client.event.WorkflowInstanceEvent;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 public class WorkflowInstance {
@@ -31,6 +24,8 @@ public class WorkflowInstance {
 
   private boolean ended = false;
 
+  private long lastEventPosition;
+
   @Column(length = 20000)
   private String payload;
 
@@ -41,6 +36,10 @@ public class WorkflowInstance {
   @LazyCollection(LazyCollectionOption.FALSE)
   @ElementCollection
   private List<String> endedActivities = new ArrayList<>();
+
+  @LazyCollection(LazyCollectionOption.FALSE)
+  @ElementCollection
+  private List<String> takenSequenceFlows = new ArrayList<>();
 
   @LazyCollection(LazyCollectionOption.FALSE)
   @OneToMany(cascade=CascadeType.ALL)
@@ -54,6 +53,8 @@ public class WorkflowInstance {
     dto.setId(workflowInstanceEvent.getWorkflowInstanceKey());
 
     dto.setPayload(workflowInstanceEvent.getPayload());
+
+    dto.setLastEventPosition(workflowInstanceEvent.getMetadata().getPosition());
 
     return dto;
   }
@@ -72,10 +73,20 @@ public class WorkflowInstance {
     return this;
   }
 
+  public WorkflowInstance sequenceFlowTaken(String activityId) {
+      takenSequenceFlows.add(activityId);
+      return this;
+    }
+
   public WorkflowInstance incidentOccured(Incident incident) {
     this.incidents.add(incident);
     return this;
   }
+
+  public WorkflowInstance incidentResolved(Incident incident) {
+      this.incidents.remove(incident);
+      return this;
+    }
 
   public Broker getBroker() {
     return broker;
@@ -89,10 +100,11 @@ public class WorkflowInstance {
     return payload;
   }
 
-  public void setPayload(String payload) {
+  public WorkflowInstance setPayload(String payload) {
     if (payload!=null && payload.length()>0) {
       this.payload = payload;
     }
+    return this;
   }
 
   public long getId() {
@@ -160,6 +172,27 @@ public class WorkflowInstance {
 
   public List<Incident> getIncidents() {
     return this.incidents;
+  }
+
+  public long getLastEventPosition()
+  {
+    return lastEventPosition;
+  }
+
+  public WorkflowInstance setLastEventPosition(long lastEventPosition)
+  {
+    this.lastEventPosition = lastEventPosition;
+    return this;
+  }
+
+  public List<String> getTakenSequenceFlows()
+  {
+    return takenSequenceFlows;
+  }
+
+  public void setTakenSequenceFlows(List<String> takenSequenceFlows)
+  {
+    this.takenSequenceFlows = takenSequenceFlows;
   }
 
 }

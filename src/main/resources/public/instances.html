@@ -75,7 +75,11 @@ em.optional:after {
       background-color: #52b415; // bpmn.io #610000 // camunda
       border-color: #143d52;
       color: #143d52;
-    } 
+    }
+    
+    .bpmn-badge.error {
+      background-color: #f75f00;
+    }
   </style>
 
 </head>
@@ -151,7 +155,12 @@ em.optional:after {
       </div>
       <div class="col-md-2">
         <h2>Payload</h2>
-          <pre id="payload"></pre>        
+          <div>
+          	<textarea id="payload"></textarea>    
+          </div>
+          <div>
+         	 <a id="update-payload" href="#" onclick="updatePayload()" class="btn btn-warning">Update Payload</a>
+          </div>
         <h2>Incidents</h2>
           <table id="incidentsTable" class="table table-striped">
             <thead>
@@ -182,6 +191,9 @@ em.optional:after {
               <td id="workflowDefinitionKey"></td>
             </tr>
           </table>
+         <div>
+       	 	<a id="cancel-workflow-instance" href="#" onclick="cancelWorkflowInstance()" class="btn btn-primary">Cancel instance</a>
+         </div>
       </div>
       </div>
     </section>
