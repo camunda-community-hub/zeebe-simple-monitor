@@ -4,15 +4,14 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>org.camunda</groupId>
-		<artifactId>camunda-release-parent</artifactId>
-		<version>2.5</version>
+		<groupId>io.zeebe</groupId>
+		<artifactId>zb-parent</artifactId>
+		<version>0.2.0</version>
 		<relativePath />
 	</parent>
 
-	<groupId>com.camunda.consulting</groupId>
 	<artifactId>zeebe-simple-monitor</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0</version>
 
 	<packaging>jar</packaging>
 
@@ -109,26 +108,23 @@
 					</execution>
 				</executions>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                  <failOnViolation>false</failOnViolation>
+                </configuration>
+                <executions>
+                </executions>
+              </plugin>
 		</plugins>
 	</build>
 
-	<!-- <repositories> <repository> <id>camunda-private</id> <url>https://app.camunda.com/nexus/content/groups/private/</url> 
-		</repository> </repositories> -->
 	<scm>
-		<url>https://github.com/camunda-consulting/zeebe-simple-monitor</url>
-		<connection>scm:git:git@github.com:camunda-consulting/zeebe-simple-monitor.git</connection>
-		<developerConnection>scm:git:git@github.com:camunda-consulting/zeebe-simple-monitor.git</developerConnection>
+		<url>https://github.com/zeebe-io/zeebe-simple-monitor</url>
+		<connection>scm:git:git@github.com:zeebe-io/zeebe-simple-monitor.git</connection>
+		<developerConnection>scm:git:git@github.com:zeebe-io/zeebe-simple-monitor.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 
-	<distributionManagement>
-		<snapshotRepository>
-			<id>camunda-nexus</id>
-			<url>https://app.camunda.com/nexus/content/repositories/camunda-consulting-private-snapshots/</url>
-		</snapshotRepository>
-		<repository>
-			<id>camunda-nexus</id>
-			<url>https://app.camunda.com/nexus/content/repositories/camunda-consulting-private/</url>
-		</repository>
-	</distributionManagement>
 </project>
