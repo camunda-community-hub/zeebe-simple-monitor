@@ -13,7 +13,7 @@
 	<artifactId>zeebe-simple-monitor</artifactId>
 	<version>0.2.0-SNAPSHOT</version>
 
-	<packaging>jar</packaging>
+    <packaging>jar</packaging>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -45,8 +45,8 @@
 			<version>${zeebe.version}</version>
 		</dependency>
 
-		<!-- Dependency to allow starting the broker embedded <dependency> <groupId>io.zeebe</groupId> 
-			<artifactId>zeebe-broker-core</artifactId> <version>${zeebe.version}</version> 
+		<!-- Dependency to allow starting the broker embedded <dependency> <groupId>io.zeebe</groupId>
+			<artifactId>zeebe-broker-core</artifactId> <version>${zeebe.version}</version>
 			</dependency> -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -94,7 +94,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>${project.name}</finalName>
+		<finalName>${project.name}-${project.version}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -118,7 +118,25 @@
                 </executions>
               </plugin>
 		</plugins>
-	</build>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>sonatype-oss-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <configuration>
+                            <!-- skip gpg signing as the release is not pushed to maven central -->
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 	<scm>
 		<url>https://github.com/zeebe-io/zeebe-simple-monitor</url>
