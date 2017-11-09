@@ -41,6 +41,46 @@ curl -sL https://github.com/aktau/github-release/releases/download/v0.7.2/linux-
 ./github-release upload --user zeebe-io --repo zeebe-simple-monitor --tag ${RELEASE_VERSION} --name "${CHECKSUM}" --file "${CHECKSUM}"
 '''
 
+def dockerRelease = '''\
+#!/bin/bash -xeu
+
+IMAGE="camunda/zeebe-simple-monitor"
+
+echo "Building Zeebe Simple Monitor Docker image ${RELEASE_VERSION}."
+docker build --no-cache -t ${IMAGE}:${RELEASE_VERSION} --build-arg JAR=target/zeebe-simple-monitor-${RELEASE_VERSION}.jar .
+
+echo "Authenticating with DockerHub and pushing image."
+docker login --username ${DOCKER_HUB_USERNAME} --password ${DOCKER_HUB_PASSWORD} --email ci@camunda.com
+
+echo "Pushing ${IMAGE}:${RELEASE_VERSION}"
+docker push ${IMAGE}:${RELEASE_VERSION}
+
+# to make sure we can tag latest, there were problems before
+docker rmi ${IMAGE}:latest || echo "No latest image found"
+
+docker tag ${IMAGE}:${RELEASE_VERSION} ${IMAGE}:latest
+
+echo "Pushing ${IMAGE}:latest"
+docker push ${IMAGE}:latest
+'''
+
+def dockerSnapshot = '''\
+#!/bin/bash -xeu
+
+if [ -f target/zeebe-simple-monitor-*-SNAPSHOT.jar ]; then
+    IMAGE="camunda/zeebe-simple-monitor:SNAPSHOT"
+
+    echo "Building Zeebe Simple Monitor Docker image ${IMAGE}."
+    docker build --no-cache -t ${IMAGE} --build-arg JAR=target/zeebe-simple-monitor-*-SNAPSHOT.jar .
+
+    echo "Authenticating with DockerHub and pushing image."
+    docker login --username ${DOCKER_HUB_USERNAME} --password ${DOCKER_HUB_PASSWORD} --email ci@camunda.com
+
+    echo "Pushing ${IMAGE}"
+    docker push ${IMAGE}
+fi
+'''
+
 // properties used by the release build
 def releaseProperties = [
     resume: 'false',
@@ -76,7 +116,7 @@ mavenJob(jobName)
     {
         githubPush()
     }
-    label 'ubuntu'
+    label 'dind'
     jdk 'jdk-8-latest'
 
     rootPOM pom
@@ -84,6 +124,10 @@ mavenJob(jobName)
     localRepository LocalRepositoryLocation.LOCAL_TO_WORKSPACE
     providedSettings mavenSettingsId
     mavenInstallation mavenVersion
+
+    postBuildSteps('SUCCESS') {
+        shell dockerSnapshot
+    }
 
     wrappers
     {
@@ -116,6 +160,8 @@ mavenJob(jobName)
         credentialsBinding {
           // github token for release upload
           string('GITHUB_TOKEN', 'github-camunda-jenkins-token')
+          // docker hub credentials for docker push
+          usernamePassword('DOCKER_HUB_USERNAME', 'DOCKER_HUB_PASSWORD', 'camundajenkins-dockerhub')
         }
 
         release
@@ -148,6 +194,8 @@ mavenJob(jobName)
                 }
 
                 shell githubRelease
+
+                shell dockerRelease
 
             }
 
