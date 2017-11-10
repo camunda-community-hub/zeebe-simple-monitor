@@ -1,6 +1,9 @@
-FROM docker.consulting.camunda.com/jdk8
-
-ADD target/zeebe-simple-monitor.jar /
-CMD ["java","-jar","/zeebe-simple-monitor.jar"]
+FROM openjdk:8-jre-alpine
 
 EXPOSE 8080
+
+ARG JAR
+
+COPY ${JAR} /usr/local/zeebe-simple-monitor.jar
+
+ENTRYPOINT ["java", "-jar", "/usr/local/zeebe-simple-monitor.jar"]
