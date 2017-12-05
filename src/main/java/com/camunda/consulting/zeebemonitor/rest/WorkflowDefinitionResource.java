@@ -80,7 +80,7 @@ public class WorkflowDefinitionResource {
     for (FileDto file : deployment.getFiles()) {
       workflows //
         .deploy(Constants.DEFAULT_TOPIC) //
-        .resourceBytes(file.getContent(), getResourceType(file))
+        .addResourceBytes(file.getContent(), file.getFilename())
         .execute();
     }
   }
