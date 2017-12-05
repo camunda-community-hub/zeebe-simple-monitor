@@ -30,81 +30,84 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/workflow-instance")
-public class WorkflowInstanceResource {
+public class WorkflowInstanceResource
+{
 
-  @Autowired
-  private ZeebeConnections connections;
+    @Autowired
+    private ZeebeConnections connections;
 
-  @Autowired
-  private WorkflowInstanceRepository workflowInstanceRepository;
+    @Autowired
+    private WorkflowInstanceRepository workflowInstanceRepository;
 
-  @RequestMapping("/")
-  public Iterable<WorkflowInstance> getWorkflowInstances() {
-    return workflowInstanceRepository.findAll();
-  }
-
-  @RequestMapping(path="/{key}", method=RequestMethod.DELETE)
-  public void cancelWorkflowInstance(@PathVariable("key") long workflowInstanceKey) throws Exception {
-
-    final WorkflowInstance workflowInstance = workflowInstanceRepository.findOne(workflowInstanceKey);
-    if (workflowInstance != null)
+    @RequestMapping("/")
+    public Iterable<WorkflowInstance> getWorkflowInstances()
     {
-      final ZeebeClient client = connections.getZeebeClient(workflowInstance.getBroker());
-
-      final WorkflowInstanceEvent event = findLastWorkflowInstanceEvent(workflowInstance, workflowInstanceKey);
-
-      client.workflows() //
-          .cancel(event)
-          .execute();
-      }
-  }
-
-  @RequestMapping(path="/{key}/update-payload", method=RequestMethod.PUT)
-  public void updatePayload(@PathVariable("key") long workflowInstanceKey, @RequestBody String payload) throws Exception {
-
-    final WorkflowInstance workflowInstance = workflowInstanceRepository.findOne(workflowInstanceKey);
-    if (workflowInstance != null)
-    {
-      final ZeebeClient client = connections.getZeebeClient(workflowInstance.getBroker());
-
-      final WorkflowInstanceEvent event = findLastWorkflowInstanceEvent(workflowInstance, workflowInstance.getLastEventPosition());
-
-      client.workflows() //
-        .updatePayload(event)
-        .payload(payload)
-        .execute();
+        return workflowInstanceRepository.findAll();
     }
-  }
 
-  private WorkflowInstanceEvent findLastWorkflowInstanceEvent(WorkflowInstance workflowInstance, long position) throws Exception
-  {
-    final CompletableFuture<WorkflowInstanceEvent> future = new CompletableFuture<>();
-
-    final ZeebeClient client = connections.getZeebeClient(workflowInstance.getBroker());
-
-    TopicSubscription subscription = null;
-    try
+    @RequestMapping(path = "/{key}", method = RequestMethod.DELETE)
+    public void cancelWorkflowInstance(@PathVariable("key") long workflowInstanceKey) throws Exception
     {
-      subscription = client.topics().newSubscription(Constants.DEFAULT_TOPIC)
-        .name("wf-instance-lookup")
-        .forcedStart()
-        .startAtPosition(position - 1)
-        .workflowInstanceEventHandler(wfEvent ->
+
+        final WorkflowInstance workflowInstance = workflowInstanceRepository.findOne(workflowInstanceKey);
+        if (workflowInstance != null)
         {
-          if (wfEvent.getMetadata().getPosition() == position)
-          {
-            future.complete(wfEvent);
-          }
-        }).open();
+            final ZeebeClient client = connections.getZeebeClient(workflowInstance.getBroker());
 
-       return future.get(10, TimeUnit.SECONDS);
+            final WorkflowInstanceEvent event = findLastWorkflowInstanceEvent(workflowInstance, workflowInstanceKey);
+
+            client.workflows() //
+                  .cancel(event).execute();
+        }
     }
-    finally {
-      if (subscription != null)
-      {
-        subscription.close();
-      }
+
+    @RequestMapping(path = "/{key}/update-payload", method = RequestMethod.PUT)
+    public void updatePayload(@PathVariable("key") long workflowInstanceKey, @RequestBody String payload) throws Exception
+    {
+
+        final WorkflowInstance workflowInstance = workflowInstanceRepository.findOne(workflowInstanceKey);
+        if (workflowInstance != null)
+        {
+            final ZeebeClient client = connections.getZeebeClient(workflowInstance.getBroker());
+
+            final WorkflowInstanceEvent event = findLastWorkflowInstanceEvent(workflowInstance, workflowInstance.getLastEventPosition());
+
+            client.workflows() //
+                  .updatePayload(event).payload(payload).execute();
+        }
     }
-  }
+
+    private WorkflowInstanceEvent findLastWorkflowInstanceEvent(WorkflowInstance workflowInstance, long position) throws Exception
+    {
+        final CompletableFuture<WorkflowInstanceEvent> future = new CompletableFuture<>();
+
+        final ZeebeClient client = connections.getZeebeClient(workflowInstance.getBroker());
+
+        TopicSubscription subscription = null;
+        try
+        {
+            subscription = client.topics()
+                                 .newSubscription(Constants.DEFAULT_TOPIC)
+                                 .name("wf-instance-lookup")
+                                 .forcedStart()
+                                 .startAtPosition(position - 1)
+                                 .workflowInstanceEventHandler(wfEvent -> {
+                                     if (wfEvent.getMetadata().getPosition() == position)
+                                     {
+                                         future.complete(wfEvent);
+                                     }
+                                 })
+                                 .open();
+
+            return future.get(10, TimeUnit.SECONDS);
+        }
+        finally
+        {
+            if (subscription != null)
+            {
+                subscription.close();
+            }
+        }
+    }
 
 }

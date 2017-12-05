@@ -1,30 +1,30 @@
 <!DOCTYPE html>
 <html lang=en>
 <head>
-  <meta charset=utf-8>
-  <meta http-equiv=X-UA-Compatible content="IE=edge">
-  <meta name=viewport content="width=device-width,initial-scale=1">
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge">
+    <meta name=viewport content="width=device-width,initial-scale=1">
 
-  <title> Zeebe Simple Monitor </title>
+    <title> Zeebe Simple Monitor </title>
 
-  <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <script src="/webjars/jquery/jquery.min.js"></script>
-  <script src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+    <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/webjars/jquery/jquery.min.js"></script>
+    <script src="/webjars/bootstrap/js/bootstrap.min.js"></script>
 
-  <script type="text/javascript" src="./app.js"></script>
-  <link rel="stylesheet" href="./app.css">
+    <script type="text/javascript" src="./app.js"></script>
+    <link rel="stylesheet" href="./app.css">
 
-  <script src="./vendor/prism.js"></script>
-  <link rel="stylesheet" href="./vendor/prism.css">
-
-
-  <link rel="stylesheet" href="./css/styles.min.css">
-
-  <!-- <link rel=apple-touch-icon href="./img/apple-touch-icon.png"> -->
-  <link rel=icon href="./img/favicon.ico">
+    <script src="./vendor/prism.js"></script>
+    <link rel="stylesheet" href="./vendor/prism.css">
 
 
-  <style type="text/css">
+    <link rel="stylesheet" href="./css/styles.min.css">
+
+    <!-- <link rel=apple-touch-icon href="./img/apple-touch-icon.png"> -->
+    <link rel=icon href="./img/favicon.ico">
+
+
+    <style type="text/css">
 pre.scaffolding {
   line-height: 1;
 }
@@ -39,9 +39,10 @@ em.optional:before {
 em.optional:after {
   content: ']';
 }
-  </style>
 
-<style type="text/css">
+    </style>
+
+    <style type="text/css">
   .djs-container .highlight .djs-outline {
      stroke-width: 2px important;
      stroke: #08c !important;
@@ -71,93 +72,97 @@ em.optional:after {
       border-color: #143d52;
       color: #143d52;
     } 
-  </style>
+
+    </style>
 
 </head>
 <body>
-  <header class="cam-brand-header">
+<header class="cam-brand-header">
     <!-- depending on your layout, you may want to use the `.container-fluid` class instead below -->
     <div class="container-fluid">
-      <a class="navbar-brand" href="./index.html" title="TNGP Monitor">
+        <a class="navbar-brand" href="./index.html" title="TNGP Monitor">
         <span class="brand-name" style="top: 0px;">
-          <img style="height: 35px;" src="img/logo.png" /> Zeebe Simple Monitor
+          <img style="height: 35px;" src="img/logo.png"/> Zeebe Simple Monitor
         </span>
-      </a>
+        </a>
 
-      <!-- this is intended for the site navigation -->
-      <nav class="sections-menu"><ul>
-        <li><a href="./index.html">Configuration</a></li>
-        <li><a href="./definitions.html">Workflow Definitions</a></li>
-        <li><a href="./instances.html">Workflow Instances</a></li>
-        <li class="active"><a href="./logs.html">Logs</a></li>
-        <li><a href="./search.html">Search</a></li>
-      </ul></nav>
+        <!-- this is intended for the site navigation -->
+        <nav class="sections-menu">
+            <ul>
+                <li><a href="./index.html">Configuration</a></li>
+                <li><a href="./definitions.html">Workflow Definitions</a></li>
+                <li><a href="./instances.html">Workflow Instances</a></li>
+                <li class="active"><a href="./logs.html">Logs</a></li>
+                <li><a href="./search.html">Search</a></li>
+            </ul>
+        </nav>
 
-      <nav class="app-menu">
-        <ul>
-          <li id="brokerGlobalInfo">
-            <!--<a href=""><span id="defaultBrokerState" class="btn btn-danger">Not connected. Klick to connect default.</span></a>-->
-          </li>
-        </ul>
-      </nav>
+        <nav class="app-menu">
+            <ul>
+                <li id="brokerGlobalInfo">
+                    <!--<a href=""><span id="defaultBrokerState" class="btn btn-danger">Not connected. Klick to connect default.</span></a>-->
+                </li>
+            </ul>
+        </nav>
     </div>
-  </header>
+</header>
 
-  <div class="page-body container-fluid">
+<div class="page-body container-fluid">
     <section class="page-section">
-      <header>
-        <h1>Event Log</h1>
+        <header>
+            <h1>Event Log</h1>
 
-        <p>
-          Showing all events processed by connected brokers
-        </p>
-      </header>
+            <p>
+                Showing all events processed by connected brokers
+            </p>
+        </header>
 
-      <div id="errorPanel" style="display: none;">
-          <div  class="alert alert-danger" style="margin-top: 25px;" role="alert">
-                  <button type="button" class="close"  aria-label="Close" onclick="ackError()"><span aria-hidden="true">&times;</span></button>
-                  <strong>Error:</strong> <span id="errorText"></span>
-          </div>
-      </div>  
+        <div id="errorPanel" style="display: none;">
+            <div class="alert alert-danger" style="margin-top: 25px;" role="alert">
+                <button type="button" class="close" aria-label="Close" onclick="ackError()"><span aria-hidden="true">&times;</span></button>
+                <strong>Error:</strong> <span id="errorText"></span>
+            </div>
+        </div>
 
-          <h2>
-            List 
-            <a onclick="refresh()" class="btn btn-default"><span class="glyphicon glyphicon-refresh" ></span></a>            
-          </h2>
-          <table id="brokerLogsTable" class="table table-striped">
+        <h2>
+            List
+            <a onclick="refresh()" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></a>
+        </h2>
+        <table id="brokerLogsTable" class="table table-striped">
             <thead>
-              <th>Broker</th>
-              <th>Topic Event Type</th>
-              <th>State</th>
-              <th>PartitionId</th>
-              <th>Positon</th>
-              <th>Key</th>
-              <th>Payload</th>
+            <th>Broker</th>
+            <th>Topic Event Type</th>
+            <th>State</th>
+            <th>PartitionId</th>
+            <th>Positon</th>
+            <th>Key</th>
+            <th>Payload</th>
             </thead>
             <tr>
-              <td>1</td>
-              <td>x</td>
-            </tr>            
-          </table>
-      
+                <td>1</td>
+                <td>x</td>
+            </tr>
+        </table>
+
     </section>
-  </div>
+</div>
 
-  <footer class="cam-brand-footer">
+<footer class="cam-brand-footer">
     <div class="container-fluid">
-      <div class="col-xs-8">
-        <!-- whatever you want -->
-      </div>
-      <div class="text-right col-xs-4">
-        &copy; Camunda services GmbH 2016, All Rights Reserved
-      </div>
+        <div class="col-xs-8">
+            <!-- whatever you want -->
+        </div>
+        <div class="text-right col-xs-4">
+            &copy; Camunda services GmbH 2016, All Rights Reserved
+        </div>
     </div>
-  </footer>
+</footer>
 
-  <script>
+<script>
   $(document).ready(function() {  
     init('logs');
   });
-  </script>   
+
+</script>
 </body>
 </html>

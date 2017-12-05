@@ -15,12 +15,12 @@
  */
 package com.camunda.consulting.zeebemonitor.repository;
 
+import com.camunda.consulting.zeebemonitor.entity.WorkflowDefinition;
 import org.springframework.data.repository.CrudRepository;
 
-import com.camunda.consulting.zeebemonitor.entity.WorkflowDefinition;
+public interface WorkflowDefinitionRepository extends CrudRepository<WorkflowDefinition, String>
+{
 
-public interface WorkflowDefinitionRepository extends CrudRepository<WorkflowDefinition, String> {
+    WorkflowDefinition findByBrokerConnectionStringAndKeyAndVersion(String brokerConnectionString, String key, int version);
 
-  WorkflowDefinition findByBrokerConnectionStringAndKeyAndVersion(String brokerConnectionString, String key, int version);
-  
 }

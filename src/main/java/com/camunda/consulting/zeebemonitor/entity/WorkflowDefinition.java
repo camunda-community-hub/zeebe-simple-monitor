@@ -16,105 +16,116 @@
 package com.camunda.consulting.zeebemonitor.entity;
 
 import java.util.UUID;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import io.zeebe.client.event.WorkflowEvent;
 
 @Entity
-public class WorkflowDefinition {
+public class WorkflowDefinition
+{
 
-  /**
-   * Generate random uuid for unique identification of workflow definition
-   */
-  @Id
-  private String uuid = UUID.randomUUID().toString();
+    /**
+     * Generate random uuid for unique identification of workflow definition
+     */
+    @Id
+    private String uuid = UUID.randomUUID().toString();
 
-  private String key;
-  private int version;
+    private String key;
+    private int version;
 
-  @OneToOne
-  private Broker broker;
+    @OneToOne
+    private Broker broker;
 
-  @Column(length = 100000)
-  private String resource;
+    @Column(length = 100000)
+    private String resource;
 
-  @Transient
-  private long countRunning;
-  
-  @Transient
-  private long countEnded;
+    @Transient
+    private long countRunning;
 
-  public static WorkflowDefinition from(WorkflowEvent event) {
-    WorkflowDefinition dto = new WorkflowDefinition();
+    @Transient
+    private long countEnded;
 
-    dto.setVersion(event.getVersion());
-    dto.setKey(event.getBpmnProcessId());
-    dto.setResource(event.getBpmnXml());
-    
-    return dto;
-  }
+    public static WorkflowDefinition from(WorkflowEvent event)
+    {
+        final WorkflowDefinition dto = new WorkflowDefinition();
 
-  public String getResource() {
-    return resource;
-  }
+        dto.setVersion(event.getVersion());
+        dto.setKey(event.getBpmnProcessId());
+        dto.setResource(event.getBpmnXml());
 
-  public void setResource(String resource) {
-    this.resource = resource;
-  }
+        return dto;
+    }
 
-  public String getKey() {
-    return key;
-  }
+    public String getResource()
+    {
+        return resource;
+    }
 
-  public void setKey(String key) {
-    this.key = key;
-  }
+    public void setResource(String resource)
+    {
+        this.resource = resource;
+    }
 
-  public int getVersion() {
-    return version;
-  }
+    public String getKey()
+    {
+        return key;
+    }
 
-  public void setVersion(int version) {
-    this.version = version;
-  }
+    public void setKey(String key)
+    {
+        this.key = key;
+    }
 
-  public Broker getBroker() {
-    return broker;
-  }
+    public int getVersion()
+    {
+        return version;
+    }
 
-  public void setBroker(Broker broker) {
-    this.broker = broker;
-  }
+    public void setVersion(int version)
+    {
+        this.version = version;
+    }
 
-  public long getCountRunning() {
-    return countRunning;
-  }
+    public Broker getBroker()
+    {
+        return broker;
+    }
 
-  public void setCountRunning(long countRunning) {
-    this.countRunning = countRunning;
-  }
+    public void setBroker(Broker broker)
+    {
+        this.broker = broker;
+    }
 
-  public long getCountEnded() {
-    return countEnded;
-  }
+    public long getCountRunning()
+    {
+        return countRunning;
+    }
 
-  public void setCountEnded(long countEnded) {
-    this.countEnded = countEnded;
-  }
+    public void setCountRunning(long countRunning)
+    {
+        this.countRunning = countRunning;
+    }
 
-  @Override
-  public String toString() {
-    return "WorkflowDefinitionDto [key=" + key + ", broker=" + broker + ", version=" + version + ", countRunning=" + countRunning + ", countEnded=" + countEnded
-        + "]";
-  }
+    public long getCountEnded()
+    {
+        return countEnded;
+    }
 
-  public String getUuid() {
-    return uuid;
-  }
+    public void setCountEnded(long countEnded)
+    {
+        this.countEnded = countEnded;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "WorkflowDefinitionDto [key=" + key + ", broker=" + broker + ", version=" + version + ", countRunning=" + countRunning +
+                ", countEnded=" + countEnded + "]";
+    }
+
+    public String getUuid()
+    {
+        return uuid;
+    }
 
 }

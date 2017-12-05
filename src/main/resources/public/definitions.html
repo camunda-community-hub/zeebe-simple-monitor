@@ -1,34 +1,34 @@
 <!DOCTYPE html>
 <html lang=en>
 <head>
-  <meta charset=utf-8>
-  <meta http-equiv=X-UA-Compatible content="IE=edge">
-  <meta name=viewport content="width=device-width,initial-scale=1">
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge">
+    <meta name=viewport content="width=device-width,initial-scale=1">
 
-  <title> Zeebe Simple Monitor </title>
+    <title> Zeebe Simple Monitor </title>
 
-  <script src="/webjars/jquery/jquery.min.js"></script>
+    <script src="/webjars/jquery/jquery.min.js"></script>
 
-  <!-- bpmn-js viewer -->
-  <script type="text/javascript" src="webjars/bpmn-js/dist/bpmn-navigated-viewer.js"></script>
-  <link type="text/css" rel="stylesheet" href="webjars/bpmn-js/dist/assets/diagram-js.css" />
-  <link type="text/css" rel="stylesheet" href="webjars/bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css" />
-  <link type="text/css" rel="stylesheet" href="./css/modeler.css" />
+    <!-- bpmn-js viewer -->
+    <script type="text/javascript" src="webjars/bpmn-js/dist/bpmn-navigated-viewer.js"></script>
+    <link type="text/css" rel="stylesheet" href="webjars/bpmn-js/dist/assets/diagram-js.css"/>
+    <link type="text/css" rel="stylesheet" href="webjars/bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css"/>
+    <link type="text/css" rel="stylesheet" href="./css/modeler.css"/>
 
-  <script type="text/javascript" src="./app.js"></script>
-  <link rel="stylesheet" href="./app.css">
+    <script type="text/javascript" src="./app.js"></script>
+    <link rel="stylesheet" href="./app.css">
 
-  <script src="./vendor/prism.js"></script>
-  <link rel="stylesheet" href="./vendor/prism.css">
-
-
-  <link rel="stylesheet" href="./css/styles.min.css">
-
-  <!-- <link rel=apple-touch-icon href="./img/apple-touch-icon.png"> -->
-  <link rel=icon href="./img/favicon.ico">
+    <script src="./vendor/prism.js"></script>
+    <link rel="stylesheet" href="./vendor/prism.css">
 
 
-  <style type="text/css">
+    <link rel="stylesheet" href="./css/styles.min.css">
+
+    <!-- <link rel=apple-touch-icon href="./img/apple-touch-icon.png"> -->
+    <link rel=icon href="./img/favicon.ico">
+
+
+    <style type="text/css">
 pre.scaffolding {
   line-height: 1;
 }
@@ -43,146 +43,150 @@ em.optional:before {
 em.optional:after {
   content: ']';
 }
-  </style>
+
+    </style>
 </head>
 <body>
-  <header class="cam-brand-header">
+<header class="cam-brand-header">
     <!-- depending on your layout, you may want to use the `.container-fluid` class instead below -->
     <div class="container-fluid">
-      <a class="navbar-brand" href="./index.html" title="Zeebe Simple Monitor">
+        <a class="navbar-brand" href="./index.html" title="Zeebe Simple Monitor">
         <span class="brand-name" style="top: 0px;">
-          <img style="height: 35px;" src="img/logo.png" /> Zeebe Simple Monitor
+          <img style="height: 35px;" src="img/logo.png"/> Zeebe Simple Monitor
         </span>
-      </a>
+        </a>
 
-      <!-- this is intended for the site navigation -->
-      <nav class="sections-menu"><ul>
-        <li><a href="./index.html">Configuration</a></li>
-        <li class="active"><a href="./definitions.html">Workflow Definitions</a></li>
-        <li><a href="./instances.html">Workflow Instances</a></li>
-        <li><a href="./logs.html">Logs</a></li>
-        <li><a href="./search.html">Search</a></li>
-      </ul></nav>
+        <!-- this is intended for the site navigation -->
+        <nav class="sections-menu">
+            <ul>
+                <li><a href="./index.html">Configuration</a></li>
+                <li class="active"><a href="./definitions.html">Workflow Definitions</a></li>
+                <li><a href="./instances.html">Workflow Instances</a></li>
+                <li><a href="./logs.html">Logs</a></li>
+                <li><a href="./search.html">Search</a></li>
+            </ul>
+        </nav>
 
-      <nav class="app-menu">
-        <ul>
-          <li id="brokerGlobalInfo">
-            <!--<a href=""><span id="defaultBrokerState" class="btn btn-danger">Not connected. Klick to connect default.</span></a>-->
-          </li>
-        </ul>
-      </nav>
+        <nav class="app-menu">
+            <ul>
+                <li id="brokerGlobalInfo">
+                    <!--<a href=""><span id="defaultBrokerState" class="btn btn-danger">Not connected. Klick to connect default.</span></a>-->
+                </li>
+            </ul>
+        </nav>
     </div>
-  </header>
+</header>
 
-  <div class="page-body container-fluid">
+<div class="page-body container-fluid">
     <section class="page-section">
-      <header>
-        <h1>Workflow Definitions</h1>
+        <header>
+            <h1>Workflow Definitions</h1>
 
-        <p>
-          Inspect deployed BPMN workflow definitions within connected Zeebe brokers.
-        </p>
-      </header>
+            <p>
+                Inspect deployed BPMN workflow definitions within connected Zeebe brokers.
+            </p>
+        </header>
 
-      <div id="errorPanel" style="display: none;">
-          <div  class="alert alert-danger" style="margin-top: 25px;" role="alert">
-                  <button type="button" class="close"  aria-label="Close" onclick="ackError()"><span aria-hidden="true">&times;</span></button>
-                  <strong>Error:</strong> <span id="errorText"></span>
-          </div>
-      </div>  
+        <div id="errorPanel" style="display: none;">
+            <div class="alert alert-danger" style="margin-top: 25px;" role="alert">
+                <button type="button" class="close" aria-label="Close" onclick="ackError()"><span aria-hidden="true">&times;</span></button>
+                <strong>Error:</strong> <span id="errorText"></span>
+            </div>
+        </div>
 
-     <div class="row">
-        <div class="col-md-2">
-          <h2>
-            List
-            <a onclick="refresh()" class="btn btn-default"><span class="glyphicon glyphicon-refresh" ></span></a>            
-          </h2>
-          <table id="workflowDefinitionTable" class="table table-striped">
-            <thead>
-              <th>Workflow</th>
-              <th>#</th>
-            </thead>
-            <tr>
-              <td class="tngp-table-selected"></td>
-              <td class="tngp-table-selected"></td>
-            </tr>            
-          </table>
+        <div class="row">
+            <div class="col-md-2">
+                <h2>
+                    List
+                    <a onclick="refresh()" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></a>
+                </h2>
+                <table id="workflowDefinitionTable" class="table table-striped">
+                    <thead>
+                    <th>Workflow</th>
+                    <th>#</th>
+                    </thead>
+                    <tr>
+                        <td class="tngp-table-selected"></td>
+                        <td class="tngp-table-selected"></td>
+                    </tr>
+                </table>
 
-          <h2>Deploy</h2>
-          <div><p>
-                        <input id="documentToUpload" name="Dokument hochladen" type="file" multiple="multiple" accept=".bpmn20.xml, .bpmn, .xml" 
-                        style="font-size: x-small;"/>
-          </p></div>
-          <div><p>
-              <select id="selectedBrokerDropdown" size="1"> 
-              </select>
-          </p></div>
-          <div><p>
-                         <a href="#" onclick="uploadModels()" class="btn btn-primary">Deploy new definition</a> <!-- <span class="glyphicon glyphicon-cloud-upload" style="font-size: 5em;"> -->
-          </p></div>       
-             
-      </div>
-      <div class="col-md-8">
-          <h2>
-            Selected 
-            <a onclick="refresh()" class="btn btn-default"><span class="glyphicon glyphicon-refresh" ></span></a>            
-          </h2>
-        <div id="diagramCanvas" class="bpmn-io-viewer-height"></div>     
-      </div>
-      <div class="col-md-2">
-        <h2>Info</h2>
-          <table class="table table-striped">
-            <tr>
-              <td>Name</td>
-              <td id="workflowDefinitionName"></td>
-            </tr>
-            <tr>
-              <td>Key</td>
-              <td id="workflowDefinitionKey"></td>
-            </tr>
-            <tr>
-              <td>Version</td>
-              <td id="workflowDefinitionVersion"></td>
-            </tr>
-            <tr>
-              <td><b># running</b> instances</td>
-              <td id="countRunning"></td>
-            </tr>
-            <tr>
-              <td><b># ended</b> instances</td>
-              <td id="countEnded"></td>
-            </tr>
-            <tr>
-              <td>Broker</td>
-              <td id="workflowDefinitionBroker"></td>
-            </tr>
-          </table>
+                <h2>Deploy</h2>
+                <div><p>
+                    <input id="documentToUpload" name="Dokument hochladen" type="file" multiple="multiple" accept=".bpmn20.xml, .bpmn, .xml"
+                           style="font-size: x-small;"/>
+                </p></div>
+                <div><p>
+                    <select id="selectedBrokerDropdown" size="1">
+                    </select>
+                </p></div>
+                <div><p>
+                    <a href="#" onclick="uploadModels()" class="btn btn-primary">Deploy new definition</a>
+                    <!-- <span class="glyphicon glyphicon-cloud-upload" style="font-size: 5em;"> -->
+                </p></div>
 
-        <h2>Start</h2>
-            <div><p>Payload (JSON): 
-                <textarea  id="payload" style="font-size: smaller;">{}</textarea>
-            </p></div>
-            <div><p>
-                <a href="#" onclick="startWorkflowInstance()" class="btn btn-primary">Start new instance</a>
-            </p></div> 
+            </div>
+            <div class="col-md-8">
+                <h2>
+                    Selected
+                    <a onclick="refresh()" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></a>
+                </h2>
+                <div id="diagramCanvas" class="bpmn-io-viewer-height"></div>
+            </div>
+            <div class="col-md-2">
+                <h2>Info</h2>
+                <table class="table table-striped">
+                    <tr>
+                        <td>Name</td>
+                        <td id="workflowDefinitionName"></td>
+                    </tr>
+                    <tr>
+                        <td>Key</td>
+                        <td id="workflowDefinitionKey"></td>
+                    </tr>
+                    <tr>
+                        <td>Version</td>
+                        <td id="workflowDefinitionVersion"></td>
+                    </tr>
+                    <tr>
+                        <td><b># running</b> instances</td>
+                        <td id="countRunning"></td>
+                    </tr>
+                    <tr>
+                        <td><b># ended</b> instances</td>
+                        <td id="countEnded"></td>
+                    </tr>
+                    <tr>
+                        <td>Broker</td>
+                        <td id="workflowDefinitionBroker"></td>
+                    </tr>
+                </table>
 
-      </div>
-      </div>
+                <h2>Start</h2>
+                <div><p>Payload (JSON):
+                    <textarea id="payload" style="font-size: smaller;">{}</textarea>
+                </p></div>
+                <div><p>
+                    <a href="#" onclick="startWorkflowInstance()" class="btn btn-primary">Start new instance</a>
+                </p></div>
+
+            </div>
+        </div>
     </section>
-  </div>
+</div>
 
-  <footer class="cam-brand-footer">
+<footer class="cam-brand-footer">
     <div class="container-fluid">
-      <div class="col-xs-8">
-        <!-- whatever you want -->
-      </div>
-      <div class="text-right col-xs-4">
-        &copy; Camunda services GmbH 2017, All Rights Reserved
-      </div>
+        <div class="col-xs-8">
+            <!-- whatever you want -->
+        </div>
+        <div class="text-right col-xs-4">
+            &copy; Camunda services GmbH 2017, All Rights Reserved
+        </div>
     </div>
-  </footer>
+</footer>
 
-  <script>
+<script>
   $(document).ready(function() {  
     init('definition');
 
@@ -190,6 +194,7 @@ em.optional:after {
     viewer = new BpmnViewer({container: '#diagramCanvas', width: '100%', height: '100%'});
     container = $('#js-drop-zone');    
   });
-  </script>   
+
+</script>
 </body>
 </html>

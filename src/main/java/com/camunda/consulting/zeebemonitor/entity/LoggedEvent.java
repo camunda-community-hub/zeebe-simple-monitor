@@ -15,99 +15,105 @@
  */
 package com.camunda.consulting.zeebemonitor.entity;
 
-import java.io.StringReader;
-
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 @Entity
-public class LoggedEvent {
-  @Id
-  @GeneratedValue
-  private Long id;
+public class LoggedEvent
+{
+    @Id
+    @GeneratedValue
+    private Long id;
 
-  @OneToOne
-  private Broker broker;
+    @OneToOne
+    private Broker broker;
 
-  @Column(length = 20000)
-  private String eventPayload;
+    @Column(length = 20000)
+    private String eventPayload;
 
-  private int partitionId;
+    private int partitionId;
 
-  private long position;
+    private long position;
 
-  private long key;
+    private long key;
 
-  private String eventType;
+    private String eventType;
 
-  private String state;
+    private String state;
 
-  public LoggedEvent() {}
-
-  public LoggedEvent(Broker broker, int partitionId, long position, long key, String eventType, String state, String eventPayload) {
-    this.broker = broker;
-    this.partitionId = partitionId;
-    this.position = position;
-    this.key = key;
-    this.eventType = eventType;
-    this.state = state;
-
-    if (eventPayload!=null && eventPayload.length()>=20000) {
-      eventPayload = eventPayload.substring(0, 19999);
+    public LoggedEvent()
+    {
     }
 
-    this.eventPayload = eventPayload;
-  }
+    public LoggedEvent(Broker broker, int partitionId, long position, long key, String eventType, String state, String eventPayload)
+    {
+        this.broker = broker;
+        this.partitionId = partitionId;
+        this.position = position;
+        this.key = key;
+        this.eventType = eventType;
+        this.state = state;
 
-  public String getPayload() {
-    return eventPayload;
-  }
+        if (eventPayload != null && eventPayload.length() >= 20000)
+        {
+            eventPayload = eventPayload.substring(0, 19999);
+        }
 
-  public Long getId() {
-    return id;
-  }
+        this.eventPayload = eventPayload;
+    }
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+    public String getPayload()
+    {
+        return eventPayload;
+    }
 
-  public Broker getBroker() {
-    return broker;
-  }
+    public Long getId()
+    {
+        return id;
+    }
 
-  public void setBroker(Broker broker) {
-    this.broker = broker;
-  }
+    public void setId(Long id)
+    {
+        this.id = id;
+    }
 
-  public String getEventPayload() {
-    return eventPayload;
-  }
+    public Broker getBroker()
+    {
+        return broker;
+    }
 
-  public int getPartitionId() {
-    return partitionId;
-  }
+    public void setBroker(Broker broker)
+    {
+        this.broker = broker;
+    }
 
-  public long getPosition() {
-    return position;
-  }
+    public String getEventPayload()
+    {
+        return eventPayload;
+    }
 
-  public long getKey() {
-    return key;
-  }
+    public int getPartitionId()
+    {
+        return partitionId;
+    }
 
-  public String getEventType() {
-    return eventType;
-  }
+    public long getPosition()
+    {
+        return position;
+    }
 
-  public String getState() {
-    return state;
-  }
+    public long getKey()
+    {
+        return key;
+    }
 
+    public String getEventType()
+    {
+        return eventType;
+    }
 
+    public String getState()
+    {
+        return state;
+    }
 
 }
