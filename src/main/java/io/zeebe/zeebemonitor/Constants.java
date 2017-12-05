@@ -13,17 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.consulting.zeebemonitor;
+package io.zeebe.zeebemonitor;
 
-import org.junit.Test;
-
-public class NoTestsYetTest
+public class Constants
 {
 
-    @Test
-    public void sorryNothingToTestYet()
-    {
-        // just to make jenkins happy :-)
-    }
+    public static final String DEFAULT_TOPIC = "default-topic";
+    public static final int DEFAULT_PARTITION = 0;
 
 }

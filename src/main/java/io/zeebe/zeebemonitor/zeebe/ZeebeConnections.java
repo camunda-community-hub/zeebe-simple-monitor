@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.consulting.zeebemonitor.zeebe;
+package io.zeebe.zeebemonitor.zeebe;
 
 import java.io.StringReader;
 import java.util.*;
 import javax.json.Json;
 
-import com.camunda.consulting.zeebemonitor.Constants;
-import com.camunda.consulting.zeebemonitor.entity.*;
-import com.camunda.consulting.zeebemonitor.repository.*;
+import io.zeebe.zeebemonitor.Constants;
 import io.zeebe.client.ClientProperties;
 import io.zeebe.client.ZeebeClient;
 import io.zeebe.client.event.IncidentEvent;
 import io.zeebe.client.event.WorkflowInstanceEvent;
+import io.zeebe.zeebemonitor.entity.*;
+import io.zeebe.zeebemonitor.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.ApplicationScope;

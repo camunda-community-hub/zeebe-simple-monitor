@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.consulting.zeebemonitor.zeebe;
+package io.zeebe.zeebemonitor.zeebe;
 
-import com.camunda.consulting.zeebemonitor.entity.Broker;
+import io.zeebe.zeebemonitor.entity.Broker;
 
 public class ZeebeConnectionDto
 {

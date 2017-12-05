@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.consulting.zeebemonitor.rest;
+package io.zeebe.zeebemonitor.rest;
 
 import java.util.List;
 
-import com.camunda.consulting.zeebemonitor.entity.Broker;
-import com.camunda.consulting.zeebemonitor.entity.LoggedEvent;
-import com.camunda.consulting.zeebemonitor.repository.BrokerRepository;
-import com.camunda.consulting.zeebemonitor.repository.LoggedEventRepository;
-import com.camunda.consulting.zeebemonitor.zeebe.ZeebeConnectionDto;
-import com.camunda.consulting.zeebemonitor.zeebe.ZeebeConnections;
+import io.zeebe.zeebemonitor.entity.Broker;
+import io.zeebe.zeebemonitor.entity.LoggedEvent;
+import io.zeebe.zeebemonitor.repository.BrokerRepository;
+import io.zeebe.zeebemonitor.repository.LoggedEventRepository;
+import io.zeebe.zeebemonitor.zeebe.ZeebeConnectionDto;
+import io.zeebe.zeebemonitor.zeebe.ZeebeConnections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;

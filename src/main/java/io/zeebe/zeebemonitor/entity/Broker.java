@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.consulting.zeebemonitor.entity;
+package io.zeebe.zeebemonitor.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

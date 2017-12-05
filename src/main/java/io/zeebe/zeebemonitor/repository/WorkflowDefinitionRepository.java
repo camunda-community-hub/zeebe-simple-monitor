@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.consulting.zeebemonitor.repository;
+package io.zeebe.zeebemonitor.repository;
 
-import com.camunda.consulting.zeebemonitor.entity.WorkflowDefinition;
+import io.zeebe.zeebemonitor.entity.WorkflowDefinition;
 import org.springframework.data.repository.CrudRepository;
 
 public interface WorkflowDefinitionRepository extends CrudRepository<WorkflowDefinition, String>

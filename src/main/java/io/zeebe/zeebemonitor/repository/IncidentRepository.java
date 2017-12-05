@@ -13,34 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.consulting.zeebemonitor.entity;
+package io.zeebe.zeebemonitor.repository;
 
-import java.util.List;
+import io.zeebe.zeebemonitor.entity.Incident;
+import org.springframework.data.repository.CrudRepository;
 
-public class DeploymentDto
+public interface IncidentRepository extends CrudRepository<Incident, Long>
 {
 
-    private String broker;
-    private List<FileDto> files;
-
-    public String getBroker()
-    {
-        return broker;
-    }
-
-    public void setBroker(String broker)
-    {
-        this.broker = broker;
-    }
-
-    public List<FileDto> getFiles()
-    {
-        return files;
-    }
-
-    public void setFiles(List<FileDto> files)
-    {
-        this.files = files;
-    }
+    //  List<BrokerConnection> findByLastName(String lastName);
 
 }

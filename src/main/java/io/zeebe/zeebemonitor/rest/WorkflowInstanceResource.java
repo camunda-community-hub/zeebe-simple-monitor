@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.consulting.zeebemonitor.rest;
+package io.zeebe.zeebemonitor.rest;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import com.camunda.consulting.zeebemonitor.Constants;
-import com.camunda.consulting.zeebemonitor.entity.WorkflowInstance;
-import com.camunda.consulting.zeebemonitor.repository.WorkflowInstanceRepository;
-import com.camunda.consulting.zeebemonitor.zeebe.ZeebeConnections;
+import io.zeebe.zeebemonitor.Constants;
+import io.zeebe.zeebemonitor.entity.WorkflowInstance;
+import io.zeebe.zeebemonitor.repository.WorkflowInstanceRepository;
+import io.zeebe.zeebemonitor.zeebe.ZeebeConnections;
 import io.zeebe.client.ZeebeClient;
 import io.zeebe.client.event.TopicSubscription;
 import io.zeebe.client.event.WorkflowInstanceEvent;

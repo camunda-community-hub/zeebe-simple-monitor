@@ -13,14 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.consulting.zeebemonitor.repository;
+package io.zeebe.zeebemonitor.entity;
 
-import com.camunda.consulting.zeebemonitor.entity.LoggedEvent;
-import org.springframework.data.repository.CrudRepository;
+import java.util.List;
 
-public interface LoggedEventRepository extends CrudRepository<LoggedEvent, Long>
+public class DeploymentDto
 {
 
-    //  List<BrokerConnection> findByLastName(String lastName);
+    private String broker;
+    private List<FileDto> files;
+
+    public String getBroker()
+    {
+        return broker;
+    }
+
+    public void setBroker(String broker)
+    {
+        this.broker = broker;
+    }
+
+    public List<FileDto> getFiles()
+    {
+        return files;
+    }
+
+    public void setFiles(List<FileDto> files)
+    {
+        this.files = files;
+    }
 
 }

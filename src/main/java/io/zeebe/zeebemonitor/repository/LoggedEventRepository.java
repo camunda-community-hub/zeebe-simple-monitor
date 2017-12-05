@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.consulting.zeebemonitor;
+package io.zeebe.zeebemonitor.repository;
 
-public class Constants
+import io.zeebe.zeebemonitor.entity.LoggedEvent;
+import org.springframework.data.repository.CrudRepository;
+
+public interface LoggedEventRepository extends CrudRepository<LoggedEvent, Long>
 {
 
-    public static final String DEFAULT_TOPIC = "default-topic";
-    public static final int DEFAULT_PARTITION = 0;
+    //  List<BrokerConnection> findByLastName(String lastName);
 
 }

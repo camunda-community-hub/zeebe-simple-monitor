@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.consulting.zeebemonitor.rest;
+package io.zeebe.zeebemonitor.rest;
 
 import java.io.UnsupportedEncodingException;
 
-import com.camunda.consulting.zeebemonitor.Constants;
-import com.camunda.consulting.zeebemonitor.entity.DeploymentDto;
-import com.camunda.consulting.zeebemonitor.entity.FileDto;
-import com.camunda.consulting.zeebemonitor.entity.WorkflowDefinition;
-import com.camunda.consulting.zeebemonitor.repository.WorkflowDefinitionRepository;
-import com.camunda.consulting.zeebemonitor.repository.WorkflowInstanceRepository;
-import com.camunda.consulting.zeebemonitor.zeebe.ZeebeConnections;
+import io.zeebe.zeebemonitor.Constants;
+import io.zeebe.zeebemonitor.entity.DeploymentDto;
+import io.zeebe.zeebemonitor.entity.FileDto;
+import io.zeebe.zeebemonitor.entity.WorkflowDefinition;
+import io.zeebe.zeebemonitor.repository.WorkflowDefinitionRepository;
+import io.zeebe.zeebemonitor.repository.WorkflowInstanceRepository;
+import io.zeebe.zeebemonitor.zeebe.ZeebeConnections;
 import io.zeebe.client.WorkflowsClient;
 import io.zeebe.client.event.ResourceType;
 import org.springframework.beans.factory.annotation.Autowired;

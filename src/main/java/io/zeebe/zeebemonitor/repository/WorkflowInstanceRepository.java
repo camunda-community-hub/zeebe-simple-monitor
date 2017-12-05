@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.consulting.zeebemonitor.repository;
+package io.zeebe.zeebemonitor.repository;
 
 import java.util.List;
 
-import com.camunda.consulting.zeebemonitor.entity.WorkflowInstance;
+import io.zeebe.zeebemonitor.entity.WorkflowInstance;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
