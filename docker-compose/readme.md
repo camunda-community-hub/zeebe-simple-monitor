@@ -1,1 +1,0 @@
-This does not yet work as we have to wait for https://github.com/zeebe-io/zeebe/issues/298 or play around with https://github.com/bullshit-bingo/zeebe-docker-configurable-host

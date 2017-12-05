@@ -2,14 +2,14 @@ version: '2'
 
 services:
   zeebe:
-    image: camunda/zeebe:0.1.1
-    volumes:
-        - ./zeebe.cfg.toml:/usr/local/zeebe/conf/zeebe.cfg.toml
+    image: camunda/zeebe:latest
+    environment:
+        - ZEEBE_LOG_LEVEL=debug
     ports:
       - "51015:51015"
-      - "51016:51016"
-      - "51017:51017"
   monitor:
-    image: docker.consulting.camunda.com/zeebe-simple-monitor:latest
+    image: camunda/zeebe-simple-monitor:latest
     ports:
       - "9000:8080"
+    links:
+      - zeebe
