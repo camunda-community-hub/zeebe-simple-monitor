@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>zeebe-simple-monitor</artifactId>
-	<version>0.3.0</version>
+	<version>0.4.0-SNAPSHOT</version>
 
     <packaging>jar</packaging>
 
@@ -132,7 +132,7 @@
 		<url>https://github.com/zeebe-io/zeebe-simple-monitor</url>
 		<connection>scm:git:git@github.com:zeebe-io/zeebe-simple-monitor.git</connection>
 		<developerConnection>scm:git:git@github.com:zeebe-io/zeebe-simple-monitor.git</developerConnection>
-		<tag>0.3.0</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 </project>
