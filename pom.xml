@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>zeebe-simple-monitor</artifactId>
-	<version>0.2.0-SNAPSHOT</version>
+	<version>0.3.0-SNAPSHOT</version>
 
     <packaging>jar</packaging>
 
@@ -19,7 +19,7 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 
-		<zeebe.version>0.4.0</zeebe.version>
+		<zeebe.version>0.5.0</zeebe.version>
 		<spring.boot.version>1.5.5.RELEASE</spring.boot.version>
 		<version.java>1.8</version.java>
 	</properties>
@@ -107,15 +107,6 @@
 					</execution>
 				</executions>
 			</plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <configuration>
-                  <failOnViolation>false</failOnViolation>
-                </configuration>
-                <executions>
-                </executions>
-              </plugin>
 		</plugins>
     </build>
 

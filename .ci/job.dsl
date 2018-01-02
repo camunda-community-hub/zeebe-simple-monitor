@@ -44,6 +44,9 @@ curl -sL https://github.com/aktau/github-release/releases/download/v0.7.2/linux-
 def dockerRelease = '''\
 #!/bin/bash -xeu
 
+# clear docker host env set by jenkins job
+unset DOCKER_HOST
+
 IMAGE="camunda/zeebe-simple-monitor"
 
 echo "Building Zeebe Simple Monitor Docker image ${RELEASE_VERSION}."
@@ -55,10 +58,7 @@ docker login --username ${DOCKER_HUB_USERNAME} --password ${DOCKER_HUB_PASSWORD}
 echo "Pushing ${IMAGE}:${RELEASE_VERSION}"
 docker push ${IMAGE}:${RELEASE_VERSION}
 
-# to make sure we can tag latest, there were problems before
-docker rmi ${IMAGE}:latest || echo "No latest image found"
-
-docker tag ${IMAGE}:${RELEASE_VERSION} ${IMAGE}:latest
+docker tag -f ${IMAGE}:${RELEASE_VERSION} ${IMAGE}:latest
 
 echo "Pushing ${IMAGE}:latest"
 docker push ${IMAGE}:latest
@@ -66,6 +66,9 @@ docker push ${IMAGE}:latest
 
 def dockerSnapshot = '''\
 #!/bin/bash -xeu
+
+# clear docker host env set by jenkins job
+unset DOCKER_HOST
 
 if [ -f target/zeebe-simple-monitor-*-SNAPSHOT.jar ]; then
     IMAGE="camunda/zeebe-simple-monitor:SNAPSHOT"

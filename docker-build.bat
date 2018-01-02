@@ -1,1 +1,0 @@
-docker build -t docker.consulting.camunda.com/zeebe-simple-monitor .
