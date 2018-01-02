@@ -15,15 +15,19 @@
  */
 package io.zeebe.zeebemonitor.zeebe;
 
+import static java.util.stream.Collectors.toList;
+
 import java.io.StringReader;
 import java.util.*;
+
 import javax.json.Json;
 
-import io.zeebe.zeebemonitor.Constants;
 import io.zeebe.client.ClientProperties;
 import io.zeebe.client.ZeebeClient;
+import io.zeebe.client.clustering.impl.TopicLeader;
 import io.zeebe.client.event.IncidentEvent;
 import io.zeebe.client.event.WorkflowInstanceEvent;
+import io.zeebe.zeebemonitor.Constants;
 import io.zeebe.zeebemonitor.entity.*;
 import io.zeebe.zeebemonitor.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +91,8 @@ public class ZeebeConnections
         clientProperties.put(ClientProperties.BROKER_CONTACTPOINT, broker.getConnectionString());
 
         final ZeebeClient client = ZeebeClient.create(clientProperties);
+
+        ensureThatDefaultTopicExist(broker, client);
 
         openConnections.put(broker.getConnectionString(), client);
 
@@ -179,6 +185,20 @@ public class ZeebeConnections
         }).open();
 
         return client;
+    }
+
+    private void ensureThatDefaultTopicExist(final Broker broker, final ZeebeClient client)
+    {
+        final List<String> topicNames = client.requestTopology().execute()
+                .getTopicLeaders()
+                .stream()
+                .map(TopicLeader::getTopicName)
+                .collect(toList());
+
+        if (!topicNames.contains(Constants.DEFAULT_TOPIC))
+        {
+            throw new RuntimeException(String.format("Missing required topic '%s' on broker '%s'", Constants.DEFAULT_TOPIC, broker.getConnectionString()));
+        }
     }
 
     private void workflowDefinitionDeployed(Broker broker, WorkflowDefinition def)

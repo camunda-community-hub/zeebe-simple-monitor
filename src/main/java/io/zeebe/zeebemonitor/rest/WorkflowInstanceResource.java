@@ -18,13 +18,14 @@ package io.zeebe.zeebemonitor.rest;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import io.zeebe.client.ZeebeClient;
+import io.zeebe.client.clustering.impl.TopicLeader;
+import io.zeebe.client.event.TopicSubscription;
+import io.zeebe.client.event.WorkflowInstanceEvent;
 import io.zeebe.zeebemonitor.Constants;
 import io.zeebe.zeebemonitor.entity.WorkflowInstance;
 import io.zeebe.zeebemonitor.repository.WorkflowInstanceRepository;
 import io.zeebe.zeebemonitor.zeebe.ZeebeConnections;
-import io.zeebe.client.ZeebeClient;
-import io.zeebe.client.event.TopicSubscription;
-import io.zeebe.client.event.WorkflowInstanceEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -86,11 +87,13 @@ public class WorkflowInstanceResource
         TopicSubscription subscription = null;
         try
         {
+            final int partitionId = getPartitionIdOfTopic(client, Constants.DEFAULT_TOPIC);
+
             subscription = client.topics()
                                  .newSubscription(Constants.DEFAULT_TOPIC)
                                  .name("wf-instance-lookup")
                                  .forcedStart()
-                                 .startAtPosition(position - 1)
+                                 .startAtPosition(partitionId, position - 1)
                                  .workflowInstanceEventHandler(wfEvent -> {
                                      if (wfEvent.getMetadata().getPosition() == position)
                                      {
@@ -108,6 +111,17 @@ public class WorkflowInstanceResource
                 subscription.close();
             }
         }
+    }
+
+    private int getPartitionIdOfTopic(final ZeebeClient client, String topic)
+    {
+        return client.requestTopology().execute()
+                .getTopicLeaders()
+                .stream()
+                .filter(tl -> tl.getTopicName().equals(topic))
+                .findFirst()
+                .map(TopicLeader::getPartitionId)
+                .orElseThrow(() -> new RuntimeException("Doesn't find topic with name: " + topic));
     }
 
 }
