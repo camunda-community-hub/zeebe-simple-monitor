@@ -18,16 +18,21 @@ package io.zeebe.zeebemonitor.rest;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.zeebe.client.ZeebeClient;
-import io.zeebe.client.clustering.impl.TopicLeader;
+import io.zeebe.client.clustering.impl.BrokerPartitionState;
 import io.zeebe.client.event.TopicSubscription;
 import io.zeebe.client.event.WorkflowInstanceEvent;
 import io.zeebe.zeebemonitor.Constants;
 import io.zeebe.zeebemonitor.entity.WorkflowInstance;
 import io.zeebe.zeebemonitor.repository.WorkflowInstanceRepository;
 import io.zeebe.zeebemonitor.zeebe.ZeebeConnections;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/workflow-instance")
@@ -94,7 +99,8 @@ public class WorkflowInstanceResource
                                  .name("wf-instance-lookup")
                                  .forcedStart()
                                  .startAtPosition(partitionId, position - 1)
-                                 .workflowInstanceEventHandler(wfEvent -> {
+                                 .workflowInstanceEventHandler(wfEvent ->
+                                 {
                                      if (wfEvent.getMetadata().getPosition() == position)
                                      {
                                          future.complete(wfEvent);
@@ -116,11 +122,12 @@ public class WorkflowInstanceResource
     private int getPartitionIdOfTopic(final ZeebeClient client, String topic)
     {
         return client.requestTopology().execute()
-                .getTopicLeaders()
+                .getBrokers()
                 .stream()
-                .filter(tl -> tl.getTopicName().equals(topic))
+                .flatMap(b -> b.getPartitions().stream())
+                .filter(p -> p.getTopicName().equals(topic))
                 .findFirst()
-                .map(TopicLeader::getPartitionId)
+                .map(BrokerPartitionState::getPartitionId)
                 .orElseThrow(() -> new RuntimeException("Doesn't find topic with name: " + topic));
     }
 

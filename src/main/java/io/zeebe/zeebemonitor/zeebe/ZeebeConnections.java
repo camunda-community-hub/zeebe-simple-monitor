@@ -15,24 +15,36 @@
  */
 package io.zeebe.zeebemonitor.zeebe;
 
-import static java.util.stream.Collectors.toList;
-
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 import javax.json.Json;
+import javax.json.JsonObject;
 
-import io.zeebe.client.ClientProperties;
-import io.zeebe.client.ZeebeClient;
-import io.zeebe.client.clustering.impl.TopicLeader;
-import io.zeebe.client.event.IncidentEvent;
-import io.zeebe.client.event.WorkflowInstanceEvent;
-import io.zeebe.zeebemonitor.Constants;
-import io.zeebe.zeebemonitor.entity.*;
-import io.zeebe.zeebemonitor.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.ApplicationScope;
+
+import io.zeebe.client.ClientProperties;
+import io.zeebe.client.ZeebeClient;
+import io.zeebe.client.event.IncidentEvent;
+import io.zeebe.client.event.WorkflowInstanceEvent;
+import io.zeebe.zeebemonitor.Constants;
+import io.zeebe.zeebemonitor.entity.Broker;
+import io.zeebe.zeebemonitor.entity.Incident;
+import io.zeebe.zeebemonitor.entity.LoggedEvent;
+import io.zeebe.zeebemonitor.entity.WorkflowDefinition;
+import io.zeebe.zeebemonitor.entity.WorkflowInstance;
+import io.zeebe.zeebemonitor.repository.BrokerRepository;
+import io.zeebe.zeebemonitor.repository.IncidentRepository;
+import io.zeebe.zeebemonitor.repository.LoggedEventRepository;
+import io.zeebe.zeebemonitor.repository.WorkflowDefinitionRepository;
+import io.zeebe.zeebemonitor.repository.WorkflowInstanceRepository;
 
 @Component
 @ApplicationScope
@@ -172,7 +184,10 @@ public class ZeebeConnections
 
         client.topics().newSubscription(Constants.DEFAULT_TOPIC).startAtHeadOfTopic().forcedStart().name(untypedSubscriptionName).handler((event) ->
         {
-            final String state = Json.createReader(new StringReader(event.getJson())).readObject().getString("state");
+            final JsonObject jsonObject = Json.createReader(new StringReader(event.getJson())).readObject();
+
+            final String state = jsonObject.containsKey("state") ? jsonObject.getString("state") : "(none)";
+
             loggedEventRepository.save(new LoggedEvent(//
                     broker, //
                     event.getMetadata().getPartitionId(), //
@@ -189,13 +204,15 @@ public class ZeebeConnections
 
     private void ensureThatDefaultTopicExist(final Broker broker, final ZeebeClient client)
     {
-        final List<String> topicNames = client.requestTopology().execute()
-                .getTopicLeaders()
+        final boolean hasDefaultTopic = client
+                .topics()
+                .getTopics()
+                .execute()
+                .getTopics()
                 .stream()
-                .map(TopicLeader::getTopicName)
-                .collect(toList());
+                .anyMatch(t -> Constants.DEFAULT_TOPIC.equals(t.getName()));
 
-        if (!topicNames.contains(Constants.DEFAULT_TOPIC))
+        if (!hasDefaultTopic)
         {
             throw new RuntimeException(String.format("Missing required topic '%s' on broker '%s'", Constants.DEFAULT_TOPIC, broker.getConnectionString()));
         }
@@ -298,7 +315,6 @@ public class ZeebeConnections
     {
         final ZeebeClient client = openConnections.get(broker.getConnectionString());
 
-        client.disconnect();
         client.close();
 
         openConnections.remove(broker.getConnectionString());
@@ -308,7 +324,6 @@ public class ZeebeConnections
     {
         for (ZeebeClient client : openConnections.values())
         {
-            client.disconnect();
             client.close();
         }
         openConnections = new HashMap<>();
