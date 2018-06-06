@@ -15,12 +15,10 @@
  */
 package io.zeebe.zeebemonitor.repository;
 
-import io.zeebe.zeebemonitor.entity.Broker;
-import org.springframework.data.repository.CrudRepository;
+import java.util.List;
 
-public interface BrokerRepository extends CrudRepository<Broker, String>
+public interface PartitionRepositoryCustom
 {
-
-    //  List<BrokerConnection> findByLastName(String lastName);
+    List<String> getTopicNames();
 
 }

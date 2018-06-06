@@ -15,35 +15,26 @@
  */
 package io.zeebe.zeebemonitor.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
-@Entity
-public class Incident
+public class IncidentEntity
 {
+    private long key;
 
-    @Id
-    private long id;
-
+    private long workflowInstanceKey;
     private String activityId;
     private String errorType;
     private String errorMessage;
 
-    public Incident()
+    public IncidentEntity()
     {
     }
 
-    public Incident(long id, String activityId, String errorType, String errorMessage)
+    public IncidentEntity(long key, long workflowInstanceKey, String activityId, String errorType, String errorMessage)
     {
-        this.id = id;
+        this.key = key;
+        this.workflowInstanceKey = workflowInstanceKey;
         this.activityId = activityId;
         this.errorType = errorType;
         this.errorMessage = errorMessage;
-    }
-
-    public long getId()
-    {
-        return id;
     }
 
     public String getActivityId()
@@ -61,7 +52,7 @@ public class Incident
         return errorType;
     }
 
-    public Incident setErrorType(String errorType)
+    public IncidentEntity setErrorType(String errorType)
     {
         this.errorType = errorType;
         return this;
@@ -72,10 +63,30 @@ public class Incident
         return errorMessage;
     }
 
-    public Incident setErrorMessage(String errorMessage)
+    public IncidentEntity setErrorMessage(String errorMessage)
     {
         this.errorMessage = errorMessage;
         return this;
+    }
+
+    public long getIncidentKey()
+    {
+        return key;
+    }
+
+    public void setKey(long incidentKey)
+    {
+        this.key = incidentKey;
+    }
+
+    public long getWorkflowInstanceKey()
+    {
+        return workflowInstanceKey;
+    }
+
+    public void setWorkflowInstanceKey(long workflowInstanceKey)
+    {
+        this.workflowInstanceKey = workflowInstanceKey;
     }
 
     @Override
@@ -83,7 +94,7 @@ public class Incident
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (int) (id ^ (id >>> 32));
+        result = prime * result + (int) (key ^ (key >>> 32));
         return result;
     }
 
@@ -102,8 +113,8 @@ public class Incident
         {
             return false;
         }
-        final Incident other = (Incident) obj;
-        if (id != other.id)
+        final IncidentEntity other = (IncidentEntity) obj;
+        if (key != other.key)
         {
             return false;
         }

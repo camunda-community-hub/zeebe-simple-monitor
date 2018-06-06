@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>io.zeebe</groupId>
 		<artifactId>zb-parent</artifactId>
-		<version>0.6.0</version>
+		<version>0.8.0</version>
 		<relativePath />
 	</parent>
 
 	<artifactId>zeebe-simple-monitor</artifactId>
-	<version>0.5.0-SNAPSHOT</version>
+	<version>0.6.0-SNAPSHOT</version>
 
     <packaging>jar</packaging>
 
@@ -19,9 +19,11 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 
-		<zeebe.version>0.8.0</zeebe.version>
-		<spring.boot.version>1.5.5.RELEASE</spring.boot.version>
+		<zeebe.version>0.10.0</zeebe.version>
+		<spring.boot.version>2.0.2.RELEASE</spring.boot.version>
+				
 		<version.java>1.8</version.java>
+		
 	</properties>
 
 
@@ -44,23 +46,16 @@
 			<version>${zeebe.version}</version>
 		</dependency>
 
-		<!-- Dependency to allow starting the broker embedded <dependency> <groupId>io.zeebe</groupId>
-			<artifactId>zeebe-broker-core</artifactId> <version>${zeebe.version}</version>
-			</dependency> -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>compile</scope>
-		</dependency>
+	        <groupId>org.springframework.data</groupId>
+	        <artifactId>spring-data-mongodb</artifactId>
+	    </dependency>
+		
 		<dependency>
 			<groupId>org.glassfish</groupId>
 			<artifactId>javax.json</artifactId>
@@ -69,6 +64,7 @@
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>webjars-locator</artifactId>
+			<version>0.34</version>
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
@@ -76,9 +72,14 @@
 			<version>3.3.7</version>
 		</dependency>
 		<dependency>
+		    <groupId>org.webjars.bower</groupId>
+		    <artifactId>popper.js</artifactId>
+		    <version>1.14.3</version>
+		</dependency>
+		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>jquery</artifactId>
-			<version>3.1.1</version>
+			<version>3.3.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.webjars.bower</groupId>

@@ -15,12 +15,10 @@
  */
 package io.zeebe.zeebemonitor.repository;
 
-import io.zeebe.zeebemonitor.entity.LoggedEvent;
+import io.zeebe.zeebemonitor.entity.WorkflowEntity;
 import org.springframework.data.repository.CrudRepository;
 
-public interface LoggedEventRepository extends CrudRepository<LoggedEvent, Long>
+public interface WorkflowRepository extends CrudRepository<WorkflowEntity, Long>
 {
-
-    //  List<BrokerConnection> findByLastName(String lastName);
 
 }

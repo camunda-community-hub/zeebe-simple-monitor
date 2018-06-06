@@ -15,120 +15,86 @@
  */
 package io.zeebe.zeebemonitor.rest;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
-import io.zeebe.client.ZeebeClient;
-import io.zeebe.client.clustering.impl.BrokerPartitionState;
-import io.zeebe.client.event.TopicSubscription;
-import io.zeebe.client.event.WorkflowInstanceEvent;
-import io.zeebe.zeebemonitor.Constants;
-import io.zeebe.zeebemonitor.entity.WorkflowInstance;
+import io.zeebe.client.api.events.WorkflowInstanceEvent;
+import io.zeebe.client.api.record.ZeebeObjectMapper;
+import io.zeebe.zeebemonitor.entity.RecordEntity;
+import io.zeebe.zeebemonitor.entity.WorkflowInstanceEntity;
+import io.zeebe.zeebemonitor.repository.RecordRepository;
 import io.zeebe.zeebemonitor.repository.WorkflowInstanceRepository;
-import io.zeebe.zeebemonitor.zeebe.ZeebeConnections;
+import io.zeebe.zeebemonitor.zeebe.ZeebeConnectionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/workflow-instance")
+@RequestMapping("/api/instances")
 public class WorkflowInstanceResource
 {
 
     @Autowired
-    private ZeebeConnections connections;
+    private ZeebeConnectionService connections;
 
     @Autowired
     private WorkflowInstanceRepository workflowInstanceRepository;
 
+    @Autowired
+    private RecordRepository recordRepository;
+
     @RequestMapping("/")
-    public Iterable<WorkflowInstance> getWorkflowInstances()
+    public Iterable<WorkflowInstanceEntity> getWorkflowInstances()
     {
         return workflowInstanceRepository.findAll();
     }
 
-    @RequestMapping(path = "/{key}", method = RequestMethod.DELETE)
-    public void cancelWorkflowInstance(@PathVariable("key") long workflowInstanceKey) throws Exception
+    @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
+    public void cancelWorkflowInstance(@PathVariable("id") String id) throws Exception
     {
+        final WorkflowInstanceEntity workflowInstance = workflowInstanceRepository
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException("no workflow instance found with id: " + id));
 
-        final WorkflowInstance workflowInstance = workflowInstanceRepository.findOne(workflowInstanceKey);
-        if (workflowInstance != null)
-        {
-            final ZeebeClient client = connections.getZeebeClient(workflowInstance.getBroker());
+        final WorkflowInstanceEvent event = findWorkflowInstanceEvent(workflowInstance.getPartitionId(), workflowInstance.getLastWorkflowInstanceEventPosition());
 
-            final WorkflowInstanceEvent event = findLastWorkflowInstanceEvent(workflowInstance, workflowInstanceKey);
-
-            client.workflows() //
-                  .cancel(event).execute();
-        }
+        connections
+            .getClient()
+            .topicClient(workflowInstance.getTopicName())
+            .workflowClient()
+            .newCancelInstanceCommand(event)
+            .send()
+            .join();
     }
 
-    @RequestMapping(path = "/{key}/update-payload", method = RequestMethod.PUT)
-    public void updatePayload(@PathVariable("key") long workflowInstanceKey, @RequestBody String payload) throws Exception
+    @RequestMapping(path = "/{id}/update-payload", method = RequestMethod.PUT)
+    public void updatePayload(@PathVariable("id") String id, @RequestBody String payload) throws Exception
     {
 
-        final WorkflowInstance workflowInstance = workflowInstanceRepository.findOne(workflowInstanceKey);
-        if (workflowInstance != null)
-        {
-            final ZeebeClient client = connections.getZeebeClient(workflowInstance.getBroker());
+        final WorkflowInstanceEntity workflowInstance = workflowInstanceRepository
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException("no workflow instance found with id: " + id));
 
-            final WorkflowInstanceEvent event = findLastWorkflowInstanceEvent(workflowInstance, workflowInstance.getLastEventPosition());
+        final WorkflowInstanceEvent event = findWorkflowInstanceEvent(workflowInstance.getPartitionId(), workflowInstance.getLastEventPosition());
 
-            client.workflows() //
-                  .updatePayload(event).payload(payload).execute();
-        }
+        connections
+            .getClient()
+            .topicClient(workflowInstance.getTopicName())
+            .workflowClient()
+            .newUpdatePayloadCommand(event)
+            .payload(payload)
+            .send()
+            .join();
     }
 
-    private WorkflowInstanceEvent findLastWorkflowInstanceEvent(WorkflowInstance workflowInstance, long position) throws Exception
+    private WorkflowInstanceEvent findWorkflowInstanceEvent(int partitionId, long position) throws Exception
     {
-        final CompletableFuture<WorkflowInstanceEvent> future = new CompletableFuture<>();
+        final RecordEntity record = recordRepository.findByPartitionIdAndPosition(partitionId, position);
 
-        final ZeebeClient client = connections.getZeebeClient(workflowInstance.getBroker());
-
-        TopicSubscription subscription = null;
-        try
+        if (record == null)
         {
-            final int partitionId = getPartitionIdOfTopic(client, Constants.DEFAULT_TOPIC);
-
-            subscription = client.topics()
-                                 .newSubscription(Constants.DEFAULT_TOPIC)
-                                 .name("wf-instance-lookup")
-                                 .forcedStart()
-                                 .startAtPosition(partitionId, position - 1)
-                                 .workflowInstanceEventHandler(wfEvent ->
-                                 {
-                                     if (wfEvent.getMetadata().getPosition() == position)
-                                     {
-                                         future.complete(wfEvent);
-                                     }
-                                 })
-                                 .open();
-
-            return future.get(10, TimeUnit.SECONDS);
+            throw new RuntimeException(String.format("no record found at partition '%d' and position '%d'", partitionId, position));
         }
-        finally
-        {
-            if (subscription != null)
-            {
-                subscription.close();
-            }
-        }
-    }
 
-    private int getPartitionIdOfTopic(final ZeebeClient client, String topic)
-    {
-        return client.requestTopology().execute()
-                .getBrokers()
-                .stream()
-                .flatMap(b -> b.getPartitions().stream())
-                .filter(p -> p.getTopicName().equals(topic))
-                .findFirst()
-                .map(BrokerPartitionState::getPartitionId)
-                .orElseThrow(() -> new RuntimeException("Doesn't find topic with name: " + topic));
+        final ZeebeObjectMapper objectMapper = connections.getClient().objectMapper();
+
+        return objectMapper.fromJson(record.getContentAsJson(), WorkflowInstanceEvent.class);
     }
 
 }

@@ -13,18 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.zeebe.zeebemonitor;
+package io.zeebe.zeebemonitor.repository;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import io.zeebe.zeebemonitor.entity.ConfigurationEntity;
+import org.springframework.data.repository.CrudRepository;
 
-@SpringBootApplication
-public class Application
+public interface ConfigurationRepository extends CrudRepository<ConfigurationEntity, String>, ConfigurationRepositoryCustom
 {
-
-    public static void main(String... args)
-    {
-        SpringApplication.run(Application.class, args);
-    }
 
 }

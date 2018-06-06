@@ -13,39 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.zeebe.zeebemonitor.zeebe;
+package io.zeebe.zeebemonitor.rest;
 
-import io.zeebe.zeebemonitor.entity.Broker;
-
-public class ZeebeConnectionDto
+public class TopicDto
 {
+    private String topicName;
+    private int partitionCount;
+    private int replicationFactor;
 
-    private Broker broker;
-    private boolean connected;
-
-    public ZeebeConnectionDto(Broker broker, boolean connected)
+    public String getTopicName()
     {
-        this.broker = broker;
-        this.connected = connected;
+        return topicName;
     }
 
-    public Broker getBroker()
+    public void setTopicName(String topicName)
     {
-        return broker;
+        this.topicName = topicName;
     }
 
-    public void setBroker(Broker broker)
+    public int getPartitionCount()
     {
-        this.broker = broker;
+        return partitionCount;
     }
 
-    public boolean isConnected()
+    public void setPartitionCount(int partitionCount)
     {
-        return connected;
+        this.partitionCount = partitionCount;
     }
 
-    public void setConnected(boolean connected)
+    public int getReplicationFactor()
     {
-        this.connected = connected;
+        return replicationFactor;
     }
+
+    public void setReplicationFactor(int replicationFactor)
+    {
+        this.replicationFactor = replicationFactor;
+    }
+
 }

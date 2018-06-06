@@ -17,18 +17,13 @@ package io.zeebe.zeebemonitor.rest;
 
 import java.util.List;
 
-import io.zeebe.zeebemonitor.entity.Broker;
-import io.zeebe.zeebemonitor.entity.LoggedEvent;
-import io.zeebe.zeebemonitor.repository.BrokerRepository;
-import io.zeebe.zeebemonitor.repository.LoggedEventRepository;
-import io.zeebe.zeebemonitor.zeebe.ZeebeConnectionDto;
-import io.zeebe.zeebemonitor.zeebe.ZeebeConnections;
+import io.zeebe.client.api.commands.BrokerInfo;
+import io.zeebe.zeebemonitor.entity.ConfigurationEntity;
+import io.zeebe.zeebemonitor.repository.ConfigurationRepository;
+import io.zeebe.zeebemonitor.zeebe.ZeebeConnectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Component
 @RestController
@@ -37,73 +32,70 @@ public class BrokerResource
 {
 
     @Autowired
-    private LoggedEventRepository loggedEventRepository;
+    private ConfigurationRepository configurationRepository;
 
     @Autowired
-    private BrokerRepository brokerRepository;
+    private ZeebeConnectionService zeebeConnections;
 
-    @Autowired
-    private ZeebeConnections zeebeConnections;
-
-    //  @PostConstruct
-    //  public void init(){
-    //      if (brokerRepository.findOne("127.0.0.1:51015")==null) {
-    //        Broker broker = new Broker("", "127.0.0.1:51015");
-    //        brokerRepository.save(broker);
-    //        zeebeConnections.connect(broker);
-    //      }
-    //  }
-
-    @RequestMapping("/log")
-    public Iterable<LoggedEvent> getLogs()
+    @RequestMapping("/config")
+    public ConfigurationEntity getConfiguration()
     {
-        return loggedEventRepository.findAll();
-    }
-
-    @RequestMapping("/")
-    public List<ZeebeConnectionDto> getBrokerConnections()
-    {
-        return zeebeConnections.getConnectionDtoList();
+        return configurationRepository
+                .getConfiguration()
+                .orElseGet(() -> null);
     }
 
     @RequestMapping(path = "/connect", method = RequestMethod.POST)
-    public ZeebeConnectionDto connect(@RequestBody String connectionString)
+    public void connect()
     {
-        Broker broker = brokerRepository.findOne(connectionString);
-        if (broker == null)
+        configurationRepository.getConfiguration().ifPresent(config ->
         {
-            broker = new Broker(null, connectionString); // TODO: Add names to UI
-            brokerRepository.save(broker);
-        }
-
-        if (!zeebeConnections.isConnected(broker))
-        {
-            zeebeConnections.connect(broker);
-        }
-
-        return zeebeConnections.getConnectionDto(broker);
+            if (!zeebeConnections.isConnected())
+            {
+                zeebeConnections.connect(config);
+            }
+        });
     }
 
-    @RequestMapping(path = "/disconnect", method = RequestMethod.POST)
-    public ZeebeConnectionDto disconnect(@RequestBody String connectionString)
+    @RequestMapping(path = "/setup", method = RequestMethod.POST)
+    public ConfigurationEntity setup(@RequestBody String connectionString)
     {
-        final Broker broker = brokerRepository.findOne(connectionString);
-        if (broker != null)
+        configurationRepository.getConfiguration().ifPresent(config ->
         {
-            if (zeebeConnections.isConnected(broker))
-            {
-                zeebeConnections.disconnect(broker);
-            }
-            return zeebeConnections.getConnectionDto(broker);
-        }
-        return null;
+            throw new RuntimeException("Monitor is already connected to: " + config.getConnectionString());
+        });
+
+        final ConfigurationEntity config = new ConfigurationEntity(connectionString);
+        configurationRepository.save(config);
+
+        zeebeConnections.connect(config);
+
+        return config;
+    }
+
+    @RequestMapping(path = "/check-connection")
+    public boolean checkConnection()
+    {
+        return zeebeConnections.isConnected();
     }
 
     @RequestMapping(path = "/cleanup", method = RequestMethod.POST)
     public void cleanup()
     {
-        // TODO: Cleanup for only one broker?
         zeebeConnections.deleteAllData();
+    }
+
+    @RequestMapping(path = "/topology")
+    public List<BrokerInfo> getTopology()
+    {
+        final List<BrokerInfo> brokers = zeebeConnections
+            .getClient()
+            .newTopologyRequest()
+            .send()
+            .join()
+            .getBrokers();
+
+        return brokers;
     }
 
 }

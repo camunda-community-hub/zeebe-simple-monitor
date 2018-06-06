@@ -1,9 +1,15 @@
-Simple monitor showing Zeebe information
+Zeebe Simple Monitor
 =========================
 
-This Spring Boot application can connect to [Zeebe](https://zeebe.io) and registers for all events handled on the broker. It projects them into some own JPA entities locally in order to be displayed in a small HTML5 web application.
+This Spring Boot application connects to [Zeebe](https://zeebe.io) and receive all data (i.e. records). It aggregates the data and store it locally in MongoDB. The aggregated data can be displayed in a small HTML5 web application.
 
-**This is a hobby project meant for playing around with Zeebe. It is NOT meant to be used in production. There are no severe tests and no gurantees!**
+**Features:**
+* inspect deployed workflows
+* inspect workflow instances, including payload and incidents
+* inspect raw records (events/commands) and search
+* management operations (e.g. new deployment, cancel workflow instance, update payload)
+
+*This is a community project meant for playing around with Zeebe. It is not officially supported by the Zeebe Team (i.e. no gurantees). Everybody is invited to contribute!* 
 
 
 ## How to build
@@ -14,25 +20,22 @@ Build with Maven
 
 ## How to run
 
+> [Install and launch MongoDB](http://docs.mongodb.org/manual/installation/)
+
 Execute the (Fat) JAR file via
 
-`java -jar target/zeebe-simple-monitor.jar`
+`java -jar target/zeebe-simple-monitor-{VERSION}.jar`
 
 Open a web browser and go to http://localhost:8080
 
+
 ## Impressions
 
-![screenshot](docs/screen-workflow-definition.png)
+![screenshot](docs/workflows.png)
 
-![screenshot](docs/screen-workflow-instances.png)
+![screenshot](docs/instances.png)
 
-You can connect to Zeebe brokers if you can reach them via network.
-
-![screenshot](docs/screen-config.png)
-
-and see all events
-
-![screenshot](docs/screen-events.png)
+![screenshot](docs/records.png)
 
 ## Code of Conduct
 

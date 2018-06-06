@@ -13,41 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.zeebe.zeebemonitor.entity;
+package io.zeebe.zeebemonitor.repository;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import io.zeebe.zeebemonitor.entity.PartitionEntity;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-@Entity
-public class Broker
+public interface PartitionRepository extends MongoRepository<PartitionEntity, Integer>, PartitionRepositoryCustom
 {
-
-    //  @GeneratedValue
-    //  private String id; // = UUID.randomUUID().toString()
-
-    @Id
-    private String connectionString;
-    private String name;
-
-    public Broker()
-    {
-    }
-
-    public Broker(String name, String connectionString)
-    {
-        super();
-        this.name = name;
-        this.connectionString = connectionString;
-    }
-
-    public String getConnectionString()
-    {
-        return connectionString;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
 }

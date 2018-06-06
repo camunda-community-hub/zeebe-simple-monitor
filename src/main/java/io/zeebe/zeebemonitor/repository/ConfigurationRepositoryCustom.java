@@ -15,18 +15,11 @@
  */
 package io.zeebe.zeebemonitor.repository;
 
-import io.zeebe.zeebemonitor.entity.WorkflowInstanceEntity;
-import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.repository.CrudRepository;
+import java.util.Optional;
 
-public interface WorkflowInstanceRepository extends CrudRepository<WorkflowInstanceEntity, String>
+import io.zeebe.zeebemonitor.entity.ConfigurationEntity;
+
+public interface ConfigurationRepositoryCustom
 {
-    @Query(value = "{ 'workflowKey' : ?0, 'ended' : false }", count = true)
-    long countRunningInstances(long workfloKey);
-
-    @Query(value = "{ 'workflowKey' : ?0, 'ended' : true }", count = true)
-    long countEndedInstances(long workflowKey);
-
-    WorkflowInstanceEntity findByWorkflowInstanceKeyAndPartitionId(long workflowInstanceKeys, int partitionId);
-
+    Optional<ConfigurationEntity> getConfiguration();
 }

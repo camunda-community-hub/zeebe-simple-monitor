@@ -2,10 +2,14 @@ var viewer = null;
 var container = null;
 
 let restAccess = "api/";
-//let restAccess = "http://localhost:8080/camunda-tngp-monitor/api/";
-let brokers = [];
 let brokerLogs = {};
 
+let topics = [];
+
+let isConnected = false;
+var config;
+
+var selectedTopic;
 var workflowDefinitions;
 var selectedWorkflowDefinition;
 
@@ -13,94 +17,18 @@ var workflowInstances;
 var selectedWorkflowInstance;
 var currentPage;
 
-/*
-{
-		name: 'default',
-		connectionString: '127.0.0.1:51015',
-		state: 'disconnected'		
-	}
-	*/
-
 function cleanupData() {
 			$.ajax({
 		             type : 'POST',
 		             url: restAccess + 'broker/cleanup',
 		             success: function (result) {
-					    loadBrokers();
-					    refresh();		
+		            	 window.location.replace('/');		
 		             },
 		             error: function (xhr, ajaxOptions, thrownError) {
-		             	console.log(xhr);
-		             	console.log(thrownError);
-		             	showError(xhr.responseJSON.message);
-		             },
+		               	 showErrorResonse(xhr, ajaxOptions, thrownError);
+	                },
 		             crossDomain: true,
 		    });				
-}
-
-function brokerConnect(connectionString) {
-			$.ajax({
-		             type : 'POST',
-		             url: restAccess + 'broker/connect',
-		             data: connectionString,
-		             contentType: 'application/text; charset=utf-8',
-		             //dataType: 'json',
-		             success: function (result) {
-					    loadBrokers();
-					    refresh();		
-		             },
-		             error: function (xhr, ajaxOptions, thrownError) {
-		            	 showErrorResonse(xhr, ajaxOptions, thrownError);
-		             },
-		             timeout: 5000,
-		             crossDomain: true,
-		    });				
-}	
-function brokerDisconnect(connectionString) {
-			$.ajax({
-		             type : 'POST',
-		             url: restAccess + 'broker/disconnect',
-		             data: connectionString,
-		             contentType: 'application/text; charset=utf-8',
-		             //dataType: 'json',
-		             success: function (result) {
-					    loadBrokers();
-					    refresh();		
-		             },
-		             error: function (xhr, ajaxOptions, thrownError) {
-		            	 showErrorResonse(xhr, ajaxOptions, thrownError);
-		             },
-		             timeout: 5000,
-		             crossDomain: true,
-		    });		
-}	
-
-
-function renderBrokerTable() {
-	$("#brokerTable > tbody").html("");
-	var atLeastOneBrokerConnected = false;
-	for (index = brokerConnections.length-1; index >= 0; --index) {
-		var brokerConnection = brokerConnections[index];
-		if (brokerConnection.connected) {
-			$('#brokerTable tbody').append("<tr><td>"+brokerConnection.broker.name+"</td><td>"+brokerConnection.broker.connectionString+"</td><td><span class='label label-success'>connected</span></td><td><a onclick='brokerDisconnect(\""+brokerConnection.broker.connectionString+"\")'>disconnect</a></td></tr>");
-			atLeastOneBrokerConnected = true;
-		} else {
-			$('#brokerTable tbody').append("<tr><td>"+brokerConnection.broker.name+"</td><td>"+brokerConnection.broker.connectionString+"</td><td>disconnected</td><td><a onclick='brokerConnect(\""+brokerConnection.broker.connectionString+"\")'>connect</a></td></tr>");
-		}
-	}
-	if (atLeastOneBrokerConnected) {
-		$('#brokerGlobalInfo').html('<a><span class="label label-success">connected</span></a>');
-	} else {
-		$('#brokerGlobalInfo').html('<a onclick="brokerConnect(\'127.0.0.1:51015\')"><span class="label label-danger">Not connected. Click to connect default.</span></a>')	;	
-	}
-}
-
-function renderBrokerDropdown() {
-    // add brokers to selected broker dropdown
-	$('#selectedBrokerDropdown').empty();
-	for (index = brokerConnections.length-1; index >= 0; --index) {
-		$("#selectedBrokerDropdown").append('<option>'+brokerConnections[index].broker.connectionString+'</option>');
-	}	
 }
 
 function init(page) {	
@@ -109,43 +37,240 @@ function init(page) {
 }
 
 function refresh() {
+	
 	if (currentPage=='broker') {
-		loadBrokers();
+		loadConfiguration();
+		checkConnection();
+		loadTopology();
 	} else if (currentPage=='definition') {
-		loadBrokers();
+		loadTopics();
 		loadWorkflowDefinitions();		
 	} else if (currentPage=="instance") {
-		loadBrokers();
 		loadWorkflowInstances();		
 	} else if (currentPage=="logs") {
-		loadBrokers();
-		loadBrokerLogs();		
+		loadRecords();		
+	} else if (currentPage=="setup" ) {
+		renderSetup();
 	}
 }
 
-function addBroker() {
-	brokerConnect( $('#brokerConnection').val() );
-	$('#brokerConnection').text('');
+function renderSetup() {
+	
+	loadConfiguration();
+	
+	if (config) {
+		window.location.replace('/');
+	}
 }
 
-function loadBrokers() {
-	$.get(restAccess + 'broker/', function(brokerList) {
-		brokerConnections = brokerList;
-		renderBrokerTable();
-		renderBrokerDropdown();
+// -------- config page
+
+function loadConfiguration() {
+	
+	$.ajax({
+        type : 'GET',
+        url: restAccess + 'broker/config',
+        contentType: 'application/text; charset=utf-8',
+        success: function (cfg) {
+       	 config = cfg
+       	 renderConfiguration(config)
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+       	 showErrorResonse(xhr, ajaxOptions, thrownError);
+        },
+        timeout: 3000,
+        crossDomain: true,
+	});	
+}
+
+function renderConfiguration(config) {	
+	$("#connection-string").html(config.connectionString)	
+}
+
+function loadTopology() {
+	
+	$.ajax({
+        type : 'GET',
+        url: restAccess + 'broker/topology',
+        contentType: 'application/json; charset=utf-8',
+        success: function (topology) {
+       	 renderTopology(topology)
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+        	if (isConnected) {
+        		showErrorResonse(xhr, ajaxOptions, thrownError);
+        	}
+        },
+        timeout: 3000,
+        crossDomain: true,
+	});	
+}
+
+function renderTopology(topology) {
+	$("#topologyTable > tbody").html("");
+	for (index = 0; index < topology.length; index++) {
+		var broker = topology[index];
+		
+		for (p = 0; p < broker.partitions.length; p++) {
+			var partition = broker.partitions[p];
+			
+			$('#topologyTable tbody').append("<tr><td>" + broker.address + "</td><td>" + partition.topicName + "</td><td>" + partition.partitionId + "</td><td>" + partition.role + "</td></tr>");
+		}
+	}
+}	
+
+function connectToBroker() {
+	$.ajax({
+             type : 'POST',
+             url: restAccess + 'broker/connect',
+             contentType: 'application/text; charset=utf-8',
+             success: function (cfg) {
+            	refresh();		
+             },
+             error: function (xhr, ajaxOptions, thrownError) {
+            	 showErrorResonse(xhr, ajaxOptions, thrownError);
+             },
+             timeout: 5000,
+             crossDomain: true,
+    });				
+}
+
+function createTopic() {
+	var topicName = $('#topicName').val()
+	var partitionCount = $('#partitionCount').val()
+	var replicationFactor = $('#replicationFactor').val()
+	
+	var command = '{"topicName":"' + topicName + '", "partitionCount":' + partitionCount + ', "replicationFactor":' + replicationFactor + '}';
+	
+	$.ajax({
+        type : 'POST',
+        url: restAccess + 'topics/',
+        data: command,
+        contentType: 'application/json; charset=utf-8',
+        success: function (result) {
+        	setTimeout(function() {
+				refresh();
+			}, 1000);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+       	 showErrorResonse(xhr, ajaxOptions, thrownError);
+        },
+        timeout: 20000,
+        crossDomain: true,
+});
+}
+
+function setup() {
+	setupTo( $('#brokerConnection').val() );
+}
+
+function setupTo(connectionString) {
+	$.ajax({
+             type : 'POST',
+             url: restAccess + 'broker/setup',
+             data: connectionString,
+             contentType: 'application/text; charset=utf-8',
+             success: function (cfg) {
+            	 config = cfg
+            	 window.location.replace('/')	
+             },
+             error: function (xhr, ajaxOptions, thrownError) {
+            	 showErrorResonse(xhr, ajaxOptions, thrownError);
+             },
+             timeout: 20000,
+             crossDomain: true,
+    });				
+}
+
+function checkConnection() {
+	$.ajax({
+	     type : 'GET',
+	     url: restAccess + 'broker/check-connection',
+	     contentType: 'application/text; charset=utf-8',
+	     success: function (result) {
+	    	 isConnected = result;
+	    	 renderConnectionState(result);		    	 
+	     },
+	     error: function (xhr, textStatus, thrownError) {
+	    	 isConnected = false;	 
+	    	 renderConnectionState(false);   	 
+	     },
+	     timeout: 3000,
+	     crossDomain: true,
+	});				
+}	
+
+function connect() {
+	$.ajax({
+             type : 'POST',
+             url: restAccess + 'broker/connect',
+             contentType: 'application/json; charset=utf-8',
+             success: function (cfg) {
+            	 setTimeout(function() {
+     				refresh();
+     			}, 1000);	
+             },
+             error: function (xhr, ajaxOptions, thrownError) {
+            	 showErrorResonse(xhr, ajaxOptions, thrownError);
+             },
+             timeout: 5000,
+             crossDomain: true,
+    });				
+}
+
+function renderConnectionState(connected) {
+	if (connected) {
+	$('#connection-state').html('<span class="label label-success">connected</span>');
+	}
+	else {
+	$('#connection-state').html('<span class="label label-warning">disconnected</span>' + '<button onclick="connect()" type="button" class="btn btn-success pull-right">Connect</button>');
+	
+	}
+}
+
+
+//-------- workflow page
+
+function loadTopics() {
+	$.ajax({
+        type : 'GET',
+        url: restAccess + 'topics/',
+        contentType: 'application/json; charset=utf-8',
+        success: function (result) {
+        	topics = result;
+        	renderTopicSelection();
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+       	 showErrorResonse(xhr, ajaxOptions, thrownError);
+        },
+        timeout: 3000,
+        crossDomain: true,
+	});	
+}
+
+function renderTopicSelection() {
+	
+	$("#selectedTopicDropdown").empty();
+	
+	$("#selectedTopicDropdown").click(function(){ 
+		selectedTopic = $("#selectedTopicDropdown").val();
 	});
-}
-
-function loadBrokerLogs() {
-	$.get(restAccess + 'broker/log', function(logs) {
-		brokerLogs = logs;
-		renderBrokerLogsTable();
-	});
-}
-
+	
+	for (index = 0; index < topics.length; index++) {
+		var topic = topics[index];
+		
+		$('#selectedTopicDropdown').append('<option value="' + topic + '">' + topic + '</option>');
+	}
+	
+	if (selectedTopic) {
+		$("#selectedTopicDropdown").val(selectedTopic);
+	} else {
+		$("#selectedTopicDropdown").val($("#selectedTopicDropdown option:first").val());
+	}
+}	
 
 function loadWorkflowDefinitions() {
-	$.get(restAccess + 'workflow-definition/', function(result) {
+	$.get(restAccess + 'workflows/', function(result) {
 	    workflowDefinitions = result;
 	    if (!selectedWorkflowDefinition && workflowDefinitions && workflowDefinitions.length>0) {
 	    	selectedWorkflowDefinition = workflowDefinitions[workflowDefinitions.length - 1];
@@ -160,10 +285,17 @@ function renderWorkflowDefinitionTable() {
 	for (index = workflowDefinitions.length-1; index >= 0; --index) {
 		var def = workflowDefinitions[index];
 		var selectedClass = '';
-		if (selectedWorkflowDefinition && def.key==selectedWorkflowDefinition.key && def.version==selectedWorkflowDefinition.version) {
+		if (selectedWorkflowDefinition && def.workflowKey==selectedWorkflowDefinition.workflowKey) {
 			selectedClass ='class="tngp-table-selected"';
 		}
-		$('#workflowDefinitionTable tbody').append("<tr><td "+selectedClass+"><a onclick='selectWorkflowDefinition("+index+")'>"+def.key + "(" + def.version + ")" +"</a></td><td "+selectedClass+">"+def.countRunning+"</td></tr>");
+		$('#workflowDefinitionTable tbody').append("<tr>" + 
+				"<td "+selectedClass+"><a onclick='selectWorkflowDefinition("+index+")'>"+def.workflowKey+"</a></td>" + 
+				"<td "+selectedClass+"><a onclick='selectWorkflowDefinition("+index+")'>"+def.bpmnProcessId+"</a></td>"+
+				"<td "+selectedClass+">"+def.version+"</td>"+
+				"<td "+selectedClass+">"+def.topic+"</td>"+
+				"<td "+selectedClass+">"+def.countRunning+"</td>"+
+				"<td "+selectedClass+">"+def.countEnded+"</td>"+
+				"</tr>");
 	}
 }	
 
@@ -176,10 +308,10 @@ function selectWorkflowDefinition(index) {
 
 function renderSelectedWorkflowDefinition() {
 	if (selectedWorkflowDefinition) {
-		$('#workflowDefinitionKey').html(selectedWorkflowDefinition.key);
-		$('#workflowDefinitionName').html(selectedWorkflowDefinition.key);
-		$('#workflowDefinitionVersion').text(selectedWorkflowDefinition.version);
-		$('#workflowDefinitionBroker').text(selectedWorkflowDefinition.broker.connectionString);
+		$('#workflowKey').html(selectedWorkflowDefinition.workflowKey);
+		$('#bpmnProcessId').html(selectedWorkflowDefinition.bpmnProcessId);
+		$('#workflowVersion').text(selectedWorkflowDefinition.version);
+		$('#topic').text(selectedWorkflowDefinition.topic);
 
 		$('#countRunning').text(selectedWorkflowDefinition.countRunning);
 		$('#countEnded').text(selectedWorkflowDefinition.countEnded);
@@ -203,16 +335,15 @@ function renderSelectedWorkflowDefinition() {
 }
 
 function startWorkflowInstance() {
-	console.log(selectedWorkflowDefinition);
+	
 	if (selectedWorkflowDefinition) {
-		console.log(JSON.stringify( $('#payload').val() ));
+		
 		$.ajax({
-	             type : 'PUT',
-	             url: restAccess + 'workflow-definition/' + selectedWorkflowDefinition.broker.connectionString + "/" + selectedWorkflowDefinition.key + "/" + selectedWorkflowDefinition.version,
+	             type : 'POST',
+	             url: restAccess + 'workflows/' + selectedWorkflowDefinition.workflowKey,
 	             data:  $('#payload').val(),
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
-	             	console.log("STARTED");
 	             	setTimeout(function() {
     					refresh();
 					}, 1000);
@@ -226,8 +357,10 @@ function startWorkflowInstance() {
 	}
 }
 
+//-------- instance page
+
 function loadWorkflowInstances() {
-	$.get(restAccess + 'workflow-instance/', function(result) {
+	$.get(restAccess + 'instances/', function(result) {
 	    workflowInstances = result;
 	    if (workflowInstances && workflowInstances.length>0) {
 	    	
@@ -257,8 +390,15 @@ function renderWorkflowInstanceTable() {
 		if (selectedWorkflowInstance && def.id==selectedWorkflowInstance.id) {
 			selectedClass ='class="tngp-table-selected"';
 		}
-		$('#workflowInstanceTable tbody').append(
-			"<tr><td "+selectedClass+"><a onclick='selectWorkflowInstance("+index+")'>"+def.id +"</a></td><td "+selectedClass+">"+def.workflowDefinitionKey+"</td></tr>");
+		
+		$('#workflowInstanceTable tbody').append("<tr>" + 
+				"<td "+selectedClass+"><a onclick='selectWorkflowInstance("+index+")'>"+def.workflowInstanceKey+"</a></td>" + 
+				"<td "+selectedClass+">"+def.bpmnProcessId+"</td>"+
+				"<td "+selectedClass+">"+def.workflowVersion+"</td>"+
+				"<td "+selectedClass+">"+def.workflowKey+"</td>"+
+				"<td "+selectedClass+">"+def.topicName+"</td>"+
+				"<td "+selectedClass+">"+(def.ended ? "Ended" : "Running")+"</td>"+
+				"</tr>");
 	}
 }	
 
@@ -272,24 +412,28 @@ function selectWorkflowInstance(index) {
 function renderSelectedWorkflowInstance() {
 	if (selectedWorkflowInstance) {
 		
-		$('#workflowInstanceId').html(selectedWorkflowInstance.id);
+		$('#workflowInstanceKey').html(selectedWorkflowInstance.workflowInstanceKey);
 		if (selectedWorkflowInstance.ended) {
 			$('#workflowRunning').html("Ended");
 		} else {
 			$('#workflowRunning').html("Running");
 		}
 
-		$('#workflowDefinitionUuid').html(selectedWorkflowInstance.workflowDefinitionUuid);
-		$('#workflowDefinitionKey').html(selectedWorkflowInstance.workflowDefinitionKey);
+		$('#workflowKey').html(selectedWorkflowInstance.workflowKey);
+		$('#bpmnProcessId').html(selectedWorkflowInstance.bpmnProcessId);
+		
 		$('#payload').val(
 			JSON.stringify(
 				JSON.parse(selectedWorkflowInstance.payload), undefined, 2
 			));
 		
+		$("#update-payload").prop("disabled", selectedWorkflowInstance.ended);
+		$("#cancel-workflow-instance").prop("disabled", selectedWorkflowInstance.ended);
+		
 		renderIncidentsTable();
 
 		$('#workflowInstanceInfo').text('');
-		$.get(restAccess + 'workflow-definition/' + selectedWorkflowInstance.broker.connectionString + '/' + selectedWorkflowInstance.workflowDefinitionKey + '/' + selectedWorkflowInstance.workflowDefinitionVersion, function(result) {
+		$.get(restAccess + 'workflows/' + selectedWorkflowInstance.workflowKey, function(result) {
 			viewer.importXML(result.resource, function(err) {
 							if (err) {
 								console.log('error rendering', err);
@@ -321,29 +465,61 @@ function renderIncidentsTable() {
 	}
 }
 
-function renderBrokerLogsTable() {
+//-------- log page
+
+function loadRecords() {
+	
+	countRecords();
+	
+	$.ajax({
+        type : 'POST',
+        url: restAccess + 'records/search',
+        data:  $('#recordQuery').val(),
+        contentType: 'application/json; charset=utf-8',
+        success: function (logs) {
+        	brokerLogs = logs;
+    		renderRecordsTable();
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+       	 showErrorResonse(xhr, ajaxOptions, thrownError);
+        },
+   	 timeout: 5000,
+        crossDomain: true,
+	});
+}
+
+function countRecords() {
+	$.ajax({
+        type : 'POST',
+        url: restAccess + 'records/count',
+        data:  $('#recordQuery').val(),
+        contentType: 'application/json; charset=utf-8',
+        success: function (count) {
+        	$('#recordCount').html(count)
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+       	 showErrorResonse(xhr, ajaxOptions, thrownError);
+        },
+   	 timeout: 5000,
+        crossDomain: true,
+	});
+}
+
+
+function renderRecordsTable() {
 	$("#brokerLogsTable > tbody").html("");
 
 			for (index = brokerLogs.length-1; index >= 0; --index) {
 
-				var loggedEvent = brokerLogs[index];
-                var payload = JSON.parse(loggedEvent.payload);
-                
+				var log = brokerLogs[index];
+				var json = log.content
+				var prettyJson = JSON.stringify(json, null, 4)
+                				
 				$('#brokerLogsTable tbody').append(
-					"<tr><td>"+loggedEvent.broker.connectionString+"</td>"
-					+"<td>"+loggedEvent.eventType+"</td>"
-					+"<td>"+loggedEvent.state+"</td>"
-					+"<td>"+loggedEvent.partitionId+"</td>"
-					+"<td>"+loggedEvent.position+"</td>"
-					+"<td>"+loggedEvent.key+"</td>"
-					+"<td>"
-			        + '<a label="Details" data-toggle="collapse" data-target="#payload'+index+'" class="btn btn-default table-row-btn"><span class="glyphicon glyphicon-eye-open"></span></a>'
-			        +"<div class=\"collapse\" id=\"payload"+ index + "\"><pre>"+JSON.stringify(payload, null, 2)+"</pre></div></td></tr>");
-
+					"<tr><td><p style='white-space:pre'>"+prettyJson+"</p></td>"
+					+"</td></tr>");
 			}
 }
-
-
 
 
 
@@ -370,7 +546,7 @@ function uploadModels() {
 	var fileUpload = $('#documentToUpload').get(0);
 
 	var filesToUpload = {
-		broker: $('#selectedBrokerDropdown').val(), 
+		topic: $('#selectedTopicDropdown').val(), 
 		files: []
 	} 
 
@@ -411,7 +587,7 @@ function uploadModels() {
 	var uploadFiles = function() {
 	    $.ajax({
 	             type : 'POST',
-	             url: restAccess + 'workflow-definition/',
+	             url: restAccess + 'workflows/',
 	             data:  JSON.stringify(filesToUpload),
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
@@ -488,7 +664,7 @@ function updatePayload() {
 	if (selectedWorkflowInstance) {
 		$.ajax({
 	             type : 'PUT',
-	             url: restAccess + 'workflow-instance/' + selectedWorkflowInstance.id + "/update-payload",
+	             url: restAccess + 'instances/' + selectedWorkflowInstance.id + "/update-payload",
 	             data:  $('#payload').val(),
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
@@ -509,7 +685,7 @@ function cancelWorkflowInstance() {
 	if (selectedWorkflowInstance) {
 		$.ajax({
 	             type : 'DELETE',
-	             url: restAccess + 'workflow-instance/' + selectedWorkflowInstance.id,
+	             url: restAccess + 'instances/' + selectedWorkflowInstance.id,
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
 	             	setTimeout(function() {

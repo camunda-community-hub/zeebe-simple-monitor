@@ -7,17 +7,12 @@
 
     <title> Zeebe Simple Monitor </title>
 
-    <script src="/webjars/jquery/jquery.min.js"></script>
-
     <!-- bpmn-js viewer -->
-    <script type="text/javascript" src="webjars/bpmn-js/dist/bpmn-navigated-viewer.js"></script>
     <link type="text/css" rel="stylesheet" href="webjars/bpmn-js/dist/assets/diagram-js.css"/>
-    <link type="text/css" rel="stylesheet" href="webjars/bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css
+    <link type="text/css" rel="stylesheet" href="webjars/bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css"/>
 
-  <link type=" text
-    /css" rel="stylesheet" href="./css/modeler.css" />
+  	<link type="text/css" rel="stylesheet" href="./css/modeler.css" />
 
-    <script type="text/javascript" src="./app.js"></script>
     <link rel="stylesheet" href="./app.css">
 
     <script src="./vendor/prism.js"></script>
@@ -87,10 +82,11 @@ em.optional:after {
 
 </head>
 <body>
+
 <header class="cam-brand-header">
     <!-- depending on your layout, you may want to use the `.container-fluid` class instead below -->
     <div class="container-fluid">
-        <a class="navbar-brand" href="./index.html" title="Zeebe Simple Monitor">
+        <a class="navbar-brand" href="./" title="Zeebe Monitor">
         <span class="brand-name" style="top: 0px;">
           <img style="height: 35px;" src="img/logo.png"/> Zeebe Simple Monitor
         </span>
@@ -99,35 +95,20 @@ em.optional:after {
         <!-- this is intended for the site navigation -->
         <nav class="sections-menu">
             <ul>
-                <li><a href="./index.html">Configuration</a></li>
-                <li><a href="./definitions.html">Workflow Definitions</a></li>
-                <li class="active"><a href="./instances.html">Workflow Instances</a></li>
-                <li><a href="./logs.html">Logs</a></li>
-                <li><a href="./search.html">Search</a></li>
-            </ul>
-        </nav>
-
-        <nav class="app-menu">
-            <ul>
-                <li id="brokerGlobalInfo">
-                    <!--<a href=""><span id="defaultBrokerState" class="btn btn-danger">Not connected. Klick to connect default.</span></a>-->
-                </li>
+                <li><a href="./index.html">Broker</a></li>
+                <li><a href="./definitions.html">Workflows</a></li>
+                <li class="active"><a href="./instances.html">Instances</a></li>
+                <li><a href="./logs.html">Records</a></li>
             </ul>
         </nav>
     </div>
+    
 </header>
 
 <div class="page-body container-fluid">
     <section class="page-section">
-        <header>
-            <h1>Workflow Instances</h1>
-
-            <p>
-                Inspect running workflow instances of connected Zeebe brokers.
-            </p>
-        </header>
-
-        <div id="errorPanel" style="display: none;">
+       
+         <div id="errorPanel" style="display: none;">
             <div class="alert alert-danger" style="margin-top: 25px;" role="alert">
                 <button type="button" class="close" aria-label="Close" onclick="ackError()"><span aria-hidden="true">&times;</span></button>
                 <strong>Error:</strong> <span id="errorText"></span>
@@ -135,37 +116,60 @@ em.optional:after {
         </div>
 
         <div class="row">
-            <div class="col-md-2">
+            <div class="col-md-12">
                 <h2>
-                    List
-                    <a onclick="refresh()" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></a>
+               		<a onclick="refresh()" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></a>
+                
+                    Instances
                 </h2>
-                <table id="workflowInstanceTable" class="table table-striped">
-                    <thead>
-                    <th>Id</th>
-                    <th>Workflow</th>
-                    </thead>
-                    <tr>
-                        <td class="tngp-table-selected"></td>
-                        <td class="tngp-table-selected"></td>
-                    </tr>
-                </table>
+                
+                <div style="max-height:250px; overflow: auto;">
+	            
+	                <table id="workflowInstanceTable" class="table table-striped">
+	                    <thead>
+	                    <th>Key</th>
+	                    <th>BPMN process id</th>
+	                    <th>Version</th>
+	                    <th>Workflow key</th>
+	                    <th>Topic</th>
+						<th>State</th>
+	                    </thead>
+	                    <tr>
+	                        <td class="tngp-table-selected"></td>
+	                        <td class="tngp-table-selected"></td>
+	                    </tr>
+	                </table>
+                </div>
             </div>
-            <div class="col-md-8">
+         </div>
+            
+        <div class="row">
+           	
+           	<hr/>
+           
+            <div class="col-md-9">
                 <h2>
-                    Selected
-                    <a onclick="refresh()" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></a>
+                    Selected Instance
+                    
+                    <button id="cancel-workflow-instance" onclick="cancelWorkflowInstance()" class="btn btn-primary pull-right">
+                    	Cancel instance
+                    </button>
+             
+                    
                 </h2>
                 <div id="diagramCanvas" class="bpmn-io-viewer-height"></div>
             </div>
-            <div class="col-md-2">
-                <h2>Payload</h2>
-                <div>
-                    <textarea id="payload"></textarea>
+            <div class="col-md-3">
+            	
+            	<div class="form-group">
+	                <label>Payload (JSON)</label>
+	                <textarea id="payload" class="form-control" style="height:150px; overflow: auto;">{}</textarea>
                 </div>
+            
                 <div>
-                    <a id="update-payload" href="#" onclick="updatePayload()" class="btn btn-warning">Update Payload</a>
+                    <button id="update-payload" onclick="updatePayload()" class="btn btn-warning">Update Payload</button>
                 </div>
+
                 <h2>Incidents</h2>
                 <table id="incidentsTable" class="table table-striped">
                     <thead>
@@ -177,28 +181,7 @@ em.optional:after {
                         <td class="tngp-table-selected"></td>
                     </tr>
                 </table>
-                <h2>Info</h2>
-                <table class="table table-striped">
-                    <tr>
-                        <td>Id</td>
-                        <td id="workflowInstanceId"></td>
-                    </tr>
-                    <tr>
-                        <td>State</td>
-                        <td id="workflowRunning"></td>
-                    </tr>
-                    <tr>
-                        <td>Workflow Definition Uuid (temporary)</td>
-                        <td id="workflowDefinitionUuid"></td>
-                    </tr>
-                    <tr>
-                        <td>Workflow Definition Key</td>
-                        <td id="workflowDefinitionKey"></td>
-                    </tr>
-                </table>
-                <div>
-                    <a id="cancel-workflow-instance" href="#" onclick="cancelWorkflowInstance()" class="btn btn-primary">Cancel instance</a>
-                </div>
+                
             </div>
         </div>
     </section>
@@ -214,6 +197,11 @@ em.optional:after {
         </div>
     </div>
 </footer>
+
+<script src="/webjars/jquery/jquery.min.js"></script>
+<script src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="./app.js"></script>
+<script type="text/javascript" src="webjars/bpmn-js/dist/bpmn-navigated-viewer.js"></script>
 
 <script>
   $(document).ready(function() {  

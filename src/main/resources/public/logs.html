@@ -6,23 +6,16 @@
     <meta name=viewport content="width=device-width,initial-scale=1">
 
     <title> Zeebe Simple Monitor </title>
-
-    <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <script src="/webjars/jquery/jquery.min.js"></script>
-    <script src="/webjars/bootstrap/js/bootstrap.min.js"></script>
-
-    <script type="text/javascript" src="./app.js"></script>
+    
     <link rel="stylesheet" href="./app.css">
 
     <script src="./vendor/prism.js"></script>
     <link rel="stylesheet" href="./vendor/prism.css">
 
-
     <link rel="stylesheet" href="./css/styles.min.css">
 
     <!-- <link rel=apple-touch-icon href="./img/apple-touch-icon.png"> -->
     <link rel=icon href="./img/favicon.ico">
-
 
     <style type="text/css">
 pre.scaffolding {
@@ -77,10 +70,11 @@ em.optional:after {
 
 </head>
 <body>
+
 <header class="cam-brand-header">
     <!-- depending on your layout, you may want to use the `.container-fluid` class instead below -->
     <div class="container-fluid">
-        <a class="navbar-brand" href="./index.html" title="TNGP Monitor">
+        <a class="navbar-brand" href="./" title="Zeebe Monitor">
         <span class="brand-name" style="top: 0px;">
           <img style="height: 35px;" src="img/logo.png"/> Zeebe Simple Monitor
         </span>
@@ -89,34 +83,19 @@ em.optional:after {
         <!-- this is intended for the site navigation -->
         <nav class="sections-menu">
             <ul>
-                <li><a href="./index.html">Configuration</a></li>
-                <li><a href="./definitions.html">Workflow Definitions</a></li>
-                <li><a href="./instances.html">Workflow Instances</a></li>
-                <li class="active"><a href="./logs.html">Logs</a></li>
-                <li><a href="./search.html">Search</a></li>
-            </ul>
-        </nav>
-
-        <nav class="app-menu">
-            <ul>
-                <li id="brokerGlobalInfo">
-                    <!--<a href=""><span id="defaultBrokerState" class="btn btn-danger">Not connected. Klick to connect default.</span></a>-->
-                </li>
+                <li><a href="./index.html">Broker</a></li>
+                <li><a href="./definitions.html">Workflows</a></li>
+                <li><a href="./instances.html">Instances</a></li>
+                <li class="active"><a href="./logs.html">Records</a></li>
             </ul>
         </nav>
     </div>
+    
 </header>
 
 <div class="page-body container-fluid">
     <section class="page-section">
-        <header>
-            <h1>Event Log</h1>
-
-            <p>
-                Showing all events processed by connected brokers
-            </p>
-        </header>
-
+        
         <div id="errorPanel" style="display: none;">
             <div class="alert alert-danger" style="margin-top: 25px;" role="alert">
                 <button type="button" class="close" aria-label="Close" onclick="ackError()"><span aria-hidden="true">&times;</span></button>
@@ -125,24 +104,47 @@ em.optional:after {
         </div>
 
         <h2>
-            List
-            <a onclick="refresh()" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></a>
+        	<a onclick="refresh()" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></a>
+        
+            Records
         </h2>
+        
+        <div class="row">
+        
+        	<div class="col-md-12">
+        
+      		<div class="form-group">
+                  <label>Query </label>
+                  <input type="text" class="form-control" id="recordQuery" placeholder="{}" value="{}">
+                  <span>Examples: 
+                  		<i>{'content.metadata.valueType' : 'INCIDENT'}</i> , 
+                  		<i>{'content.payload.price' : { $gt : 100} }</i> , 
+                  		<i>{'content.activityId' : { $in : ['collectMoney','shipParcel'] } }</i>
+           		 </span>
+              </div>
+             
+              <button class="btn btn-secondary" onclick="loadRecords()">
+              	<span class="glyphicon glyphicon-search"></span>
+              	Search
+              </button>
+              
+              </div>
+        
+        </div>  
+        
+        <div class="row">
+        <div class="col-md-12">
+        
+        <h2>Results (<span id="recordCount"></span>)</h2>
+        
         <table id="brokerLogsTable" class="table table-striped">
-            <thead>
-            <th>Broker</th>
-            <th>Topic Event Type</th>
-            <th>State</th>
-            <th>PartitionId</th>
-            <th>Positon</th>
-            <th>Key</th>
-            <th>Payload</th>
-            </thead>
             <tr>
                 <td>1</td>
                 <td>x</td>
             </tr>
         </table>
+        </div>
+        </div>
 
     </section>
 </div>
@@ -157,6 +159,10 @@ em.optional:after {
         </div>
     </div>
 </footer>
+
+<script src="/webjars/jquery/jquery.min.js"></script>
+<script src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="./app.js"></script>
 
 <script>
   $(document).ready(function() {  

@@ -15,12 +15,10 @@
  */
 package io.zeebe.zeebemonitor.repository;
 
-import io.zeebe.zeebemonitor.entity.Incident;
-import org.springframework.data.repository.CrudRepository;
+import io.zeebe.zeebemonitor.entity.RecordEntity;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface IncidentRepository extends CrudRepository<Incident, Long>
+public interface RecordRepository extends MongoRepository<RecordEntity, Long>
 {
-
-    //  List<BrokerConnection> findByLastName(String lastName);
-
+    RecordEntity findByPartitionIdAndPosition(int partitionId, long position);
 }

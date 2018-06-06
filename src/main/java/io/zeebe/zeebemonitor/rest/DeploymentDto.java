@@ -13,14 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.zeebe.zeebemonitor.repository;
+package io.zeebe.zeebemonitor.rest;
 
-import io.zeebe.zeebemonitor.entity.WorkflowDefinition;
-import org.springframework.data.repository.CrudRepository;
+import java.util.List;
 
-public interface WorkflowDefinitionRepository extends CrudRepository<WorkflowDefinition, String>
+public class DeploymentDto
 {
+    private String topic;
 
-    WorkflowDefinition findByBrokerConnectionStringAndKeyAndVersion(String brokerConnectionString, String key, int version);
+    private List<FileDto> files;
+
+    public List<FileDto> getFiles()
+    {
+        return files;
+    }
+
+    public void setFiles(List<FileDto> files)
+    {
+        this.files = files;
+    }
+
+    public String getTopic()
+    {
+        return topic;
+    }
+
+    public void setTopic(String topic)
+    {
+        this.topic = topic;
+    }
 
 }

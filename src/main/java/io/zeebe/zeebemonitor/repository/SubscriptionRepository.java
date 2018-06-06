@@ -13,34 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.zeebe.zeebemonitor.entity;
+package io.zeebe.zeebemonitor.repository;
 
-import java.util.List;
+import io.zeebe.zeebemonitor.entity.SubscriptionEntity;
+import org.springframework.data.repository.CrudRepository;
 
-public class DeploymentDto
+public interface SubscriptionRepository extends CrudRepository<SubscriptionEntity, String>
 {
-
-    private String broker;
-    private List<FileDto> files;
-
-    public String getBroker()
-    {
-        return broker;
-    }
-
-    public void setBroker(String broker)
-    {
-        this.broker = broker;
-    }
-
-    public List<FileDto> getFiles()
-    {
-        return files;
-    }
-
-    public void setFiles(List<FileDto> files)
-    {
-        this.files = files;
-    }
 
 }
