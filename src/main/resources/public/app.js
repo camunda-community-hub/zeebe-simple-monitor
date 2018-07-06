@@ -473,7 +473,7 @@ function loadRecords() {
 	
 	$.ajax({
         type : 'POST',
-        url: restAccess + 'records/search',
+        url: restAccess + 'records/search?start=0&limit=50',
         data:  $('#recordQuery').val(),
         contentType: 'application/json; charset=utf-8',
         success: function (logs) {

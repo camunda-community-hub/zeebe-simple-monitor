@@ -1,35 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>io.zeebe</groupId>
-		<artifactId>zb-parent</artifactId>
-		<version>0.8.0</version>
-		<relativePath />
-	</parent>
-
+	<groupId>io.zeebe</groupId>
 	<artifactId>zeebe-simple-monitor</artifactId>
 	<version>0.6.0-SNAPSHOT</version>
 
-    <packaging>jar</packaging>
+	<packaging>jar</packaging>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 
-		<zeebe.version>0.10.0</zeebe.version>
+		<zeebe.version>0.11.0</zeebe.version>
 		<spring.boot.version>2.0.2.RELEASE</spring.boot.version>
-				
+
 		<version.java>1.8</version.java>
-		
 	</properties>
 
 
 	<dependencyManagement>
 		<dependencies>
-
+			<dependency>
+				<groupId>io.zeebe</groupId>
+				<artifactId>zb-bom</artifactId>
+				<version>${zeebe.version}</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+			<dependency>
+				<groupId>io.zeebe</groupId>
+				<artifactId>zb-parent</artifactId>
+				<version>${zeebe.version}</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
@@ -43,19 +51,18 @@
 		<dependency>
 			<groupId>io.zeebe</groupId>
 			<artifactId>zeebe-client-java</artifactId>
-			<version>${zeebe.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		
+
 		<dependency>
-	        <groupId>org.springframework.data</groupId>
-	        <artifactId>spring-data-mongodb</artifactId>
-	    </dependency>
-		
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-mongodb</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.glassfish</groupId>
 			<artifactId>javax.json</artifactId>
@@ -72,9 +79,9 @@
 			<version>3.3.7</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.webjars.bower</groupId>
-		    <artifactId>popper.js</artifactId>
-		    <version>1.14.3</version>
+			<groupId>org.webjars.bower</groupId>
+			<artifactId>popper.js</artifactId>
+			<version>1.14.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
@@ -109,25 +116,25 @@
 				</executions>
 			</plugin>
 		</plugins>
-    </build>
+	</build>
 
-    <profiles>
-        <profile>
-            <id>sonatype-oss-release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <configuration>
-                            <!-- skip gpg signing as the release is not pushed to maven central -->
-                            <skip>true</skip>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+	<profiles>
+		<profile>
+			<id>sonatype-oss-release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<configuration>
+							<!-- skip gpg signing as the release is not pushed to maven central -->
+							<skip>true</skip>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<scm>
 		<url>https://github.com/zeebe-io/zeebe-simple-monitor</url>

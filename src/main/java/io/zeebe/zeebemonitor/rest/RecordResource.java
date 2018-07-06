@@ -15,41 +15,45 @@
  */
 package io.zeebe.zeebemonitor.rest;
 
-import io.zeebe.zeebemonitor.entity.RecordEntity;
-import io.zeebe.zeebemonitor.repository.RecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.zeebe.zeebemonitor.entity.RecordEntity;
+import io.zeebe.zeebemonitor.repository.RecordRepository;
 
 @Component
 @RestController
 @RequestMapping("/api/records")
-public class RecordResource
-{
-    @Autowired
-    private MongoTemplate mongoTemplate;
+public class RecordResource {
+  @Autowired private MongoTemplate mongoTemplate;
 
-    @Autowired
-    private RecordRepository recordRepository;
+  @Autowired private RecordRepository recordRepository;
 
-    @RequestMapping("/")
-    public Iterable<RecordEntity> getRecords()
-    {
-        return recordRepository.findAll();
-    }
+  @RequestMapping("/")
+  public Iterable<RecordEntity> getRecords() {
+    return recordRepository.findAll();
+  }
 
-    @RequestMapping(value = "/search", method = RequestMethod.POST)
-    public Iterable<RecordEntity> getRecords(@RequestBody String query)
-    {
-        return mongoTemplate.find(new BasicQuery(query), RecordEntity.class);
-    }
+  //  @RequestMapping(value = "/search", method = RequestMethod.POST)
+  //  public Iterable<RecordEntity> getRecords(@RequestBody String query) {
+  //    return mongoTemplate.find(new BasicQuery(query), RecordEntity.class);
+  //  }
 
-    @RequestMapping(value = "/count", method = RequestMethod.POST)
-    public long getRecordCount(@RequestBody String query)
-    {
-        return mongoTemplate.count(new BasicQuery(query), RecordEntity.class);
-    }
+  @RequestMapping(value = "/search", method = RequestMethod.POST)
+  public Iterable<RecordEntity> getRecords(
+      @RequestBody String query, @RequestParam int start, @RequestParam int limit) {
+    return mongoTemplate.find(new BasicQuery(query).skip(start).limit(limit), RecordEntity.class);
+  }
 
+  @RequestMapping(value = "/count", method = RequestMethod.POST)
+  public long getRecordCount(@RequestBody String query) {
+    return mongoTemplate.count(new BasicQuery(query), RecordEntity.class);
+  }
 }
