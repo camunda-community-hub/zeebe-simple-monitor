@@ -17,6 +17,10 @@ var workflowInstances;
 var selectedWorkflowInstance;
 var currentPage;
 
+let recordsPerPage = 20;
+var recordPage = 0;
+var recordCount = 0;
+
 function cleanupData() {
 			$.ajax({
 		             type : 'POST',
@@ -471,9 +475,27 @@ function loadRecords() {
 	
 	countRecords();
 	
+	recordPage = 0;		
+}
+
+function loadRecordPage() {
+	start = recordPage * recordsPerPage;
+
+	if (recordPage == 0) {
+		$('#recordPrevious').addClass("disabled")
+	} else {
+		$('#recordPrevious').removeClass("disabled")
+	}
+
+	if ((start + recordsPerPage) >= recordCount) {
+		$('#recordNext').addClass("disabled")
+	} else {
+		$('#recordNext').removeClass("disabled")
+	}		
+	
 	$.ajax({
         type : 'POST',
-        url: restAccess + 'records/search?start=0&limit=50',
+        url: restAccess + 'records/search?start=' + start + '&limit=' + recordsPerPage,
         data:  $('#recordQuery').val(),
         contentType: 'application/json; charset=utf-8',
         success: function (logs) {
@@ -488,6 +510,20 @@ function loadRecords() {
 	});
 }
 
+function loadNextRecords() {		
+	if ((start + recordsPerPage) < recordCount) {
+		recordPage = recordPage + 1;	
+		loadRecordPage();
+	}
+}
+
+function loadPreviousRecords() {		
+	if (recordPage > 0) {	
+		recordPage = recordPage - 1;	
+		loadRecordPage();
+	}
+}
+
 function countRecords() {
 	$.ajax({
         type : 'POST',
@@ -495,7 +531,10 @@ function countRecords() {
         data:  $('#recordQuery').val(),
         contentType: 'application/json; charset=utf-8',
         success: function (count) {
+          recordCount = count;
         	$('#recordCount').html(count)
+        	
+        	loadRecordPage();
         },
         error: function (xhr, ajaxOptions, thrownError) {
        	 showErrorResonse(xhr, ajaxOptions, thrownError);

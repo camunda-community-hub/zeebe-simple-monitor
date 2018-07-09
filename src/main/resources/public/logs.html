@@ -136,7 +136,7 @@ em.optional:after {
         <div class="col-md-12">
         
         <h2>Results (<span id="recordCount"></span>)</h2>
-        
+                
         <table id="brokerLogsTable" class="table table-striped">
             <tr>
                 <td>1</td>
@@ -145,6 +145,13 @@ em.optional:after {
         </table>
         </div>
         </div>
+        
+        <nav aria-label="record-pagination">
+				  <ul class="pager">
+				  	<li class="previous" id="recordPrevious"><a href="#" onclick="loadPreviousRecords()">Previous</a></li>
+				    <li class="next" id="recordNext"><a href="#" onclick="loadNextRecords()">Next</a></li>
+				  </ul>
+				</nav>
 
     </section>
 </div>
