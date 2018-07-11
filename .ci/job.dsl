@@ -22,6 +22,26 @@ git config --global user.email "ci@camunda.com"
 git config --global user.name "camunda-jenkins"
 '''
 
+def mavenGpgKeys = '''\
+#!/bin/bash
+
+if [ -e "${MVN_CENTRAL_GPG_KEY_SEC}" ]
+then
+  gpg -q --allow-secret-key-import --import ${MVN_CENTRAL_GPG_KEY_SEC} || echo 'Private GPG Sign Key is already imported!.'
+  rm ${MVN_CENTRAL_GPG_KEY_SEC}
+else
+  echo 'Private GPG Key not found.'
+fi
+
+if [ -e "${MVN_CENTRAL_GPG_KEY_PUB}" ]
+then
+  gpg -q --import ${MVN_CENTRAL_GPG_KEY_PUB} || echo 'Public GPG Sign Key is already imported!.'
+  rm ${MVN_CENTRAL_GPG_KEY_PUB}
+else
+  echo 'Public GPG Key not found.'
+fi
+'''
+
 def githubRelease = '''\
 #!/bin/bash
 
@@ -93,7 +113,7 @@ def releaseProperties = [
     pushChanges: '${PUSH_CHANGES}',
     remoteTagging: '${PUSH_CHANGES}',
     localCheckout: '${USE_LOCAL_CHECKOUT}',
-    arguments: '--settings=${NEXUS_SETTINGS} -DskipTests=true -Dskip.central.release=true -Dskip.camunda.release=true',
+    arguments: '--settings=${NEXUS_SETTINGS} -DskipTests=true -Dgpg.passphrase="${GPG_PASSPHRASE}" -Dskip.central.release=${SKIP_DEPLOY_TO_MAVEN_CENTRAL} -Dskip.camunda.release=${SKIP_DEPLOY_TO_CAMUNDA_NEXUS}',
 ]
 
 
@@ -119,7 +139,7 @@ mavenJob(jobName)
     {
         githubPush()
     }
-    label 'dind'
+    label 'ubuntu'
     jdk 'jdk-8-latest'
 
     rootPOM pom
@@ -161,6 +181,10 @@ mavenJob(jobName)
         }
 
         credentialsBinding {
+	  // maven central signing credentials
+          string('GPG_PASSPHRASE', 'password_maven_central_gpg_signing_key')
+          file('MVN_CENTRAL_GPG_KEY_SEC', 'maven_central_gpg_signing_key')
+          file('MVN_CENTRAL_GPG_KEY_PUB', 'maven_central_gpg_signing_key_pub')
           // github token for release upload
           string('GITHUB_TOKEN', 'github-camunda-jenkins-token')
           // docker hub credentials for docker push
@@ -178,6 +202,8 @@ mavenJob(jobName)
                 stringParam('DEVELOPMENT_VERSION', '0.2.0-SNAPSHOT', 'Next development version')
                 booleanParam('PUSH_CHANGES', true, 'If <strong>TRUE</strong>, push the changes to remote repositories.  If <strong>FALSE</strong>, do not push changes to remote repositories. Must be used in conjunction with USE_LOCAL_CHECKOUT = <strong>TRUE</strong> to test the release!')
                 booleanParam('USE_LOCAL_CHECKOUT', false, 'If <strong>TRUE</strong>, uses the local git repository to checkout the release tag to build.  If <strong>FALSE</strong>, checks out the release tag from the remote repositoriy. Must be used in conjunction with PUSH_CHANGES = <strong>FALSE</strong> to test the release!')
+		booleanParam('SKIP_DEPLOY_TO_MAVEN_CENTRAL', false, 'If <strong>TRUE</strong>, skip the deployment to maven central. Should be used when testing the release.')
+                booleanParam('SKIP_DEPLOY_TO_CAMUNDA_NEXUS', false, 'If <strong>TRUE</strong>, skip the deployment to camunda nexus. Should be used when testing the release.')
             }
 
             preBuildSteps
@@ -190,7 +216,7 @@ mavenJob(jobName)
                 {
                     mavenInstallation mavenVersion
                     providedSettings mavenSettingsId
-                    goals 'release:prepare release:perform -B'
+                    goals 'release:prepare release:perform -Dgpg.passphrase="${GPG_PASSPHRASE}" -B'
 
                     properties releaseProperties
                     localRepository LocalRepositoryLocation.LOCAL_TO_WORKSPACE
