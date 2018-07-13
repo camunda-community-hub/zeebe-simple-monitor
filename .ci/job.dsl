@@ -139,7 +139,7 @@ mavenJob(jobName)
     {
         githubPush()
     }
-    label 'ubuntu'
+    label 'dind'
     jdk 'jdk-8-latest'
 
     rootPOM pom
