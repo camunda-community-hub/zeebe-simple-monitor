@@ -720,6 +720,27 @@ function updatePayload() {
 	}
 }
 
+function updateRetries() {
+	if (selectedWorkflowInstance) {
+		$.ajax({
+	             type : 'PUT',
+	             url: restAccess + 'instances/' + selectedWorkflowInstance.id + "/update-retries",
+	             data:  '{"retries": "2"}', // TODO
+	             contentType: 'application/json; charset=utf-8',
+	             success: function (result) {
+	             	setTimeout(function() {
+    					refresh();
+					}, 1000);
+	             },
+	             error: function (xhr, ajaxOptions, thrownError) {
+	            	 showErrorResonse(xhr, ajaxOptions, thrownError);
+	             },
+            	 timeout: 5000,
+	             crossDomain: true,
+	    });
+	}
+}
+
 function cancelWorkflowInstance() {
 	if (selectedWorkflowInstance) {
 		$.ajax({

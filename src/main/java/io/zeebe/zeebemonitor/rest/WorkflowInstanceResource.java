@@ -15,6 +15,7 @@
  */
 package io.zeebe.zeebemonitor.rest;
 
+import io.zeebe.client.api.events.JobEvent;
 import io.zeebe.client.api.events.WorkflowInstanceEvent;
 import io.zeebe.client.api.record.ZeebeObjectMapper;
 import io.zeebe.zeebemonitor.entity.RecordEntity;
@@ -82,6 +83,30 @@ public class WorkflowInstanceResource
             .send()
             .join();
     }
+    
+    @RequestMapping(path = "/{id}/update-retries", method = RequestMethod.PUT)
+    public void updateRetries(@PathVariable("id") String id) throws Exception
+    {
+
+        final WorkflowInstanceEntity workflowInstance = workflowInstanceRepository
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException("no workflow instance found with id: " + id));
+
+        if (workflowInstance.getLastFailedJobRecordEventPosition()>0) {          
+          final JobEvent event = findJobEvent(workflowInstance.getPartitionId(), workflowInstance.getLastFailedJobRecordEventPosition());
+          
+          connections
+            .getClient()
+            .topicClient(workflowInstance.getTopicName())
+            .jobClient()
+            .newUpdateRetriesCommand(event)
+            .retries(2)
+            .send()
+            .join();
+        } else {
+          throw new IllegalArgumentException("Couldn't update retries, haven't found failed job");
+        }
+    }    
 
     private WorkflowInstanceEvent findWorkflowInstanceEvent(int partitionId, long position) throws Exception
     {
@@ -96,5 +121,19 @@ public class WorkflowInstanceResource
 
         return objectMapper.fromJson(record.getContentAsJson(), WorkflowInstanceEvent.class);
     }
+    
+    private JobEvent findJobEvent(int partitionId, long position) throws Exception
+    {
+        final RecordEntity record = recordRepository.findByPartitionIdAndPosition(partitionId, position);
+
+        if (record == null)
+        {
+            throw new RuntimeException(String.format("no record found at partition '%d' and position '%d'", partitionId, position));
+        }
+
+        final ZeebeObjectMapper objectMapper = connections.getClient().objectMapper();
+
+        return objectMapper.fromJson(record.getContentAsJson(), JobEvent.class);
+    }    
 
 }

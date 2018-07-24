@@ -150,18 +150,23 @@ em.optional:after {
             <div class="col-md-9">
                 <h2>
                     Selected Instance
-                    
-                    <button id="cancel-workflow-instance" onclick="cancelWorkflowInstance()" class="btn btn-primary pull-right">
-                    	Cancel instance
-                    </button>
-             
-                    
+                    <div class="pull-right">
+                      <button id="cancel-workflow-instance" onclick="cancelWorkflowInstance()" class="btn"
+                          title="Cancel instance">
+                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                      </button>
+
+                      <button id="cancel-workflow-instance" onclick="updateRetries()" class="btn"
+                          title="Update retries">
+                        <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
+                      </button>
+                    </div>
                 </h2>
                 <div id="diagramCanvas" class="bpmn-io-viewer-height"></div>
             </div>
             <div class="col-md-3">
             	
-            	<div class="form-group">
+                <div class="form-group">
 	                <label>Payload (JSON)</label>
 	                <textarea id="payload" class="form-control" style="height:150px; overflow: auto;">{}</textarea>
                 </div>

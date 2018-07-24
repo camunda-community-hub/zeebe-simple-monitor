@@ -48,6 +48,8 @@ public class WorkflowInstanceEntity
 
     private List<IncidentEntity> incidents = new ArrayList<>();
 
+    private long lastFailedJobRecordEventPosition;
+
     public static WorkflowInstanceEntity from(WorkflowInstanceEvent workflowInstanceEvent)
     {
         final RecordMetadata metadata = workflowInstanceEvent.getMetadata();
@@ -263,6 +265,14 @@ public class WorkflowInstanceEntity
     public void setLastWorkflowInstanceEventPosition(long lastWorkflowInstanceEventPosition)
     {
         this.lastWorkflowInstanceEventPosition = lastWorkflowInstanceEventPosition;
+    }
+
+    public void setLastFailedJobRecordEventPosition(long lastFailedJobRecordEventPosition) {
+      this.lastFailedJobRecordEventPosition = lastFailedJobRecordEventPosition;
+    }
+    
+    public long getLastFailedJobRecordEventPosition() {
+      return this.lastFailedJobRecordEventPosition;
     }
 
 }
