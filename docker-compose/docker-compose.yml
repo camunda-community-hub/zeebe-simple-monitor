@@ -4,12 +4,17 @@ services:
   zeebe:
     image: camunda/zeebe:latest
     environment:
-        - ZEEBE_LOG_LEVEL=debug
+    - ZEEBE_LOG_LEVEL=debug
     ports:
-      - "51015:51015"
+    - "51015:51015"
   monitor:
     image: camunda/zeebe-simple-monitor:latest
+    environment:
+    - SPRING.DATA.MONGODB.URI=mongodb://db/test
     ports:
-      - "9000:8080"
+    - "9000:8080"
     links:
-      - zeebe
+    - zeebe
+    - db
+  db:
+    image: mongo
