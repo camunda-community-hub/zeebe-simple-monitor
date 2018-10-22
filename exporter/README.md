@@ -1,4 +1,4 @@
-SimpleMonitorExporter
+Zeebe Simple Monitor - Exporter
 =========================
 
 The current implementation is created to be used with the simple-monitor, but
@@ -20,7 +20,7 @@ After that you need to build the exporter or use the latest released version. To
 Copy from the target folder the jar with dependencies into the lib folder of the broker.
 
 ```
-cp target/zeebe-simple-monitor-exporter-0.7.0-SNAPSHOT-jar-with-dependencies.jar ~/camunda/latest/zeebe-broker-0.12.0/lib/
+cp target/zeebe-simple-monitor-exporter-%{VERSION}.jar ~/zeebe-broker-%{VERSION}/lib/
 ```
 
 ### Configure the Broker

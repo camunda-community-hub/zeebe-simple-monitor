@@ -1,55 +1,21 @@
-Zeebe Simple Monitor
+Zeebe Simple Monitor - WebApp
 =========================
 
-This Spring Boot application connects to [Zeebe](https://zeebe.io) and receive all data (i.e. records). It aggregates the data and store it locally in MongoDB. The aggregated data can be displayed in a small HTML5 web application.
+The web application is built as an Spring Boot application.
 
-**Features:**
-* inspect deployed workflows
-* inspect workflow instances, including payload and incidents
-* inspect raw records (events/commands) and search
-* management operations (e.g. new deployment, cancel workflow instance, update payload)
+### Configuration
 
-*This is a community project meant for playing around with Zeebe. It is not officially supported by the Zeebe Team (i.e. no gurantees). Everybody is invited to contribute!* 
+The configuration can be provided as `applications.properties` or `applications.yaml` file or as environment variables.
 
+In the configuration, you can change the connection to the database and to the Zeebe broker. The following lines show the default configuration:
 
-## How to build
+```
+spring.datasource.url=jdbc:h2:~/zeebe-monitor;AUTO_SERVER=TRUE
+spring.datasource.user=sa
+spring.datasource.password=
+spring.jpa.hibernate.ddl-auto=validate
 
-Build with Maven
+io.zeebe.monitor.connectionString=localhost:26500
 
-`mvn clean install`
-
-## How to run
-
-> [Install and launch MongoDB](http://docs.mongodb.org/manual/installation/)
-
-Execute the (Fat) JAR file via
-
-`java -jar target/zeebe-simple-monitor-{VERSION}.jar`
-
-Open a web browser and go to http://localhost:8080
-
-
-## Impressions
-
-![screenshot](docs/workflows.png)
-
-![screenshot](docs/instances.png)
-
-![screenshot](docs/records.png)
-
-## Code of Conduct
-
-This project adheres to the Contributor Covenant [Code of
-Conduct](/CODE_OF_CONDUCT.md). By participating, you are expected to uphold
-this code. Please report unacceptable behavior to code-of-conduct@zeebe.io.
-
-## License
-
-Most Zeebe source files are made available under the [Apache License, Version
-2.0](/LICENSE) except for the [broker-core][] component. The [broker-core][]
-source files are made available under the terms of the [GNU Affero General
-Public License (GNU AGPLv3)][agpl]. See individual source files for
-details.
-
-[broker-core]: https://github.com/zeebe-io/zeebe/tree/master/broker-core
-[agpl]: https://github.com/zeebe-io/zeebe/blob/master/GNU-AGPL-3.0
+logging.level.io.zeebe.zeebemonitor=DEBUG
+```
