@@ -43,9 +43,9 @@ Open a web browser and go to http://localhost:8080
 
 ## Impressions
 
-![screenshot](docs/workflows.png)
+![screenshot](app/docs/workflows.png)
 
-![screenshot](docs/instances.png)
+![screenshot](app/docs/instances.png)
 
 ## Code of Conduct
 
