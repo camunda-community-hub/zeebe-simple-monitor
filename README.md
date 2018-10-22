@@ -39,7 +39,7 @@ Now start the broker and the webapp
 
 Open a web browser and go to http://localhost:8080
 
-> The default configuration uses a file-based H2 database and works if the broker and the webapp runs on the same machine. See the [exporter](https://github.com/zeebe-io/zeebe-simple-monitor/exporter#Configure-the-Exporter) and the [web application](https://github.com/zeebe-io/zeebe-simple-monitor/app#Configuration) for more configuration options.
+> The default configuration uses a file-based H2 database and works if the broker and the webapp runs on the same machine. See the [exporter](https://github.com/zeebe-io/zeebe-simple-monitor/tree/master/exporter#configure-the-exporter) and the [web application](https://github.com/zeebe-io/zeebe-simple-monitor/tree/master/app#configuration) for more configuration options.
 
 ## Impressions
 
