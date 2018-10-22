@@ -1,12 +1,11 @@
 Zeebe Simple Monitor
 =========================
 
-This Spring Boot application connects to [Zeebe](https://zeebe.io) and receive all data (i.e. records). It aggregates the data and store it locally in MongoDB. The aggregated data can be displayed in a small HTML5 web application.
+This is a monitoring application for [Zeebe](https://zeebe.io). It has two parts: an [exporter](https://github.com/zeebe-io/zeebe-simple-monitor/exporter) and a [web application](https://github.com/zeebe-io/zeebe-simple-monitor/app). The exporter runs on the Zeebe broker and export data to a database. The webapp reads the data from the database and present it in a HTML5 web application.
 
 **Features:**
 * inspect deployed workflows
 * inspect workflow instances, including payload and incidents
-* inspect raw records (events/commands) and search
 * management operations (e.g. new deployment, cancel workflow instance, update payload)
 
 *This is a community project meant for playing around with Zeebe. It is not officially supported by the Zeebe Team (i.e. no gurantees). Everybody is invited to contribute!* 
@@ -20,22 +19,33 @@ Build with Maven
 
 ## How to run
 
-> [Install and launch MongoDB](http://docs.mongodb.org/manual/installation/)
+Before you start the broker, copy the exporter JAR from the target folder into the lib folder of the broker.
 
-Execute the (Fat) JAR file via
+```
+cp exporter/target/zeebe-simple-monitor-exporter-%{VERSION}.jar ~/zeebe-broker-%{VERSION}/lib/
+```
 
-`java -jar target/zeebe-simple-monitor-{VERSION}.jar`
+Register the exporter in the Zeebe configuration file `~/zeebe-broker-%{VERSION}/config/zeebe.cfg.toml`.
+
+```
+[[exporters]]
+id = "simple-monitor"
+className = "io.zeebe.monitor.SimpleMonitorExporter"
+```
+
+Now start the broker and the webapp
+
+`java -jar app/target/zeebe-simple-monitor-app-{VERSION}.jar`
 
 Open a web browser and go to http://localhost:8080
 
+> The default configuration uses a file-based H2 database and works if the broker and the webapp runs on the same machine. See the [exporter](https://github.com/zeebe-io/zeebe-simple-monitor/exporter#Configure-the-Exporter) and the [web application](https://github.com/zeebe-io/zeebe-simple-monitor/app#Configuration) for more configuration options.
 
 ## Impressions
 
 ![screenshot](docs/workflows.png)
 
 ![screenshot](docs/instances.png)
-
-![screenshot](docs/records.png)
 
 ## Code of Conduct
 
@@ -45,11 +55,7 @@ this code. Please report unacceptable behavior to code-of-conduct@zeebe.io.
 
 ## License
 
-Most Zeebe source files are made available under the [Apache License, Version
-2.0](/LICENSE) except for the [broker-core][] component. The [broker-core][]
-source files are made available under the terms of the [GNU Affero General
-Public License (GNU AGPLv3)][agpl]. See individual source files for
-details.
+[Apache License, Version 2.0](/LICENSE) 
 
 [broker-core]: https://github.com/zeebe-io/zeebe/tree/master/broker-core
 [agpl]: https://github.com/zeebe-io/zeebe/blob/master/GNU-AGPL-3.0
