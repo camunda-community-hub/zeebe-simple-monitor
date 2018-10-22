@@ -45,24 +45,40 @@ fi
 def githubRelease = '''\
 #!/bin/bash
 
-cd target
+# do github release
+curl -sL https://github.com/aktau/github-release/releases/download/v0.7.2/linux-amd64-github-release.tar.bz2 | tar xjvf - --strip 3
 
-JAR="zeebe-simple-monitor-${RELEASE_VERSION}.jar"
+./github-release release --user zeebe-io --repo zeebe-simple-monitor --tag ${RELEASE_VERSION} --name "Zeebe Simple Monitor ${RELEASE_VERSION}" --description ""
+
+
+cd app/target
+
+JAR="zeebe-simple-monitor-app-${RELEASE_VERSION}.jar"
 CHECKSUM="${JAR}.sha1sum"
 
 # create checksum files
 sha1sum ${JAR} > ${CHECKSUM}
 
-# do github release
-curl -sL https://github.com/aktau/github-release/releases/download/v0.7.2/linux-amd64-github-release.tar.bz2 | tar xjvf - --strip 3
+../../github-release upload --user zeebe-io --repo zeebe-simple-monitor --tag ${RELEASE_VERSION} --name "${JAR}" --file "${JAR}"
+../../github-release upload --user zeebe-io --repo zeebe-simple-monitor --tag ${RELEASE_VERSION} --name "${CHECKSUM}" --file "${CHECKSUM}"
 
-./github-release release --user zeebe-io --repo zeebe-simple-monitor --tag ${RELEASE_VERSION} --name "Zeebe Simple Monitor ${RELEASE_VERSION}" --description ""
-./github-release upload --user zeebe-io --repo zeebe-simple-monitor --tag ${RELEASE_VERSION} --name "${JAR}" --file "${JAR}"
-./github-release upload --user zeebe-io --repo zeebe-simple-monitor --tag ${RELEASE_VERSION} --name "${CHECKSUM}" --file "${CHECKSUM}"
+cd ../../exporter/target
+
+JAR="zeebe-simple-monitor-exporter-${RELEASE_VERSION}.jar"
+CHECKSUM="${JAR}.sha1sum"
+
+# create checksum files
+sha1sum ${JAR} > ${CHECKSUM}
+
+../../github-release upload --user zeebe-io --repo zeebe-simple-monitor --tag ${RELEASE_VERSION} --name "${JAR}" --file "${JAR}"
+../../github-release upload --user zeebe-io --repo zeebe-simple-monitor --tag ${RELEASE_VERSION} --name "${CHECKSUM}" --file "${CHECKSUM}"
+
 '''
 
 def dockerRelease = '''\
 #!/bin/bash -xeu
+
+cd app/
 
 # clear docker host env set by jenkins job
 unset DOCKER_HOST
@@ -70,7 +86,7 @@ unset DOCKER_HOST
 IMAGE="camunda/zeebe-simple-monitor"
 
 echo "Building Zeebe Simple Monitor Docker image ${RELEASE_VERSION}."
-docker build --no-cache -t ${IMAGE}:${RELEASE_VERSION} --build-arg JAR=target/zeebe-simple-monitor-${RELEASE_VERSION}.jar .
+docker build --no-cache -t ${IMAGE}:${RELEASE_VERSION} .
 
 echo "Authenticating with DockerHub and pushing image."
 docker login --username ${DOCKER_HUB_USERNAME} --password ${DOCKER_HUB_PASSWORD} --email ci@camunda.com
@@ -86,7 +102,7 @@ docker push ${IMAGE}:latest
 
 def dockerSnapshot = '''\
 #!/bin/bash -xeu
-
+cd app/
 # clear docker host env set by jenkins job
 unset DOCKER_HOST
 
@@ -94,7 +110,7 @@ if [ -f target/zeebe-simple-monitor-*-SNAPSHOT.jar ]; then
     IMAGE="camunda/zeebe-simple-monitor:SNAPSHOT"
 
     echo "Building Zeebe Simple Monitor Docker image ${IMAGE}."
-    docker build --no-cache -t ${IMAGE} --build-arg JAR=target/zeebe-simple-monitor-*-SNAPSHOT.jar .
+    docker build --no-cache -t ${IMAGE} .
 
     echo "Authenticating with DockerHub and pushing image."
     docker login --username ${DOCKER_HUB_USERNAME} --password ${DOCKER_HUB_PASSWORD} --email ci@camunda.com
