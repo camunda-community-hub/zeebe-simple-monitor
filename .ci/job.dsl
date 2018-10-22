@@ -86,7 +86,7 @@ unset DOCKER_HOST
 IMAGE="camunda/zeebe-simple-monitor"
 
 echo "Building Zeebe Simple Monitor Docker image ${RELEASE_VERSION}."
-docker build --no-cache -t ${IMAGE}:${RELEASE_VERSION} .
+docker build --no-cache --build-arg JAR=target/zeebe-simple-monitor-app-${RELEASE_VERSION}.jar -t ${IMAGE}:${RELEASE_VERSION} .
 
 echo "Authenticating with DockerHub and pushing image."
 docker login --username ${DOCKER_HUB_USERNAME} --password ${DOCKER_HUB_PASSWORD} --email ci@camunda.com
@@ -101,12 +101,12 @@ docker push ${IMAGE}:latest
 '''
 
 def dockerSnapshot = '''\
-#!/bin/bash -xeu
+#!/bin/bash
 cd app/
 # clear docker host env set by jenkins job
 unset DOCKER_HOST
 
-if [ -f target/zeebe-simple-monitor-*-SNAPSHOT.jar ]; then
+if [ -f target/zeebe-simple-monitor-app-*-SNAPSHOT.jar ]; then
     IMAGE="camunda/zeebe-simple-monitor:SNAPSHOT"
 
     echo "Building Zeebe Simple Monitor Docker image ${IMAGE}."
