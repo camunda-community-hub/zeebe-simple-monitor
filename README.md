@@ -3,12 +3,14 @@ Zeebe Simple Monitor
 
 This is a monitoring application for [Zeebe](https://zeebe.io). It has two parts: an [exporter](https://github.com/zeebe-io/zeebe-simple-monitor/exporter) and a [web application](https://github.com/zeebe-io/zeebe-simple-monitor/app). The exporter runs on the Zeebe broker and export data to a database. The webapp reads the data from the database and present it in a HTML5 web application.
 
+**Important notes:**
+* The simple monitor is a community project meant for playing around with Zeebe. **Consider it unstable! There is no guranteed maintenance! It is not officially supported by the Zeebe Team!** But of course everybody is invited to contribute!
+* The simple monitor is tested on **Chrome only**. Other browsers are not supported.
+
 **Features:**
 * inspect deployed workflows
 * inspect workflow instances, including payload and incidents
 * management operations (e.g. new deployment, cancel workflow instance, update payload)
-
-*This is a community project meant for playing around with Zeebe. It is not officially supported by the Zeebe Team (i.e. no gurantees). Everybody is invited to contribute!* 
 
 
 ## How to build
