@@ -31,12 +31,9 @@ import io.zeebe.protocol.intent.Intent;
 import io.zeebe.protocol.intent.WorkflowInstanceIntent;
 import org.slf4j.Logger;
 
-import java.net.URI;
-import java.net.URL;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -135,14 +132,12 @@ public class SimpleMonitorExporter implements Exporter {
   private void createTables() {
     try (final Statement statement = connection.createStatement()) {
 
-      final URL resource = SimpleMonitorExporter.class.getResource(CREATE_SCHEMA_SQL_PATH);
-      final URI uri = resource.toURI();
-      if (resource.getFile().contains("!")) {
-        FileSystems.newFileSystem(uri, Collections.EMPTY_MAP);
-      }
-      final Path path = Paths.get(uri);
-      final byte[] bytes = Files.readAllBytes(path);
-      final String sql = new String(bytes);
+      final InputStream resourceAsStream =
+          SimpleMonitorExporter.class.getResourceAsStream(CREATE_SCHEMA_SQL_PATH);
+      final String sql =
+          new BufferedReader(new InputStreamReader(resourceAsStream))
+              .lines()
+              .collect(Collectors.joining(System.lineSeparator()));
 
       log.info("Create tables:\n{}", sql);
       statement.executeUpdate(sql);
