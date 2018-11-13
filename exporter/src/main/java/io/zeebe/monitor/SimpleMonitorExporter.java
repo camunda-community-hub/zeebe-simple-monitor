@@ -18,19 +18,19 @@ package io.zeebe.monitor;
 import io.zeebe.exporter.context.Context;
 import io.zeebe.exporter.context.Controller;
 import io.zeebe.exporter.record.Record;
+import io.zeebe.exporter.record.RecordMetadata;
 import io.zeebe.exporter.record.value.DeploymentRecordValue;
 import io.zeebe.exporter.record.value.IncidentRecordValue;
 import io.zeebe.exporter.record.value.WorkflowInstanceRecordValue;
 import io.zeebe.exporter.record.value.deployment.DeployedWorkflow;
 import io.zeebe.exporter.record.value.deployment.DeploymentResource;
 import io.zeebe.exporter.spi.Exporter;
+import io.zeebe.protocol.Protocol;
 import io.zeebe.protocol.clientapi.RecordType;
 import io.zeebe.protocol.clientapi.ValueType;
 import io.zeebe.protocol.intent.DeploymentIntent;
 import io.zeebe.protocol.intent.Intent;
 import io.zeebe.protocol.intent.WorkflowInstanceIntent;
-import org.slf4j.Logger;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -39,9 +39,14 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
 
 public class SimpleMonitorExporter implements Exporter {
 
@@ -193,7 +198,10 @@ public class SimpleMonitorExporter implements Exporter {
   }
 
   private void exportDeploymentRecord(final Record record) {
-    if (DeploymentIntent.CREATED != record.getMetadata().getIntent()) {
+    final RecordMetadata metadata = record.getMetadata();
+    if (metadata.getIntent() != DeploymentIntent.CREATED
+        || metadata.getPartitionId() != Protocol.DEPLOYMENT_PARTITION) {
+    	// ignore deployment event on other partitions to avoid duplicates
       return;
     }
     final long timestamp = record.getTimestamp().toEpochMilli();
