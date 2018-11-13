@@ -29,8 +29,6 @@ import io.zeebe.protocol.clientapi.ValueType;
 import io.zeebe.protocol.intent.DeploymentIntent;
 import io.zeebe.protocol.intent.Intent;
 import io.zeebe.protocol.intent.WorkflowInstanceIntent;
-import org.slf4j.Logger;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -39,9 +37,14 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
 
 public class SimpleMonitorExporter implements Exporter {
 
@@ -249,10 +252,10 @@ public class SimpleMonitorExporter implements Exporter {
       final Intent intent,
       final long timestamp,
       final WorkflowInstanceRecordValue workflowInstanceRecordValue) {
-    final boolean wasWorkflowInstanceStarted = intent == WorkflowInstanceIntent.CREATED;
+    final boolean wasWorkflowInstanceStarted = intent == WorkflowInstanceIntent.ELEMENT_ACTIVATED;
     final boolean wasWorkflowInstanceEnded =
         intent == WorkflowInstanceIntent.ELEMENT_TERMINATED
-            || intent == WorkflowInstanceIntent.CREATED;
+            || intent == WorkflowInstanceIntent.ELEMENT_COMPLETED;
 
     if (wasWorkflowInstanceStarted) {
       final String bpmnProcessId = getCleanString(workflowInstanceRecordValue.getBpmnProcessId());
@@ -284,7 +287,7 @@ public class SimpleMonitorExporter implements Exporter {
       final long timestamp,
       final WorkflowInstanceRecordValue workflowInstanceRecordValue) {
     final long workflowInstanceKey = workflowInstanceRecordValue.getWorkflowInstanceKey();
-    final String activityId = getCleanString(workflowInstanceRecordValue.getActivityId());
+    final String elementId = getCleanString(workflowInstanceRecordValue.getElementId());
     final long scopeInstanceKey = workflowInstanceRecordValue.getScopeInstanceKey();
     final String payload = getCleanString(workflowInstanceRecordValue.getPayload());
     final long workflowKey = workflowInstanceRecordValue.getWorkflowKey();
@@ -297,7 +300,7 @@ public class SimpleMonitorExporter implements Exporter {
             key,
             intent,
             workflowInstanceKey,
-            activityId,
+            elementId,
             scopeInstanceKey,
             payload,
             workflowKey,
@@ -312,7 +315,7 @@ public class SimpleMonitorExporter implements Exporter {
 
     final IncidentRecordValue incidentRecordValue = (IncidentRecordValue) record.getValue();
     final long workflowInstanceKey = incidentRecordValue.getWorkflowInstanceKey();
-    final long activityInstanceKey = incidentRecordValue.getActivityInstanceKey();
+    final long elementInstanceKey = incidentRecordValue.getElementInstanceKey();
     final long jobKey = incidentRecordValue.getJobKey();
     final String errorType = getCleanString(incidentRecordValue.getErrorType());
     final String errorMessage = getCleanString(incidentRecordValue.getErrorMessage());
@@ -324,7 +327,7 @@ public class SimpleMonitorExporter implements Exporter {
             key,
             intent,
             workflowInstanceKey,
-            activityInstanceKey,
+            elementInstanceKey,
             jobKey,
             errorType,
             errorMessage,
