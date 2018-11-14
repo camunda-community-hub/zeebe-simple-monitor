@@ -12,14 +12,32 @@ This is a monitoring application for [Zeebe](https://zeebe.io). It has two parts
 * inspect workflow instances, including payload and incidents
 * management operations (e.g. new deployment, cancel workflow instance, update payload)
 
+## How to run
 
-## How to build
+### With Docker
+
+The following command will build the project, pull images and start containers with default settings.
+
+In your terminal (in the root project folder):
+
+```bash
+docker/run
+```
+Note: You can build the project with maven in a containerized environ by commenting the line 14 and uncommenting the line 15 in the `docker/run` file.
+If you don't have the right to launch `docker/run` try : 
+
+```bash
+chmod +x docker/run
+```
+and try again.
+
+### Manually
+
+#### How to build
 
 Build with Maven
 
 `mvn clean install`
-
-## How to run
 
 Before you start the broker, copy the exporter JAR from the target folder into the lib folder of the broker.
 
