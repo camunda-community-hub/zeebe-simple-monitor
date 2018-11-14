@@ -30,4 +30,20 @@ public class SimpleMonitorExporterConfiguration {
    * <p>If the value is less then one, then no timer will be scheduled.
    */
   int batchTimerMilli = 1000;
+
+  @Override
+  public String toString() {
+    return "SimpleMonitorExporterConfiguration{"
+        + "jdbcUrl='"
+        + jdbcUrl
+        + '\''
+        + ", driverName='"
+        + driverName
+        + '\''
+        + ", batchSize="
+        + batchSize
+        + ", batchTimerMilli="
+        + batchTimerMilli
+        + '}';
+  }
 }

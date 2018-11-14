@@ -37,8 +37,8 @@ className = "io.zeebe.monitor.SimpleMonitorExporter"
 
 ### Configure the Exporter
 
-The jdbc uses some default properties which can be configured as well.
-To do this you can add the following. All values are commeted out and have the default values. To change them remove the `#` and change the value.
+The JDBC uses some default properties which can be configured as well.
+To do this you can add the following. All values are commented out and have the default values. To change them remove the `#` and change the value.
 
 ```
 [[exporters]]
@@ -69,6 +69,13 @@ className = "io.zeebe.monitor.SimpleMonitorExporter"
   #
   #batchTimerMilli = 1000
 ```
+
+The JDBC properties can also be set by the following environment variables:
+
+* `SIMPLE_MONITOR_EXPORTER_JDBC_URL`
+* `SIMPLE_MONITOR_EXPORTER_JDBC_DRIVER`
+* `SIMPLE_MONITOR_EXPORTER_JDBC_USER`
+* `SIMPLE_MONITOR_EXPORTER_JDBC_PASSWORD`
 
 ### Start the broker
 
