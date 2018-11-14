@@ -41,6 +41,9 @@ public class WorkflowInstanceEntity {
   @Column(name = "VERSION_")
   private int version;
 
+  @Column(name = "STATE_")
+  private String state;
+
   @Column(name = "START_")
   private long start;
 
@@ -117,5 +120,13 @@ public class WorkflowInstanceEntity {
 
   public void setEnd(Long end) {
     this.end = end;
+  }
+
+  public String getState() {
+    return state;
+  }
+
+  public void setState(String state) {
+    this.state = state;
   }
 }

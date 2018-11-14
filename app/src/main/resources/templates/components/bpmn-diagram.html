@@ -1,0 +1,64 @@
+<div id="diagramCanvas" class="bpmn-io-viewer-height"></div>
+	
+
+<script>	
+	document.addEventListener('DOMContentLoaded', function(){ 
+	    renderDiagram();
+	}, false);
+  
+  function renderDiagram() {
+  	var resource = `{{{resource}}}`; 
+    
+    var BpmnViewer = window.BpmnJS;
+    viewer = new BpmnViewer({container: '#diagramCanvas', width: '100%', height: '100%'});
+    
+    viewer.importXML(resource, function(err) {
+			if (err) {
+        showError("Diagram rendering: " + err);
+			} else {
+				addMarkers(viewer);												
+			}
+		});
+  }
+  
+  function addMarkers(viewer) {  
+  	var canvas = viewer.get('canvas');
+		var overlays = viewer.get('overlays');
+		var injector = viewer.get('injector');				
+		var elementRegistry = injector.get('elementRegistry');
+		var graphicsFactory = injector.get('graphicsFactory');
+		
+		// zoom to fit full viewport
+		canvas.zoom('fit-viewport');
+		
+		{{#instance}}
+			
+			{{#elementInstances}}
+				addElementInstanceCounter(overlays, '{{elementId}}', {{activeInstances}}, {{endedInstances}});
+			{{/elementInstances}}
+			
+			{{#activeActivities}}
+				var elementId = "{{.}}";
+				addElementInstanceActiveMarker(canvas, elementId);
+			{{/activeActivities}}
+			
+			{{#incidentActivities}}
+				var elementId = "{{.}}";
+				addElementInstanceIncidentMarker(canvas,elementId);
+			{{/incidentActivities}}
+			
+			{{#incidents}}
+				{{^isResolved}}			
+					addIncidentMarker(overlays,'{{activityId}}');
+				{{/isResolved}}
+			{{/incidents}}
+			
+			{{#takenSequenceFlows}}
+				var flow = "{{.}}";
+				markSequenceFlow(elementRegistry, graphicsFactory, flow);
+			{{/takenSequenceFlows}}
+				
+		{{/instance}}  
+  }
+  
+</script>

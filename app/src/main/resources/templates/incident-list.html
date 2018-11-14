@@ -1,0 +1,34 @@
+<table class="table table-striped">
+	<thead>
+	  <th>Element Id</th>
+	  <th>Element Instance Key</th>
+	  <th>Error Type</th>
+		<th>Error Message</th>
+		<th>State</th>
+		<th>Created Time</th>
+		<th> </th>
+</thead>
+
+{{#instance.incidents}}
+	<tr>
+		<td>{{activityId}}</td>
+		<td>{{activityInstanceKey}}</td>
+		<td>{{errorType}}</td>
+		<td>{{errorMessage}}</td>
+		<td>{{state}}</td>
+		<td>{{createdTime}}</td>
+		<td>		
+		
+			{{^isResolved}}		
+				{{>modals/resolve-incident-modal}}
+			
+				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#resolveIncidentModal-{{key}}">
+				  Resolve
+				</button>				
+			{{/isResolved}}
+			
+		</td>
+	</tr>
+{{/instance.incidents}}
+
+</table>
