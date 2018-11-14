@@ -43,12 +43,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 
 public class SimpleMonitorExporter implements Exporter {
+
+  private static final String ENV_PREFIX = "SIMPLE_MONITOR_EXPORTER_";
+  private static final String ENV_JDBC_URL = ENV_PREFIX + "JDBC_URL";
+  private static final String ENV_JDBC_DRIVER = ENV_PREFIX + "JDBC_DRIVER";
+  private static final String ENV_JDBC_USER = ENV_PREFIX + "JDBC_USER";
+  private static final String ENV_JDBC_PASSWORD = ENV_PREFIX + "JDBC_PASSWORD";
 
   private static final String INSERT_WORKFLOW =
       "INSERT INTO WORKFLOW (ID_, KEY_, BPMN_PROCESS_ID_, VERSION_, RESOURCE_, TIMESTAMP_) VALUES ('%s', %d, '%s', %d, '%s', %d);";
@@ -102,6 +109,9 @@ public class SimpleMonitorExporter implements Exporter {
     log = context.getLogger();
     configuration =
         context.getConfiguration().instantiate(SimpleMonitorExporterConfiguration.class);
+
+    applyEnvironmentVariables(configuration);
+
     batchSize = configuration.batchSize;
     batchTimerMilli = configuration.batchTimerMilli;
 
@@ -111,6 +121,19 @@ public class SimpleMonitorExporter implements Exporter {
     } catch (final ClassNotFoundException e) {
       throw new RuntimeException("Driver not found in class path", e);
     }
+  }
+
+  private void applyEnvironmentVariables(SimpleMonitorExporterConfiguration configuration) {
+    final Map<String, String> environment = System.getenv();
+
+    Optional.ofNullable(environment.get(ENV_JDBC_URL))
+        .ifPresent(url -> configuration.jdbcUrl = url);
+    Optional.ofNullable(environment.get(ENV_JDBC_DRIVER))
+        .ifPresent(driver -> configuration.driverName = driver);
+    Optional.ofNullable(environment.get(ENV_JDBC_USER))
+        .ifPresent(user -> configuration.userName = user);
+    Optional.ofNullable(environment.get(ENV_JDBC_PASSWORD))
+        .ifPresent(password -> configuration.password = password);
   }
 
   @Override
@@ -201,7 +224,7 @@ public class SimpleMonitorExporter implements Exporter {
     final RecordMetadata metadata = record.getMetadata();
     if (metadata.getIntent() != DeploymentIntent.CREATED
         || metadata.getPartitionId() != Protocol.DEPLOYMENT_PARTITION) {
-    	// ignore deployment event on other partitions to avoid duplicates
+      // ignore deployment event on other partitions to avoid duplicates
       return;
     }
     final long timestamp = record.getTimestamp().toEpochMilli();
