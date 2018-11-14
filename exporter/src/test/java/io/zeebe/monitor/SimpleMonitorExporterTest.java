@@ -1,5 +1,9 @@
 package io.zeebe.monitor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import io.zeebe.exporter.context.Configuration;
 import io.zeebe.exporter.context.Context;
 import io.zeebe.exporter.context.Controller;
@@ -15,11 +19,6 @@ import io.zeebe.protocol.clientapi.ValueType;
 import io.zeebe.protocol.intent.DeploymentIntent;
 import io.zeebe.protocol.intent.Intent;
 import io.zeebe.protocol.intent.WorkflowInstanceIntent;
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -28,10 +27,10 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SimpleMonitorExporterTest {
 
@@ -129,7 +128,8 @@ public class SimpleMonitorExporterTest {
   public void shouldInsertWorkflowInstance() throws Exception {
     // given
     final Record workflowInstanceRecord =
-        createRecordMockForIntent(ValueType.WORKFLOW_INSTANCE, WorkflowInstanceIntent.CREATED, 4L);
+        createRecordMockForIntent(
+            ValueType.WORKFLOW_INSTANCE, WorkflowInstanceIntent.ELEMENT_ACTIVATED, 4L);
     final WorkflowInstanceRecordValue instanceRecordValueMock =
         createWorkflowInstanceRecordValueMock("process");
     when(workflowInstanceRecord.getValue()).thenReturn(instanceRecordValueMock);
@@ -179,7 +179,8 @@ public class SimpleMonitorExporterTest {
   public void shouldUpdateWorkflowInstance() throws Exception {
     // given
     final Record workflowInstanceRecord =
-        createRecordMockForIntent(ValueType.WORKFLOW_INSTANCE, WorkflowInstanceIntent.CREATED, 4L);
+        createRecordMockForIntent(
+            ValueType.WORKFLOW_INSTANCE, WorkflowInstanceIntent.ELEMENT_ACTIVATED, 4L);
     final WorkflowInstanceRecordValue instanceRecordValueMock =
         createWorkflowInstanceRecordValueMock("process");
     when(workflowInstanceRecord.getValue()).thenReturn(instanceRecordValueMock);
@@ -338,10 +339,10 @@ public class SimpleMonitorExporterTest {
   }
 
   private WorkflowInstanceRecordValue createWorkflowInstanceRecordValueMock(
-      final String activityId) {
+      final String elementId) {
     final WorkflowInstanceRecordValue instanceRecordValue = mock(WorkflowInstanceRecordValue.class);
 
-    when(instanceRecordValue.getActivityId()).thenReturn(activityId);
+    when(instanceRecordValue.getElementId()).thenReturn(elementId);
     when(instanceRecordValue.getScopeInstanceKey()).thenReturn(-1L);
     when(instanceRecordValue.getWorkflowInstanceKey()).thenReturn(4L);
     when(instanceRecordValue.getPayload()).thenReturn("{\"foo\":\"bar\"}");
