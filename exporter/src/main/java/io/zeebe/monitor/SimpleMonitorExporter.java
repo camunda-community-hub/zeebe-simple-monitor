@@ -31,6 +31,8 @@ import io.zeebe.protocol.clientapi.ValueType;
 import io.zeebe.protocol.intent.DeploymentIntent;
 import io.zeebe.protocol.intent.Intent;
 import io.zeebe.protocol.intent.WorkflowInstanceIntent;
+import org.slf4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -39,15 +41,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
 
 public class SimpleMonitorExporter implements Exporter {
 
@@ -123,7 +119,7 @@ public class SimpleMonitorExporter implements Exporter {
     }
   }
 
-  private void applyEnvironmentVariables(SimpleMonitorExporterConfiguration configuration) {
+  private void applyEnvironmentVariables(final SimpleMonitorExporterConfiguration configuration) {
     final Map<String, String> environment = System.getenv();
 
     Optional.ofNullable(environment.get(ENV_JDBC_URL))
@@ -144,7 +140,8 @@ public class SimpleMonitorExporter implements Exporter {
               configuration.jdbcUrl, configuration.userName, configuration.password);
       connection.setAutoCommit(true);
     } catch (final SQLException e) {
-      throw new RuntimeException("Error on opening database.", e);
+      throw new RuntimeException(
+          String.format("Error on opening database with configuration %s.", configuration), e);
     }
 
     createTables();
