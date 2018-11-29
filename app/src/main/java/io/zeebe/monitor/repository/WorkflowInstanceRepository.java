@@ -17,13 +17,18 @@ package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.WorkflowInstanceEntity;
 import java.util.Optional;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface WorkflowInstanceRepository extends CrudRepository<WorkflowInstanceEntity, String> {
+public interface WorkflowInstanceRepository
+    extends PagingAndSortingRepository<WorkflowInstanceEntity, String> {
 
-  Iterable<WorkflowInstanceEntity> findByWorkflowKey(long workflowKey);
+  Page<WorkflowInstanceEntity> findByWorkflowKey(long workflowKey, Pageable pageable);
 
   Optional<WorkflowInstanceEntity> findByKey(long key);
+
+  long countByWorkflowKey(long workflowKey);
 
   long countByWorkflowKeyAndEndIsNotNull(long workflowKey);
 
