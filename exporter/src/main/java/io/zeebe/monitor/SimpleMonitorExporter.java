@@ -52,6 +52,7 @@ public class SimpleMonitorExporter implements Exporter {
   private static final String ENV_JDBC_DRIVER = ENV_PREFIX + "JDBC_DRIVER";
   private static final String ENV_JDBC_USER = ENV_PREFIX + "JDBC_USER";
   private static final String ENV_JDBC_PASSWORD = ENV_PREFIX + "JDBC_PASSWORD";
+  private static final String ENV_JDBC_CREATE_SCHEMA = ENV_PREFIX + "JDBC_CREATE_SCHEMA";
 
   private static final String INSERT_WORKFLOW =
       "INSERT INTO WORKFLOW (ID_, KEY_, BPMN_PROCESS_ID_, VERSION_, RESOURCE_, TIMESTAMP_) VALUES ('%s', %d, '%s', %d, '%s', %d);";
@@ -76,8 +77,6 @@ public class SimpleMonitorExporter implements Exporter {
           + " (ID_, KEY_, INTENT_, WORKFLOW_INSTANCE_KEY_, ACTIVITY_INSTANCE_KEY_, JOB_KEY_, ERROR_TYPE_, ERROR_MSG_, TIMESTAMP_)"
           + " VALUES "
           + "('%s', %d, '%s', %d, %d, %d, '%s', '%s', %d)";
-
-  public static final String CREATE_SCHEMA_SQL_PATH = "/CREATE_SCHEMA.sql";
 
   private final Map<ValueType, Consumer<Record>> insertCreatorPerType = new HashMap<>();
   private final List<String> sqlStatements;
@@ -130,6 +129,8 @@ public class SimpleMonitorExporter implements Exporter {
         .ifPresent(user -> configuration.userName = user);
     Optional.ofNullable(environment.get(ENV_JDBC_PASSWORD))
         .ifPresent(password -> configuration.password = password);
+    Optional.ofNullable(environment.get(ENV_JDBC_CREATE_SCHEMA))
+        .ifPresent(createSchema -> configuration.createSchema = createSchema);
   }
 
   @Override
@@ -155,19 +156,24 @@ public class SimpleMonitorExporter implements Exporter {
   }
 
   private void createTables() {
-    try (final Statement statement = connection.createStatement()) {
+    if (configuration.createSchema != null && !configuration.createSchema.equals("-")) {
+      try (final Statement statement = connection.createStatement()) {
 
-      final InputStream resourceAsStream =
-          SimpleMonitorExporter.class.getResourceAsStream(CREATE_SCHEMA_SQL_PATH);
-      final String sql =
-          new BufferedReader(new InputStreamReader(resourceAsStream))
-              .lines()
-              .collect(Collectors.joining(System.lineSeparator()));
+        final InputStream resourceAsStream =
+            SimpleMonitorExporter.class.getResourceAsStream(configuration.createSchema);
+        final String sql =
+            new BufferedReader(new InputStreamReader(resourceAsStream))
+                .lines()
+                .collect(Collectors.joining(System.lineSeparator()));
 
-      log.info("Create tables:\n{}", sql);
-      statement.executeUpdate(sql);
-    } catch (final Exception e) {
-      throw new RuntimeException(e);
+
+        for (String s: sql.split("\\;")) {
+          log.info("Create tables:\n{}", s);
+          statement.executeUpdate(s);
+        }
+      } catch (final Exception e) {
+        throw new RuntimeException(e);
+      }
     }
   }
 

@@ -31,6 +31,11 @@ public class SimpleMonitorExporterConfiguration {
    */
   int batchTimerMilli = 1000;
 
+  /**
+   * Script to create database. Specify - to skip creating schema.
+   */
+  String createSchema = "/CREATE_SCHEMA.sql";
+
   @Override
   public String toString() {
     return "SimpleMonitorExporterConfiguration{"
