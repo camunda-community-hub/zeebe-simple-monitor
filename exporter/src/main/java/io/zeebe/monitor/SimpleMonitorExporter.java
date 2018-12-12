@@ -29,10 +29,9 @@ import io.zeebe.protocol.Protocol;
 import io.zeebe.protocol.clientapi.RecordType;
 import io.zeebe.protocol.clientapi.ValueType;
 import io.zeebe.protocol.intent.DeploymentIntent;
+import io.zeebe.protocol.intent.IncidentIntent;
 import io.zeebe.protocol.intent.Intent;
 import io.zeebe.protocol.intent.WorkflowInstanceIntent;
-import org.slf4j.Logger;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -41,9 +40,15 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
 
 public class SimpleMonitorExporter implements Exporter {
 
@@ -59,12 +64,12 @@ public class SimpleMonitorExporter implements Exporter {
 
   private static final String INSERT_WORKFLOW_INSTANCE =
       "INSERT INTO WORKFLOW_INSTANCE"
-          + " (ID_, PARTITION_ID_, KEY_, BPMN_PROCESS_ID_, VERSION_, WORKFLOW_KEY_, START_)"
+          + " (ID_, PARTITION_ID_, KEY_, BPMN_PROCESS_ID_, VERSION_, WORKFLOW_KEY_, STATE_, START_)"
           + " VALUES "
-          + "('%s', %d, %d, '%s', %d, %d, %d);";
+          + "('%s', %d, %d, '%s', %d, %d, '%s', %d);";
 
   private static final String UPDATE_WORKFLOW_INSTANCE =
-      "UPDATE WORKFLOW_INSTANCE SET END_ = %d WHERE KEY_ = %d;";
+      "UPDATE WORKFLOW_INSTANCE SET END_ = %d, STATE_ = '%s' WHERE KEY_ = %d;";
 
   private static final String INSERT_ACTIVITY_INSTANCE =
       "INSERT INTO ACTIVITY_INSTANCE"
@@ -74,9 +79,12 @@ public class SimpleMonitorExporter implements Exporter {
 
   private static final String INSERT_INCIDENT =
       "INSERT INTO INCIDENT"
-          + " (ID_, KEY_, INTENT_, WORKFLOW_INSTANCE_KEY_, ACTIVITY_INSTANCE_KEY_, JOB_KEY_, ERROR_TYPE_, ERROR_MSG_, TIMESTAMP_)"
+          + " (ID_, KEY_, WORKFLOW_INSTANCE_KEY_, ACTIVITY_INSTANCE_KEY_, JOB_KEY_, ERROR_TYPE_, ERROR_MSG_, CREATED_)"
           + " VALUES "
-          + "('%s', %d, '%s', %d, %d, %d, '%s', '%s', %d)";
+          + "('%s', %d, %d, %d, %d, '%s', '%s', %d)";
+
+  private static final String UPDATE_INCIDENT =
+      "UPDATE INCIDENT SET RESOLVED_ = %d WHERE KEY_ = %d;";
 
   private final Map<ValueType, Consumer<Record>> insertCreatorPerType = new HashMap<>();
   private final List<String> sqlStatements;
@@ -283,12 +291,8 @@ public class SimpleMonitorExporter implements Exporter {
       final Intent intent,
       final long timestamp,
       final WorkflowInstanceRecordValue workflowInstanceRecordValue) {
-    final boolean wasWorkflowInstanceStarted = intent == WorkflowInstanceIntent.ELEMENT_ACTIVATED;
-    final boolean wasWorkflowInstanceEnded =
-        intent == WorkflowInstanceIntent.ELEMENT_TERMINATED
-            || intent == WorkflowInstanceIntent.ELEMENT_COMPLETED;
 
-    if (wasWorkflowInstanceStarted) {
+    if (intent == WorkflowInstanceIntent.ELEMENT_ACTIVATED) {
       final String bpmnProcessId = getCleanString(workflowInstanceRecordValue.getBpmnProcessId());
       final int version = workflowInstanceRecordValue.getVersion();
       final long workflowKey = workflowInstanceRecordValue.getWorkflowKey();
@@ -302,11 +306,16 @@ public class SimpleMonitorExporter implements Exporter {
               bpmnProcessId,
               version,
               workflowKey,
+              "Active",
               timestamp);
       sqlStatements.add(insertWorkflowInstanceStatement);
-    } else if (wasWorkflowInstanceEnded) {
+    } else if (intent == WorkflowInstanceIntent.ELEMENT_COMPLETED) {
       final String updateWorkflowInstanceStatement =
-          String.format(UPDATE_WORKFLOW_INSTANCE, timestamp, key);
+          String.format(UPDATE_WORKFLOW_INSTANCE, timestamp, "Completed", key);
+      sqlStatements.add(updateWorkflowInstanceStatement);
+    } else if (intent == WorkflowInstanceIntent.ELEMENT_TERMINATED) {
+      final String updateWorkflowInstanceStatement =
+          String.format(UPDATE_WORKFLOW_INSTANCE, timestamp, "Terminated", key);
       sqlStatements.add(updateWorkflowInstanceStatement);
     }
   }
@@ -341,7 +350,7 @@ public class SimpleMonitorExporter implements Exporter {
 
   private void exportIncidentRecord(final Record record) {
     final long key = record.getKey();
-    final String intent = record.getMetadata().getIntent().name();
+    final Intent intent = record.getMetadata().getIntent();
     final long timestamp = record.getTimestamp().toEpochMilli();
 
     final IncidentRecordValue incidentRecordValue = (IncidentRecordValue) record.getValue();
@@ -351,19 +360,23 @@ public class SimpleMonitorExporter implements Exporter {
     final String errorType = getCleanString(incidentRecordValue.getErrorType());
     final String errorMessage = getCleanString(incidentRecordValue.getErrorMessage());
 
-    final String insertStatement =
-        String.format(
-            INSERT_INCIDENT,
-            createId(),
-            key,
-            intent,
-            workflowInstanceKey,
-            elementInstanceKey,
-            jobKey,
-            errorType,
-            errorMessage,
-            timestamp);
-    sqlStatements.add(insertStatement);
+    if (intent == IncidentIntent.CREATED) {
+      final String insertStatement =
+          String.format(
+              INSERT_INCIDENT,
+              createId(),
+              key,
+              workflowInstanceKey,
+              elementInstanceKey,
+              jobKey,
+              errorType,
+              errorMessage,
+              timestamp);
+      sqlStatements.add(insertStatement);
+    } else if (intent == IncidentIntent.RESOLVED) {
+      final String updateIncidentStatement = String.format(UPDATE_INCIDENT, timestamp, key);
+      sqlStatements.add(updateIncidentStatement);
+    }
   }
 
   private String getCleanString(final String string) {

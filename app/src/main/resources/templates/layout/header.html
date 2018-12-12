@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge">
+    <meta name=viewport content="width=device-width,initial-scale=1">
+
+    <title> Zeebe Simple Monitor </title>
+    
+    <!-- bpmn-js viewer -->
+    <link type="text/css" rel="stylesheet" href="/webjars/bpmn-js/dist/assets/diagram-js.css"/>
+    <link type="text/css" rel="stylesheet" href="/webjars/bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css"/>
+    <link type="text/css" rel="stylesheet" href="/css/modeler.css"/>
+		
+		<!-- Bootstrap core CSS -->
+		<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
+
+		<link rel="stylesheet" type="text/css" href="/css/app.css" />
+
+    <link rel=icon href="/img/favicon.ico">
+    
+</head>
+
+<body>
+
+	<nav class="navbar navbar-expand-md navbar-light bg-white mb-2 top-nav-border">
+		<a class="navbar-brand" href="/">
+			<img src="/img/logo.png" width="40" alt="Logo">
+			<span class="h3">Zeebe Simple Monitor</span>
+		</a>
+
+		<div class="collapse navbar-collapse">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item">
+					<a class="nav-link" href="/views/workflows">Workflows</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/views/instances">Instances</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/views/incidents">Incidents</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+			
+	<div class="container-fluid">
+	
+		<div id="errorPanel" class="alert alert-danger alert-dismissible fade show" style="display:none;" role="alert">
+		  <strong>Error:</strong> <span id="errorText"></span>
+		  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+		    <span aria-hidden="true">&times;</span>
+		  </button>
+		</div>
+		
+		<div id="successPanel" class="alert alert-success alert-dismissible fade show" style="display:none;" role="alert">
+		  <strong>Success:</strong> <span id="successText"></span>
+		  (<a href="#" onClick="reload()">Refresh</a>)
+		  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+		    <span aria-hidden="true">&times;</span>
+		  </button>
+		</div>

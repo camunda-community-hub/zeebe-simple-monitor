@@ -1,0 +1,44 @@
+{{>layout/header}}
+
+{{>modals/deployment-modal}}
+
+<div class="row">
+	<div class="col-md-12 mb-2">
+		
+		<button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#deploymentModal">
+		  New Deployment
+		</button>
+						
+	</div>
+
+	<div class="col-md-12">
+	
+		<span>{{count}} workflows</span>
+		
+		<table class="table table-striped">
+			<thead>
+			  <th>Key</th>
+			  <th>BPMN process id</th>
+			  <th>Version</th>
+				<th># active</th>
+				<th># ended</th>
+		</thead>
+		
+		{{#workflows}}
+			<tr>
+			<td><a href="/views/workflows/{{workflowKey}}">{{workflowKey}}</a></td>
+			<td>{{bpmnProcessId}}</td>
+			<td>{{version}}</td>
+			<td>{{countRunning}}</td>
+			<td>{{countEnded}}</td>
+			</tr>
+		{{/workflows}}
+		
+		</table>		
+ 		
+		{{>components/table-pagination}}
+	
+	</div>
+</div>
+
+{{>layout/footer}}

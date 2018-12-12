@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0wpxqvw" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Zeebe Modeler" exporterVersion="0.2.0">
+  <bpmn:process id="ship-parcel" name="Ship Parcel" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="Items fetched">
+      <bpmn:outgoing>SequenceFlow_0lcrb2l</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0zlm4ir" default="SequenceFlow_1f5vezv">
+      <bpmn:incoming>SequenceFlow_0lcrb2l</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1f5vezv</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_02flt20</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_0lcrb2l" sourceRef="StartEvent_1" targetRef="ExclusiveGateway_0zlm4ir" />
+    <bpmn:serviceTask id="ServiceTask_12sd1st" name="Ship Parcel">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="ship-parcel" />
+        <zeebe:taskHeaders>
+          <zeebe:header key="transport-insurance" value="false" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1f5vezv</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1redtxg</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1f5vezv" sourceRef="ExclusiveGateway_0zlm4ir" targetRef="ServiceTask_12sd1st" />
+    <bpmn:serviceTask id="ServiceTask_1gi4zqn" name="Ship Parcel with Transport Insurance">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="ship-parcel" />
+        <zeebe:taskHeaders>
+          <zeebe:header key="transport-insurance" value="true" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_02flt20</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1kauo34</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_02flt20" name="$.totalPrice &#62; 100" sourceRef="ExclusiveGateway_0zlm4ir" targetRef="ServiceTask_1gi4zqn">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">$.totalPrice &gt; 100</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="EndEvent_0elt8f8">
+      <bpmn:incoming>SequenceFlow_1redtxg</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1redtxg" sourceRef="ServiceTask_12sd1st" targetRef="EndEvent_0elt8f8" />
+    <bpmn:endEvent id="EndEvent_1hfc9sb">
+      <bpmn:incoming>SequenceFlow_1kauo34</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1kauo34" sourceRef="ServiceTask_1gi4zqn" targetRef="EndEvent_1hfc9sb" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ship-parcel">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="173" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="158" y="145" width="67" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0zlm4ir_di" bpmnElement="ExclusiveGateway_0zlm4ir" isMarkerVisible="true">
+        <dc:Bounds x="259" y="95" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="241" y="65" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0lcrb2l_di" bpmnElement="SequenceFlow_0lcrb2l">
+        <di:waypoint x="209" y="120" />
+        <di:waypoint x="259" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_12sd1st_di" bpmnElement="ServiceTask_12sd1st">
+        <dc:Bounds x="418" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1f5vezv_di" bpmnElement="SequenceFlow_1f5vezv">
+        <di:waypoint x="309" y="120" />
+        <di:waypoint x="418" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1gi4zqn_di" bpmnElement="ServiceTask_1gi4zqn">
+        <dc:Bounds x="418" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_02flt20_di" bpmnElement="SequenceFlow_02flt20">
+        <di:waypoint x="284" y="145" />
+        <di:waypoint x="284" y="230" />
+        <di:waypoint x="418" y="230" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="294" y="205" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0elt8f8_di" bpmnElement="EndEvent_0elt8f8">
+        <dc:Bounds x="590" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1redtxg_di" bpmnElement="SequenceFlow_1redtxg">
+        <di:waypoint x="518" y="120" />
+        <di:waypoint x="590" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1hfc9sb_di" bpmnElement="EndEvent_1hfc9sb">
+        <dc:Bounds x="590" y="212" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1kauo34_di" bpmnElement="SequenceFlow_1kauo34">
+        <di:waypoint x="518" y="230" />
+        <di:waypoint x="590" y="230" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

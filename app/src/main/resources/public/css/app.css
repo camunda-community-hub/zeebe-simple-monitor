@@ -1,0 +1,54 @@
+.top-nav-border {
+	border-bottom: 2px solid #0d8dba!important;
+}
+
+.bpmn-io-viewer-height {
+	height: 400px;
+}
+
+.bpmn-badge-active {
+  background-color: rgba(66, 180, 21, 0.7);
+  color: White;
+  border-radius: 5px;
+  font-family: Arial;
+  font-size: 12px;
+  padding: 5px;
+  min-height: 16px;
+  width: 50px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.bpmn-badge-inactive {
+  background-color: rgba(148, 148, 150, 0.7);
+  color: White;
+  border-radius: 5px;
+  font-family: Arial;
+  font-size: 12px;
+  padding: 5px;
+  min-height: 16px;
+  width: 50px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.bpmn-badge-incident {
+  background-color: rgba(255, 47, 0, 0.7);
+  color: White;
+  border-radius: 5px;
+  font-family: Arial;
+  font-size: 24px;
+  padding: 5px;
+  min-height: 16px;
+  width: 50px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.bpmn-element-active:not(.djs-connection) .djs-visual > :nth-child(1) {
+  stroke: rgba(66, 180, 21, 0.7) !important; 
+}
+
+.bpmn-element-incident:not(.djs-connection) .djs-visual > :nth-child(1) {
+  stroke: rgba(255, 47, 0, 0.7) !important;
+}
