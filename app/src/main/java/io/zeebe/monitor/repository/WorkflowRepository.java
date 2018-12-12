@@ -17,9 +17,9 @@ package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.WorkflowEntity;
 import java.util.Optional;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface WorkflowRepository extends CrudRepository<WorkflowEntity, String> {
+public interface WorkflowRepository extends PagingAndSortingRepository<WorkflowEntity, String> {
 
   Optional<WorkflowEntity> findByKey(long key);
 }

@@ -16,9 +16,15 @@
 package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.IncidentEntity;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface IncidentRepository extends CrudRepository<IncidentEntity, String> {
+public interface IncidentRepository extends PagingAndSortingRepository<IncidentEntity, String> {
 
   Iterable<IncidentEntity> findByWorkflowInstanceKey(long workflowInstanceKey);
+
+  Page<IncidentEntity> findByResolvedIsNull(Pageable pageable);
+
+  long countByResolvedIsNull();
 }

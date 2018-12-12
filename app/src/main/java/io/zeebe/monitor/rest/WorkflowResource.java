@@ -17,12 +17,8 @@ package io.zeebe.monitor.rest;
 
 import io.zeebe.client.api.clients.WorkflowClient;
 import io.zeebe.client.api.commands.DeployWorkflowCommandStep1.DeployWorkflowCommandBuilderStep2;
-import io.zeebe.monitor.entity.WorkflowEntity;
-import io.zeebe.monitor.repository.WorkflowInstanceRepository;
-import io.zeebe.monitor.repository.WorkflowRepository;
 import io.zeebe.monitor.zeebe.ZeebeConnectionService;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,37 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(path = "/api/workflows")
 public class WorkflowResource {
+
   @Autowired private ZeebeConnectionService connections;
-
-  @Autowired private WorkflowRepository workflowRepository;
-
-  @Autowired private WorkflowInstanceRepository workflowInstanceRepository;
-
-  @RequestMapping("/")
-  public List<WorkflowDto> getWorkflows() {
-    final List<WorkflowDto> dtos = new ArrayList<>();
-    for (WorkflowEntity workflowEntity : workflowRepository.findAll()) {
-      final WorkflowDto dto = toDto(workflowEntity);
-      dtos.add(dto);
-    }
-
-    return dtos;
-  }
-
-  @RequestMapping(path = "/{workflowKey}")
-  public WorkflowDto findWorkflow(@PathVariable("workflowKey") long workflowKey) {
-    return workflowRepository.findByKey(workflowKey).map(this::toDto).orElse(null);
-  }
-
-  private WorkflowDto toDto(WorkflowEntity workflowEntity) {
-    final long workflowKey = workflowEntity.getKey();
-
-    final long running = workflowInstanceRepository.countByWorkflowKeyAndEndIsNull(workflowKey);
-    final long ended = workflowInstanceRepository.countByWorkflowKeyAndEndIsNotNull(workflowKey);
-
-    final WorkflowDto dto = WorkflowDto.from(workflowEntity, running, ended);
-    return dto;
-  }
 
   @RequestMapping(path = "/{workflowKey}", method = RequestMethod.POST)
   public void createWorkflowInstance(
@@ -87,6 +54,10 @@ public class WorkflowResource {
     final WorkflowClient workflowClient = connections.getClient().workflowClient();
 
     final List<FileDto> files = deployment.getFiles();
+    if (files.isEmpty()) {
+      throw new RuntimeException("no resources to deploy");
+    }
+
     final FileDto firstFile = files.get(0);
 
     final DeployWorkflowCommandBuilderStep2 cmd =

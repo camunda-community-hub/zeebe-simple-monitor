@@ -1,14 +1,12 @@
 package io.zeebe.monitor.rest;
 
-public class IncidentDto {
+public class IncidentListDto {
 
   private long key;
 
-  private String activityId;
-  private long activityInstanceKey;
-  private Long jobKey;
-
-  private String payload = "";
+  private String bpmnProcessId;
+  private long workflowInstanceKey;
+  private long workflowKey;
 
   private String errorType;
   private String errorMessage;
@@ -17,30 +15,12 @@ public class IncidentDto {
   private String createdTime = "";
   private String resolvedTime = "";
 
-  private boolean isResolved;
-
   public long getKey() {
     return key;
   }
 
   public void setKey(long key) {
     this.key = key;
-  }
-
-  public long getActivityInstanceKey() {
-    return activityInstanceKey;
-  }
-
-  public void setActivityInstanceKey(long activityInstanceKey) {
-    this.activityInstanceKey = activityInstanceKey;
-  }
-
-  public Long getJobKey() {
-    return jobKey;
-  }
-
-  public void setJobKey(Long jobKey) {
-    this.jobKey = jobKey;
   }
 
   public String getErrorType() {
@@ -57,14 +37,6 @@ public class IncidentDto {
 
   public void setErrorMessage(String errorMessage) {
     this.errorMessage = errorMessage;
-  }
-
-  public String getActivityId() {
-    return activityId;
-  }
-
-  public void setActivityId(String activityId) {
-    this.activityId = activityId;
   }
 
   public String getState() {
@@ -91,19 +63,27 @@ public class IncidentDto {
     this.resolvedTime = resolvedTime;
   }
 
-  public boolean isResolved() {
-    return isResolved;
+  public String getBpmnProcessId() {
+    return bpmnProcessId;
   }
 
-  public void setResolved(boolean isResolved) {
-    this.isResolved = isResolved;
+  public void setBpmnProcessId(String bpmnProcessId) {
+    this.bpmnProcessId = bpmnProcessId;
   }
 
-  public String getPayload() {
-    return payload;
+  public long getWorkflowInstanceKey() {
+    return workflowInstanceKey;
   }
 
-  public void setPayload(String payload) {
-    this.payload = payload;
+  public void setWorkflowInstanceKey(long workflowInstanceKey) {
+    this.workflowInstanceKey = workflowInstanceKey;
+  }
+
+  public long getWorkflowKey() {
+    return workflowKey;
+  }
+
+  public void setWorkflowKey(long workflowKey) {
+    this.workflowKey = workflowKey;
   }
 }
