@@ -172,7 +172,7 @@ public class SimpleMonitorExporter implements Exporter {
               .lines()
               .collect(Collectors.joining(System.lineSeparator()));
 
-      log.info("Create tables:\n{}", sql);
+      log.debug("Create tables:\n{}", sql);
       statement.executeUpdate(sql);
     } catch (final Exception e) {
       throw new RuntimeException(e);
