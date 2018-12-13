@@ -174,7 +174,9 @@ public class SimpleMonitorExporter implements Exporter {
                 .lines()
                 .collect(Collectors.joining(System.lineSeparator()));
 
-
+        /**
+         * MySQL does not allow semicolon batching by executeUpdate(sql), split using naive approach
+         */
         for (String s: sql.split("\\;")) {
           log.info("Create tables:\n{}", s);
           statement.executeUpdate(s);
