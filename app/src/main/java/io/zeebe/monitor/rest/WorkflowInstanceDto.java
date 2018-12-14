@@ -44,6 +44,9 @@ public class WorkflowInstanceDto {
   private List<String> takenSequenceFlows = new ArrayList<>();
 
   private List<IncidentDto> incidents = new ArrayList<>();
+  private List<JobDto> jobs = new ArrayList<>();
+  private List<MessageSubscriptionDto> messageSubscriptions = new ArrayList<>();
+  private List<TimerDto> timers = new ArrayList<>();
 
   public String getPayload() {
     return payload;
@@ -171,5 +174,29 @@ public class WorkflowInstanceDto {
 
   public void setIncidentActivities(List<String> incidentActivities) {
     this.incidentActivities = incidentActivities;
+  }
+
+  public List<JobDto> getJobs() {
+    return jobs;
+  }
+
+  public void setJobs(List<JobDto> jobs) {
+    this.jobs = jobs;
+  }
+
+  public List<MessageSubscriptionDto> getMessageSubscriptions() {
+    return messageSubscriptions;
+  }
+
+  public void setMessageSubscriptions(List<MessageSubscriptionDto> messageSubscriptions) {
+    this.messageSubscriptions = messageSubscriptions;
+  }
+
+  public List<TimerDto> getTimers() {
+    return timers;
+  }
+
+  public void setTimers(List<TimerDto> timers) {
+    this.timers = timers;
   }
 }

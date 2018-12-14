@@ -4,7 +4,6 @@ import io.zeebe.client.ZeebeClient;
 import io.zeebe.client.api.clients.JobClient;
 import io.zeebe.client.api.clients.WorkflowClient;
 import java.util.Collections;
-import java.util.concurrent.CountDownLatch;
 
 public class Demo {
 
@@ -78,7 +77,6 @@ public class Demo {
                     .join())
         .open();
 
-    // wait until killed
-    new CountDownLatch(1).await();
+    Thread.sleep(5_000);
   }
 }

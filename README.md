@@ -43,6 +43,16 @@ Open a web browser and go to http://localhost:8080
 
 > The default configuration uses a file-based H2 database and works if the broker and the webapp runs on the same machine. See the [exporter](https://github.com/zeebe-io/zeebe-simple-monitor/tree/master/exporter#configure-the-exporter) and the [web application](https://github.com/zeebe-io/zeebe-simple-monitor/tree/master/app#configuration) for more configuration options.
 
+## Screenshots
+
+**Workflow View**
+
+![screenshot](app/docs/workflow-details.png)
+
+**Workflow Instance View**
+
+![screenshot](app/docs/instance-details.png)
+
 ## Code of Conduct
 
 This project adheres to the Contributor Covenant [Code of
