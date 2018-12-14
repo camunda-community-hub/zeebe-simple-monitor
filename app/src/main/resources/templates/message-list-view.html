@@ -1,0 +1,45 @@
+{{>layout/header}}
+
+{{>modals/publish-message-modal}}
+
+<div class="row">
+
+	<div class="col-md-12 mb-2">
+		
+		<button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#publishMessageModal">
+		  New Message
+		</button>
+						
+	</div>
+
+	<div class="col-md-12">
+	
+		<span>{{count}} messages</span>
+		
+		<table class="table table-striped">
+			<thead>
+			 	<th>Name</th>
+			 	<th>Correlation Key</th>
+			  <th>Message Id</th>
+			  <th>State</th>
+				<th>Time</th>
+		</thead>
+		
+		{{#messages}}
+			<tr>
+				<td>{{name}}</td>
+				<td>{{correlationKey}}</td>
+				<td>{{messageId}}</td>
+				<td>{{state}}</td>
+				<td>{{timestamp}}</td>
+			</tr>
+		{{/messages}}
+		
+		</table>		
+ 		
+		{{>components/table-pagination}}
+	
+	</div>
+</div>
+
+{{>layout/footer}}

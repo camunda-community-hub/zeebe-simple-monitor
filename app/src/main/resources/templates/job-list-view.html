@@ -3,34 +3,30 @@
 <div class="row">
 	<div class="col-md-12">
 	
-		<span>{{count}} open incidents</span>
+		<span>{{count}} open jobs</span>
 		
 		<table class="table table-striped">
 			<thead>
-				<th>Incident Key</th>
+			 	<th>Job Key</th>
+			 	<th>Job Type</th>
 			  <th>Workflow Instance Key</th>
-			  <th>BPMN process id</th>
-			  <th>Workflow Key</th>
-			  <th>Error Type</th>
+			  <th>Retries</th>
 			  <th>State</th>
-				<th>Created Time</th>
+				<th>Time</th>
 		</thead>
 		
-		{{#incidents}}
+		{{#jobs}}
 			<tr>
 				<td>{{key}}</td>
+				<td>{{jobType}}</td>
 				<td>
 					<a href="/views/instances/{{workflowInstanceKey}}">{{workflowInstanceKey}}</a>
 				</td>
-				<td>{{bpmnProcessId}}</td>
-				<td>
-					<a href="/views/workflows/{{workflowKey}}">{{workflowKey}}</a>
-				</td>
-				<td>{{errorType}}</td>
+				<td>{{retries}}</td>
 				<td>{{state}}</td>
-				<td>{{createdTime}}</td>
+				<td>{{timestamp}}</td>
 			</tr>
-		{{/incidents}}
+		{{/jobs}}
 		
 		</table>		
  		
