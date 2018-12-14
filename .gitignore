@@ -33,3 +33,4 @@ docs/mdbook
 hs_err*.log
 /data/
 /metrics/
+docker/**/*.jar
