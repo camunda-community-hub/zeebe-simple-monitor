@@ -1,0 +1,105 @@
+{{>layout/header}}
+
+{{>modals/cancel-instance-modal}}
+
+<div class="row">
+
+	<div class="col-md-12 mb-2">	
+		<div class="float-right">
+			
+			{{#instance.isRunning}}		
+				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cancelInstanceModal">
+				  Cancel Instance
+				</button>			
+			{{/instance.isRunning}}
+			
+			{{^instance.isRunning}}			
+				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cancelInstanceModal" disabled>
+				  Cancel Instance
+				</button>			
+			{{/instance.isRunning}}
+		
+		</div>		
+	</div>
+
+	<div class="col-md-2">
+		 		
+ 		<table class="table table-striped">
+		{{#instance}}
+			<tr>
+				<th>Key</th>
+				<td>{{workflowInstanceKey}}</td>
+			</tr>
+			<tr>
+				<th>BPMN process id</th>
+				<td>{{bpmnProcessId}}</td>
+			</tr>
+			<tr>
+				<th>Version</th>
+				<td>{{version}}</td>
+			</tr>
+			<tr>
+				<th>Workflow Key</th>
+				<td>
+					<a href="/views/workflows/{{workflowKey}}">{{workflowKey}}</a>
+				</td>
+			</tr>
+			<tr>
+				<th>State</th>
+				<td>{{state}}</td>
+			</tr>
+			<tr>
+				<th>Start Time</th>
+				<td>{{startTime}}</td>
+			</tr>
+			<tr>
+				<th>End Time</th>
+				<td>{{endTime}}</td>
+			</tr>
+		{{/instance}}
+		</table>	
+ 		
+	</div>
+
+	<div class="col-md-10 mb-2">
+		{{>components/bpmn-diagram}}						
+	</div>	
+
+	<div class="col-md-12">
+	
+		<nav>
+		  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+		    <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-payload" role="tab" aria-controls="nav-home" aria-selected="true">Payload</a>
+		    <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-audit-log" role="tab" aria-controls="nav-contact" aria-selected="false">Audit Log</a>
+		    <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-incidents" role="tab" aria-controls="nav-profile" aria-selected="false">Incidents</a>
+		    <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-jobs" role="tab" aria-controls="nav-contact" aria-selected="false">Jobs</a>
+		    <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-message-subscriptions" role="tab" aria-controls="nav-contact" aria-selected="false">Message Subscriptions</a>
+		    <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-timers" role="tab" aria-controls="nav-contact" aria-selected="false">Timers</a>
+		  </div>
+		</nav>
+		<div class="tab-content" id="nav-tabContent" style="height:200px;">
+		  <div class="tab-pane fade show active" id="nav-payload" role="tabpanel" aria-labelledby="nav-home-tab">
+		  	<textarea class="form-control" style="height:200px; overflow: auto;">{{instance.payload}}</textarea>
+		  </div>
+		  <div class="tab-pane fade" id="nav-audit-log" role="tabpanel" aria-labelledby="nav-contact-tab">
+		  	{{>audit-log}}
+		  </div>
+		  <div class="tab-pane fade" id="nav-incidents" role="tabpanel" aria-labelledby="nav-profile-tab">
+		  	{{>incident-list}}
+		  </div>
+		  <div class="tab-pane fade" id="nav-jobs" role="tabpanel" aria-labelledby="nav-contact-tab">
+		  	{{>job-list}}
+		  </div>
+		   <div class="tab-pane fade" id="nav-message-subscriptions" role="tabpanel" aria-labelledby="nav-contact-tab">
+		  	{{>message-subscription-list}}
+		  </div>
+	   	<div class="tab-pane fade" id="nav-timers" role="tabpanel" aria-labelledby="nav-contact-tab">
+		  	{{>timer-list}}
+		  </div>
+		  
+		</div>
+	
+	</div>
+</div>
+
+{{>layout/footer}}

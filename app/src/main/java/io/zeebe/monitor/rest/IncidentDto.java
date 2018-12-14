@@ -6,10 +6,16 @@ public class IncidentDto {
 
   private String activityId;
   private long activityInstanceKey;
-  private long jobKey;
+  private Long jobKey;
+
+  private String payload = "";
 
   private String errorType;
   private String errorMessage;
+
+  private String state = "";
+  private String createdTime = "";
+  private String resolvedTime = "";
 
   private boolean isResolved;
 
@@ -29,11 +35,11 @@ public class IncidentDto {
     this.activityInstanceKey = activityInstanceKey;
   }
 
-  public long getJobKey() {
+  public Long getJobKey() {
     return jobKey;
   }
 
-  public void setJobKey(long jobKey) {
+  public void setJobKey(Long jobKey) {
     this.jobKey = jobKey;
   }
 
@@ -53,6 +59,38 @@ public class IncidentDto {
     this.errorMessage = errorMessage;
   }
 
+  public String getActivityId() {
+    return activityId;
+  }
+
+  public void setActivityId(String activityId) {
+    this.activityId = activityId;
+  }
+
+  public String getState() {
+    return state;
+  }
+
+  public void setState(String state) {
+    this.state = state;
+  }
+
+  public String getCreatedTime() {
+    return createdTime;
+  }
+
+  public void setCreatedTime(String createdTime) {
+    this.createdTime = createdTime;
+  }
+
+  public String getResolvedTime() {
+    return resolvedTime;
+  }
+
+  public void setResolvedTime(String resolvedTime) {
+    this.resolvedTime = resolvedTime;
+  }
+
   public boolean isResolved() {
     return isResolved;
   }
@@ -61,11 +99,11 @@ public class IncidentDto {
     this.isResolved = isResolved;
   }
 
-  public String getActivityId() {
-    return activityId;
+  public String getPayload() {
+    return payload;
   }
 
-  public void setActivityId(String activityId) {
-    this.activityId = activityId;
+  public void setPayload(String payload) {
+    this.payload = payload;
   }
 }

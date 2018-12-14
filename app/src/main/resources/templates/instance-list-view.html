@@ -1,0 +1,38 @@
+{{>layout/header}}
+
+<div class="row">
+	<div class="col-md-12">
+	
+		<span>{{count}} instances</span>
+		
+		<table class="table table-striped">
+			<thead>
+			  <th>Workflow Instance Key</th>
+			  <th>BPMN process id</th>
+			  <th>Workflow Key</th>
+			  <th>State</th>
+				<th>Start Time</th>
+		</thead>
+		
+		{{#instances}}
+			<tr>
+			<td>
+				<a href="/views/instances/{{workflowInstanceKey}}">{{workflowInstanceKey}}</a>
+			</td>
+			<td>{{bpmnProcessId}}</td>
+			<td>
+				<a href="/views/workflows/{{workflowKey}}">{{workflowKey}}</a>
+			</td>
+			<td>{{state}}</td>
+			<td>{{startTime}}</td>
+			</tr>
+		{{/instances}}
+		
+		</table>		
+ 		
+		{{>components/table-pagination}}
+	
+	</div>
+</div>
+
+{{>layout/footer}}

@@ -21,6 +21,10 @@ import io.zeebe.exporter.record.Record;
 import io.zeebe.exporter.record.RecordMetadata;
 import io.zeebe.exporter.record.value.DeploymentRecordValue;
 import io.zeebe.exporter.record.value.IncidentRecordValue;
+import io.zeebe.exporter.record.value.JobRecordValue;
+import io.zeebe.exporter.record.value.MessageRecordValue;
+import io.zeebe.exporter.record.value.MessageSubscriptionRecordValue;
+import io.zeebe.exporter.record.value.TimerRecordValue;
 import io.zeebe.exporter.record.value.WorkflowInstanceRecordValue;
 import io.zeebe.exporter.record.value.deployment.DeployedWorkflow;
 import io.zeebe.exporter.record.value.deployment.DeploymentResource;
@@ -29,10 +33,13 @@ import io.zeebe.protocol.Protocol;
 import io.zeebe.protocol.clientapi.RecordType;
 import io.zeebe.protocol.clientapi.ValueType;
 import io.zeebe.protocol.intent.DeploymentIntent;
+import io.zeebe.protocol.intent.IncidentIntent;
 import io.zeebe.protocol.intent.Intent;
+import io.zeebe.protocol.intent.JobIntent;
+import io.zeebe.protocol.intent.MessageIntent;
+import io.zeebe.protocol.intent.MessageSubscriptionIntent;
+import io.zeebe.protocol.intent.TimerIntent;
 import io.zeebe.protocol.intent.WorkflowInstanceIntent;
-import org.slf4j.Logger;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -41,9 +48,15 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
 
 public class SimpleMonitorExporter implements Exporter {
 
@@ -58,12 +71,12 @@ public class SimpleMonitorExporter implements Exporter {
 
   private static final String INSERT_WORKFLOW_INSTANCE =
       "INSERT INTO WORKFLOW_INSTANCE"
-          + " (ID_, PARTITION_ID_, KEY_, BPMN_PROCESS_ID_, VERSION_, WORKFLOW_KEY_, START_)"
+          + " (ID_, PARTITION_ID_, KEY_, BPMN_PROCESS_ID_, VERSION_, WORKFLOW_KEY_, STATE_, START_)"
           + " VALUES "
-          + "('%s', %d, %d, '%s', %d, %d, %d);";
+          + "('%s', %d, %d, '%s', %d, %d, '%s', %d);";
 
   private static final String UPDATE_WORKFLOW_INSTANCE =
-      "UPDATE WORKFLOW_INSTANCE SET END_ = %d WHERE KEY_ = %d;";
+      "UPDATE WORKFLOW_INSTANCE SET END_ = %d, STATE_ = '%s' WHERE KEY_ = %d;";
 
   private static final String INSERT_ACTIVITY_INSTANCE =
       "INSERT INTO ACTIVITY_INSTANCE"
@@ -73,9 +86,48 @@ public class SimpleMonitorExporter implements Exporter {
 
   private static final String INSERT_INCIDENT =
       "INSERT INTO INCIDENT"
-          + " (ID_, KEY_, INTENT_, WORKFLOW_INSTANCE_KEY_, ACTIVITY_INSTANCE_KEY_, JOB_KEY_, ERROR_TYPE_, ERROR_MSG_, TIMESTAMP_)"
+          + " (ID_, KEY_, WORKFLOW_INSTANCE_KEY_, ACTIVITY_INSTANCE_KEY_, JOB_KEY_, ERROR_TYPE_, ERROR_MSG_, CREATED_)"
           + " VALUES "
-          + "('%s', %d, '%s', %d, %d, %d, '%s', '%s', %d)";
+          + "('%s', %d, %d, %d, %d, '%s', '%s', %d)";
+
+  private static final String UPDATE_INCIDENT =
+      "UPDATE INCIDENT SET RESOLVED_ = %d WHERE KEY_ = %d;";
+
+  private static final String INSERT_JOB =
+      "INSERT INTO JOB"
+          + " (ID_, KEY_, JOB_TYPE_, WORKFLOW_INSTANCE_KEY_, ACTIVITY_INSTANCE_KEY_, STATE_, RETRIES_, TIMESTAMP_)"
+          + " VALUES "
+          + "('%s', %d, '%s', %d, %d, '%s', %d, %d)";
+
+  private static final String UPDATE_JOB =
+      "UPDATE JOB SET STATE_ = '%s', WORKER_ = '%s', RETRIES_ = %d, TIMESTAMP_ = %d WHERE KEY_ = %d;";
+
+  private static final String INSERT_MESSAGE =
+      "INSERT INTO MESSAGE"
+          + " (ID_, KEY_, NAME_, CORRELATION_KEY_, MESSAGE_ID_, PAYLOAD_, STATE_, TIMESTAMP_)"
+          + " VALUES "
+          + "('%s', %d, '%s', '%s', '%s', '%s', '%s', %d)";
+
+  private static final String UPDATE_MESSAGE =
+      "UPDATE MESSAGE SET STATE_ = '%s', TIMESTAMP_ = %d WHERE KEY_ = %d;";
+
+  private static final String INSERT_MESSAGE_SUBSCRIPTION =
+      "INSERT INTO MESSAGE_SUBSCRIPTION"
+          + " (ID_, WORKFLOW_INSTANCE_KEY_, ACTIVITY_INSTANCE_KEY_, MESSAGE_NAME_, CORRELATION_KEY_, STATE_, TIMESTAMP_)"
+          + " VALUES "
+          + "('%s', %d, %d, '%s', '%s', '%s', %d)";
+
+  private static final String UPDATE_MESSAGE_SUBSCRIPTION =
+      "UPDATE MESSAGE_SUBSCRIPTION SET STATE_ = '%s', TIMESTAMP_ = %d WHERE ACTIVITY_INSTANCE_KEY_ = %d and MESSAGE_NAME_ = '%s';";
+
+  private static final String INSERT_TIMER =
+      "INSERT INTO TIMER"
+          + " (ID_, KEY_, ACTIVITY_INSTANCE_KEY_, HANDLER_NODE_ID_, DUE_DATE_, STATE_, TIMESTAMP_)"
+          + " VALUES "
+          + "('%s', %d, %d, '%s', %d, '%s', %d)";
+
+  private static final String UPDATE_TIMER =
+      "UPDATE TIMER SET STATE_ = '%s', TIMESTAMP_ = %d WHERE KEY_ = %d;";
 
   public static final String CREATE_SCHEMA_SQL_PATH = "/CREATE_SCHEMA.sql";
 
@@ -96,6 +148,10 @@ public class SimpleMonitorExporter implements Exporter {
     insertCreatorPerType.put(ValueType.DEPLOYMENT, this::exportDeploymentRecord);
     insertCreatorPerType.put(ValueType.WORKFLOW_INSTANCE, this::exportWorkflowInstanceRecord);
     insertCreatorPerType.put(ValueType.INCIDENT, this::exportIncidentRecord);
+    insertCreatorPerType.put(ValueType.JOB, this::exportJobRecord);
+    insertCreatorPerType.put(ValueType.MESSAGE, this::exportMessageRecord);
+    insertCreatorPerType.put(ValueType.MESSAGE_SUBSCRIPTION, this::exportMessageSubscriptionRecord);
+    insertCreatorPerType.put(ValueType.TIMER, this::exportTimerRecord);
 
     sqlStatements = new ArrayList<>();
   }
@@ -164,7 +220,7 @@ public class SimpleMonitorExporter implements Exporter {
               .lines()
               .collect(Collectors.joining(System.lineSeparator()));
 
-      log.info("Create tables:\n{}", sql);
+      log.debug("Create tables:\n{}", sql);
       statement.executeUpdate(sql);
     } catch (final Exception e) {
       throw new RuntimeException(e);
@@ -277,12 +333,8 @@ public class SimpleMonitorExporter implements Exporter {
       final Intent intent,
       final long timestamp,
       final WorkflowInstanceRecordValue workflowInstanceRecordValue) {
-    final boolean wasWorkflowInstanceStarted = intent == WorkflowInstanceIntent.ELEMENT_ACTIVATED;
-    final boolean wasWorkflowInstanceEnded =
-        intent == WorkflowInstanceIntent.ELEMENT_TERMINATED
-            || intent == WorkflowInstanceIntent.ELEMENT_COMPLETED;
 
-    if (wasWorkflowInstanceStarted) {
+    if (intent == WorkflowInstanceIntent.ELEMENT_ACTIVATED) {
       final String bpmnProcessId = getCleanString(workflowInstanceRecordValue.getBpmnProcessId());
       final int version = workflowInstanceRecordValue.getVersion();
       final long workflowKey = workflowInstanceRecordValue.getWorkflowKey();
@@ -296,11 +348,16 @@ public class SimpleMonitorExporter implements Exporter {
               bpmnProcessId,
               version,
               workflowKey,
+              "Active",
               timestamp);
       sqlStatements.add(insertWorkflowInstanceStatement);
-    } else if (wasWorkflowInstanceEnded) {
+    } else if (intent == WorkflowInstanceIntent.ELEMENT_COMPLETED) {
       final String updateWorkflowInstanceStatement =
-          String.format(UPDATE_WORKFLOW_INSTANCE, timestamp, key);
+          String.format(UPDATE_WORKFLOW_INSTANCE, timestamp, "Completed", key);
+      sqlStatements.add(updateWorkflowInstanceStatement);
+    } else if (intent == WorkflowInstanceIntent.ELEMENT_TERMINATED) {
+      final String updateWorkflowInstanceStatement =
+          String.format(UPDATE_WORKFLOW_INSTANCE, timestamp, "Terminated", key);
       sqlStatements.add(updateWorkflowInstanceStatement);
     }
   }
@@ -335,7 +392,7 @@ public class SimpleMonitorExporter implements Exporter {
 
   private void exportIncidentRecord(final Record record) {
     final long key = record.getKey();
-    final String intent = record.getMetadata().getIntent().name();
+    final Intent intent = record.getMetadata().getIntent();
     final long timestamp = record.getTimestamp().toEpochMilli();
 
     final IncidentRecordValue incidentRecordValue = (IncidentRecordValue) record.getValue();
@@ -345,19 +402,151 @@ public class SimpleMonitorExporter implements Exporter {
     final String errorType = getCleanString(incidentRecordValue.getErrorType());
     final String errorMessage = getCleanString(incidentRecordValue.getErrorMessage());
 
-    final String insertStatement =
-        String.format(
-            INSERT_INCIDENT,
-            createId(),
-            key,
-            intent,
-            workflowInstanceKey,
-            elementInstanceKey,
-            jobKey,
-            errorType,
-            errorMessage,
-            timestamp);
-    sqlStatements.add(insertStatement);
+    if (intent == IncidentIntent.CREATED) {
+      final String insertStatement =
+          String.format(
+              INSERT_INCIDENT,
+              createId(),
+              key,
+              workflowInstanceKey,
+              elementInstanceKey,
+              jobKey,
+              errorType,
+              errorMessage,
+              timestamp);
+      sqlStatements.add(insertStatement);
+    } else if (intent == IncidentIntent.RESOLVED) {
+      final String updateIncidentStatement = String.format(UPDATE_INCIDENT, timestamp, key);
+      sqlStatements.add(updateIncidentStatement);
+    }
+  }
+
+  private void exportJobRecord(final Record record) {
+    final long key = record.getKey();
+    final Intent intent = record.getMetadata().getIntent();
+    final long timestamp = record.getTimestamp().toEpochMilli();
+    final String state = intent.name().toLowerCase();
+
+    final JobRecordValue jobRecord = (JobRecordValue) record.getValue();
+    final String jobType = jobRecord.getType();
+    final long workflowInstanceKey = jobRecord.getHeaders().getWorkflowInstanceKey();
+    final long elementInstanceKey = jobRecord.getHeaders().getElementInstanceKey();
+    final int retries = jobRecord.getRetries();
+    final String worker = jobRecord.getWorker();
+
+    if (intent == JobIntent.CREATED) {
+      final String insertStatement =
+          String.format(
+              INSERT_JOB,
+              createId(),
+              key,
+              jobType,
+              workflowInstanceKey,
+              elementInstanceKey,
+              state,
+              retries,
+              timestamp);
+      sqlStatements.add(insertStatement);
+    } else {
+      final String updateStatement =
+          String.format(UPDATE_JOB, state, worker, retries, timestamp, key);
+      sqlStatements.add(updateStatement);
+    }
+  }
+
+  private void exportMessageRecord(final Record record) {
+    final long key = record.getKey();
+    final Intent intent = record.getMetadata().getIntent();
+    final long timestamp = record.getTimestamp().toEpochMilli();
+    final String state = intent.name().toLowerCase();
+
+    final MessageRecordValue messageRecord = (MessageRecordValue) record.getValue();
+
+    final String name = messageRecord.getName();
+    final String correlationKey = messageRecord.getCorrelationKey();
+    final String messageId = messageRecord.getMessageId();
+    final String payload = messageRecord.getPayload();
+
+    if (intent == MessageIntent.PUBLISHED) {
+      final String insertStatement =
+          String.format(
+              INSERT_MESSAGE,
+              createId(),
+              key,
+              name,
+              correlationKey,
+              messageId,
+              payload,
+              state,
+              timestamp);
+      sqlStatements.add(insertStatement);
+    } else {
+      final String updateStatement = String.format(UPDATE_MESSAGE, state, timestamp, key);
+      sqlStatements.add(updateStatement);
+    }
+  }
+
+  private void exportMessageSubscriptionRecord(final Record record) {
+    final Intent intent = record.getMetadata().getIntent();
+    final long timestamp = record.getTimestamp().toEpochMilli();
+    final String state = intent.name().toLowerCase();
+
+    final MessageSubscriptionRecordValue subscriptionRecord =
+        (MessageSubscriptionRecordValue) record.getValue();
+
+    final String messageName = subscriptionRecord.getMessageName();
+    final String correlationKey = subscriptionRecord.getCorrelationKey();
+    final long workflowInstanceKey = subscriptionRecord.getWorkflowInstanceKey();
+    final long elementInstanceKey = subscriptionRecord.getElementInstanceKey();
+
+    if (intent == MessageSubscriptionIntent.OPENED) {
+      final String insertStatement =
+          String.format(
+              INSERT_MESSAGE_SUBSCRIPTION,
+              createId(),
+              workflowInstanceKey,
+              elementInstanceKey,
+              messageName,
+              correlationKey,
+              state,
+              timestamp);
+      sqlStatements.add(insertStatement);
+    } else {
+      final String updateStatement =
+          String.format(
+              UPDATE_MESSAGE_SUBSCRIPTION, state, timestamp, elementInstanceKey, messageName);
+      sqlStatements.add(updateStatement);
+    }
+  }
+
+  private void exportTimerRecord(final Record record) {
+    final long key = record.getKey();
+    final Intent intent = record.getMetadata().getIntent();
+    final long timestamp = record.getTimestamp().toEpochMilli();
+    final String state = intent.name().toLowerCase();
+
+    final TimerRecordValue timerRecord = (TimerRecordValue) record.getValue();
+
+    final long elementInstanceKey = timerRecord.getElementInstanceKey();
+    final String handlerNodeId = timerRecord.getHandlerFlowNodeId();
+    final long dueDate = timerRecord.getDueDate();
+
+    if (intent == TimerIntent.CREATED) {
+      final String insertStatement =
+          String.format(
+              INSERT_TIMER,
+              createId(),
+              key,
+              elementInstanceKey,
+              handlerNodeId,
+              dueDate,
+              state,
+              timestamp);
+      sqlStatements.add(insertStatement);
+    } else {
+      final String updateStatement = String.format(UPDATE_TIMER, state, timestamp, key);
+      sqlStatements.add(updateStatement);
+    }
   }
 
   private String getCleanString(final String string) {

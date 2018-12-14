@@ -29,9 +29,6 @@ public class IncidentEntity {
   @Column(name = "KEY_")
   private long key;
 
-  @Column(name = "INTENT_")
-  private String intent;
-
   @Column(name = "WORKFLOW_INSTANCE_KEY_")
   private long workflowInstanceKey;
 
@@ -47,8 +44,11 @@ public class IncidentEntity {
   @Column(name = "ERROR_MSG_")
   private String errorMessage;
 
-  @Column(name = "TIMESTAMP_")
-  private long timestamp;
+  @Column(name = "CREATED_")
+  private long created;
+
+  @Column(name = "RESOLVED_")
+  private Long resolved;
 
   public String getErrorType() {
     return errorType;
@@ -100,19 +100,19 @@ public class IncidentEntity {
     this.jobKey = jobKey;
   }
 
-  public String getIntent() {
-    return intent;
+  public long getCreated() {
+    return created;
   }
 
-  public void setIntent(String intent) {
-    this.intent = intent;
+  public void setCreated(long created) {
+    this.created = created;
   }
 
-  public long getTimestamp() {
-    return timestamp;
+  public Long getResolved() {
+    return resolved;
   }
 
-  public void setTimestamp(long timestamp) {
-    this.timestamp = timestamp;
+  public void setResolved(Long resolved) {
+    this.resolved = resolved;
   }
 }

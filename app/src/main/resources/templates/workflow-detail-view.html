@@ -1,0 +1,76 @@
+{{>layout/header}}
+
+{{>modals/create-instance-modal}}
+
+<div class="row">
+
+	<div class="col-md-12 mb-2">
+		
+		<button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#createInstanceModal">
+		  New Instance
+		</button>
+				
+	</div>
+
+	<div class="col-md-2">
+		 		
+ 		<table class="table table-striped">
+		{{#workflow}}
+			<tr>
+				<th>Key</th>
+				<td>{{workflowKey}}</td>
+			</tr>
+			<tr>
+				<th>BPMN process id</th>
+				<td>{{bpmnProcessId}}</td>
+			</tr>
+			<tr>
+				<th>Version</th>
+				<td>{{version}}</td>
+			</tr>
+			<tr>
+				<th># active</th>
+				<td>{{countRunning}}</td>
+			</tr>
+			<tr>
+				<th># ended</th>
+				<td>{{countEnded}}</td>
+			</tr>
+		{{/workflow}}
+		</table>	
+ 		
+	</div>
+
+	<div class="col-md-10">
+		{{>components/bpmn-diagram}}						
+	</div>	
+
+	<div class="col-md-12">
+	
+		<span>{{count}} instances</span>
+	
+		<table class="table table-striped">
+			<thead>
+			  <th>Workflow Instance Key</th>
+			  <th>State</th>
+			  <th>Start Time</th>
+		</thead>
+		
+		{{#instances}}
+			<tr>
+				<td>
+					<a href="/views/instances/{{workflowInstanceKey}}">{{workflowInstanceKey}}</a>
+				</td>
+	  		<td>{{state}}</td>	  	
+	  		<td>{{startTime}}</td>
+	  	</tr>
+		{{/instances}}
+		
+		</table>		
+ 		
+		{{>components/table-pagination}}
+	
+	</div>
+</div>
+
+{{>layout/footer}}

@@ -1,0 +1,20 @@
+<table class="table table-striped">
+	<thead>
+		<th>Element Id</th>
+	  <th>Element Instance Key</th>
+	  <th>Scope Instance Key</th>
+		<th>State</th>
+		<th>Time</th>
+</thead>
+
+{{#instance.auditLogEntries}}
+	<tr>
+		<td>{{elementId}}</td>
+		<td>{{key}}</td>
+		<td>{{scopeInstanceKey}}</td>
+		<td>{{state}}</td>
+		<td>{{timestamp}}</td>
+	</tr>
+{{/instance.auditLogEntries}}
+
+</table>

@@ -15,11 +15,26 @@
  */
 package io.zeebe.monitor.repository;
 
+import io.zeebe.monitor.entity.ElementInstanceStatistics;
 import io.zeebe.monitor.entity.WorkflowEntity;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
-public interface WorkflowRepository extends CrudRepository<WorkflowEntity, String> {
+public interface WorkflowRepository extends PagingAndSortingRepository<WorkflowEntity, String> {
 
   Optional<WorkflowEntity> findByKey(long key);
+
+  @Query(
+      nativeQuery = true,
+      value =
+          "SELECT ACTIVITY_ID_ AS activityId, COUNT(*) AS count "
+              + "FROM ACTIVITY_INSTANCE "
+              + "WHERE WORKFLOW_KEY_ = :key and INTENT_ in (:intents) "
+              + "GROUP BY ACTIVITY_ID_")
+  List<ElementInstanceStatistics> getElementInstanceStatisticsByKeyAndIntentIn(
+      @Param("key") long key, @Param("intents") Collection<String> intents);
 }

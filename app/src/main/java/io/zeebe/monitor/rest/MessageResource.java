@@ -15,31 +15,32 @@
  */
 package io.zeebe.monitor.rest;
 
-import io.zeebe.client.api.commands.BrokerInfo;
 import io.zeebe.monitor.zeebe.ZeebeConnectionService;
-import java.util.List;
+import java.time.Duration;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-@Component
 @RestController
-@RequestMapping("/api/broker")
-public class BrokerResource {
+@RequestMapping("/api/messages")
+public class MessageResource {
 
-  @Autowired private ZeebeConnectionService zeebeConnections;
+  @Autowired private ZeebeConnectionService connections;
 
-  @RequestMapping(path = "/check-connection")
-  public boolean checkConnection() {
-    return zeebeConnections.isConnected();
-  }
+  @RequestMapping(path = "/", method = RequestMethod.POST)
+  public void publishMessage(@RequestBody PublishMessageDto dto) {
 
-  @RequestMapping(path = "/topology")
-  public List<BrokerInfo> getTopology() {
-    final List<BrokerInfo> brokers =
-        zeebeConnections.getClient().newTopologyRequest().send().join().getBrokers();
-
-    return brokers;
+    connections
+        .getClient()
+        .workflowClient()
+        .newPublishMessageCommand()
+        .messageName(dto.getName())
+        .correlationKey(dto.getCorrelationKey())
+        .payload(dto.getPayload())
+        .timeToLive(Duration.parse(dto.getTimeToLive()))
+        .send()
+        .join();
   }
 }

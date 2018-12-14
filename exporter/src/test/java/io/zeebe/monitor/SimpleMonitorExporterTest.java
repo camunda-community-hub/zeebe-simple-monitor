@@ -147,7 +147,7 @@ public class SimpleMonitorExporterTest {
         resultSet.beforeFirst();
         resultSet.next();
 
-        // ID_, PARTITION_ID_, KEY_, BPMN_PROCESS_ID_, VERSION_, WORKFLOW_KEY_, START_, END_
+        // ID_, PARTITION_ID_, KEY_, BPMN_PROCESS_ID_, VERSION_, WORKFLOW_KEY_, STATE_, START_, END_
         final String uuid = resultSet.getString(1);
         UUID.fromString(uuid); // should not thrown an exception
 
@@ -166,10 +166,13 @@ public class SimpleMonitorExporterTest {
         final long workflowKey = resultSet.getLong(6);
         assertThat(workflowKey).isEqualTo(1);
 
-        final long start = resultSet.getLong(7);
+        final String state = resultSet.getString(7);
+        assertThat(state).isEqualTo("Active");
+
+        final long start = resultSet.getLong(8);
         assertThat(start).isGreaterThan(0).isLessThan(Instant.now().toEpochMilli());
 
-        final long end = resultSet.getLong(8);
+        final long end = resultSet.getLong(9);
         assertThat(end).isEqualTo(0);
       }
     }
@@ -225,10 +228,13 @@ public class SimpleMonitorExporterTest {
         final long workflowKey = resultSet.getLong(6);
         assertThat(workflowKey).isEqualTo(1);
 
-        final long start = resultSet.getLong(7);
+        final String state = resultSet.getString(7);
+        assertThat(state).isEqualTo("Terminated");
+
+        final long start = resultSet.getLong(8);
         assertThat(start).isGreaterThan(0).isLessThan(Instant.now().toEpochMilli());
 
-        final long end = resultSet.getLong(8);
+        final long end = resultSet.getLong(9);
         assertThat(end).isGreaterThan(start);
       }
     }

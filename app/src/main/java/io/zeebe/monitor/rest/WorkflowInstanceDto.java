@@ -25,19 +25,28 @@ public class WorkflowInstanceDto {
 
   private String bpmnProcessId;
   private long workflowKey;
-  private int workflowVersion;
+  private int version;
 
-  private boolean ended = false;
+  private String state;
+  private boolean isRunning;
+
+  private String startTime = "";
+  private String endTime = "";
 
   private String payload;
 
-  private List<String> runningActivities = new ArrayList<>();
-  private List<String> endedActivities = new ArrayList<>();
+  private List<ElementInstanceState> elementInstances = new ArrayList<>();
+
+  private List<AuditLogEntry> auditLogEntries = new ArrayList<>();
+
+  private List<String> activeActivities = new ArrayList<>();
+  private List<String> incidentActivities = new ArrayList<>();
   private List<String> takenSequenceFlows = new ArrayList<>();
 
   private List<IncidentDto> incidents = new ArrayList<>();
-
-  private String workflowResource;
+  private List<JobDto> jobs = new ArrayList<>();
+  private List<MessageSubscriptionDto> messageSubscriptions = new ArrayList<>();
+  private List<TimerDto> timers = new ArrayList<>();
 
   public String getPayload() {
     return payload;
@@ -71,45 +80,12 @@ public class WorkflowInstanceDto {
     this.bpmnProcessId = bpmnProcessId;
   }
 
-  public List<String> getRunningActivities() {
-    return runningActivities;
-  }
-
-  public void setRunningActivities(List<String> runningActivities) {
-    this.runningActivities = runningActivities;
-  }
-
-  public List<String> getEndedActivities() {
-    return endedActivities;
-  }
-
-  public void setEndedActivities(List<String> endedActivities) {
-    this.endedActivities = endedActivities;
-  }
-
-  public boolean isEnded() {
-    return ended;
-  }
-
-  public WorkflowInstanceDto setEnded(boolean ended) {
-    this.ended = ended;
-    return this;
-  }
-
   public long getWorkflowKey() {
     return workflowKey;
   }
 
   public void setWorkflowKey(long workflowKey) {
     this.workflowKey = workflowKey;
-  }
-
-  public int getWorkflowVersion() {
-    return workflowVersion;
-  }
-
-  public void setWorkflowVersion(int workflowVersion) {
-    this.workflowVersion = workflowVersion;
   }
 
   public List<String> getTakenSequenceFlows() {
@@ -128,11 +104,99 @@ public class WorkflowInstanceDto {
     this.incidents = incidents;
   }
 
-  public String getWorkflowResource() {
-    return workflowResource;
+  public int getVersion() {
+    return version;
   }
 
-  public void setWorkflowResource(String workflowResource) {
-    this.workflowResource = workflowResource;
+  public void setVersion(int version) {
+    this.version = version;
+  }
+
+  public String getState() {
+    return state;
+  }
+
+  public void setState(String state) {
+    this.state = state;
+  }
+
+  public String getStartTime() {
+    return startTime;
+  }
+
+  public String getEndTime() {
+    return endTime;
+  }
+
+  public void setEndTime(String endTime) {
+    this.endTime = endTime;
+  }
+
+  public void setStartTime(String startTime) {
+    this.startTime = startTime;
+  }
+
+  public List<ElementInstanceState> getElementInstances() {
+    return elementInstances;
+  }
+
+  public void setElementInstances(List<ElementInstanceState> elementInstances) {
+    this.elementInstances = elementInstances;
+  }
+
+  public List<AuditLogEntry> getAuditLogEntries() {
+    return auditLogEntries;
+  }
+
+  public void setAuditLogEntries(List<AuditLogEntry> auditLogEntries) {
+    this.auditLogEntries = auditLogEntries;
+  }
+
+  public boolean isRunning() {
+    return isRunning;
+  }
+
+  public void setRunning(boolean isRunning) {
+    this.isRunning = isRunning;
+  }
+
+  public List<String> getActiveActivities() {
+    return activeActivities;
+  }
+
+  public void setActiveActivities(List<String> activeActivities) {
+    this.activeActivities = activeActivities;
+  }
+
+  public List<String> getIncidentActivities() {
+    return incidentActivities;
+  }
+
+  public void setIncidentActivities(List<String> incidentActivities) {
+    this.incidentActivities = incidentActivities;
+  }
+
+  public List<JobDto> getJobs() {
+    return jobs;
+  }
+
+  public void setJobs(List<JobDto> jobs) {
+    this.jobs = jobs;
+  }
+
+  public List<MessageSubscriptionDto> getMessageSubscriptions() {
+    return messageSubscriptions;
+  }
+
+  public void setMessageSubscriptions(List<MessageSubscriptionDto> messageSubscriptions) {
+    this.messageSubscriptions = messageSubscriptions;
+  }
+
+  public List<TimerDto> getTimers() {
+    return timers;
+  }
+
+  public void setTimers(List<TimerDto> timers) {
+    this.timers = timers;
   }
 }
