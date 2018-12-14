@@ -1,0 +1,43 @@
+<table class="table table-striped">
+	<thead>
+	  <th>Element Id</th>
+	  <th>Element Instance Key</th>
+		<th>Job Key</th>
+	 	<th>Job Type</th>
+	 	<th>Retries</th>
+		<th>Job Worker</th>
+	 	<th>State</th>
+	  <th>Time</th>
+		<th> </th>
+</thead>
+
+{{#instance.jobs}}
+	<tr>
+		<td>{{activityId}}</td>
+		<td>{{activityInstanceKey}}</td>
+		<td>{{key}}</td>
+		<td>{{jobType}}</td>
+		<td>{{retries}}</td>
+		<td>{{worker}}</td>
+		<td>{{state}}</td>
+		<td>{{timestamp}}</td>
+		<td>		
+			 {{#isActivatable}}
+			 
+			 		{{>modals/complete-job-modal}}			 		
+			 		{{>modals/fail-job-modal}}
+			 
+			 		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#completeJobModal-{{key}}">
+				  	Complete
+					</button>
+					
+					<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#failJobModal-{{key}}">
+				  	Fail
+					</button>	
+					
+			 {{/isActivatable}}			
+		</td>
+	</tr>
+{{/instance.jobs}}
+
+</table>

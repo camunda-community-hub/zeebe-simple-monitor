@@ -201,6 +201,72 @@ function cancelInstance(key) {
 
 // --------------------------------------------------------------------
 
+function completeJob(jobKey) {
+		
+		$.ajax({
+	             type : 'PUT',
+	             url: '/api/jobs/' + jobKey + '/complete',
+	             data:  document.getElementById("payload-" + jobKey).value,
+	             contentType: 'application/json; charset=utf-8',
+	             success: function (result) {
+	             	showSuccess("Job completed.");	
+	             },
+	             error: function (xhr, ajaxOptions, thrownError) {
+	            	 showErrorResonse(xhr, ajaxOptions, thrownError);
+	             },
+            	 timeout: 5000,
+	             crossDomain: true,
+	    });
+}
+
+// --------------------------------------------------------------------
+
+function failJob(jobKey) {
+		
+		$.ajax({
+	             type : 'PUT',
+	             url: '/api/jobs/' + jobKey + '/fail',
+	             contentType: 'application/json; charset=utf-8',
+	             success: function (result) {
+	             	showSuccess("Job failed.");	
+	             },
+	             error: function (xhr, ajaxOptions, thrownError) {
+	            	 showErrorResonse(xhr, ajaxOptions, thrownError);
+	             },
+            	 timeout: 5000,
+	             crossDomain: true,
+	    });
+}
+
+// --------------------------------------------------------------------
+
+function publishMessage() {
+
+		var data = {
+			name: document.getElementById("message-name").value,
+			correlationKey: document.getElementById("message-correlation-key").value,
+			payload: document.getElementById("message-payload").value,
+			timeToLive: document.getElementById("message-ttl").value
+		};
+		
+		$.ajax({
+	             type : 'POST',
+	             url: '/api/messages/',
+	             data:  JSON.stringify(data),
+	             contentType: 'application/json; charset=utf-8',
+	             success: function (result) {
+	             	showSuccess("Message published.");	
+	             },
+	             error: function (xhr, ajaxOptions, thrownError) {
+	            	 showErrorResonse(xhr, ajaxOptions, thrownError);
+	             },
+            	 timeout: 5000,
+	             crossDomain: true,
+	    });
+}
+
+// --------------------------------------------------------------------
+
 function loadDiagram(resource) {
 	viewer.importXML(resource, function(err) {
 							if (err) {

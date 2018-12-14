@@ -30,12 +30,12 @@
 		
 		// zoom to fit full viewport
 		canvas.zoom('fit-viewport');
+
+		{{#instance.elementInstances}}
+			addElementInstanceCounter(overlays, '{{elementId}}', {{activeInstances}}, {{endedInstances}});
+		{{/instance.elementInstances}}
 		
 		{{#instance}}
-			
-			{{#elementInstances}}
-				addElementInstanceCounter(overlays, '{{elementId}}', {{activeInstances}}, {{endedInstances}});
-			{{/elementInstances}}
 			
 			{{#activeActivities}}
 				var elementId = "{{.}}";

@@ -1,0 +1,46 @@
+<div class="modal fade" id="publishMessageModal" tabindex="-1" role="dialog" aria-labelledby="publishMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">New Message</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+      
+      	<div class="form-group">
+          <label class="col-form-label">Message Name</label>
+          <input id="message-name" class="form-control" type="text"
+          	{{#messageName}}value="{{.}}"{{/messageName}} />
+        </div>
+        
+        <div class="form-group">
+          <label class="col-form-label">Correlation Key</label>
+          <input id="message-correlation-key" class="form-control" type="text"
+          	{{#correlationKey}}value="{{.}}"{{/correlationKey}} />
+        </div>
+      
+      	<div class="form-group">
+          <label class="col-form-label">Payload</label>
+          <textarea id="message-payload" class="form-control" style="height:150px; overflow: auto;">{}</textarea>
+        </div>
+      
+     	 <div class="form-group">
+          <label class="col-form-label">Time-to-Live</label>
+          <input id="message-ttl" class="form-control" type="text" value="PT0S"></input>
+        </div>
+      
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      
+      	<button type="button" class="btn btn-primary"  data-dismiss="modal" onclick="publishMessage()">Publish</button>
+    	</div>
+      
+    </div>
+  </div>
+</div>

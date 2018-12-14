@@ -1,11 +1,20 @@
 package io.zeebe.monitor.rest;
 
 import io.zeebe.monitor.entity.ActivityInstanceEntity;
+import io.zeebe.monitor.entity.ElementInstanceStatistics;
 import io.zeebe.monitor.entity.IncidentEntity;
+import io.zeebe.monitor.entity.JobEntity;
+import io.zeebe.monitor.entity.MessageEntity;
+import io.zeebe.monitor.entity.MessageSubscriptionEntity;
+import io.zeebe.monitor.entity.TimerEntity;
 import io.zeebe.monitor.entity.WorkflowEntity;
 import io.zeebe.monitor.entity.WorkflowInstanceEntity;
 import io.zeebe.monitor.repository.ActivityInstanceRepository;
 import io.zeebe.monitor.repository.IncidentRepository;
+import io.zeebe.monitor.repository.JobRepository;
+import io.zeebe.monitor.repository.MessageRepository;
+import io.zeebe.monitor.repository.MessageSubscriptionRepository;
+import io.zeebe.monitor.repository.TimerRepository;
 import io.zeebe.monitor.repository.WorkflowInstanceRepository;
 import io.zeebe.monitor.repository.WorkflowRepository;
 import java.time.Instant;
@@ -14,6 +23,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +54,14 @@ public class ViewController {
   @Autowired private ActivityInstanceRepository activityInstanceRepository;
 
   @Autowired private IncidentRepository incidentRepository;
+
+  @Autowired private JobRepository jobRepository;
+
+  @Autowired private MessageRepository messageRepository;
+
+  @Autowired private MessageSubscriptionRepository messageSubscriptionRepository;
+
+  @Autowired private TimerRepository timerRepository;
 
   @GetMapping("/")
   public String index(Map<String, Object> model, Pageable pageable) {
@@ -89,6 +107,10 @@ public class ViewController {
             workflow -> {
               model.put("workflow", toDto(workflow));
               model.put("resource", workflow.getResource());
+
+              final List<ElementInstanceState> elementInstanceStates =
+                  getElementInstanceStates(key);
+              model.put("instance.elementInstances", elementInstanceStates);
             });
 
     final long count = workflowInstanceRepository.countByWorkflowKey(key);
@@ -105,6 +127,43 @@ public class ViewController {
     addPaginationToModel(model, pageable, count);
 
     return "workflow-detail-view";
+  }
+
+  private List<ElementInstanceState> getElementInstanceStates(long key) {
+
+    final List<ElementInstanceStatistics> elementEnteredStatistics =
+        workflowRepository.getElementInstanceStatisticsByKeyAndIntentIn(
+            key, WORKFLOW_INSTANCE_ENTERED_INTENTS);
+
+    final Map<String, Long> elementCompletedCount =
+        workflowRepository
+            .getElementInstanceStatisticsByKeyAndIntentIn(key, WORKFLOW_INSTANCE_COMPLETED_INTENTS)
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    ElementInstanceStatistics::getActivityId, ElementInstanceStatistics::getCount));
+
+    final List<ElementInstanceState> elementInstanceStates =
+        elementEnteredStatistics
+            .stream()
+            .map(
+                s -> {
+                  final ElementInstanceState state = new ElementInstanceState();
+
+                  final String activityId = s.getActivityId();
+                  state.setElementId(activityId);
+
+                  final long completedInstances =
+                      elementCompletedCount.getOrDefault(activityId, 0L);
+                  long enteredInstances = s.getCount();
+
+                  state.setActiveInstances(enteredInstances - completedInstances);
+                  state.setEndedInstances(completedInstances);
+
+                  return state;
+                })
+            .collect(Collectors.toList());
+    return elementInstanceStates;
   }
 
   private WorkflowInstanceListDto toDto(WorkflowInstanceEntity instance) {
@@ -344,6 +403,50 @@ public class ViewController {
     activeActivities.removeAll(activitiesWitIncidents);
     dto.setActiveActivities(activeActivities);
 
+    final List<JobDto> jobDtos =
+        jobRepository
+            .findByWorkflowInstanceKey(instance.getKey())
+            .stream()
+            .map(
+                job -> {
+                  final JobDto jobDto = toDto(job);
+                  jobDto.setActivityId(
+                      elementIdsForKeys.getOrDefault(job.getActivityInstanceKey(), ""));
+
+                  final boolean isActivatable =
+                      job.getRetries() > 0
+                          && Arrays.asList("created", "failed", "timed_out", "retries_updated")
+                              .contains(job.getState());
+                  jobDto.setActivatable(isActivatable);
+
+                  return jobDto;
+                })
+            .collect(Collectors.toList());
+    dto.setJobs(jobDtos);
+
+    final List<MessageSubscriptionDto> messageSubscriptions =
+        messageSubscriptionRepository
+            .findByWorkflowInstanceKey(instance.getKey())
+            .stream()
+            .map(
+                subscription -> {
+                  final MessageSubscriptionDto subscriptionDto = toDto(subscription);
+                  subscriptionDto.setActivityId(
+                      elementIdsForKeys.getOrDefault(subscriptionDto.getActivityInstanceKey(), ""));
+
+                  return subscriptionDto;
+                })
+            .collect(Collectors.toList());
+    dto.setMessageSubscriptions(messageSubscriptions);
+
+    final List<TimerDto> timers =
+        timerRepository
+            .findByActivityInstanceKeyIn(elementIdsForKeys.keySet())
+            .stream()
+            .map(timer -> toDto(timer))
+            .collect(Collectors.toList());
+    dto.setTimers(timers);
+
     return dto;
   }
 
@@ -394,6 +497,102 @@ public class ViewController {
     } else {
       dto.setState("Created");
     }
+
+    return dto;
+  }
+
+  @GetMapping("/views/jobs")
+  public String jobList(Map<String, Object> model, Pageable pageable) {
+
+    final long count = jobRepository.countByStateNot("completed");
+
+    final List<JobDto> dtos = new ArrayList<>();
+    for (JobEntity jobEntity : jobRepository.findByStateNot("completed", pageable)) {
+      final JobDto dto = toDto(jobEntity);
+      dtos.add(dto);
+    }
+
+    model.put("jobs", dtos);
+    model.put("count", count);
+
+    addPaginationToModel(model, pageable, count);
+
+    return "job-list-view";
+  }
+
+  private JobDto toDto(JobEntity job) {
+    final JobDto dto = new JobDto();
+
+    dto.setKey(job.getKey());
+    dto.setJobType(job.getJobType());
+    dto.setWorkflowInstanceKey(job.getWorkflowInstanceKey());
+    dto.setActivityInstanceKey(job.getActivityInstanceKey());
+    dto.setState(job.getState());
+    dto.setRetries(job.getRetries());
+    Optional.ofNullable(job.getWorker()).ifPresent(dto::setWorker);
+    dto.setTimestamp(Instant.ofEpochMilli(job.getTimestamp()).toString());
+
+    return dto;
+  }
+
+  @GetMapping("/views/messages")
+  public String messageList(Map<String, Object> model, Pageable pageable) {
+
+    final long count = messageRepository.count();
+
+    final List<MessageDto> dtos = new ArrayList<>();
+    for (MessageEntity messageEntity : messageRepository.findAll(pageable)) {
+      final MessageDto dto = toDto(messageEntity);
+      dtos.add(dto);
+    }
+
+    model.put("messages", dtos);
+    model.put("count", count);
+
+    addPaginationToModel(model, pageable, count);
+
+    return "message-list-view";
+  }
+
+  private MessageDto toDto(MessageEntity message) {
+    final MessageDto dto = new MessageDto();
+
+    dto.setKey(message.getKey());
+    dto.setName(message.getName());
+    dto.setCorrelationKey(message.getCorrelationKey());
+    dto.setMessageId(message.getMessageId());
+    dto.setPayload(message.getPayload());
+    dto.setState(message.getState());
+    dto.setTimestamp(Instant.ofEpochMilli(message.getTimestamp()).toString());
+
+    return dto;
+  }
+
+  private MessageSubscriptionDto toDto(MessageSubscriptionEntity subscription) {
+    final MessageSubscriptionDto dto = new MessageSubscriptionDto();
+
+    dto.setMessageName(subscription.getMessageName());
+    dto.setCorrelationKey(subscription.getCorrelationKey());
+
+    dto.setWorkflowInstanceKey(subscription.getWorkflowInstanceKey());
+    dto.setActivityInstanceKey(subscription.getActivityInstanceKey());
+
+    dto.setState(subscription.getState());
+    dto.setTimestamp(Instant.ofEpochMilli(subscription.getTimestamp()).toString());
+
+    dto.setOpen(subscription.getState().equals("opened"));
+
+    return dto;
+  }
+
+  private TimerDto toDto(TimerEntity timer) {
+    final TimerDto dto = new TimerDto();
+
+    dto.setActivityInstanceKey(timer.getActivityInstanceKey());
+    dto.setActivityId(timer.getHandlerNodeId());
+    dto.setState(timer.getState());
+    dto.setDueDate(Instant.ofEpochMilli(timer.getDueDate()).toString());
+    dto.setTimestamp(Instant.ofEpochMilli(timer.getTimestamp()).toString());
 
     return dto;
   }
