@@ -31,6 +31,11 @@ public class SimpleMonitorExporterConfiguration {
    */
   int batchTimerMilli = 1000;
 
+  /**
+   * By default we are creating schema tables. Specify createSchema = false to disable table creation and assume they already exist.
+   */
+  boolean createSchema = true;
+
   @Override
   public String toString() {
     return "SimpleMonitorExporterConfiguration{"
@@ -44,6 +49,8 @@ public class SimpleMonitorExporterConfiguration {
         + batchSize
         + ", batchTimerMilli="
         + batchTimerMilli
+        + ", createSchema="
+        + createSchema
         + '}';
   }
 }

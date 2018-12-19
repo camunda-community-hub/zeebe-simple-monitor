@@ -211,6 +211,10 @@ public class SimpleMonitorExporter implements Exporter {
   }
 
   private void createTables() {
+    if (!configuration.createSchema) {
+      return;
+    }
+
     try (final Statement statement = connection.createStatement()) {
 
       final InputStream resourceAsStream =
