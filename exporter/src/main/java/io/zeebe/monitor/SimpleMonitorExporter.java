@@ -21,6 +21,7 @@ import io.zeebe.exporter.record.Record;
 import io.zeebe.exporter.record.RecordMetadata;
 import io.zeebe.exporter.record.value.DeploymentRecordValue;
 import io.zeebe.exporter.record.value.IncidentRecordValue;
+import io.zeebe.exporter.record.value.JobBatchRecordValue;
 import io.zeebe.exporter.record.value.JobRecordValue;
 import io.zeebe.exporter.record.value.MessageRecordValue;
 import io.zeebe.exporter.record.value.MessageSubscriptionRecordValue;
@@ -35,6 +36,7 @@ import io.zeebe.protocol.clientapi.ValueType;
 import io.zeebe.protocol.intent.DeploymentIntent;
 import io.zeebe.protocol.intent.IncidentIntent;
 import io.zeebe.protocol.intent.Intent;
+import io.zeebe.protocol.intent.JobBatchIntent;
 import io.zeebe.protocol.intent.JobIntent;
 import io.zeebe.protocol.intent.MessageIntent;
 import io.zeebe.protocol.intent.MessageSubscriptionIntent;
@@ -129,6 +131,15 @@ public class SimpleMonitorExporter implements Exporter {
   private static final String UPDATE_TIMER =
       "UPDATE TIMER SET STATE_ = '%s', TIMESTAMP_ = %d WHERE KEY_ = %d;";
 
+  private static final String INSERT_WORKER =
+      "INSERT INTO WORKER"
+          + " (ID_, WORKER_, JOB_TYPE_, TIMESTAMP_)"
+          + " VALUES "
+          + "('%s', '%s', '%s', %d)";
+
+  private static final String REMOVE_WORKER =
+      "DELETE FROM WORKER WHERE WORKER_ = '%s' and JOB_TYPE_ = '%s' and TIMESTAMP_ < %d;";
+
   public static final String CREATE_SCHEMA_SQL_PATH = "/CREATE_SCHEMA.sql";
 
   private final Map<ValueType, Consumer<Record>> insertCreatorPerType = new HashMap<>();
@@ -152,6 +163,7 @@ public class SimpleMonitorExporter implements Exporter {
     insertCreatorPerType.put(ValueType.MESSAGE, this::exportMessageRecord);
     insertCreatorPerType.put(ValueType.MESSAGE_SUBSCRIPTION, this::exportMessageSubscriptionRecord);
     insertCreatorPerType.put(ValueType.TIMER, this::exportTimerRecord);
+    insertCreatorPerType.put(ValueType.JOB_BATCH, this::exportJobBatchRecord);
 
     sqlStatements = new ArrayList<>();
   }
@@ -550,6 +562,25 @@ public class SimpleMonitorExporter implements Exporter {
     } else {
       final String updateStatement = String.format(UPDATE_TIMER, state, timestamp, key);
       sqlStatements.add(updateStatement);
+    }
+  }
+
+  private void exportJobBatchRecord(final Record record) {
+    final Intent intent = record.getMetadata().getIntent();
+    final long timestamp = record.getTimestamp().toEpochMilli();
+
+    final JobBatchRecordValue jobBatch = (JobBatchRecordValue) record.getValue();
+
+    final String worker = jobBatch.getWorker();
+    final String jobType = jobBatch.getType();
+
+    if (intent == JobBatchIntent.ACTIVATED) {
+      final String insertStatement =
+          String.format(INSERT_WORKER, createId(), worker, jobType, timestamp);
+      sqlStatements.add(insertStatement);
+
+      final String removeStatement = String.format(REMOVE_WORKER, worker, jobType, timestamp);
+      sqlStatements.add(removeStatement);
     }
   }
 

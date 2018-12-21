@@ -15,21 +15,7 @@
  */
 package io.zeebe.monitor.repository;
 
-import io.zeebe.monitor.entity.JobEntity;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import io.zeebe.monitor.entity.WorkerEntity;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface JobRepository extends PagingAndSortingRepository<JobEntity, String> {
-
-  List<JobEntity> findByWorkflowInstanceKey(long workflowInstanceKey);
-
-  Optional<JobEntity> findByKey(long key);
-
-  Page<JobEntity> findByStateNotIn(Collection<String> state, Pageable pageable);
-
-  long countByStateNotIn(Collection<String> state);
-}
+public interface WorkerRepository extends PagingAndSortingRepository<WorkerEntity, String> {}
