@@ -7,6 +7,7 @@ import io.zeebe.monitor.entity.JobEntity;
 import io.zeebe.monitor.entity.MessageEntity;
 import io.zeebe.monitor.entity.MessageSubscriptionEntity;
 import io.zeebe.monitor.entity.TimerEntity;
+import io.zeebe.monitor.entity.WorkerEntity;
 import io.zeebe.monitor.entity.WorkflowEntity;
 import io.zeebe.monitor.entity.WorkflowInstanceEntity;
 import io.zeebe.monitor.repository.ActivityInstanceRepository;
@@ -15,6 +16,7 @@ import io.zeebe.monitor.repository.JobRepository;
 import io.zeebe.monitor.repository.MessageRepository;
 import io.zeebe.monitor.repository.MessageSubscriptionRepository;
 import io.zeebe.monitor.repository.TimerRepository;
+import io.zeebe.monitor.repository.WorkerRepository;
 import io.zeebe.monitor.repository.WorkflowInstanceRepository;
 import io.zeebe.monitor.repository.WorkflowRepository;
 import java.time.Instant;
@@ -47,6 +49,8 @@ public class ViewController {
           "END_EVENT_OCCURRED",
           "GATEWAY_ACTIVATED");
 
+  private static final List<String> JOB_COMPLETED_INTENTS = Arrays.asList("completed", "canceled");
+
   @Autowired private WorkflowRepository workflowRepository;
 
   @Autowired private WorkflowInstanceRepository workflowInstanceRepository;
@@ -62,6 +66,8 @@ public class ViewController {
   @Autowired private MessageSubscriptionRepository messageSubscriptionRepository;
 
   @Autowired private TimerRepository timerRepository;
+
+  @Autowired private WorkerRepository workerRepository;
 
   @GetMapping("/")
   public String index(Map<String, Object> model, Pageable pageable) {
@@ -504,10 +510,10 @@ public class ViewController {
   @GetMapping("/views/jobs")
   public String jobList(Map<String, Object> model, Pageable pageable) {
 
-    final long count = jobRepository.countByStateNot("completed");
+    final long count = jobRepository.countByStateNotIn(JOB_COMPLETED_INTENTS);
 
     final List<JobDto> dtos = new ArrayList<>();
-    for (JobEntity jobEntity : jobRepository.findByStateNot("completed", pageable)) {
+    for (JobEntity jobEntity : jobRepository.findByStateNotIn(JOB_COMPLETED_INTENTS, pageable)) {
       final JobDto dto = toDto(jobEntity);
       dtos.add(dto);
     }
@@ -594,6 +600,33 @@ public class ViewController {
     dto.setDueDate(Instant.ofEpochMilli(timer.getDueDate()).toString());
     dto.setTimestamp(Instant.ofEpochMilli(timer.getTimestamp()).toString());
 
+    return dto;
+  }
+
+  @GetMapping("/views/workers")
+  public String workerList(Map<String, Object> model, Pageable pageable) {
+
+    final long count = workerRepository.count();
+
+    final List<WorkerDto> dtos = new ArrayList<>();
+    for (WorkerEntity entity : workerRepository.findAll(pageable)) {
+      final WorkerDto dto = toDto(entity);
+      dtos.add(dto);
+    }
+
+    model.put("workers", dtos);
+    model.put("count", count);
+
+    addPaginationToModel(model, pageable, count);
+
+    return "worker-list-view";
+  }
+
+  private WorkerDto toDto(WorkerEntity entity) {
+    final WorkerDto dto = new WorkerDto();
+    dto.setWorker(entity.getWorker());
+    dto.setJobType(entity.getJobType());
+    dto.setLastPollRequest(Instant.ofEpochMilli(entity.getTimestamp()).toString());
     return dto;
   }
 
