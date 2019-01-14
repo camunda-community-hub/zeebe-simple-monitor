@@ -28,6 +28,7 @@ services:
     image: camunda/zeebe-simple-monitor:latest
     environment:
       - spring.datasource.url=jdbc:h2:tcp://db:1521/zeebe-monitor
+      - io.zeebe.monitor.connectionString=zeebe:26500
     ports:
       - "8080:8080"
     depends_on:
