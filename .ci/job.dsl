@@ -129,7 +129,7 @@ def releaseProperties = [
     pushChanges: '${PUSH_CHANGES}',
     remoteTagging: '${PUSH_CHANGES}',
     localCheckout: '${USE_LOCAL_CHECKOUT}',
-    arguments: '--settings=${NEXUS_SETTINGS} -DskipTests=true -Dgpg.passphrase="${GPG_PASSPHRASE}" -Dskip.central.release=${SKIP_DEPLOY_TO_MAVEN_CENTRAL} -Dskip.camunda.release=${SKIP_DEPLOY_TO_CAMUNDA_NEXUS}',
+    arguments: '--settings=${NEXUS_SETTINGS} -Dgpg.passphrase="${GPG_PASSPHRASE}" -Dskip.central.release=${SKIP_DEPLOY_TO_MAVEN_CENTRAL} -Dskip.camunda.release=${SKIP_DEPLOY_TO_CAMUNDA_NEXUS}',
 ]
 
 
