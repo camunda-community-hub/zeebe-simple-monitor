@@ -15,7 +15,7 @@
  */
 package io.zeebe.monitor.rest;
 
-import io.zeebe.client.api.clients.WorkflowClient;
+import io.zeebe.client.ZeebeClient;
 import io.zeebe.client.api.commands.DeployWorkflowCommandStep1.DeployWorkflowCommandBuilderStep2;
 import io.zeebe.monitor.zeebe.ZeebeConnectionService;
 import java.io.UnsupportedEncodingException;
@@ -39,7 +39,6 @@ public class WorkflowResource {
 
     connections
         .getClient()
-        .workflowClient()
         .newCreateInstanceCommand()
         .workflowKey(workflowKey)
         .payload(payload)
@@ -51,7 +50,7 @@ public class WorkflowResource {
   public void uploadModel(@RequestBody DeploymentDto deployment)
       throws UnsupportedEncodingException {
 
-    final WorkflowClient workflowClient = connections.getClient().workflowClient();
+    final ZeebeClient client = connections.getClient();
 
     final List<FileDto> files = deployment.getFiles();
     if (files.isEmpty()) {
@@ -61,9 +60,7 @@ public class WorkflowResource {
     final FileDto firstFile = files.get(0);
 
     final DeployWorkflowCommandBuilderStep2 cmd =
-        workflowClient
-            .newDeployCommand()
-            .addResourceBytes(firstFile.getContent(), firstFile.getFilename());
+        client.newDeployCommand().addResourceBytes(firstFile.getContent(), firstFile.getFilename());
 
     for (FileDto file : files.subList(1, files.size())) {
       cmd.addResourceBytes(file.getContent(), file.getFilename());

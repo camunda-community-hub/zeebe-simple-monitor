@@ -32,8 +32,8 @@ public class IncidentEntity {
   @Column(name = "WORKFLOW_INSTANCE_KEY_")
   private long workflowInstanceKey;
 
-  @Column(name = "ACTIVITY_INSTANCE_KEY_")
-  private long activityInstanceKey;
+  @Column(name = "ELEMENT_INSTANCE_KEY_")
+  private long elementInstanceKey;
 
   @Column(name = "JOB_KEY_")
   private long jobKey;
@@ -84,12 +84,12 @@ public class IncidentEntity {
     this.workflowInstanceKey = workflowInstanceKey;
   }
 
-  public long getActivityInstanceKey() {
-    return activityInstanceKey;
+  public long getElementInstanceKey() {
+    return elementInstanceKey;
   }
 
-  public void setActivityInstanceKey(long activityInstanceKey) {
-    this.activityInstanceKey = activityInstanceKey;
+  public void setElementInstanceKey(long elementInstanceKey) {
+    this.elementInstanceKey = elementInstanceKey;
   }
 
   public long getJobKey() {

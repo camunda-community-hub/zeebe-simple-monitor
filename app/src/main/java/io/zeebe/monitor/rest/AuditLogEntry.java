@@ -3,7 +3,7 @@ package io.zeebe.monitor.rest;
 public class AuditLogEntry {
 
   private long key;
-  private long scopeInstanceKey;
+  private long flowScopeKey;
 
   private String elementId;
 
@@ -20,12 +20,12 @@ public class AuditLogEntry {
     this.key = key;
   }
 
-  public long getScopeInstanceKey() {
-    return scopeInstanceKey;
+  public long getFlowScopeKey() {
+    return flowScopeKey;
   }
 
-  public void setScopeInstanceKey(long scopeInstanceKey) {
-    this.scopeInstanceKey = scopeInstanceKey;
+  public void setFlowScopeKey(long flowScopeKey) {
+    this.flowScopeKey = flowScopeKey;
   }
 
   public String getElementId() {

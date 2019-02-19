@@ -32,8 +32,8 @@ public class JobEntity {
   @Column(name = "WORKFLOW_INSTANCE_KEY_")
   private long workflowInstanceKey;
 
-  @Column(name = "ACTIVITY_INSTANCE_KEY_")
-  private long activityInstanceKey;
+  @Column(name = "ELEMENT_INSTANCE_KEY_")
+  private long elementInstanceKey;
 
   @Column(name = "JOB_TYPE_")
   private String jobType;
@@ -74,12 +74,12 @@ public class JobEntity {
     this.workflowInstanceKey = workflowInstanceKey;
   }
 
-  public long getActivityInstanceKey() {
-    return activityInstanceKey;
+  public long getElementInstanceKey() {
+    return elementInstanceKey;
   }
 
-  public void setActivityInstanceKey(long activityInstanceKey) {
-    this.activityInstanceKey = activityInstanceKey;
+  public void setElementInstanceKey(long elementInstanceKey) {
+    this.elementInstanceKey = elementInstanceKey;
   }
 
   public String getJobType() {

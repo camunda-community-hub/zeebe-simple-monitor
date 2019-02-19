@@ -19,8 +19,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-@Entity(name = "ACTIVITY_INSTANCE")
-public class ActivityInstanceEntity {
+@Entity(name = "ELEMENT_INSTANCE")
+public class ElementInstanceEntity {
 
   @Id
   @Column(name = "ID_")
@@ -38,11 +38,11 @@ public class ActivityInstanceEntity {
   @Column(name = "WORKFLOW_INSTANCE_KEY_")
   private long workflowInstanceKey;
 
-  @Column(name = "ACTIVITY_ID_")
-  private String activityId;
+  @Column(name = "ELEMENT_ID_")
+  private String elementId;
 
-  @Column(name = "SCOPE_INSTANCE_KEY_")
-  private long scopeInstanceKey;
+  @Column(name = "FLOW_SCOPE_KEY_")
+  private long flowScopeKey;
 
   @Column(name = "PAYLOAD_")
   private String payload;
@@ -77,20 +77,20 @@ public class ActivityInstanceEntity {
     this.timestamp = timestamp;
   }
 
-  public String getActivityId() {
-    return activityId;
+  public String getElementId() {
+    return elementId;
   }
 
-  public void setActivityId(String activityId) {
-    this.activityId = activityId;
+  public void setElementId(String elementId) {
+    this.elementId = elementId;
   }
 
-  public long getScopeInstanceKey() {
-    return scopeInstanceKey;
+  public long getFlowScopeKey() {
+    return flowScopeKey;
   }
 
-  public void setScopeInstanceKey(long scopeInstanceKey) {
-    this.scopeInstanceKey = scopeInstanceKey;
+  public void setFlowScopeKey(long flowScopeKey) {
+    this.flowScopeKey = flowScopeKey;
   }
 
   public String getPayload() {

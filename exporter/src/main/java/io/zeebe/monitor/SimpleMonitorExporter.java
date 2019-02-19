@@ -80,15 +80,15 @@ public class SimpleMonitorExporter implements Exporter {
   private static final String UPDATE_WORKFLOW_INSTANCE =
       "UPDATE WORKFLOW_INSTANCE SET END_ = %d, STATE_ = '%s' WHERE KEY_ = %d;";
 
-  private static final String INSERT_ACTIVITY_INSTANCE =
-      "INSERT INTO ACTIVITY_INSTANCE"
-          + " (ID_, PARTITION_ID_, KEY_, INTENT_, WORKFLOW_INSTANCE_KEY_, ACTIVITY_ID_, SCOPE_INSTANCE_KEY_, PAYLOAD_, WORKFLOW_KEY_, TIMESTAMP_)"
+  private static final String INSERT_ELEMENT_INSTANCE =
+      "INSERT INTO ELEMENT_INSTANCE"
+          + " (ID_, PARTITION_ID_, KEY_, INTENT_, WORKFLOW_INSTANCE_KEY_, ELEMENT_ID_, FLOW_SCOPE_KEY_, PAYLOAD_, WORKFLOW_KEY_, TIMESTAMP_)"
           + " VALUES "
           + "('%s', %d, %d, '%s', %d, '%s', %d, '%s', %d, %d);";
 
   private static final String INSERT_INCIDENT =
       "INSERT INTO INCIDENT"
-          + " (ID_, KEY_, WORKFLOW_INSTANCE_KEY_, ACTIVITY_INSTANCE_KEY_, JOB_KEY_, ERROR_TYPE_, ERROR_MSG_, CREATED_)"
+          + " (ID_, KEY_, WORKFLOW_INSTANCE_KEY_, ELEMENT_INSTANCE_KEY_, JOB_KEY_, ERROR_TYPE_, ERROR_MSG_, CREATED_)"
           + " VALUES "
           + "('%s', %d, %d, %d, %d, '%s', '%s', %d)";
 
@@ -97,7 +97,7 @@ public class SimpleMonitorExporter implements Exporter {
 
   private static final String INSERT_JOB =
       "INSERT INTO JOB"
-          + " (ID_, KEY_, JOB_TYPE_, WORKFLOW_INSTANCE_KEY_, ACTIVITY_INSTANCE_KEY_, STATE_, RETRIES_, TIMESTAMP_)"
+          + " (ID_, KEY_, JOB_TYPE_, WORKFLOW_INSTANCE_KEY_, ELEMENT_INSTANCE_KEY_, STATE_, RETRIES_, TIMESTAMP_)"
           + " VALUES "
           + "('%s', %d, '%s', %d, %d, '%s', %d, %d)";
 
@@ -115,16 +115,16 @@ public class SimpleMonitorExporter implements Exporter {
 
   private static final String INSERT_MESSAGE_SUBSCRIPTION =
       "INSERT INTO MESSAGE_SUBSCRIPTION"
-          + " (ID_, WORKFLOW_INSTANCE_KEY_, ACTIVITY_INSTANCE_KEY_, MESSAGE_NAME_, CORRELATION_KEY_, STATE_, TIMESTAMP_)"
+          + " (ID_, WORKFLOW_INSTANCE_KEY_, ELEMENT_INSTANCE_KEY_, MESSAGE_NAME_, CORRELATION_KEY_, STATE_, TIMESTAMP_)"
           + " VALUES "
           + "('%s', %d, %d, '%s', '%s', '%s', %d)";
 
   private static final String UPDATE_MESSAGE_SUBSCRIPTION =
-      "UPDATE MESSAGE_SUBSCRIPTION SET STATE_ = '%s', TIMESTAMP_ = %d WHERE ACTIVITY_INSTANCE_KEY_ = %d and MESSAGE_NAME_ = '%s';";
+      "UPDATE MESSAGE_SUBSCRIPTION SET STATE_ = '%s', TIMESTAMP_ = %d WHERE ELEMENT_INSTANCE_KEY_ = %d and MESSAGE_NAME_ = '%s';";
 
   private static final String INSERT_TIMER =
       "INSERT INTO TIMER"
-          + " (ID_, KEY_, ACTIVITY_INSTANCE_KEY_, HANDLER_NODE_ID_, DUE_DATE_, STATE_, TIMESTAMP_)"
+          + " (ID_, KEY_, ELEMENT_INSTANCE_KEY_, HANDLER_NODE_ID_, DUE_DATE_, STATE_, TIMESTAMP_)"
           + " VALUES "
           + "('%s', %d, %d, '%s', %d, '%s', %d)";
 
@@ -386,20 +386,20 @@ public class SimpleMonitorExporter implements Exporter {
       final WorkflowInstanceRecordValue workflowInstanceRecordValue) {
     final long workflowInstanceKey = workflowInstanceRecordValue.getWorkflowInstanceKey();
     final String elementId = getCleanString(workflowInstanceRecordValue.getElementId());
-    final long scopeInstanceKey = workflowInstanceRecordValue.getScopeInstanceKey();
+    final long flowScopeKey = workflowInstanceRecordValue.getFlowScopeKey();
     final String payload = getCleanString(workflowInstanceRecordValue.getPayload());
     final long workflowKey = workflowInstanceRecordValue.getWorkflowKey();
 
     final String insertActivityInstanceStatement =
         String.format(
-            INSERT_ACTIVITY_INSTANCE,
+            INSERT_ELEMENT_INSTANCE,
             createId(),
             partitionId,
             key,
             intent,
             workflowInstanceKey,
             elementId,
-            scopeInstanceKey,
+            flowScopeKey,
             payload,
             workflowKey,
             timestamp);

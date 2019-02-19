@@ -1,8 +1,6 @@
 package io.zeebe.monitor;
 
 import io.zeebe.client.ZeebeClient;
-import io.zeebe.client.api.clients.JobClient;
-import io.zeebe.client.api.clients.WorkflowClient;
 import java.util.Collections;
 
 public class Demo {
@@ -10,10 +8,8 @@ public class Demo {
   public static void main(String[] args) throws InterruptedException {
 
     final ZeebeClient client = ZeebeClient.newClient();
-    final WorkflowClient workflowClient = client.workflowClient();
-    final JobClient jobClient = client.jobClient();
 
-    workflowClient
+    client
         .newDeployCommand()
         .addResourceFromClasspath("orderProcess.bpmn")
         .addResourceFromClasspath("ship-parcel.bpmn")
@@ -21,28 +17,13 @@ public class Demo {
         .send()
         .join();
 
-    workflowClient
-        .newCreateInstanceCommand()
-        .bpmnProcessId("order-process")
-        .latestVersion()
-        .send()
-        .join();
+    client.newCreateInstanceCommand().bpmnProcessId("order-process").latestVersion().send().join();
 
-    workflowClient
-        .newCreateInstanceCommand()
-        .bpmnProcessId("ship-parcel")
-        .latestVersion()
-        .send()
-        .join();
+    client.newCreateInstanceCommand().bpmnProcessId("ship-parcel").latestVersion().send().join();
 
-    workflowClient
-        .newCreateInstanceCommand()
-        .bpmnProcessId("payment")
-        .latestVersion()
-        .send()
-        .join();
+    client.newCreateInstanceCommand().bpmnProcessId("payment").latestVersion().send().join();
 
-    jobClient
+    client
         .newWorker()
         .jobType("collect-money")
         .handler(
@@ -53,20 +34,25 @@ public class Demo {
                     .join())
         .open();
 
-    jobClient
+    client
         .newWorker()
         .jobType("fetch-items")
         .handler((c, job) -> c.newCompleteCommand(job.getKey()).send().join())
         .open();
 
-    jobClient
+    client
         .newWorker()
         .jobType("ship-parcel")
         .handler(
-            (c, job) -> c.newFailCommand(job.getKey()).retries(job.getRetries() - 1).send().join())
+            (c, job) ->
+                c.newFailCommand(job.getKey())
+                    .retries(job.getRetries() - 1)
+                    .errorMessage("Bad luck ;)")
+                    .send()
+                    .join())
         .open();
 
-    jobClient
+    client
         .newWorker()
         .jobType("payment")
         .handler(

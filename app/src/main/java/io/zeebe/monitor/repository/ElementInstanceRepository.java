@@ -15,10 +15,10 @@
  */
 package io.zeebe.monitor.repository;
 
-import io.zeebe.monitor.entity.ActivityInstanceEntity;
+import io.zeebe.monitor.entity.ElementInstanceEntity;
 import org.springframework.data.repository.CrudRepository;
 
-public interface ActivityInstanceRepository extends CrudRepository<ActivityInstanceEntity, String> {
+public interface ElementInstanceRepository extends CrudRepository<ElementInstanceEntity, String> {
 
-  Iterable<ActivityInstanceEntity> findByWorkflowInstanceKey(long workflowInstanceKey);
+  Iterable<ElementInstanceEntity> findByWorkflowInstanceKey(long workflowInstanceKey);
 }

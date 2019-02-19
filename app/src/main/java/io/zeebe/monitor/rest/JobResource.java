@@ -15,7 +15,7 @@
  */
 package io.zeebe.monitor.rest;
 
-import io.zeebe.client.api.clients.JobClient;
+import io.zeebe.client.ZeebeClient;
 import io.zeebe.client.api.response.ActivatedJob;
 import io.zeebe.monitor.entity.JobEntity;
 import io.zeebe.monitor.repository.JobRepository;
@@ -42,17 +42,17 @@ public class JobResource {
   @RequestMapping(path = "/{key}/complete", method = RequestMethod.PUT)
   public void completeJob(@PathVariable("key") long key, @RequestBody String payload) {
 
-    final JobClient jobClient = connections.getClient().jobClient();
-    final ActivatedJob activatedJob = activateJob(key, jobClient);
-    jobClient.newCompleteCommand(activatedJob.getKey()).payload(payload).send().join();
+    final ZeebeClient client = connections.getClient();
+    final ActivatedJob activatedJob = activateJob(key, client);
+    client.newCompleteCommand(activatedJob.getKey()).payload(payload).send().join();
   }
 
   @RequestMapping(path = "/{key}/fail", method = RequestMethod.PUT)
   public void failJob(@PathVariable("key") long key) {
 
-    final JobClient jobClient = connections.getClient().jobClient();
-    final ActivatedJob activatedJob = activateJob(key, jobClient);
-    jobClient
+    final ZeebeClient client = connections.getClient();
+    final ActivatedJob activatedJob = activateJob(key, client);
+    client
         .newFailCommand(activatedJob.getKey())
         .retries(0)
         .errorMessage("Failed by user.")
@@ -60,7 +60,7 @@ public class JobResource {
         .join();
   }
 
-  private ActivatedJob activateJob(long key, final JobClient jobClient) {
+  private ActivatedJob activateJob(long key, final ZeebeClient client) {
     final JobEntity job =
         jobRepository
             .findByKey(key)
@@ -68,13 +68,13 @@ public class JobResource {
 
     final String jobType = job.getJobType();
 
-    return activateJob(jobClient, key, jobType);
+    return activateJob(client, key, jobType);
   }
 
-  private ActivatedJob activateJob(final JobClient jobClient, long key, final String jobType) {
+  private ActivatedJob activateJob(final ZeebeClient client, long key, final String jobType) {
 
     final List<ActivatedJob> jobs =
-        jobClient
+        client
             .newActivateJobsCommand()
             .jobType(jobType)
             .amount(10)
@@ -90,7 +90,7 @@ public class JobResource {
       return jobs.stream()
           .filter(activatedJob -> activatedJob.getKey() == key)
           .findFirst()
-          .orElseGet(() -> activateJob(jobClient, key, jobType));
+          .orElseGet(() -> activateJob(client, key, jobType));
     }
   }
 }

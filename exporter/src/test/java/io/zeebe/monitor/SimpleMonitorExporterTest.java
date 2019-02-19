@@ -36,7 +36,7 @@ public class SimpleMonitorExporterTest {
 
   public static final String SELECT_FROM_WORKFLOW = "SELECT * FROM WORKFLOW;";
   public static final String SELECT_FROM_WORKFLOW_INSTANCE = "SELECT * FROM WORKFLOW_INSTANCE;";
-  public static final String SELECT_FROM_ACTIVITY_INSTANCE = "SELECT * FROM ACTIVITY_INSTANCE;";
+  public static final String SELECT_FROM_ELEMENT_INSTANCE = "SELECT * FROM ELEMENT_INSTANCE;";
 
   private SimpleMonitorExporter exporter;
   private SimpleMonitorExporterConfiguration configuration;
@@ -259,7 +259,7 @@ public class SimpleMonitorExporterTest {
         DriverManager.getConnection(
             configuration.jdbcUrl, configuration.userName, configuration.password)) {
       try (final Statement statement = connection.createStatement()) {
-        statement.execute(SELECT_FROM_ACTIVITY_INSTANCE);
+        statement.execute(SELECT_FROM_ELEMENT_INSTANCE);
         final ResultSet resultSet = statement.getResultSet();
         resultSet.beforeFirst();
         resultSet.next();
@@ -349,7 +349,7 @@ public class SimpleMonitorExporterTest {
     final WorkflowInstanceRecordValue instanceRecordValue = mock(WorkflowInstanceRecordValue.class);
 
     when(instanceRecordValue.getElementId()).thenReturn(elementId);
-    when(instanceRecordValue.getScopeInstanceKey()).thenReturn(-1L);
+    when(instanceRecordValue.getFlowScopeKey()).thenReturn(-1L);
     when(instanceRecordValue.getWorkflowInstanceKey()).thenReturn(4L);
     when(instanceRecordValue.getPayload()).thenReturn("{\"foo\":\"bar\"}");
 

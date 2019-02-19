@@ -35,8 +35,8 @@ public class MessageSubscriptionEntity {
   @Column(name = "WORKFLOW_INSTANCE_KEY_")
   private long workflowInstanceKey;
 
-  @Column(name = "ACTIVITY_INSTANCE_KEY_")
-  private long activityInstanceKey;
+  @Column(name = "ELEMENT_INSTANCE_KEY_")
+  private long elementInstanceKey;
 
   @Column(name = "STATE_")
   private String state;
@@ -92,11 +92,11 @@ public class MessageSubscriptionEntity {
     this.workflowInstanceKey = workflowInstanceKey;
   }
 
-  public long getActivityInstanceKey() {
-    return activityInstanceKey;
+  public long getElementInstanceKey() {
+    return elementInstanceKey;
   }
 
-  public void setActivityInstanceKey(long activityInstanceKey) {
-    this.activityInstanceKey = activityInstanceKey;
+  public void setElementInstanceKey(long elementInstanceKey) {
+    this.elementInstanceKey = elementInstanceKey;
   }
 }

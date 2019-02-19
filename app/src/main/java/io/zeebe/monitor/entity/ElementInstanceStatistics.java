@@ -2,7 +2,7 @@ package io.zeebe.monitor.entity;
 
 public interface ElementInstanceStatistics {
 
-  String getActivityId();
+  String getElementId();
 
   long getCount();
 }
