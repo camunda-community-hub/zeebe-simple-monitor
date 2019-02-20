@@ -33,7 +33,8 @@ public class WorkflowInstanceDto {
   private String startTime = "";
   private String endTime = "";
 
-  private String payload;
+  private List<VariableEntry> variables = new ArrayList<>();
+  private List<Long> activeScopes = new ArrayList<>();
 
   private List<ElementInstanceState> elementInstances = new ArrayList<>();
 
@@ -47,14 +48,6 @@ public class WorkflowInstanceDto {
   private List<JobDto> jobs = new ArrayList<>();
   private List<MessageSubscriptionDto> messageSubscriptions = new ArrayList<>();
   private List<TimerDto> timers = new ArrayList<>();
-
-  public String getPayload() {
-    return payload;
-  }
-
-  public void setPayload(String payload) {
-    this.payload = payload;
-  }
 
   public int getPartitionId() {
     return partitionId;
@@ -198,5 +191,21 @@ public class WorkflowInstanceDto {
 
   public void setTimers(List<TimerDto> timers) {
     this.timers = timers;
+  }
+
+  public List<VariableEntry> getVariables() {
+    return variables;
+  }
+
+  public void setVariables(List<VariableEntry> variables) {
+    this.variables = variables;
+  }
+
+  public List<Long> getActiveScopes() {
+    return activeScopes;
+  }
+
+  public void setActiveScopes(List<Long> activeScopes) {
+    this.activeScopes = activeScopes;
   }
 }

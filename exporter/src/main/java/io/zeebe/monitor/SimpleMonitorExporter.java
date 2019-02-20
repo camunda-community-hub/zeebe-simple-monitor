@@ -26,6 +26,7 @@ import io.zeebe.exporter.record.value.JobRecordValue;
 import io.zeebe.exporter.record.value.MessageRecordValue;
 import io.zeebe.exporter.record.value.MessageSubscriptionRecordValue;
 import io.zeebe.exporter.record.value.TimerRecordValue;
+import io.zeebe.exporter.record.value.VariableRecordValue;
 import io.zeebe.exporter.record.value.WorkflowInstanceRecordValue;
 import io.zeebe.exporter.record.value.deployment.DeployedWorkflow;
 import io.zeebe.exporter.record.value.deployment.DeploymentResource;
@@ -82,9 +83,9 @@ public class SimpleMonitorExporter implements Exporter {
 
   private static final String INSERT_ELEMENT_INSTANCE =
       "INSERT INTO ELEMENT_INSTANCE"
-          + " (ID_, PARTITION_ID_, KEY_, INTENT_, WORKFLOW_INSTANCE_KEY_, ELEMENT_ID_, FLOW_SCOPE_KEY_, PAYLOAD_, WORKFLOW_KEY_, TIMESTAMP_)"
+          + " (ID_, PARTITION_ID_, KEY_, INTENT_, WORKFLOW_INSTANCE_KEY_, ELEMENT_ID_, FLOW_SCOPE_KEY_, WORKFLOW_KEY_, TIMESTAMP_)"
           + " VALUES "
-          + "('%s', %d, %d, '%s', %d, '%s', %d, '%s', %d, %d);";
+          + "('%s', %d, %d, '%s', %d, '%s', %d, %d, %d);";
 
   private static final String INSERT_INCIDENT =
       "INSERT INTO INCIDENT"
@@ -140,6 +141,12 @@ public class SimpleMonitorExporter implements Exporter {
   private static final String REMOVE_WORKER =
       "DELETE FROM WORKER WHERE WORKER_ = '%s' and JOB_TYPE_ = '%s' and TIMESTAMP_ < %d;";
 
+  private static final String INSERT_VARIABLE =
+      "INSERT INTO VARIABLE"
+          + " (ID_, NAME_, VALUE_, WORKFLOW_INSTANCE_KEY_, SCOPE_KEY_, STATE_, TIMESTAMP_)"
+          + " VALUES "
+          + "('%s', '%s', '%s', %d, %d, '%s', %d)";
+
   public static final String CREATE_SCHEMA_SQL_PATH = "/CREATE_SCHEMA.sql";
 
   private final Map<ValueType, Consumer<Record>> insertCreatorPerType = new HashMap<>();
@@ -164,6 +171,7 @@ public class SimpleMonitorExporter implements Exporter {
     insertCreatorPerType.put(ValueType.MESSAGE_SUBSCRIPTION, this::exportMessageSubscriptionRecord);
     insertCreatorPerType.put(ValueType.TIMER, this::exportTimerRecord);
     insertCreatorPerType.put(ValueType.JOB_BATCH, this::exportJobBatchRecord);
+    insertCreatorPerType.put(ValueType.VARIABLE, this::exportVariableRecord);
 
     sqlStatements = new ArrayList<>();
   }
@@ -339,7 +347,7 @@ public class SimpleMonitorExporter implements Exporter {
     if (isWorkflowInstance(record, workflowInstanceRecordValue)) {
       exportWorkflowInstance(key, partitionId, intent, timestamp, workflowInstanceRecordValue);
     } else {
-      exportActivityInstance(key, partitionId, intent, timestamp, workflowInstanceRecordValue);
+      exportElementInstance(key, partitionId, intent, timestamp, workflowInstanceRecordValue);
     }
   }
 
@@ -378,7 +386,7 @@ public class SimpleMonitorExporter implements Exporter {
     }
   }
 
-  private void exportActivityInstance(
+  private void exportElementInstance(
       final long key,
       final int partitionId,
       final Intent intent,
@@ -387,7 +395,6 @@ public class SimpleMonitorExporter implements Exporter {
     final long workflowInstanceKey = workflowInstanceRecordValue.getWorkflowInstanceKey();
     final String elementId = getCleanString(workflowInstanceRecordValue.getElementId());
     final long flowScopeKey = workflowInstanceRecordValue.getFlowScopeKey();
-    final String payload = getCleanString(workflowInstanceRecordValue.getPayload());
     final long workflowKey = workflowInstanceRecordValue.getWorkflowKey();
 
     final String insertActivityInstanceStatement =
@@ -400,7 +407,6 @@ public class SimpleMonitorExporter implements Exporter {
             workflowInstanceKey,
             elementId,
             flowScopeKey,
-            payload,
             workflowKey,
             timestamp);
     sqlStatements.add(insertActivityInstanceStatement);
@@ -582,6 +588,31 @@ public class SimpleMonitorExporter implements Exporter {
       final String removeStatement = String.format(REMOVE_WORKER, worker, jobType, timestamp);
       sqlStatements.add(removeStatement);
     }
+  }
+
+  private void exportVariableRecord(final Record record) {
+    final Intent intent = record.getMetadata().getIntent();
+    final long timestamp = record.getTimestamp().toEpochMilli();
+    final String state = intent.name().toLowerCase();
+
+    final VariableRecordValue variableRecord = (VariableRecordValue) record.getValue();
+
+    final String name = variableRecord.getName();
+    final String value = variableRecord.getValue();
+    final long workflowInstanceKey = variableRecord.getWorkflowInstanceKey();
+    final long scopeKey = variableRecord.getScopeKey();
+
+    final String insertStatement =
+        String.format(
+            INSERT_VARIABLE,
+            createId(),
+            name,
+            value,
+            workflowInstanceKey,
+            scopeKey,
+            state,
+            timestamp);
+    sqlStatements.add(insertStatement);
   }
 
   private String getCleanString(final String string) {

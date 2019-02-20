@@ -107,14 +107,46 @@ function createInstance(key) {
 	
 // --------------------------------------------------------------------
 
-function updatePayload(key) {
+function updateVariable(scopeKey, name) {
+
+		var newValue = document.getElementById("variable-new-value-" + scopeKey + "-" + name).value;
+
+		var data = '{"' + name + '":' + newValue + '}';
+
 		$.ajax({
 	       type : 'PUT',
-	       url:  '/api/instances/' + key + "/update-payload",
-	       data:  document.getElementById("new-payload").value,
+	       url:  '/api/instances/' + scopeKey + "/update-variables",
+	       data:  data,
 	       contentType: 'application/json; charset=utf-8',
 	       success: function (result) {
-	       	showSuccess("Payload updated.");	
+	       	showSuccess("Variable updated.");	
+	       },
+	       error: function (xhr, ajaxOptions, thrownError) {
+	      	 showErrorResonse(xhr, ajaxOptions, thrownError);
+	       },
+	    	 timeout: 5000,
+	       crossDomain: true,
+	    });
+}
+
+function setVariable() {
+		
+		var scopeKeyElement = document.getElementById("variable-scopeKey");
+		var scopeKey = scopeKeyElement.options[scopeKeyElement.selectedIndex].text;
+		
+		var name = document.getElementById("variable-name").value;
+
+		var newValue = document.getElementById("variable-value").value;
+
+		var data = '{"' + name + '":' + newValue + '}';
+
+		$.ajax({
+	       type : 'PUT',
+	       url:  '/api/instances/' + scopeKey + "/update-variables",
+	       data:  data,
+	       contentType: 'application/json; charset=utf-8',
+	       success: function (result) {
+	       	showSuccess("Variable set.");	
 	       },
 	       error: function (xhr, ajaxOptions, thrownError) {
 	      	 showErrorResonse(xhr, ajaxOptions, thrownError);
@@ -126,11 +158,11 @@ function updatePayload(key) {
 
 // --------------------------------------------------------------------
 
-function updateRetries(key) {
+function updateRetries(jobKey) {
 		$.ajax({
 	             type : 'PUT',
-	             url: '/api/instances/' + key + "/update-retries",
-	             data:  document.getElementById("remaining-retries").value,
+	             url: '/api/instances/' + jobKey + "/update-retries",
+	             data:  document.getElementById("remaining-retries-" + jobKey).value,
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
 	             	showSuccess("Retries updated.");	
@@ -145,22 +177,20 @@ function updateRetries(key) {
 
 // --------------------------------------------------------------------
 
-function resolveJobIncident(incidentKey, elementInstanceKey, jobKey) {
+function resolveJobIncident(incidentKey, jobKey) {
 
 		var remainingRetries = document.getElementById("remaining-retries-" + incidentKey).value;
 	
-		resolveIncident(incidentKey, elementInstanceKey, jobKey, remainingRetries);
+		resolveIncident(incidentKey, jobKey, remainingRetries);
 }
 
-function resolveWorkflowInstanceIncident(incidentKey, elementInstanceKey) {
-		resolveIncident(incidentKey, elementInstanceKey, null, null);
+function resolveWorkflowInstanceIncident(incidentKey) {
+		resolveIncident(incidentKey, null, null);
 }
 
-function resolveIncident(incidentKey, elementInstanceKey, jobKey, remainingRetries) {
+function resolveIncident(incidentKey, jobKey, remainingRetries) {
 
 		var data = {
-			elementInstanceKey: elementInstanceKey,
-			payload: document.getElementById("new-payload-" + incidentKey).value,
 			jobKey: jobKey,
 			remainingRetries: remainingRetries
 		};

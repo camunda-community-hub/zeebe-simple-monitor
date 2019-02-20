@@ -1,5 +1,6 @@
 {{>layout/header}}
 
+{{>modals/set-variable-modal}}
 {{>modals/cancel-instance-modal}}
 
 <div class="row">
@@ -8,12 +9,20 @@
 		<div class="float-right">
 			
 			{{#instance.isRunning}}		
+				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#setVariableModal">
+				  Set Variable
+				</button>	
+			
 				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cancelInstanceModal">
 				  Cancel Instance
 				</button>			
 			{{/instance.isRunning}}
 			
-			{{^instance.isRunning}}			
+			{{^instance.isRunning}}		
+				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#setVariableModal" disabled>
+				  Set Variable
+				</button>	
+				
 				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cancelInstanceModal" disabled>
 				  Cancel Instance
 				</button>			
@@ -69,7 +78,7 @@
 	
 		<nav>
 		  <div class="nav nav-tabs" id="nav-tab" role="tablist">
-		    <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-payload" role="tab" aria-controls="nav-home" aria-selected="true">Payload</a>
+		    <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-variables" role="tab" aria-controls="nav-home" aria-selected="true">Variables</a>
 		    <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-audit-log" role="tab" aria-controls="nav-contact" aria-selected="false">Audit Log</a>
 		    <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-incidents" role="tab" aria-controls="nav-profile" aria-selected="false">Incidents</a>
 		    <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-jobs" role="tab" aria-controls="nav-contact" aria-selected="false">Jobs</a>
@@ -78,8 +87,8 @@
 		  </div>
 		</nav>
 		<div class="tab-content" id="nav-tabContent" style="height:200px;">
-		  <div class="tab-pane fade show active" id="nav-payload" role="tabpanel" aria-labelledby="nav-home-tab">
-		  	<textarea class="form-control" style="height:200px; overflow: auto;">{{instance.payload}}</textarea>
+		  <div class="tab-pane fade show active" id="nav-variables" role="tabpanel" aria-labelledby="nav-home-tab">
+		  	{{>variable-list}}
 		  </div>
 		  <div class="tab-pane fade" id="nav-audit-log" role="tabpanel" aria-labelledby="nav-contact-tab">
 		  	{{>audit-log}}

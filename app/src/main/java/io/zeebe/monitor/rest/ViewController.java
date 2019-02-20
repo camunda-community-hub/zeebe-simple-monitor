@@ -7,6 +7,7 @@ import io.zeebe.monitor.entity.JobEntity;
 import io.zeebe.monitor.entity.MessageEntity;
 import io.zeebe.monitor.entity.MessageSubscriptionEntity;
 import io.zeebe.monitor.entity.TimerEntity;
+import io.zeebe.monitor.entity.VariableEntity;
 import io.zeebe.monitor.entity.WorkerEntity;
 import io.zeebe.monitor.entity.WorkflowEntity;
 import io.zeebe.monitor.entity.WorkflowInstanceEntity;
@@ -16,9 +17,11 @@ import io.zeebe.monitor.repository.JobRepository;
 import io.zeebe.monitor.repository.MessageRepository;
 import io.zeebe.monitor.repository.MessageSubscriptionRepository;
 import io.zeebe.monitor.repository.TimerRepository;
+import io.zeebe.monitor.repository.VariableRepository;
 import io.zeebe.monitor.repository.WorkerRepository;
 import io.zeebe.monitor.repository.WorkflowInstanceRepository;
 import io.zeebe.monitor.repository.WorkflowRepository;
+import io.zeebe.util.collection.Tuple;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,6 +65,8 @@ public class ViewController {
   @Autowired private TimerRepository timerRepository;
 
   @Autowired private WorkerRepository workerRepository;
+
+  @Autowired private VariableRepository variableRepository;
 
   @GetMapping("/")
   public String index(Map<String, Object> model, Pageable pageable) {
@@ -231,15 +236,12 @@ public class ViewController {
                 false)
             .collect(Collectors.toList());
 
-    final ElementInstanceEntity lastEvent = events.get(events.size() - 1);
-
     final WorkflowInstanceDto dto = new WorkflowInstanceDto();
     dto.setWorkflowInstanceKey(instance.getKey());
 
     dto.setPartitionId(instance.getPartitionId());
 
     dto.setWorkflowKey(instance.getWorkflowKey());
-    dto.setPayload(lastEvent.getPayload());
 
     dto.setBpmnProcessId(instance.getBpmnProcessId());
     dto.setVersion(instance.getVersion());
@@ -324,7 +326,6 @@ public class ViewController {
                   entry.setKey(e.getKey());
                   entry.setFlowScopeKey(e.getFlowScopeKey());
                   entry.setElementId(e.getElementId());
-                  entry.setPaylaod(e.getPayload());
                   entry.setState(e.getIntent());
                   entry.setTimestamp(Instant.ofEpochMilli(e.getTimestamp()).toString());
 
@@ -355,12 +356,6 @@ public class ViewController {
 
                   incidentDto.setActivityId(elementIdsForKeys.get(i.getElementInstanceKey()));
                   incidentDto.setActivityInstanceKey(i.getElementInstanceKey());
-
-                  events
-                      .stream()
-                      .filter(e -> e.getKey() == i.getElementInstanceKey())
-                      .findFirst()
-                      .ifPresent(e -> incidentDto.setPayload(e.getPayload()));
 
                   if (i.getJobKey() > 0) {
                     incidentDto.setJobKey(i.getJobKey());
@@ -399,6 +394,61 @@ public class ViewController {
 
     activeActivities.removeAll(activitiesWitIncidents);
     dto.setActiveActivities(activeActivities);
+
+    final Map<Tuple<Long, String>, List<VariableEntity>> variablesByScopeAndName =
+        variableRepository
+            .findByWorkflowInstanceKey(instance.getKey())
+            .stream()
+            .collect(Collectors.groupingBy(v -> new Tuple<>(v.getScopeKey(), v.getName())));
+    variablesByScopeAndName.forEach(
+        (scopeKeyName, variables) -> {
+          final VariableEntry variableDto = new VariableEntry();
+          variableDto.setScopeKey(scopeKeyName.getLeft());
+          variableDto.setName(scopeKeyName.getRight());
+
+          final VariableEntity lastUpdate = variables.get(variables.size() - 1);
+          variableDto.setValue(lastUpdate.getValue());
+          variableDto.setTimestamp(Instant.ofEpochMilli(lastUpdate.getTimestamp()).toString());
+
+          final List<VariableUpdateEntry> varUpdates =
+              variables
+                  .stream()
+                  .map(
+                      v -> {
+                        final VariableUpdateEntry varUpdate = new VariableUpdateEntry();
+                        varUpdate.setValue(v.getValue());
+                        varUpdate.setTimestamp(Instant.ofEpochMilli(v.getTimestamp()).toString());
+                        return varUpdate;
+                      })
+                  .collect(Collectors.toList());
+          variableDto.setUpdates(varUpdates);
+
+          dto.getVariables().add(variableDto);
+        });
+
+    final List<Long> activeScopes = new ArrayList<>();
+    if (!isEnded) {
+      activeScopes.add(instance.getKey());
+
+      // TODO add active scopes when a variable can be set locally
+      //      final List<Long> completedElementInstances =
+      //          events
+      //              .stream()
+      //              .filter(e -> WORKFLOW_INSTANCE_COMPLETED_INTENTS.contains(e.getIntent()))
+      //              .map(ElementInstanceEntity::getKey)
+      //              .collect(Collectors.toList());
+      //
+      //      final List<Long> activeElementInstances =
+      //          events
+      //              .stream()
+      //              .filter(e -> WORKFLOW_INSTANCE_ENTERED_INTENTS.contains(e.getIntent()))
+      //              .map(ElementInstanceEntity::getKey)
+      //              .filter(id -> !completedElementInstances.contains(id))
+      //              .collect(Collectors.toList());
+      //
+      //      activeScopes.addAll(activeElementInstances);
+    }
+    dto.setActiveScopes(activeScopes);
 
     final List<JobDto> jobDtos =
         jobRepository
