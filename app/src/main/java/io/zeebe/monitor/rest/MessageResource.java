@@ -34,7 +34,6 @@ public class MessageResource {
 
     connections
         .getClient()
-        .workflowClient()
         .newPublishMessageCommand()
         .messageName(dto.getName())
         .correlationKey(dto.getCorrelationKey())

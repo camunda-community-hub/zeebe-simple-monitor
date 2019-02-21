@@ -29,8 +29,8 @@ public class TimerEntity {
   @Column(name = "KEY_")
   private long key;
 
-  @Column(name = "ACTIVITY_INSTANCE_KEY_")
-  private long activityInstanceKey;
+  @Column(name = "ELEMENT_INSTANCE_KEY_")
+  private long elementInstanceKey;
 
   @Column(name = "HANDLER_NODE_ID_")
   private String handlerNodeId;
@@ -60,12 +60,12 @@ public class TimerEntity {
     this.key = key;
   }
 
-  public long getActivityInstanceKey() {
-    return activityInstanceKey;
+  public long getElementInstanceKey() {
+    return elementInstanceKey;
   }
 
-  public void setActivityInstanceKey(long activityInstanceKey) {
-    this.activityInstanceKey = activityInstanceKey;
+  public void setElementInstanceKey(long elementInstanceKey) {
+    this.elementInstanceKey = elementInstanceKey;
   }
 
   public String getState() {

@@ -39,19 +39,13 @@ public class WorkflowInstanceResource {
 
   @RequestMapping(path = "/{key}", method = RequestMethod.DELETE)
   public void cancelWorkflowInstance(@PathVariable("key") long key) throws Exception {
-    connections.getClient().workflowClient().newCancelInstanceCommand(key).send().join();
+    connections.getClient().newCancelInstanceCommand(key).send().join();
   }
 
   @RequestMapping(path = "/{key}/update-payload", method = RequestMethod.PUT)
   public void updatePayload(@PathVariable("key") long key, @RequestBody String payload)
       throws Exception {
-    connections
-        .getClient()
-        .workflowClient()
-        .newUpdatePayloadCommand(key)
-        .payload(payload)
-        .send()
-        .join();
+    connections.getClient().newUpdatePayloadCommand(key).payload(payload).send().join();
   }
 
   @RequestMapping(path = "/{key}/update-retries", method = RequestMethod.PUT)
@@ -69,13 +63,7 @@ public class WorkflowInstanceResource {
               final long jobKey = incident.getJobKey();
 
               if (jobKey > 0) {
-                connections
-                    .getClient()
-                    .jobClient()
-                    .newUpdateRetriesCommand(jobKey)
-                    .retries(2)
-                    .send()
-                    .join();
+                connections.getClient().newUpdateRetriesCommand(jobKey).retries(2).send().join();
               }
             });
   }
@@ -88,7 +76,6 @@ public class WorkflowInstanceResource {
 
     if (dto.getPayload() != null && !dto.getPayload().isEmpty()) {
       client
-          .workflowClient()
           .newUpdatePayloadCommand(dto.getElementInstanceKey())
           .payload(dto.getPayload())
           .send()
@@ -97,13 +84,12 @@ public class WorkflowInstanceResource {
 
     if (dto.getJobKey() != null && dto.getJobKey() > 0) {
       client
-          .jobClient()
           .newUpdateRetriesCommand(dto.getJobKey())
           .retries(dto.getRemainingRetries())
           .send()
           .join();
     }
 
-    client.workflowClient().newResolveIncidentCommand(key).send().join();
+    client.newResolveIncidentCommand(key).send().join();
   }
 }

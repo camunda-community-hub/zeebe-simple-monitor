@@ -22,5 +22,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface TimerRepository extends PagingAndSortingRepository<TimerEntity, String> {
 
-  List<TimerEntity> findByActivityInstanceKeyIn(Collection<Long> activityInstanceKeys);
+  List<TimerEntity> findByElementInstanceKeyIn(Collection<Long> elementInstanceKeys);
 }

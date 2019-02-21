@@ -31,10 +31,10 @@ public interface WorkflowRepository extends PagingAndSortingRepository<WorkflowE
   @Query(
       nativeQuery = true,
       value =
-          "SELECT ACTIVITY_ID_ AS activityId, COUNT(*) AS count "
-              + "FROM ACTIVITY_INSTANCE "
+          "SELECT ELEMENT_ID_ AS elementId, COUNT(*) AS count "
+              + "FROM ELEMENT_INSTANCE "
               + "WHERE WORKFLOW_KEY_ = :key and INTENT_ in (:intents) "
-              + "GROUP BY ACTIVITY_ID_")
+              + "GROUP BY ELEMENT_ID_")
   List<ElementInstanceStatistics> getElementInstanceStatisticsByKeyAndIntentIn(
       @Param("key") long key, @Param("intents") Collection<String> intents);
 }

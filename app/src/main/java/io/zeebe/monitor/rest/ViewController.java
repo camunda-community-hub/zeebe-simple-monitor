@@ -1,6 +1,6 @@
 package io.zeebe.monitor.rest;
 
-import io.zeebe.monitor.entity.ActivityInstanceEntity;
+import io.zeebe.monitor.entity.ElementInstanceEntity;
 import io.zeebe.monitor.entity.ElementInstanceStatistics;
 import io.zeebe.monitor.entity.IncidentEntity;
 import io.zeebe.monitor.entity.JobEntity;
@@ -10,7 +10,7 @@ import io.zeebe.monitor.entity.TimerEntity;
 import io.zeebe.monitor.entity.WorkerEntity;
 import io.zeebe.monitor.entity.WorkflowEntity;
 import io.zeebe.monitor.entity.WorkflowInstanceEntity;
-import io.zeebe.monitor.repository.ActivityInstanceRepository;
+import io.zeebe.monitor.repository.ElementInstanceRepository;
 import io.zeebe.monitor.repository.IncidentRepository;
 import io.zeebe.monitor.repository.JobRepository;
 import io.zeebe.monitor.repository.MessageRepository;
@@ -38,16 +38,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class ViewController {
 
   private static final List<String> WORKFLOW_INSTANCE_ENTERED_INTENTS =
-      Arrays.asList(
-          "ELEMENT_ACTIVATED", "START_EVENT_OCCURRED", "END_EVENT_OCCURRED", "GATEWAY_ACTIVATED");
+      Arrays.asList("ELEMENT_ACTIVATED");
 
   private static final List<String> WORKFLOW_INSTANCE_COMPLETED_INTENTS =
-      Arrays.asList(
-          "ELEMENT_COMPLETED",
-          "ELEMENT_TERMINATED",
-          "START_EVENT_OCCURRED",
-          "END_EVENT_OCCURRED",
-          "GATEWAY_ACTIVATED");
+      Arrays.asList("ELEMENT_COMPLETED", "ELEMENT_TERMINATED");
 
   private static final List<String> JOB_COMPLETED_INTENTS = Arrays.asList("completed", "canceled");
 
@@ -55,7 +49,7 @@ public class ViewController {
 
   @Autowired private WorkflowInstanceRepository workflowInstanceRepository;
 
-  @Autowired private ActivityInstanceRepository activityInstanceRepository;
+  @Autowired private ElementInstanceRepository activityInstanceRepository;
 
   @Autowired private IncidentRepository incidentRepository;
 
@@ -147,7 +141,7 @@ public class ViewController {
             .stream()
             .collect(
                 Collectors.toMap(
-                    ElementInstanceStatistics::getActivityId, ElementInstanceStatistics::getCount));
+                    ElementInstanceStatistics::getElementId, ElementInstanceStatistics::getCount));
 
     final List<ElementInstanceState> elementInstanceStates =
         elementEnteredStatistics
@@ -156,11 +150,10 @@ public class ViewController {
                 s -> {
                   final ElementInstanceState state = new ElementInstanceState();
 
-                  final String activityId = s.getActivityId();
-                  state.setElementId(activityId);
+                  final String elementId = s.getElementId();
+                  state.setElementId(elementId);
 
-                  final long completedInstances =
-                      elementCompletedCount.getOrDefault(activityId, 0L);
+                  final long completedInstances = elementCompletedCount.getOrDefault(elementId, 0L);
                   long enteredInstances = s.getCount();
 
                   state.setActiveInstances(enteredInstances - completedInstances);
@@ -230,7 +223,7 @@ public class ViewController {
   }
 
   private WorkflowInstanceDto toInstanceDto(WorkflowInstanceEntity instance) {
-    final List<ActivityInstanceEntity> events =
+    final List<ElementInstanceEntity> events =
         StreamSupport.stream(
                 activityInstanceRepository
                     .findByWorkflowInstanceKey(instance.getKey())
@@ -238,7 +231,7 @@ public class ViewController {
                 false)
             .collect(Collectors.toList());
 
-    final ActivityInstanceEntity lastEvent = events.get(events.size() - 1);
+    final ElementInstanceEntity lastEvent = events.get(events.size() - 1);
 
     final WorkflowInstanceDto dto = new WorkflowInstanceDto();
     dto.setWorkflowInstanceKey(instance.getKey());
@@ -265,14 +258,14 @@ public class ViewController {
         events
             .stream()
             .filter(e -> WORKFLOW_INSTANCE_COMPLETED_INTENTS.contains(e.getIntent()))
-            .map(ActivityInstanceEntity::getActivityId)
+            .map(ElementInstanceEntity::getElementId)
             .collect(Collectors.toList());
 
     final List<String> activeActivities =
         events
             .stream()
             .filter(e -> WORKFLOW_INSTANCE_ENTERED_INTENTS.contains(e.getIntent()))
-            .map(ActivityInstanceEntity::getActivityId)
+            .map(ElementInstanceEntity::getElementId)
             .filter(id -> !completedActivities.contains(id))
             .collect(Collectors.toList());
     dto.setActiveActivities(activeActivities);
@@ -281,7 +274,7 @@ public class ViewController {
         events
             .stream()
             .filter(e -> e.getIntent().equals("SEQUENCE_FLOW_TAKEN"))
-            .map(ActivityInstanceEntity::getActivityId)
+            .map(ElementInstanceEntity::getElementId)
             .collect(Collectors.toList());
     dto.setTakenSequenceFlows(takenSequenceFlows);
 
@@ -290,16 +283,14 @@ public class ViewController {
             .stream()
             .filter(e -> WORKFLOW_INSTANCE_COMPLETED_INTENTS.contains(e.getIntent()))
             .collect(
-                Collectors.groupingBy(
-                    ActivityInstanceEntity::getActivityId, Collectors.counting()));
+                Collectors.groupingBy(ElementInstanceEntity::getElementId, Collectors.counting()));
 
     final Map<String, Long> enteredElementsById =
         events
             .stream()
             .filter(e -> WORKFLOW_INSTANCE_ENTERED_INTENTS.contains(e.getIntent()))
             .collect(
-                Collectors.groupingBy(
-                    ActivityInstanceEntity::getActivityId, Collectors.counting()));
+                Collectors.groupingBy(ElementInstanceEntity::getElementId, Collectors.counting()));
 
     final List<ElementInstanceState> elementStates =
         enteredElementsById
@@ -331,8 +322,8 @@ public class ViewController {
                   final AuditLogEntry entry = new AuditLogEntry();
 
                   entry.setKey(e.getKey());
-                  entry.setScopeInstanceKey(e.getScopeInstanceKey());
-                  entry.setElementId(e.getActivityId());
+                  entry.setFlowScopeKey(e.getFlowScopeKey());
+                  entry.setElementId(e.getElementId());
                   entry.setPaylaod(e.getPayload());
                   entry.setState(e.getIntent());
                   entry.setTimestamp(Instant.ofEpochMilli(e.getTimestamp()).toString());
@@ -350,7 +341,7 @@ public class ViewController {
             .collect(Collectors.toList());
 
     final Map<Long, String> elementIdsForKeys = new HashMap<>();
-    events.forEach(e -> elementIdsForKeys.put(e.getKey(), e.getActivityId()));
+    events.forEach(e -> elementIdsForKeys.put(e.getKey(), e.getElementId()));
 
     final List<IncidentDto> incidentDtos =
         incidents
@@ -362,12 +353,12 @@ public class ViewController {
                   final IncidentDto incidentDto = new IncidentDto();
                   incidentDto.setKey(incidentKey);
 
-                  incidentDto.setActivityId(elementIdsForKeys.get(i.getActivityInstanceKey()));
-                  incidentDto.setActivityInstanceKey(i.getActivityInstanceKey());
+                  incidentDto.setActivityId(elementIdsForKeys.get(i.getElementInstanceKey()));
+                  incidentDto.setActivityInstanceKey(i.getElementInstanceKey());
 
                   events
                       .stream()
-                      .filter(e -> e.getKey() == i.getActivityInstanceKey())
+                      .filter(e -> e.getKey() == i.getElementInstanceKey())
                       .findFirst()
                       .ifPresent(e -> incidentDto.setPayload(e.getPayload()));
 
@@ -400,7 +391,7 @@ public class ViewController {
         incidents
             .stream()
             .filter(i -> i.getResolved() == null || i.getResolved() <= 0)
-            .map(i -> elementIdsForKeys.get(i.getActivityInstanceKey()))
+            .map(i -> elementIdsForKeys.get(i.getElementInstanceKey()))
             .distinct()
             .collect(Collectors.toList());
 
@@ -417,7 +408,7 @@ public class ViewController {
                 job -> {
                   final JobDto jobDto = toDto(job);
                   jobDto.setActivityId(
-                      elementIdsForKeys.getOrDefault(job.getActivityInstanceKey(), ""));
+                      elementIdsForKeys.getOrDefault(job.getElementInstanceKey(), ""));
 
                   final boolean isActivatable =
                       job.getRetries() > 0
@@ -447,7 +438,7 @@ public class ViewController {
 
     final List<TimerDto> timers =
         timerRepository
-            .findByActivityInstanceKeyIn(elementIdsForKeys.keySet())
+            .findByElementInstanceKeyIn(elementIdsForKeys.keySet())
             .stream()
             .map(timer -> toDto(timer))
             .collect(Collectors.toList());
@@ -532,7 +523,7 @@ public class ViewController {
     dto.setKey(job.getKey());
     dto.setJobType(job.getJobType());
     dto.setWorkflowInstanceKey(job.getWorkflowInstanceKey());
-    dto.setActivityInstanceKey(job.getActivityInstanceKey());
+    dto.setActivityInstanceKey(job.getElementInstanceKey());
     dto.setState(job.getState());
     dto.setRetries(job.getRetries());
     Optional.ofNullable(job.getWorker()).ifPresent(dto::setWorker);
@@ -581,7 +572,7 @@ public class ViewController {
     dto.setCorrelationKey(subscription.getCorrelationKey());
 
     dto.setWorkflowInstanceKey(subscription.getWorkflowInstanceKey());
-    dto.setActivityInstanceKey(subscription.getActivityInstanceKey());
+    dto.setActivityInstanceKey(subscription.getElementInstanceKey());
 
     dto.setState(subscription.getState());
     dto.setTimestamp(Instant.ofEpochMilli(subscription.getTimestamp()).toString());
@@ -594,7 +585,7 @@ public class ViewController {
   private TimerDto toDto(TimerEntity timer) {
     final TimerDto dto = new TimerDto();
 
-    dto.setActivityInstanceKey(timer.getActivityInstanceKey());
+    dto.setActivityInstanceKey(timer.getElementInstanceKey());
     dto.setActivityId(timer.getHandlerNodeId());
     dto.setState(timer.getState());
     dto.setDueDate(Instant.ofEpochMilli(timer.getDueDate()).toString());
