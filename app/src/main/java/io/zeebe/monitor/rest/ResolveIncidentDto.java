@@ -7,9 +7,6 @@ public class ResolveIncidentDto {
   private Long jobKey;
   private int remainingRetries;
 
-  private long elementInstanceKey;
-  private String payload;
-
   public long getIncidentKey() {
     return incidentKey;
   }
@@ -32,21 +29,5 @@ public class ResolveIncidentDto {
 
   public void setRemainingRetries(int remainingRetries) {
     this.remainingRetries = remainingRetries;
-  }
-
-  public long getElementInstanceKey() {
-    return elementInstanceKey;
-  }
-
-  public void setElementInstanceKey(long elementInstanceKey) {
-    this.elementInstanceKey = elementInstanceKey;
-  }
-
-  public String getPayload() {
-    return payload;
-  }
-
-  public void setPayload(String payload) {
-    this.payload = payload;
   }
 }

@@ -241,7 +241,7 @@ public class SimpleMonitorExporterTest {
   }
 
   @Test
-  public void shouldCreateActivityInstance() throws Exception {
+  public void shouldCreateElementInstance() throws Exception {
     // given
     final Record workflowInstanceRecord =
         createRecordMockForIntent(
@@ -287,13 +287,10 @@ public class SimpleMonitorExporterTest {
         final long scopeInstanceKey = resultSet.getLong(7);
         assertThat(scopeInstanceKey).isEqualTo(-1);
 
-        final String payload = resultSet.getString(8);
-        assertThat(payload).isEqualTo("{\"foo\":\"bar\"}");
-
-        final long workflowKey = resultSet.getLong(9);
+        final long workflowKey = resultSet.getLong(8);
         assertThat(workflowKey).isEqualTo(1L);
 
-        final long timestamp = resultSet.getLong(10);
+        final long timestamp = resultSet.getLong(9);
         assertThat(timestamp).isGreaterThan(0).isLessThan(Instant.now().toEpochMilli());
       }
     }

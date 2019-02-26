@@ -44,9 +44,6 @@ public class ElementInstanceEntity {
   @Column(name = "FLOW_SCOPE_KEY_")
   private long flowScopeKey;
 
-  @Column(name = "PAYLOAD_")
-  private String payload;
-
   @Column(name = "WORKFLOW_KEY_")
   private long workflowKey;
 
@@ -91,14 +88,6 @@ public class ElementInstanceEntity {
 
   public void setFlowScopeKey(long flowScopeKey) {
     this.flowScopeKey = flowScopeKey;
-  }
-
-  public String getPayload() {
-    return payload;
-  }
-
-  public void setPayload(String payload) {
-    this.payload = payload;
   }
 
   public String getId() {

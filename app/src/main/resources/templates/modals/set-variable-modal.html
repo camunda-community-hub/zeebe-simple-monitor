@@ -1,0 +1,43 @@
+<div class="modal fade" id="setVariableModal" tabindex="-1" role="dialog" aria-labelledby="setVariableModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Variable</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+            
+        <div class="form-group">
+          <label class="col-form-label">Scope Key</label>
+          <select id="variable-scopeKey" class="form-control">
+          	{{#instance.activeScopes}}
+				      <option>{{.}}</option>
+          	{{/instance.activeScopes}}
+			    </select>
+        </div>   
+            
+      	<div class="form-group">
+          <label class="col-form-label">Name</label>
+          <input id="variable-name" class="form-control" type="text" value="" />
+        </div>
+              
+      	<div class="form-group">
+          <label class="col-form-label">Value</label>
+          <input id="variable-value" class="form-control" type="text" value="" />
+        </div>
+      
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      
+      	<button type="button" class="btn btn-primary"  data-dismiss="modal" onclick="setVariable()">Set</button>
+    	</div>
+      
+    </div>
+  </div>
+</div>

@@ -10,10 +10,10 @@
       </div>
       
       <div class="modal-body">
-      
-      	<div class="form-group">
-          <label class="col-form-label">New Payload</label>
-          <textarea id="new-payload-{{key}}" class="form-control" style="height:150px; overflow: auto;">{{payload}}</textarea>
+        
+        <div class="form-group">
+          <label class="col-form-label">Make sure that you fixed the error</label>
+          <input type="text" class="form-control" value="{{errorMessage}}" readonly>
         </div>
       
       	{{#jobKey}}
@@ -29,11 +29,11 @@
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       
       	{{#jobKey}}
-        	<button type="button" class="btn btn-primary"  data-dismiss="modal" onclick="resolveJobIncident({{key}}, {{activityInstanceKey}}, {{jobKey}})">Resolve</button>
+        	<button type="button" class="btn btn-primary"  data-dismiss="modal" onclick="resolveJobIncident({{key}}, {{jobKey}})">Resolve</button>
       	{{/jobKey}}
       	
       	{{^jobKey}}
-        	<button type="button" class="btn btn-primary"  data-dismiss="modal" onclick="resolveWorkflowInstanceIncident({{key}}, {{activityInstanceKey}})">Resolve</button>
+        	<button type="button" class="btn btn-primary"  data-dismiss="modal" onclick="resolveWorkflowInstanceIncident({{key}})">Resolve</button>
       	{{/jobKey}}
      
 			</div>

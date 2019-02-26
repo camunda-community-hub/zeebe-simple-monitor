@@ -16,12 +16,7 @@
 package io.zeebe.monitor.rest;
 
 import io.zeebe.client.ZeebeClient;
-import io.zeebe.monitor.entity.IncidentEntity;
-import io.zeebe.monitor.repository.IncidentRepository;
 import io.zeebe.monitor.zeebe.ZeebeConnectionService;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,37 +30,15 @@ public class WorkflowInstanceResource {
 
   @Autowired private ZeebeConnectionService connections;
 
-  @Autowired private IncidentRepository incidentRepository;
-
   @RequestMapping(path = "/{key}", method = RequestMethod.DELETE)
   public void cancelWorkflowInstance(@PathVariable("key") long key) throws Exception {
     connections.getClient().newCancelInstanceCommand(key).send().join();
   }
 
-  @RequestMapping(path = "/{key}/update-payload", method = RequestMethod.PUT)
+  @RequestMapping(path = "/{key}/update-variables", method = RequestMethod.PUT)
   public void updatePayload(@PathVariable("key") long key, @RequestBody String payload)
       throws Exception {
     connections.getClient().newUpdatePayloadCommand(key).payload(payload).send().join();
-  }
-
-  @RequestMapping(path = "/{key}/update-retries", method = RequestMethod.PUT)
-  public void updateRetries(@PathVariable("key") long key) throws Exception {
-
-    final List<IncidentEntity> incidents =
-        StreamSupport.stream(incidentRepository.findByWorkflowInstanceKey(key).spliterator(), false)
-            .collect(Collectors.toList());
-
-    incidents
-        .stream()
-        .filter(i -> i.getResolved() == null || i.getResolved() < 0)
-        .forEach(
-            incident -> {
-              final long jobKey = incident.getJobKey();
-
-              if (jobKey > 0) {
-                connections.getClient().newUpdateRetriesCommand(jobKey).retries(2).send().join();
-              }
-            });
   }
 
   @RequestMapping(path = "/{key}/resolve-incident", method = RequestMethod.PUT)
@@ -73,14 +46,6 @@ public class WorkflowInstanceResource {
       throws Exception {
 
     final ZeebeClient client = connections.getClient();
-
-    if (dto.getPayload() != null && !dto.getPayload().isEmpty()) {
-      client
-          .newUpdatePayloadCommand(dto.getElementInstanceKey())
-          .payload(dto.getPayload())
-          .send()
-          .join();
-    }
 
     if (dto.getJobKey() != null && dto.getJobKey() > 0) {
       client
