@@ -15,7 +15,7 @@ mvn clean install
 # docker run -it --rm --name maven-zeebe-simple-monitor -v "$(pwd)":/usr/src/zeebe-simple-monitor -w /usr/src/zeebe-simple-monitor maven:3.3-jdk-8 mvn clean install
 echo "Done"
 
-CONTAINERS=(zeebe_monitor zeebe_broker zeebe_db)
+CONTAINERS=(monitor zeebe db)
 
 for i in "${!CONTAINERS[@]}"
 do
