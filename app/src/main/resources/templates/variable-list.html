@@ -1,8 +1,9 @@
 <table class="table table-striped">
 	<thead>
 		<th>Scope Key</th>
-	  <th>Name</th>
-	  <th>Value</th>
+		<th>Scope Name</th>
+	  <th>Variable Name</th>
+	  <th>Variable Value</th>
 		<th>Time</th>
 		<th> </th>
 </thead>
@@ -10,6 +11,7 @@
 {{#instance.variables}}
 	<tr>
 		<td>{{scopeKey}}</td>
+		<td>{{scopeName}}</td>
 		<td>{{name}}</td>
 		<td>{{value}}</td>
 		<td>{{timestamp}}</td>

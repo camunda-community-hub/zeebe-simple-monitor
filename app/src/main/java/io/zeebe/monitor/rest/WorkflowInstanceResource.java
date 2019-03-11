@@ -35,10 +35,22 @@ public class WorkflowInstanceResource {
     connections.getClient().newCancelInstanceCommand(key).send().join();
   }
 
-  @RequestMapping(path = "/{key}/update-variables", method = RequestMethod.PUT)
-  public void updatePayload(@PathVariable("key") long key, @RequestBody String payload)
+  @RequestMapping(path = "/{key}/set-variables", method = RequestMethod.PUT)
+  public void setVariables(@PathVariable("key") long key, @RequestBody String payload)
       throws Exception {
-    connections.getClient().newUpdatePayloadCommand(key).payload(payload).send().join();
+    connections.getClient().newSetVariablesCommand(key).variables(payload).send().join();
+  }
+
+  @RequestMapping(path = "/{key}/set-variables-local", method = RequestMethod.PUT)
+  public void setVariablesLocal(@PathVariable("key") long key, @RequestBody String payload)
+      throws Exception {
+    connections
+        .getClient()
+        .newSetVariablesCommand(key)
+        .variables(payload)
+        .local(true)
+        .send()
+        .join();
   }
 
   @RequestMapping(path = "/{key}/resolve-incident", method = RequestMethod.PUT)

@@ -41,7 +41,7 @@ public class WorkflowResource {
         .getClient()
         .newCreateInstanceCommand()
         .workflowKey(workflowKey)
-        .payload(payload)
+        .variables(payload)
         .send()
         .join();
   }

@@ -342,6 +342,7 @@ public class ViewController {
             .collect(Collectors.toList());
 
     final Map<Long, String> elementIdsForKeys = new HashMap<>();
+    elementIdsForKeys.put(instance.getKey(), instance.getBpmnProcessId());
     events.forEach(e -> elementIdsForKeys.put(e.getKey(), e.getElementId()));
 
     final List<IncidentDto> incidentDtos =
@@ -403,7 +404,11 @@ public class ViewController {
     variablesByScopeAndName.forEach(
         (scopeKeyName, variables) -> {
           final VariableEntry variableDto = new VariableEntry();
-          variableDto.setScopeKey(scopeKeyName.getLeft());
+          final long scopeKey = scopeKeyName.getLeft();
+
+          variableDto.setScopeKey(scopeKey);
+          variableDto.setScopeName(elementIdsForKeys.get(scopeKey));
+
           variableDto.setName(scopeKeyName.getRight());
 
           final VariableEntity lastUpdate = variables.get(variables.size() - 1);
@@ -426,27 +431,27 @@ public class ViewController {
           dto.getVariables().add(variableDto);
         });
 
-    final List<Long> activeScopes = new ArrayList<>();
+    final List<ActiveScope> activeScopes = new ArrayList<>();
     if (!isEnded) {
-      activeScopes.add(instance.getKey());
+      activeScopes.add(new ActiveScope(instance.getKey(), instance.getBpmnProcessId()));
 
-      // TODO add active scopes when a variable can be set locally
-      //      final List<Long> completedElementInstances =
-      //          events
-      //              .stream()
-      //              .filter(e -> WORKFLOW_INSTANCE_COMPLETED_INTENTS.contains(e.getIntent()))
-      //              .map(ElementInstanceEntity::getKey)
-      //              .collect(Collectors.toList());
-      //
-      //      final List<Long> activeElementInstances =
-      //          events
-      //              .stream()
-      //              .filter(e -> WORKFLOW_INSTANCE_ENTERED_INTENTS.contains(e.getIntent()))
-      //              .map(ElementInstanceEntity::getKey)
-      //              .filter(id -> !completedElementInstances.contains(id))
-      //              .collect(Collectors.toList());
-      //
-      //      activeScopes.addAll(activeElementInstances);
+      final List<Long> completedElementInstances =
+          events
+              .stream()
+              .filter(e -> WORKFLOW_INSTANCE_COMPLETED_INTENTS.contains(e.getIntent()))
+              .map(ElementInstanceEntity::getKey)
+              .collect(Collectors.toList());
+
+      final List<ActiveScope> activeElementInstances =
+          events
+              .stream()
+              .filter(e -> WORKFLOW_INSTANCE_ENTERED_INTENTS.contains(e.getIntent()))
+              .map(ElementInstanceEntity::getKey)
+              .filter(id -> !completedElementInstances.contains(id))
+              .map(scopeKey -> new ActiveScope(scopeKey, elementIdsForKeys.get(scopeKey)))
+              .collect(Collectors.toList());
+
+      activeScopes.addAll(activeElementInstances);
     }
     dto.setActiveScopes(activeScopes);
 
