@@ -8,6 +8,7 @@ public class VariableEntry {
   private String name;
   private String value;
   private long scopeKey;
+  private String scopeName;
   private String timestamp;
 
   private List<VariableUpdateEntry> updates = new ArrayList<>();
@@ -50,5 +51,13 @@ public class VariableEntry {
 
   public void setUpdates(List<VariableUpdateEntry> updates) {
     this.updates = updates;
+  }
+
+  public String getScopeName() {
+    return scopeName;
+  }
+
+  public void setScopeName(String scopeName) {
+    this.scopeName = scopeName;
   }
 }

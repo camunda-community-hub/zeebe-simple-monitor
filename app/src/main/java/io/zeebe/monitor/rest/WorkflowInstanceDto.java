@@ -34,7 +34,7 @@ public class WorkflowInstanceDto {
   private String endTime = "";
 
   private List<VariableEntry> variables = new ArrayList<>();
-  private List<Long> activeScopes = new ArrayList<>();
+  private List<ActiveScope> activeScopes = new ArrayList<>();
 
   private List<ElementInstanceState> elementInstances = new ArrayList<>();
 
@@ -201,11 +201,11 @@ public class WorkflowInstanceDto {
     this.variables = variables;
   }
 
-  public List<Long> getActiveScopes() {
+  public List<ActiveScope> getActiveScopes() {
     return activeScopes;
   }
 
-  public void setActiveScopes(List<Long> activeScopes) {
+  public void setActiveScopes(List<ActiveScope> activeScopes) {
     this.activeScopes = activeScopes;
   }
 }

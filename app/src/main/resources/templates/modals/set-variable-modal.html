@@ -15,7 +15,7 @@
           <label class="col-form-label">Scope Key</label>
           <select id="variable-scopeKey" class="form-control">
           	{{#instance.activeScopes}}
-				      <option>{{.}}</option>
+				      <option value="{{scopeKey}}">{{scopeKey}} ({{scopeName}})</option>
           	{{/instance.activeScopes}}
 			    </select>
         </div>   
@@ -29,6 +29,11 @@
           <label class="col-form-label">Value</label>
           <input id="variable-value" class="form-control" type="text" value="" />
         </div>
+        
+        <div class="form-group form-check">
+			    <input type="checkbox" class="form-check-input" id="variable-local">
+			    <label class="form-check-label" for="variable-local">Local (no propagation)</label>
+			  </div>
       
       </div>
       

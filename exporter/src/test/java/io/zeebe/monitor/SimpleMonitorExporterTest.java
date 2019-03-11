@@ -348,7 +348,6 @@ public class SimpleMonitorExporterTest {
     when(instanceRecordValue.getElementId()).thenReturn(elementId);
     when(instanceRecordValue.getFlowScopeKey()).thenReturn(-1L);
     when(instanceRecordValue.getWorkflowInstanceKey()).thenReturn(4L);
-    when(instanceRecordValue.getPayload()).thenReturn("{\"foo\":\"bar\"}");
 
     when(instanceRecordValue.getWorkflowKey()).thenReturn(1L);
     when(instanceRecordValue.getVersion()).thenReturn(0);

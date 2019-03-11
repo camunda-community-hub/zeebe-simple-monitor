@@ -115,7 +115,7 @@ function updateVariable(scopeKey, name) {
 
 		$.ajax({
 	       type : 'PUT',
-	       url:  '/api/instances/' + scopeKey + "/update-variables",
+	       url:  '/api/instances/' + scopeKey + "/set-variables",
 	       data:  data,
 	       contentType: 'application/json; charset=utf-8',
 	       success: function (result) {
@@ -132,17 +132,25 @@ function updateVariable(scopeKey, name) {
 function setVariable() {
 		
 		var scopeKeyElement = document.getElementById("variable-scopeKey");
-		var scopeKey = scopeKeyElement.options[scopeKeyElement.selectedIndex].text;
+		var scopeKey = scopeKeyElement.options[scopeKeyElement.selectedIndex].value;
 		
 		var name = document.getElementById("variable-name").value;
 
 		var newValue = document.getElementById("variable-value").value;
 
 		var data = '{"' + name + '":' + newValue + '}';
+		
+		var local = document.getElementById("variable-local").checked;
+
+		var url = '/api/instances/' + scopeKey + "/set-variables";
+		
+		if (local) {
+			url = url + "-local";
+		}
 
 		$.ajax({
 	       type : 'PUT',
-	       url:  '/api/instances/' + scopeKey + "/update-variables",
+	       url:  url,
 	       data:  data,
 	       contentType: 'application/json; charset=utf-8',
 	       success: function (result) {
