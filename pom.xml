@@ -4,7 +4,7 @@
 
     <groupId>io.zeebe</groupId>
     <artifactId>zeebe-simple-monitor-root</artifactId>
-    <version>0.12.0</version>
+    <version>0.13.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -115,7 +115,7 @@
         <url>https://github.com/zeebe-io/zeebe-simple-monitor</url>
         <connection>scm:git:git@github.com:zeebe-io/zeebe-simple-monitor.git</connection>
         <developerConnection>scm:git:git@github.com:zeebe-io/zeebe-simple-monitor.git</developerConnection>
-        <tag>0.12.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
 </project>
