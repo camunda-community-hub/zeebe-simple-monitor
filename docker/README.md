@@ -16,4 +16,4 @@ chmod +x docker/run
 and try again.
 
 
-Go to http://localhost:9000 and connect to broker `zeebe:26500`.
+Open a web browser and go to http://localhost:8080
