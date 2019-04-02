@@ -15,22 +15,22 @@
  */
 package io.zeebe.monitor;
 
-import io.zeebe.exporter.context.Context;
-import io.zeebe.exporter.context.Controller;
-import io.zeebe.exporter.record.Record;
-import io.zeebe.exporter.record.RecordMetadata;
-import io.zeebe.exporter.record.value.DeploymentRecordValue;
-import io.zeebe.exporter.record.value.IncidentRecordValue;
-import io.zeebe.exporter.record.value.JobBatchRecordValue;
-import io.zeebe.exporter.record.value.JobRecordValue;
-import io.zeebe.exporter.record.value.MessageRecordValue;
-import io.zeebe.exporter.record.value.MessageSubscriptionRecordValue;
-import io.zeebe.exporter.record.value.TimerRecordValue;
-import io.zeebe.exporter.record.value.VariableRecordValue;
-import io.zeebe.exporter.record.value.WorkflowInstanceRecordValue;
-import io.zeebe.exporter.record.value.deployment.DeployedWorkflow;
-import io.zeebe.exporter.record.value.deployment.DeploymentResource;
-import io.zeebe.exporter.spi.Exporter;
+import io.zeebe.exporter.api.context.Context;
+import io.zeebe.exporter.api.context.Controller;
+import io.zeebe.exporter.api.record.Record;
+import io.zeebe.exporter.api.record.RecordMetadata;
+import io.zeebe.exporter.api.record.value.DeploymentRecordValue;
+import io.zeebe.exporter.api.record.value.IncidentRecordValue;
+import io.zeebe.exporter.api.record.value.JobBatchRecordValue;
+import io.zeebe.exporter.api.record.value.JobRecordValue;
+import io.zeebe.exporter.api.record.value.MessageRecordValue;
+import io.zeebe.exporter.api.record.value.MessageSubscriptionRecordValue;
+import io.zeebe.exporter.api.record.value.TimerRecordValue;
+import io.zeebe.exporter.api.record.value.VariableRecordValue;
+import io.zeebe.exporter.api.record.value.WorkflowInstanceRecordValue;
+import io.zeebe.exporter.api.record.value.deployment.DeployedWorkflow;
+import io.zeebe.exporter.api.record.value.deployment.DeploymentResource;
+import io.zeebe.exporter.api.spi.Exporter;
 import io.zeebe.protocol.Protocol;
 import io.zeebe.protocol.clientapi.RecordType;
 import io.zeebe.protocol.clientapi.ValueType;
@@ -487,7 +487,7 @@ public class SimpleMonitorExporter implements Exporter {
     final String name = messageRecord.getName();
     final String correlationKey = messageRecord.getCorrelationKey();
     final String messageId = messageRecord.getMessageId();
-    final String payload = messageRecord.getPayload();
+    final String variables = messageRecord.getVariables();
 
     if (intent == MessageIntent.PUBLISHED) {
       final String insertStatement =
@@ -498,7 +498,7 @@ public class SimpleMonitorExporter implements Exporter {
               name,
               correlationKey,
               messageId,
-              payload,
+              variables,
               state,
               timestamp);
       sqlStatements.add(insertStatement);

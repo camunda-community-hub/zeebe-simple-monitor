@@ -25,8 +25,9 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <zeebe.version>0.16.1</zeebe.version>
+        <zeebe.version>0.17.0</zeebe.version>
         <spring.boot.version>2.1.2.RELEASE</spring.boot.version>
+				<hazelcast.exporter.version>0.2.0</hazelcast.exporter.version>
 
         <!-- release parent settings -->
         <version.java>1.8</version.java>
@@ -45,11 +46,12 @@
         <dependencies>
             <dependency>
                 <groupId>io.zeebe</groupId>
-                <artifactId>zb-bom</artifactId>
+                <artifactId>zeebe-bom</artifactId>
                 <version>${zeebe.version}</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
+            
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -57,6 +59,12 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            
+            <dependency>
+							<groupId>io.zeebe.hazelcast</groupId>
+							<artifactId>zeebe-hazelcast-connector</artifactId>
+							<version>${hazelcast.exporter.version}</version>
+						</dependency>
 
             <dependency>
                 <groupId>com.h2database</groupId>

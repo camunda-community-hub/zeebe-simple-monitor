@@ -21,7 +21,7 @@
     
 </head>
 
-<body>
+<body onload="connect()" onunload="disconnect()">
 
 	<nav class="navbar navbar-expand-md navbar-light bg-white mb-2 top-nav-border">
 		<a class="navbar-brand" href="/">
@@ -57,7 +57,7 @@
 	
 		<div id="errorPanel" class="alert alert-danger alert-dismissible fade show" style="display:none;" role="alert">
 		  <strong>Error:</strong> <span id="errorText"></span>
-		  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+		  <button type="button" class="close" aria-label="Close" onclick="$('.alert').hide()">
 		    <span aria-hidden="true">&times;</span>
 		  </button>
 		</div>
@@ -65,7 +65,15 @@
 		<div id="successPanel" class="alert alert-success alert-dismissible fade show" style="display:none;" role="alert">
 		  <strong>Success:</strong> <span id="successText"></span>
 		  (<a href="#" onClick="reload()">Refresh</a>)
-		  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+		  <button type="button" class="close" aria-label="Close" onclick="$('.alert').hide()">
+		    <span aria-hidden="true">&times;</span>
+		  </button>
+		</div>
+	
+		<div id="infoPanel" class="alert alert-primary alert-dismissible fade show" style="display:none;" role="alert">
+		  <strong>Info:</strong> <span id="infoText"></span>
+		  (<a href="#" onClick="reload()">Refresh</a>)
+		  <button type="button" class="close" aria-label="Close" onclick="$('.alert').hide()">
 		    <span aria-hidden="true">&times;</span>
 		  </button>
 		</div>

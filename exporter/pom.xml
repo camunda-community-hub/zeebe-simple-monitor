@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>io.zeebe</groupId>
-            <artifactId>zb-exporter-api</artifactId>
+            <artifactId>zeebe-exporter-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
