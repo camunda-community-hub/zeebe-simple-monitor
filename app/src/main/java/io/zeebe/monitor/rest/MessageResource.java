@@ -37,7 +37,7 @@ public class MessageResource {
         .newPublishMessageCommand()
         .messageName(dto.getName())
         .correlationKey(dto.getCorrelationKey())
-        .payload(dto.getPayload())
+        .variables(dto.getPayload())
         .timeToLive(Duration.parse(dto.getTimeToLive()))
         .send()
         .join();

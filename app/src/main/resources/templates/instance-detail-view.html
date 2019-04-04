@@ -112,3 +112,9 @@
 </div>
 
 {{>layout/footer}}
+
+<script>
+	$(document).ready(function(){
+		subscribeForWorkflowInstance({{instance.workflowInstanceKey}});
+	});
+</script>

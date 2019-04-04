@@ -18,11 +18,14 @@ package io.zeebe.monitor.zeebe;
 import io.zeebe.client.ZeebeClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ZeebeConnectionService {
   private static final Logger LOG = LoggerFactory.getLogger(ZeebeConnectionService.class);
+
+  @Autowired private ZeebeNotificationService notificationService;
 
   private ZeebeClient client;
   private boolean connected = false;
@@ -36,6 +39,9 @@ public class ZeebeConnectionService {
       LOG.info("connected to {}", connectionString);
 
       connected = true;
+
+      notificationService.start();
+
     } else {
       LOG.warn("Failed to connect to {}", connectionString);
     }
@@ -72,6 +78,7 @@ public class ZeebeConnectionService {
     LOG.info("disconnect");
 
     client.close();
+    notificationService.close();
 
     connected = false;
     client = null;

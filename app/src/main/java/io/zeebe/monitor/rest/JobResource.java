@@ -40,11 +40,11 @@ public class JobResource {
   @Autowired private JobRepository jobRepository;
 
   @RequestMapping(path = "/{key}/complete", method = RequestMethod.PUT)
-  public void completeJob(@PathVariable("key") long key, @RequestBody String payload) {
+  public void completeJob(@PathVariable("key") long key, @RequestBody String variables) {
 
     final ZeebeClient client = connections.getClient();
     final ActivatedJob activatedJob = activateJob(key, client);
-    client.newCompleteCommand(activatedJob.getKey()).payload(payload).send().join();
+    client.newCompleteCommand(activatedJob.getKey()).variables(variables).send().join();
   }
 
   @RequestMapping(path = "/{key}/fail", method = RequestMethod.PUT)
@@ -77,7 +77,7 @@ public class JobResource {
         client
             .newActivateJobsCommand()
             .jobType(jobType)
-            .amount(10)
+            .maxJobsToActivate(10)
             .timeout(Duration.ofSeconds(10))
             .workerName(WORKER_NAME)
             .send()

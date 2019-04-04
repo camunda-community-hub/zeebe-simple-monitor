@@ -10,15 +10,14 @@ services:
     networks:
         - zeebe-network
   zeebe:
-    container_name: zeebe_broker
-    image: camunda/zeebe:latest
+    build: .
     environment:
         - ZEEBE_LOG_LEVEL=debug
     ports:
       - "26500:26500"
+      - "5701:5701"
     volumes:
-      - ./zeebe-simple-monitor-exporter.jar:/usr/local/zeebe/lib/zeebe-simple-monitor-exporter.jar
-      - ./zeebe.cfg.toml:/usr/local/zeebe/conf/zeebe.cfg.toml 
+      - ./zeebe.cfg.toml:/usr/local/zeebe/conf/zeebe.cfg.toml
     networks:
         - zeebe-network
     depends_on:
@@ -29,10 +28,13 @@ services:
     environment:
       - spring.datasource.url=jdbc:h2:tcp://db:1521/zeebe-monitor
       - io.zeebe.monitor.connectionString=zeebe:26500
+      - io.zeebe.monitor.hazelcast.connection=zeebe:5701
     ports:
       - "8080:8080"
     depends_on:
         - db
+        - zeebe
+    restart: always
     networks:
         - zeebe-network
 networks:

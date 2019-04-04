@@ -9,6 +9,11 @@ function showSuccess(message) {
 	$('#successPanel').show();
 }
 
+function showInfo(message) {
+	document.getElementById("infoText").innerHTML = message;
+	$('#infoPanel').show();
+}
+
 function showErrorResonse(xhr, ajaxOptions, thrownError) {
 	if (xhr.responseJSON) {
 		showError(xhr.responseJSON.message);
@@ -23,6 +28,45 @@ function showErrorResonse(xhr, ajaxOptions, thrownError) {
 function reload() {
 	history.go(0)
 }
+
+// --------------------------------------------------------------------
+					
+						var stompClient = null;
+						
+						var subscribedWorkflowInstanceKeys = [];
+             
+            function connect() {
+                var socket = new SockJS('/notifications');
+                stompClient = Stomp.over(socket);  
+                stompClient.connect({}, function(frame) {
+                    stompClient.subscribe('/notifications/workflow-instance', function(message) {
+                      handleMessage(JSON.parse(message.body));
+                    });
+                });
+            }
+             
+            function disconnect() {
+                if(stompClient != null) {
+                    stompClient.disconnect();
+                }
+            }
+             
+            function sendMessage(msg) {
+                stompClient.send("/notifications", {}, 
+                  JSON.stringify(msg));
+            }
+             
+            function handleMessage(notification) {
+								var workflowInstanceKey = notification.workflowInstanceKey;
+								
+								if (subscribedWorkflowInstanceKeys.includes(workflowInstanceKey)) {
+									showInfo('Workflow instance has changed.');
+								}								
+						}
+						
+						function subscribeForWorkflowInstance(key) {
+							subscribedWorkflowInstanceKeys.push(key);
+						}
 
 // --------------------------------------------------------------------
 

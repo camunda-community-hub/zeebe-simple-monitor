@@ -17,5 +17,8 @@ spring.jpa.hibernate.ddl-auto=validate
 
 io.zeebe.monitor.connectionString=localhost:26500
 
+io.zeebe.monitor.hazelcast.connection=localhost:5701
+io.zeebe.monitor.hazelcast.topic=zeebe-workflow-instances
+
 logging.level.io.zeebe.zeebemonitor=DEBUG
 ```

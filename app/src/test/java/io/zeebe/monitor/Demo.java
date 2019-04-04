@@ -29,7 +29,7 @@ public class Demo {
         .handler(
             (c, job) ->
                 c.newCompleteCommand(job.getKey())
-                    .payload(Collections.singletonMap("totalPrice", 49.95))
+                    .variables(Collections.singletonMap("totalPrice", 49.95))
                     .send()
                     .join())
         .open();
@@ -58,7 +58,7 @@ public class Demo {
         .handler(
             (c, job) ->
                 c.newCompleteCommand(job.getKey())
-                    .payload(Collections.singletonMap("success", false))
+                    .variables(Collections.singletonMap("success", false))
                     .send()
                     .join())
         .open();

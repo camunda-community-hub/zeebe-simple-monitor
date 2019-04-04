@@ -4,16 +4,11 @@ set -e
 
 CONFIG_FILE=docker/local-config/docker-compose.yml
 PULL_CMD="docker-compose -f $CONFIG_FILE pull"
-UP_CMD="docker-compose up"
+UP_CMD="docker-compose up --build"
 
 function rmContainers() {
   docker-compose -f $CONFIG_FILE rm -fv $SERVICE_NAME || true
 }
-
-echo "Building project"
-mvn clean install
-# docker run -it --rm --name maven-zeebe-simple-monitor -v "$(pwd)":/usr/src/zeebe-simple-monitor -w /usr/src/zeebe-simple-monitor maven:3.3-jdk-8 mvn clean install
-echo "Done"
 
 CONTAINERS=(monitor zeebe db)
 
@@ -23,6 +18,12 @@ do
 done
 
 $PULL_CMD
+
+echo "Building project"
+mvn clean install
+# docker run -it --rm --name maven-zeebe-simple-monitor -v "$(pwd)":/usr/src/zeebe-simple-monitor -w /usr/src/zeebe-simple-monitor maven:3.3-jdk-8 mvn clean install
+docker build -t camunda/zeebe-simple-monitor:latest -f app/Dockerfile app
+echo "Done"
 
 echo "copying jar"
 cp exporter/target/zeebe-simple-monitor-exporter-*.jar docker/local-config/zeebe-simple-monitor-exporter.jar
