@@ -35,29 +35,35 @@ and try again.
 
 #### How to build
 
-Build with Maven
+1. Build with Maven
 
-`mvn clean install`
+		`mvn clean install`
 
-Before you start the broker, copy the exporter JAR from the target folder into the lib folder of the broker.
+2. Before you start the broker, copy the exporter JAR from the target folder into the lib folder of the broker.
 
-```
-cp exporter/target/zeebe-simple-monitor-exporter-%{VERSION}.jar ~/zeebe-broker-%{VERSION}/lib/
-```
+		```
+		cp exporter/target/zeebe-simple-monitor-exporter-%{VERSION}.jar ~/zeebe-broker-%{VERSION}/lib/
+		```
+		
+		If you don't use the Hazelcast exporter yet then download the [Hazelcast exporter jar](https://github.com/zeebe-io/zeebe-hazelcast-exporter/releases) and copy it also into the lib folder.
 
-Register the exporter in the Zeebe configuration file `~/zeebe-broker-%{VERSION}/config/zeebe.cfg.toml`.
+3. Register the exporters in the Zeebe configuration file `~/zeebe-broker-%{VERSION}/config/zeebe.cfg.toml`.
 
-```
-[[exporters]]
-id = "simple-monitor"
-className = "io.zeebe.monitor.SimpleMonitorExporter"
-```
+		```
+		[[exporters]]
+		id = "simple-monitor"
+		className = "io.zeebe.monitor.SimpleMonitorExporter"
+		
+		[[exporters]]
+		id = "hazelcast"
+		className = "io.zeebe.hazelcast.exporter.HazelcastExporter"
+		```
 
-Now start the broker and the webapp
+4. Now start the broker and the webapp
 
-`java -jar app/target/zeebe-simple-monitor-app-{VERSION}.jar`
+		`java -jar app/target/zeebe-simple-monitor-app-{VERSION}.jar`
 
-Open a web browser and go to http://localhost:8080
+5. Open a web browser and go to http://localhost:8080
 
 > The default configuration uses a file-based H2 database and works if the broker and the webapp runs on the same machine. See the [exporter](https://github.com/zeebe-io/zeebe-simple-monitor/tree/master/exporter#configure-the-exporter) and the [web application](https://github.com/zeebe-io/zeebe-simple-monitor/tree/master/app#configuration) for more configuration options.
 

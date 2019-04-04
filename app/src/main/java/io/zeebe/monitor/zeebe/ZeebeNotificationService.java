@@ -9,6 +9,7 @@ import io.zeebe.hazelcast.connect.java.WorkflowInstanceEventListener;
 import io.zeebe.monitor.rest.WorkflowInstanceNotification;
 import io.zeebe.monitor.rest.WorkflowInstanceNotification.Type;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
@@ -17,10 +18,13 @@ public class ZeebeNotificationService {
 
   @Autowired private SimpMessagingTemplate webSocket;
 
-  private HazelcastInstance hazelcast;
+  @Value("${io.zeebe.monitor.hazelcast.connection}")
+  private String hazelcastConnection;
 
-  // TODO add url + topic of hazelcast to config
-  private String hazelcastConnection = "127.0.0.1:5701";
+  @Value("${io.zeebe.monitor.hazelcast.topic}")
+  private String hazelcastTopic;
+
+  private HazelcastInstance hazelcast;
 
   public void start() {
     final ClientConfig clientConfig = new ClientConfig();
@@ -28,7 +32,7 @@ public class ZeebeNotificationService {
 
     hazelcast = HazelcastClient.newHazelcastClient(clientConfig);
 
-    final ITopic<byte[]> topic = hazelcast.getTopic("zeebe-workflow-instances");
+    final ITopic<byte[]> topic = hazelcast.getTopic(hazelcastTopic);
     topic.addMessageListener(
         new WorkflowInstanceEventListener(this::sendWorkflowInstanceNotification));
   }
