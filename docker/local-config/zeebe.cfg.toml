@@ -293,7 +293,7 @@ className = "io.zeebe.monitor.SimpleMonitorExporter"
   # available in the exporter/broker classpath (add it to the broker lib folder).
   # The name is used to load the driver implementation like this
   # Class.forName(configuration.driverName);
-  # 
+  #
   driverName = "org.h2.Driver"
   userName = "sa"
   password = ""
@@ -309,6 +309,10 @@ className = "io.zeebe.monitor.SimpleMonitorExporter"
   #If the value is less then one, then no timer will be scheduled.
   #
   #batchTimerMilli = 1000
+
+[[exporters]]
+id = "hazelcast"
+className = "io.zeebe.hazelcast.exporter.HazelcastExporter"
 
 #id = "elasticsearch"
 #className = "io.zeebe.exporter.ElasticsearchExporter"
