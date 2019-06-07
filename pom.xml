@@ -75,6 +75,37 @@
         </dependencies>
     </dependencyManagement>
 
+    <profiles>
+        <profile>
+            <id>release</id>
+            <properties>
+                <plugin.version.gpg>1.6</plugin.version.gpg>
+                <gpg.passphrase>${env.GPG_PASS}</gpg.passphrase>
+                <resume>false</resume>
+                <tag>${env.RELEASE_VERSION}</tag>
+                <releaseVersion>${env.RELEASE_VERSION}</releaseVersion>
+                <developmentVersion>${env.DEVELOPMENT_VERSION}</developmentVersion>
+                <arguments>-s .ci/settings.xml -DskipTests</arguments>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-gpg-plugin</artifactId>
+                            <configuration>
+                                <gpgArguments>
+                                    <arg>--pinentry-mode</arg>
+                                    <arg>loopback</arg>
+                                </gpgArguments>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+    </profiles>
+
     <repositories>
         <repository>
             <id>zeebe</id>
@@ -100,24 +131,6 @@
             </snapshots>
         </repository>
     </repositories>
-
-    <profiles>
-        <profile>
-            <id>sonatype-oss-release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <configuration>
-                            <!-- skip gpg signing as the release is not pushed to maven central -->
-                            <skip>true</skip>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
     <scm>
         <url>https://github.com/zeebe-io/zeebe-simple-monitor</url>
