@@ -89,9 +89,9 @@ public class SimpleMonitorExporter implements Exporter {
 
   private static final String INSERT_INCIDENT =
       "INSERT INTO INCIDENT"
-          + " (ID_, KEY_, WORKFLOW_INSTANCE_KEY_, ELEMENT_INSTANCE_KEY_, JOB_KEY_, ERROR_TYPE_, ERROR_MSG_, CREATED_)"
+          + " (ID_, KEY_, BPMN_PROCESS_ID_, WORKFLOW_KEY_, WORKFLOW_INSTANCE_KEY_, ELEMENT_INSTANCE_KEY_, JOB_KEY_, ERROR_TYPE_, ERROR_MSG_, CREATED_)"
           + " VALUES "
-          + "('%s', %d, %d, %d, %d, '%s', '%s', %d)";
+          + "('%s', %d, '%s', %d, %d, %d, %d, '%s', '%s', %d)";
 
   private static final String UPDATE_INCIDENT =
       "UPDATE INCIDENT SET RESOLVED_ = %d WHERE KEY_ = %d;";
@@ -418,6 +418,8 @@ public class SimpleMonitorExporter implements Exporter {
     final long timestamp = record.getTimestamp().toEpochMilli();
 
     final IncidentRecordValue incidentRecordValue = (IncidentRecordValue) record.getValue();
+    final String bpmnProcessId = getCleanString(incidentRecordValue.getBpmnProcessId());
+    final long workflowKey = incidentRecordValue.getWorkflowKey();
     final long workflowInstanceKey = incidentRecordValue.getWorkflowInstanceKey();
     final long elementInstanceKey = incidentRecordValue.getElementInstanceKey();
     final long jobKey = incidentRecordValue.getJobKey();
@@ -430,6 +432,8 @@ public class SimpleMonitorExporter implements Exporter {
               INSERT_INCIDENT,
               createId(),
               key,
+              bpmnProcessId,
+              workflowKey,
               workflowInstanceKey,
               elementInstanceKey,
               jobKey,
