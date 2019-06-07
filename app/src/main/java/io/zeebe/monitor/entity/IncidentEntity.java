@@ -29,6 +29,12 @@ public class IncidentEntity {
   @Column(name = "KEY_")
   private long key;
 
+  @Column(name = "BPMN_PROCESS_ID_")
+  private String bpmnProcessId;
+
+  @Column(name = "WORKFLOW_KEY_")
+  private long workflowKey;
+
   @Column(name = "WORKFLOW_INSTANCE_KEY_")
   private long workflowInstanceKey;
 
@@ -74,6 +80,24 @@ public class IncidentEntity {
 
   public void setKey(long incidentKey) {
     this.key = incidentKey;
+  }
+
+  public String getBpmnProcessId() {
+    return bpmnProcessId;
+  }
+
+  public IncidentEntity setBpmnProcessId(String bpmnProcessId) {
+    this.bpmnProcessId = bpmnProcessId;
+    return this;
+  }
+
+  public long getWorkflowKey() {
+    return workflowKey;
+  }
+
+  public IncidentEntity setWorkflowKey(long workflowKey) {
+    this.workflowKey = workflowKey;
+    return this;
   }
 
   public long getWorkflowInstanceKey() {

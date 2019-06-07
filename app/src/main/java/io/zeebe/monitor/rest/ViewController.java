@@ -525,15 +525,9 @@ public class ViewController {
     final IncidentListDto dto = new IncidentListDto();
     dto.setKey(incident.getIncidentKey());
 
+    dto.setBpmnProcessId(incident.getBpmnProcessId());
+    dto.setWorkflowKey(incident.getWorkflowKey());;
     dto.setWorkflowInstanceKey(incident.getWorkflowInstanceKey());
-
-    workflowInstanceRepository
-        .findByKey(incident.getWorkflowInstanceKey())
-        .ifPresent(
-            instance -> {
-              dto.setBpmnProcessId(instance.getBpmnProcessId());
-              dto.setWorkflowKey(instance.getWorkflowKey());
-            });
 
     dto.setErrorType(incident.getErrorType());
     dto.setErrorMessage(incident.getErrorMessage());
