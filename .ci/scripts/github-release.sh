@@ -6,7 +6,7 @@ export GITHUB_REPO=zeebe-simple-monitor
 
 # do github release
 curl -sL https://github.com/aktau/github-release/releases/download/v0.7.2/linux-amd64-github-release.tar.bz2 | tar xjvf - --strip 3
-./github-release release --user ${GITHUB_ORG} --repo ${GITHUB_REPO} --tag ${RELEASE_VERSION} --draft --name "Zeebe Hazelcast Exporter ${RELEASE_VERSION}" --description ""
+./github-release release --user ${GITHUB_ORG} --repo ${GITHUB_REPO} --tag ${RELEASE_VERSION} --draft --name "Zeebe Simple Monitor ${RELEASE_VERSION}" --description ""
 
 # upload app
 cd app/target
