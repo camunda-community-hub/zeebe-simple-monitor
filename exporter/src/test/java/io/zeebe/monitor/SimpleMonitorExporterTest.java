@@ -14,8 +14,9 @@ import io.zeebe.exporter.api.record.value.WorkflowInstanceRecordValue;
 import io.zeebe.exporter.api.record.value.deployment.DeployedWorkflow;
 import io.zeebe.exporter.api.record.value.deployment.DeploymentResource;
 import io.zeebe.exporter.api.record.value.deployment.ResourceType;
-import io.zeebe.protocol.clientapi.RecordType;
-import io.zeebe.protocol.clientapi.ValueType;
+import io.zeebe.protocol.Protocol;
+import io.zeebe.protocol.RecordType;
+import io.zeebe.protocol.ValueType;
 import io.zeebe.protocol.intent.DeploymentIntent;
 import io.zeebe.protocol.intent.Intent;
 import io.zeebe.protocol.intent.WorkflowInstanceIntent;
@@ -37,6 +38,8 @@ public class SimpleMonitorExporterTest {
   public static final String SELECT_FROM_WORKFLOW = "SELECT * FROM WORKFLOW;";
   public static final String SELECT_FROM_WORKFLOW_INSTANCE = "SELECT * FROM WORKFLOW_INSTANCE;";
   public static final String SELECT_FROM_ELEMENT_INSTANCE = "SELECT * FROM ELEMENT_INSTANCE;";
+
+  private static final int PARTITION_ID = Protocol.START_PARTITION_ID;
 
   private SimpleMonitorExporter exporter;
   private SimpleMonitorExporterConfiguration configuration;
@@ -152,7 +155,7 @@ public class SimpleMonitorExporterTest {
         UUID.fromString(uuid); // should not thrown an exception
 
         final int partitionId = resultSet.getInt(2);
-        assertThat(partitionId).isEqualTo(0);
+        assertThat(partitionId).isEqualTo(PARTITION_ID);
 
         final long key = resultSet.getLong(3);
         assertThat(key).isEqualTo(4L);
@@ -214,7 +217,7 @@ public class SimpleMonitorExporterTest {
         UUID.fromString(uuid); // should not thrown an exception
 
         final int partitionId = resultSet.getInt(2);
-        assertThat(partitionId).isEqualTo(0);
+        assertThat(partitionId).isEqualTo(PARTITION_ID);
 
         final long key = resultSet.getLong(3);
         assertThat(key).isEqualTo(4L);
@@ -270,7 +273,7 @@ public class SimpleMonitorExporterTest {
         UUID.fromString(uuid); // should not thrown an exception
 
         final int partitionId = resultSet.getInt(2);
-        assertThat(partitionId).isEqualTo(0);
+        assertThat(partitionId).isEqualTo(PARTITION_ID);
 
         final long key = resultSet.getLong(3);
         assertThat(key).isEqualTo(1L);
@@ -308,7 +311,7 @@ public class SimpleMonitorExporterTest {
 
     final RecordMetadata metadataMock = mock(RecordMetadata.class);
     when(metadataMock.getRecordType()).thenReturn(RecordType.EVENT);
-    when(metadataMock.getPartitionId()).thenReturn(0);
+    when(metadataMock.getPartitionId()).thenReturn(Protocol.START_PARTITION_ID);
     when(metadataMock.getValueType()).thenReturn(valueType);
     when(metadataMock.getIntent()).thenReturn(intent);
 
