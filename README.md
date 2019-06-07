@@ -24,7 +24,7 @@ In your terminal (in the root project folder):
 docker/run
 ```
 Note: You can build the project with maven in a containerized environ by commenting the line 14 and uncommenting the line 15 in the `docker/run` file.
-If you don't have the right to launch `docker/run` try : 
+If you don't have the right to launch `docker/run` try :
 
 ```bash
 chmod +x docker/run
@@ -36,32 +36,33 @@ and try again.
 #### How to build
 
 1. Build with Maven
-
-		`mvn clean install`
+    ```
+	mvn clean install
+    ```
 
 2. Before you start the broker, copy the exporter JAR from the target folder into the lib folder of the broker.
 
-		```
-		cp exporter/target/zeebe-simple-monitor-exporter-%{VERSION}.jar ~/zeebe-broker-%{VERSION}/lib/
-		```
-		
-		If you don't use the Hazelcast exporter yet then download the [Hazelcast exporter jar](https://github.com/zeebe-io/zeebe-hazelcast-exporter/releases) and copy it also into the lib folder.
+    ```
+    cp exporter/target/zeebe-simple-monitor-exporter-%{VERSION}.jar ~/zeebe-broker-%{VERSION}/lib/
+	```
+
+	If you don't use the Hazelcast exporter yet then download the [Hazelcast exporter jar](https://github.com/zeebe-io/zeebe-hazelcast-exporter/releases) and copy it also into the lib folder.
 
 3. Register the exporters in the Zeebe configuration file `~/zeebe-broker-%{VERSION}/config/zeebe.cfg.toml`.
+    ```
+    [[exporters]]
+    id = "simple-monitor"
+    className = "io.zeebe.monitor.SimpleMonitorExporter"
 
-		```
-		[[exporters]]
-		id = "simple-monitor"
-		className = "io.zeebe.monitor.SimpleMonitorExporter"
-		
-		[[exporters]]
-		id = "hazelcast"
-		className = "io.zeebe.hazelcast.exporter.HazelcastExporter"
-		```
+    [[exporters]]
+    id = "hazelcast"
+    className = "io.zeebe.hazelcast.exporter.HazelcastExporter"
+    ```
 
 4. Now start the broker and the webapp
-
-		`java -jar app/target/zeebe-simple-monitor-app-{VERSION}.jar`
+    ```
+	java -jar app/target/zeebe-simple-monitor-app-{VERSION}.jar
+    ```
 
 5. Open a web browser and go to http://localhost:8080
 
@@ -85,7 +86,7 @@ this code. Please report unacceptable behavior to code-of-conduct@zeebe.io.
 
 ## License
 
-[Apache License, Version 2.0](/LICENSE) 
+[Apache License, Version 2.0](/LICENSE)
 
 [broker-core]: https://github.com/zeebe-io/zeebe/tree/master/broker-core
 [agpl]: https://github.com/zeebe-io/zeebe/blob/master/GNU-AGPL-3.0
