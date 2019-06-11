@@ -1,6 +1,6 @@
 FROM maven:latest as downloader
 
-ENV HAZELCAST_EXPORTER_VERSION 0.2.0
+ENV HAZELCAST_EXPORTER_VERSION 0.3.0
 
 RUN mvn dependency:get -B \
     -DgroupId="io.zeebe.hazelcast" -DartifactId="zeebe-hazelcast-exporter" \
