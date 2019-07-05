@@ -7,19 +7,7 @@ import static org.mockito.Mockito.when;
 import io.zeebe.exporter.api.context.Configuration;
 import io.zeebe.exporter.api.context.Context;
 import io.zeebe.exporter.api.context.Controller;
-import io.zeebe.exporter.api.record.Record;
-import io.zeebe.exporter.api.record.RecordMetadata;
-import io.zeebe.exporter.api.record.value.DeploymentRecordValue;
-import io.zeebe.exporter.api.record.value.WorkflowInstanceRecordValue;
-import io.zeebe.exporter.api.record.value.deployment.DeployedWorkflow;
-import io.zeebe.exporter.api.record.value.deployment.DeploymentResource;
-import io.zeebe.exporter.api.record.value.deployment.ResourceType;
 import io.zeebe.protocol.Protocol;
-import io.zeebe.protocol.RecordType;
-import io.zeebe.protocol.ValueType;
-import io.zeebe.protocol.intent.DeploymentIntent;
-import io.zeebe.protocol.intent.Intent;
-import io.zeebe.protocol.intent.WorkflowInstanceIntent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -28,6 +16,18 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import io.zeebe.protocol.record.Record;
+import io.zeebe.protocol.record.RecordType;
+import io.zeebe.protocol.record.ValueType;
+import io.zeebe.protocol.record.intent.DeploymentIntent;
+import io.zeebe.protocol.record.intent.Intent;
+import io.zeebe.protocol.record.intent.WorkflowInstanceIntent;
+import io.zeebe.protocol.record.value.DeploymentRecordValue;
+import io.zeebe.protocol.record.value.WorkflowInstanceRecordValue;
+import io.zeebe.protocol.record.value.deployment.DeployedWorkflow;
+import io.zeebe.protocol.record.value.deployment.DeploymentResource;
+import io.zeebe.protocol.record.value.deployment.ResourceType;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -307,15 +307,13 @@ public class SimpleMonitorExporterTest {
       final ValueType valueType, final Intent intent, final long key) {
     final Record recordMock = mock(Record.class);
     when(recordMock.getKey()).thenReturn(key);
-    when(recordMock.getTimestamp()).thenReturn(Instant.now());
+    when(recordMock.getTimestamp()).thenReturn(Instant.now().toEpochMilli());
 
-    final RecordMetadata metadataMock = mock(RecordMetadata.class);
-    when(metadataMock.getRecordType()).thenReturn(RecordType.EVENT);
-    when(metadataMock.getPartitionId()).thenReturn(Protocol.START_PARTITION_ID);
-    when(metadataMock.getValueType()).thenReturn(valueType);
-    when(metadataMock.getIntent()).thenReturn(intent);
+    when(recordMock.getRecordType()).thenReturn(RecordType.EVENT);
+    when(recordMock.getValueType()).thenReturn(valueType);
+    when(recordMock.getPartitionId()).thenReturn(Protocol.START_PARTITION_ID);
+    when(recordMock.getIntent()).thenReturn(intent);
 
-    when(recordMock.getMetadata()).thenReturn(metadataMock);
     return recordMock;
   }
 

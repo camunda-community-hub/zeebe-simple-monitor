@@ -15,34 +15,19 @@
  */
 package io.zeebe.monitor;
 
+import io.zeebe.exporter.api.Exporter;
 import io.zeebe.exporter.api.context.Context;
 import io.zeebe.exporter.api.context.Controller;
-import io.zeebe.exporter.api.record.Record;
-import io.zeebe.exporter.api.record.RecordMetadata;
-import io.zeebe.exporter.api.record.value.DeploymentRecordValue;
-import io.zeebe.exporter.api.record.value.IncidentRecordValue;
-import io.zeebe.exporter.api.record.value.JobBatchRecordValue;
-import io.zeebe.exporter.api.record.value.JobRecordValue;
-import io.zeebe.exporter.api.record.value.MessageRecordValue;
-import io.zeebe.exporter.api.record.value.MessageSubscriptionRecordValue;
-import io.zeebe.exporter.api.record.value.TimerRecordValue;
-import io.zeebe.exporter.api.record.value.VariableRecordValue;
-import io.zeebe.exporter.api.record.value.WorkflowInstanceRecordValue;
-import io.zeebe.exporter.api.record.value.deployment.DeployedWorkflow;
-import io.zeebe.exporter.api.record.value.deployment.DeploymentResource;
-import io.zeebe.exporter.api.Exporter;
 import io.zeebe.protocol.Protocol;
-import io.zeebe.protocol.RecordType;
-import io.zeebe.protocol.ValueType;
-import io.zeebe.protocol.intent.DeploymentIntent;
-import io.zeebe.protocol.intent.IncidentIntent;
-import io.zeebe.protocol.intent.Intent;
-import io.zeebe.protocol.intent.JobBatchIntent;
-import io.zeebe.protocol.intent.JobIntent;
-import io.zeebe.protocol.intent.MessageIntent;
-import io.zeebe.protocol.intent.MessageSubscriptionIntent;
-import io.zeebe.protocol.intent.TimerIntent;
-import io.zeebe.protocol.intent.WorkflowInstanceIntent;
+import io.zeebe.protocol.record.Record;
+import io.zeebe.protocol.record.RecordType;
+import io.zeebe.protocol.record.ValueType;
+import io.zeebe.protocol.record.intent.*;
+import io.zeebe.protocol.record.value.*;
+import io.zeebe.protocol.record.value.deployment.DeployedWorkflow;
+import io.zeebe.protocol.record.value.deployment.DeploymentResource;
+import org.slf4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -51,15 +36,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
 
 public class SimpleMonitorExporter implements Exporter {
 
@@ -193,6 +172,19 @@ public class SimpleMonitorExporter implements Exporter {
     } catch (final ClassNotFoundException e) {
       throw new RuntimeException("Driver not found in class path", e);
     }
+
+      context.setFilter(
+              new Context.RecordFilter() {
+                  @Override
+                  public boolean acceptType(RecordType recordType) {
+                      return recordType == RecordType.EVENT;
+                  }
+
+                  @Override
+                  public boolean acceptValue(ValueType valueType) {
+                      return insertCreatorPerType.containsKey(valueType);
+                  }
+              });
   }
 
   private void applyEnvironmentVariables(final SimpleMonitorExporterConfiguration configuration) {
@@ -264,12 +256,8 @@ public class SimpleMonitorExporter implements Exporter {
   @Override
   public void export(final Record record) {
     lastPosition = record.getPosition();
-    if (record.getMetadata().getRecordType() != RecordType.EVENT) {
-      return;
-    }
 
-    final Consumer<Record> recordConsumer =
-        insertCreatorPerType.get(record.getMetadata().getValueType());
+    final Consumer<Record> recordConsumer = insertCreatorPerType.get(record.getValueType());
     if (recordConsumer != null) {
       recordConsumer.accept(record);
 
@@ -297,22 +285,19 @@ public class SimpleMonitorExporter implements Exporter {
     controller.updateLastExportedRecordPosition(lastPosition);
   }
 
-  private void exportDeploymentRecord(final Record record) {
-    final RecordMetadata metadata = record.getMetadata();
-    if (metadata.getIntent() != DeploymentIntent.CREATED
-        || metadata.getPartitionId() != Protocol.DEPLOYMENT_PARTITION) {
+  private void exportDeploymentRecord(final Record<DeploymentRecordValue> record) {
+    if (record.getIntent() != DeploymentIntent.CREATED
+        || record.getPartitionId() != Protocol.DEPLOYMENT_PARTITION) {
       // ignore deployment event on other partitions to avoid duplicates
       return;
     }
-    final long timestamp = record.getTimestamp().toEpochMilli();
+    final long timestamp = record.getTimestamp();
     final DeploymentRecordValue deploymentRecordValue = (DeploymentRecordValue) record.getValue();
 
     final List<DeploymentResource> resources = deploymentRecordValue.getResources();
     for (final DeploymentResource resource : resources) {
       final List<DeployedWorkflow> deployedWorkflows =
-          deploymentRecordValue
-              .getDeployedWorkflows()
-              .stream()
+          deploymentRecordValue.getDeployedWorkflows().stream()
               .filter(w -> w.getResourceName().equals(resource.getResourceName()))
               .collect(Collectors.toList());
       for (final DeployedWorkflow deployedWorkflow : deployedWorkflows) {
@@ -330,21 +315,19 @@ public class SimpleMonitorExporter implements Exporter {
     }
   }
 
-  private boolean isWorkflowInstance(
-      final Record record, final WorkflowInstanceRecordValue workflowInstanceRecordValue) {
-    return workflowInstanceRecordValue.getWorkflowInstanceKey() == record.getKey();
+  private boolean isWorkflowInstance(final Record<WorkflowInstanceRecordValue> record) {
+    return record.getValue().getWorkflowInstanceKey() == record.getKey();
   }
 
-  private void exportWorkflowInstanceRecord(final Record record) {
+  private void exportWorkflowInstanceRecord(final Record<WorkflowInstanceRecordValue> record) {
     final long key = record.getKey();
-    final int partitionId = record.getMetadata().getPartitionId();
-    final Intent intent = record.getMetadata().getIntent();
-    final long timestamp = record.getTimestamp().toEpochMilli();
+    final int partitionId = record.getPartitionId();
+    final Intent intent = record.getIntent();
+    final long timestamp = record.getTimestamp();
 
-    final WorkflowInstanceRecordValue workflowInstanceRecordValue =
-        (WorkflowInstanceRecordValue) record.getValue();
+    final WorkflowInstanceRecordValue workflowInstanceRecordValue = record.getValue();
 
-    if (isWorkflowInstance(record, workflowInstanceRecordValue)) {
+    if (isWorkflowInstance(record)) {
       exportWorkflowInstance(key, partitionId, intent, timestamp, workflowInstanceRecordValue);
     } else {
       exportElementInstance(key, partitionId, intent, timestamp, workflowInstanceRecordValue);
@@ -412,10 +395,10 @@ public class SimpleMonitorExporter implements Exporter {
     sqlStatements.add(insertActivityInstanceStatement);
   }
 
-  private void exportIncidentRecord(final Record record) {
+  private void exportIncidentRecord(final Record<IncidentRecordValue> record) {
     final long key = record.getKey();
-    final Intent intent = record.getMetadata().getIntent();
-    final long timestamp = record.getTimestamp().toEpochMilli();
+    final Intent intent = record.getIntent();
+    final long timestamp = record.getTimestamp();
 
     final IncidentRecordValue incidentRecordValue = (IncidentRecordValue) record.getValue();
     final String bpmnProcessId = getCleanString(incidentRecordValue.getBpmnProcessId());
@@ -423,7 +406,7 @@ public class SimpleMonitorExporter implements Exporter {
     final long workflowInstanceKey = incidentRecordValue.getWorkflowInstanceKey();
     final long elementInstanceKey = incidentRecordValue.getElementInstanceKey();
     final long jobKey = incidentRecordValue.getJobKey();
-    final String errorType = getCleanString(incidentRecordValue.getErrorType());
+    final String errorType = getCleanString(incidentRecordValue.getErrorType().name());
     final String errorMessage = getCleanString(incidentRecordValue.getErrorMessage());
 
     if (intent == IncidentIntent.CREATED) {
@@ -447,16 +430,16 @@ public class SimpleMonitorExporter implements Exporter {
     }
   }
 
-  private void exportJobRecord(final Record record) {
+  private void exportJobRecord(final Record<JobRecordValue> record) {
     final long key = record.getKey();
-    final Intent intent = record.getMetadata().getIntent();
-    final long timestamp = record.getTimestamp().toEpochMilli();
+    final Intent intent = record.getIntent();
+    final long timestamp = record.getTimestamp();
     final String state = intent.name().toLowerCase();
 
-    final JobRecordValue jobRecord = (JobRecordValue) record.getValue();
+    final JobRecordValue jobRecord = record.getValue();
     final String jobType = jobRecord.getType();
-    final long workflowInstanceKey = jobRecord.getHeaders().getWorkflowInstanceKey();
-    final long elementInstanceKey = jobRecord.getHeaders().getElementInstanceKey();
+    final long workflowInstanceKey = jobRecord.getWorkflowInstanceKey();
+    final long elementInstanceKey = jobRecord.getElementInstanceKey();
     final int retries = jobRecord.getRetries();
     final String worker = jobRecord.getWorker();
 
@@ -480,10 +463,10 @@ public class SimpleMonitorExporter implements Exporter {
     }
   }
 
-  private void exportMessageRecord(final Record record) {
+  private void exportMessageRecord(final Record<MessageRecordValue> record) {
     final long key = record.getKey();
-    final Intent intent = record.getMetadata().getIntent();
-    final long timestamp = record.getTimestamp().toEpochMilli();
+    final Intent intent = record.getIntent();
+    final long timestamp = record.getTimestamp();
     final String state = intent.name().toLowerCase();
 
     final MessageRecordValue messageRecord = (MessageRecordValue) record.getValue();
@@ -491,7 +474,7 @@ public class SimpleMonitorExporter implements Exporter {
     final String name = messageRecord.getName();
     final String correlationKey = messageRecord.getCorrelationKey();
     final String messageId = messageRecord.getMessageId();
-    final String variables = messageRecord.getVariables();
+    final String variables = messageRecord.getVariables().toString();
 
     if (intent == MessageIntent.PUBLISHED) {
       final String insertStatement =
@@ -512,13 +495,13 @@ public class SimpleMonitorExporter implements Exporter {
     }
   }
 
-  private void exportMessageSubscriptionRecord(final Record record) {
-    final Intent intent = record.getMetadata().getIntent();
-    final long timestamp = record.getTimestamp().toEpochMilli();
+  private void exportMessageSubscriptionRecord(
+      final Record<MessageSubscriptionRecordValue> record) {
+    final Intent intent = record.getIntent();
+    final long timestamp = record.getTimestamp();
     final String state = intent.name().toLowerCase();
 
-    final MessageSubscriptionRecordValue subscriptionRecord =
-        (MessageSubscriptionRecordValue) record.getValue();
+    final MessageSubscriptionRecordValue subscriptionRecord = record.getValue();
 
     final String messageName = subscriptionRecord.getMessageName();
     final String correlationKey = subscriptionRecord.getCorrelationKey();
@@ -545,16 +528,16 @@ public class SimpleMonitorExporter implements Exporter {
     }
   }
 
-  private void exportTimerRecord(final Record record) {
+  private void exportTimerRecord(final Record<TimerRecordValue> record) {
     final long key = record.getKey();
-    final Intent intent = record.getMetadata().getIntent();
-    final long timestamp = record.getTimestamp().toEpochMilli();
+    final Intent intent = record.getIntent();
+    final long timestamp = record.getTimestamp();
     final String state = intent.name().toLowerCase();
 
     final TimerRecordValue timerRecord = (TimerRecordValue) record.getValue();
 
     final long elementInstanceKey = timerRecord.getElementInstanceKey();
-    final String handlerNodeId = timerRecord.getHandlerFlowNodeId();
+      final String handlerNodeId = timerRecord.getTargetElementId();
     final long dueDate = timerRecord.getDueDate();
 
     if (intent == TimerIntent.CREATED) {
@@ -575,11 +558,11 @@ public class SimpleMonitorExporter implements Exporter {
     }
   }
 
-  private void exportJobBatchRecord(final Record record) {
-    final Intent intent = record.getMetadata().getIntent();
-    final long timestamp = record.getTimestamp().toEpochMilli();
+  private void exportJobBatchRecord(final Record<JobBatchRecordValue> record) {
+    final Intent intent = record.getIntent();
+    final long timestamp = record.getTimestamp();
 
-    final JobBatchRecordValue jobBatch = (JobBatchRecordValue) record.getValue();
+    final JobBatchRecordValue jobBatch = record.getValue();
 
     final String worker = jobBatch.getWorker();
     final String jobType = jobBatch.getType();
@@ -594,12 +577,12 @@ public class SimpleMonitorExporter implements Exporter {
     }
   }
 
-  private void exportVariableRecord(final Record record) {
-    final Intent intent = record.getMetadata().getIntent();
-    final long timestamp = record.getTimestamp().toEpochMilli();
+  private void exportVariableRecord(final Record<VariableRecordValue> record) {
+    final Intent intent = record.getIntent();
+    final long timestamp = record.getTimestamp();
     final String state = intent.name().toLowerCase();
 
-    final VariableRecordValue variableRecord = (VariableRecordValue) record.getValue();
+    final VariableRecordValue variableRecord = record.getValue();
 
     final String name = variableRecord.getName();
     final String value = variableRecord.getValue();

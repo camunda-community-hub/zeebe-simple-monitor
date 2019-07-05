@@ -25,9 +25,9 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <zeebe.version>0.18.0</zeebe.version>
+        <zeebe.version>0.19.0</zeebe.version>
         <spring.boot.version>2.1.2.RELEASE</spring.boot.version>
-        <hazelcast.exporter.version>0.3.0</hazelcast.exporter.version>
+        <hazelcast.exporter.version>0.4.0</hazelcast.exporter.version>
 
         <!-- release parent settings -->
         <version.java>1.8</version.java>

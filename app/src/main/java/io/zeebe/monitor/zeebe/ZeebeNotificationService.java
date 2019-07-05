@@ -3,11 +3,12 @@ package io.zeebe.monitor.zeebe;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.ITopic;
 import io.zeebe.exporter.proto.Schema.WorkflowInstanceRecord;
-import io.zeebe.hazelcast.connect.java.WorkflowInstanceEventListener;
+import io.zeebe.hazelcast.connect.java.ZeebeHazelcast;
 import io.zeebe.monitor.rest.WorkflowInstanceNotification;
 import io.zeebe.monitor.rest.WorkflowInstanceNotification.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 public class ZeebeNotificationService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ZeebeNotificationService.class);
 
   @Autowired private SimpMessagingTemplate webSocket;
 
@@ -30,11 +33,19 @@ public class ZeebeNotificationService {
     final ClientConfig clientConfig = new ClientConfig();
     clientConfig.getNetworkConfig().addAddress(hazelcastConnection);
 
-    hazelcast = HazelcastClient.newHazelcastClient(clientConfig);
+      try {
+          LOG.info("Connecting to Hazelcast '{}'", hazelcastConnection);
 
-    final ITopic<byte[]> topic = hazelcast.getTopic(hazelcastTopic);
-    topic.addMessageListener(
-        new WorkflowInstanceEventListener(this::sendWorkflowInstanceNotification));
+          hazelcast = HazelcastClient.newHazelcastClient(clientConfig);
+
+          LOG.info("Listening on Hazelcast topic '{}' for workflow instances", hazelcastTopic);
+
+          new ZeebeHazelcast(hazelcast)
+                  .addWorkflowInstanceListener(hazelcastTopic, this::sendWorkflowInstanceNotification);
+
+      } catch (Exception e) {
+          LOG.warn("Failed to connect to Hazelcast. Still works but no updates will be received.", e);
+      }
   }
 
   private void sendWorkflowInstanceNotification(WorkflowInstanceRecord workflowInstance) {
