@@ -1,20 +1,17 @@
 Zeebe Simple Monitor
 =========================
 
-This is a monitoring application for [Zeebe](https://zeebe.io). It has two parts: an [exporter](https://github.com/zeebe-io/zeebe-simple-monitor/exporter) and a [web application](https://github.com/zeebe-io/zeebe-simple-monitor/app). The exporter runs on the Zeebe broker and export data to a database. The webapp reads the data from the database and present it in a HTML5 web application.
+A monitoring application for [Zeebe](https://zeebe.io). It is designed for developers and helps to understand how workflows are executed in Zeebe.
 
-**Important notes:**
-* The simple monitor is a community project meant for playing around with Zeebe. **Consider it unstable! There is no guranteed maintenance! It is not officially supported by the Zeebe Team!** But of course everybody is invited to contribute!
-* The simple monitor is tested on **Chrome only**. Other browsers are not supported.
+![screencast](app/docs/zeebe-simple-monitor.gif)
 
-**Features:**
-* inspect deployed workflows
-* inspect workflow instances, including payload and incidents
-* management operations (e.g. new deployment, cancel workflow instance, update payload)
+The application data is imported from Zeebe using the [Hazelcast exporter](https://github.com/zeebe-io/zeebe-hazelcast-exporter). 
 
-## How to run
+![how-it-works](app/docs/how-it-works.png)
 
-### With Docker
+## Install
+
+### Docker
 
 The following command will build the project, pull images and start containers with default settings.
 
@@ -33,50 +30,63 @@ and try again.
 
 ### Manually
 
-#### How to build
+1. Download the latest [Hazelcast exporter JAR](https://github.com/zeebe-io/zeebe-hazelcast-exporter/releases)
 
-1. Build with Maven
+2. Copy the JAR into the broker folder `~/zeebe-broker-%{VERSION}/lib`
+
+3. Add the exporter to the broker configuration `~/zeebe-broker-%{VERSION}/config/zeebe.cfg.toml`.
     ```
-	mvn clean install
-    ```
-
-2. Before you start the broker, copy the exporter JAR from the target folder into the lib folder of the broker.
-
-    ```
-    cp exporter/target/zeebe-simple-monitor-exporter-%{VERSION}.jar ~/zeebe-broker-%{VERSION}/lib/
-	```
-
-	If you don't use the Hazelcast exporter yet then download the [Hazelcast exporter jar](https://github.com/zeebe-io/zeebe-hazelcast-exporter/releases) and copy it also into the lib folder.
-
-3. Register the exporters in the Zeebe configuration file `~/zeebe-broker-%{VERSION}/config/zeebe.cfg.toml`.
-    ```
-    [[exporters]]
-    id = "simple-monitor"
-    className = "io.zeebe.monitor.SimpleMonitorExporter"
-
     [[exporters]]
     id = "hazelcast"
     className = "io.zeebe.hazelcast.exporter.HazelcastExporter"
+    
+      [exporters.args]
+      # comma separated list of io.zeebe.protocol.record.ValueType
+      enabledValueTypes = "JOB,WORKFLOW_INSTANCE,DEPLOYMENT,INCIDENT,TIMER,VARIABLE,MESSAGE,MESSAGE_SUBSCRIPTION,MESSAGE_START_EVENT_SUBSCRIPTION"
+    
+      # If true, the exporter update its position after publish the record to Hazelcast.
+      # Otherwise, it never update its position. On broker start, it will always start from the begin of the log. 
+      # CAUTION! The broker can't delete data and may run out of disk space if set to false. 
+      updatePosition = false
     ```
 
-4. Now start the broker and the webapp
-    ```
-	java -jar app/target/zeebe-simple-monitor-app-{VERSION}.jar
-    ```
+4. Start the broker
+    
+5. Download the latest [application JAR](https://github.com/zeebe-io/zeebe-simple-monitor/releases)    
 
-5. Open a web browser and go to http://localhost:8080
+6. Start the application
+    `java -jar zeebe-simple-monitor-app-{VERSION}.jar`
 
-> The default configuration uses a file-based H2 database and works if the broker and the webapp runs on the same machine. See the [exporter](https://github.com/zeebe-io/zeebe-simple-monitor/tree/master/exporter#configure-the-exporter) and the [web application](https://github.com/zeebe-io/zeebe-simple-monitor/tree/master/app#configuration) for more configuration options.
+7. Go to http://localhost:8080
 
-## Screenshots
+### Configuration
 
-**Workflow View**
+The configuration of the application can be changes via `application.properties`, `application.yaml` or command line arguments.
 
-![screenshot](app/docs/workflow-details.png)
+```
+# application database
+spring.datasource.url=jdbc:h2:mem:zeebe-monitor;DB_CLOSE_DELAY=-1
+spring.datasource.user=sa
+spring.datasource.password=
+spring.jpa.hibernate.ddl-auto=create
 
-**Workflow Instance View**
+# connection to Zeebe broker
+io.zeebe.monitor.connectionString=localhost:26500
 
-![screenshot](app/docs/instance-details.png)
+# connection to Hazelcast
+io.zeebe.monitor.hazelcast.connection=localhost:5701
+
+# logging
+logging.level.io.zeebe.zeebemonitor=DEBUG
+logging.level.com.hazelcast=WARN
+
+```
+
+## Build from Source
+
+Build with Maven
+   
+`mvn clean install`
 
 ## Code of Conduct
 
@@ -87,6 +97,3 @@ this code. Please report unacceptable behavior to code-of-conduct@zeebe.io.
 ## License
 
 [Apache License, Version 2.0](/LICENSE)
-
-[broker-core]: https://github.com/zeebe-io/zeebe/tree/master/broker-core
-[agpl]: https://github.com/zeebe-io/zeebe/blob/master/GNU-AGPL-3.0

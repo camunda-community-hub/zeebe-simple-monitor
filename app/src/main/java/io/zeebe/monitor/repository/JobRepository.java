@@ -23,7 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface JobRepository extends PagingAndSortingRepository<JobEntity, String> {
+public interface JobRepository extends PagingAndSortingRepository<JobEntity, Long> {
 
   List<JobEntity> findByWorkflowInstanceKey(long workflowInstanceKey);
 

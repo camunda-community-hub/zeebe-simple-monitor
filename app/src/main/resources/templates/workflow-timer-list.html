@@ -1,22 +1,20 @@
 <table class="table table-striped">
     <thead>
     <th>Element Id</th>
-    <th>Element Instance Key</th>
     <th>Due Date</th>
     <th>Repetitions</th>
     <th>State</th>
     <th>Time</th>
     </thead>
 
-    {{#instance.timers}}
+    {{#timers}}
     <tr>
         <td>{{activityId}}</td>
-        <td>{{activityInstanceKey}}</td>
         <td>{{dueDate}}</td>
         <td>{{repetitions}}</td>
         <td>{{state}}</td>
         <td>{{timestamp}}</td>
     </tr>
-    {{/instance.timers}}
+    {{/timers}}
 
 </table>

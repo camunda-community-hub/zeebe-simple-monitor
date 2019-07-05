@@ -1,6 +1,6 @@
 FROM maven:latest as downloader
 
-ENV HAZELCAST_EXPORTER_VERSION 0.3.0
+ENV HAZELCAST_EXPORTER_VERSION 0.4.0
 
 RUN mvn dependency:get -B \
     -DgroupId="io.zeebe.hazelcast" -DartifactId="zeebe-hazelcast-exporter" \
@@ -14,5 +14,4 @@ RUN mvn dependency:copy -B \
 
 FROM camunda/zeebe:latest
 
-COPY zeebe-simple-monitor-exporter.jar /usr/local/zeebe/lib/zeebe-simple-monitor-exporter.jar
 COPY --from=downloader /tmp/zeebe-hazelcast-exporter.jar /usr/local/zeebe/lib/zeebe-hazelcast-exporter.jar

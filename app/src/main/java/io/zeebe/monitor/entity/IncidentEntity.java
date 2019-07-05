@@ -23,9 +23,6 @@ import javax.persistence.Id;
 public class IncidentEntity {
 
   @Id
-  @Column(name = "ID_")
-  private String id;
-
   @Column(name = "KEY_")
   private long key;
 

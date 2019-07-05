@@ -1,0 +1,30 @@
+<table class="table table-striped">
+    <thead>
+    <th>Element Id</th>
+    <th>Message Name</th>
+    <th>State</th>
+    <th>Time</th>
+    <th></th>
+    </thead>
+
+    {{#messageSubscriptions}}
+    <tr>
+        <td>{{activityId}}</td>
+        <td>{{messageName}}</td>
+        <td>{{state}}</td>
+        <td>{{timestamp}}</td>
+        <td>
+            {{#isOpen}}
+
+            {{>modals/publish-message-modal}}
+
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#publishMessageModal">
+                Publish Message
+            </button>
+
+            {{/isOpen}}
+        </td>
+    </tr>
+    {{/messageSubscriptions}}
+
+</table>

@@ -19,7 +19,7 @@ import io.zeebe.monitor.entity.VariableEntity;
 import java.util.List;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface VariableRepository extends PagingAndSortingRepository<VariableEntity, String> {
+public interface VariableRepository extends PagingAndSortingRepository<VariableEntity, Long> {
 
   List<VariableEntity> findByWorkflowInstanceKey(long workflowInstanceKey);
 }

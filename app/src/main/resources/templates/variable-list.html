@@ -1,35 +1,39 @@
 <table class="table table-striped">
-	<thead>
-		<th>Scope Key</th>
-		<th>Scope Name</th>
-	  <th>Variable Name</th>
-	  <th>Variable Value</th>
-		<th>Time</th>
-		<th> </th>
-</thead>
+    <thead>
+    <th>Scope Key</th>
+    <th>Scope Name</th>
+    <th>Variable Name</th>
+    <th>Variable Value</th>
+    <th>Time</th>
+    <th></th>
+    </thead>
 
-{{#instance.variables}}
-	<tr>
-		<td>{{scopeKey}}</td>
-		<td>{{scopeName}}</td>
-		<td>{{name}}</td>
-		<td>{{value}}</td>
-		<td>{{timestamp}}</td>
-		<td> 
-			{{>modals/variable-updates-modal}}
-			
-			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#variableUpdatesModal-{{scopeKey}}-{{name}}">
-		  	Show History
-			</button>
-		
-			{{>modals/update-variable-modal}}			
-			 
-	 		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#updateVariableModal-{{scopeKey}}-{{name}}">
-		  	Update
-			</button>
-			
-		</td>
-	</tr>
-{{/instance.variables}}
+    {{#instance.variables}}
+    <tr>
+        <td>{{scopeKey}}</td>
+        <td>{{scopeName}}</td>
+        <td>{{name}}</td>
+        <td>{{value}}</td>
+        <td>{{timestamp}}</td>
+        <td>
+            {{>modals/variable-updates-modal}}
+
+            <button type="button" class="btn btn-primary" data-toggle="modal"
+                    data-target="#variableUpdatesModal-{{scopeKey}}-{{name}}">
+                Show History
+            </button>
+
+            {{>modals/update-variable-modal}}
+
+            <button type="button" class="btn btn-primary" data-toggle="modal"
+                    data-target="#updateVariableModal-{{scopeKey}}-{{name}}"
+                    {{^instance.isRunning}}disabled{{
+            /instance.isRunning}}>
+            Update
+            </button>
+
+        </td>
+    </tr>
+    {{/instance.variables}}
 
 </table>

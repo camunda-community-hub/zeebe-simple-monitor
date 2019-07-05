@@ -18,14 +18,11 @@ package io.zeebe.monitor.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 @Entity(name = "WORKFLOW")
 public class WorkflowEntity {
-
   @Id
-  @Column(name = "ID_")
-  private String id;
-
   @Column(name = "KEY_")
   private long key;
 
@@ -35,15 +32,12 @@ public class WorkflowEntity {
   @Column(name = "VERSION_")
   private int version;
 
+  @Lob
   @Column(name = "RESOURCE_")
   private String resource;
 
   @Column(name = "TIMESTAMP_")
   private long timestamp;
-
-  public String getId() {
-    return id;
-  }
 
   public String getResource() {
     return resource;

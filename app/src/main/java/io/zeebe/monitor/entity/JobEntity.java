@@ -23,9 +23,6 @@ import javax.persistence.Id;
 public class JobEntity {
 
   @Id
-  @Column(name = "ID_")
-  private String id;
-
   @Column(name = "KEY_")
   private long key;
 
@@ -49,14 +46,6 @@ public class JobEntity {
 
   @Column(name = "TIMESTAMP_")
   private long timestamp;
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
 
   public long getKey() {
     return key;

@@ -23,8 +23,8 @@ import javax.persistence.Id;
 public class VariableEntity {
 
   @Id
-  @Column(name = "ID_")
-  private String id;
+  @Column(name = "POSITION_")
+  private Long position;
 
   @Column(name = "NAME_")
   private String name;
@@ -43,14 +43,6 @@ public class VariableEntity {
 
   @Column(name = "TIMESTAMP_")
   private long timestamp;
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
 
   public String getState() {
     return state;
@@ -98,5 +90,13 @@ public class VariableEntity {
 
   public void setScopeKey(long scopeKey) {
     this.scopeKey = scopeKey;
+  }
+
+  public Long getPosition() {
+    return position;
+  }
+
+  public void setPosition(Long position) {
+    this.position = position;
   }
 }
