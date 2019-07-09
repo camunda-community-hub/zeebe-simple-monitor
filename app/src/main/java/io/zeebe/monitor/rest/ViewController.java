@@ -76,7 +76,7 @@ public class ViewController {
   @GetMapping("/views/workflows")
   public String workflowList(Map<String, Object> model, Pageable pageable) {
 
-	List<Long> keys = new ArrayList<>(); 
+    List<Long> keys = new ArrayList<>(); 
     List<WorkflowDto> workflows = new ArrayList<>();
     for (WorkflowEntity workflowEntity : workflowRepository.findAll(pageable)) {
       WorkflowDto dto = toDto(workflowEntity);
