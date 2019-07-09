@@ -76,14 +76,18 @@ public class ViewController {
   @GetMapping("/views/workflows")
   public String workflowList(Map<String, Object> model, Pageable pageable) {
 
-    final long count = workflowRepository.count();
-
-    final List<WorkflowDto> workflows = new ArrayList<>();
+	List<Long> keys = new ArrayList<>(); 
+    List<WorkflowDto> workflows = new ArrayList<>();
     for (WorkflowEntity workflowEntity : workflowRepository.findAll(pageable)) {
-      final WorkflowDto dto = toDto(workflowEntity);
-      workflows.add(dto);
+      WorkflowDto dto = toDto(workflowEntity);
+      if (!keys.contains(dto.getWorkflowKey())) {
+    	  keys.add(dto.getWorkflowKey());
+    	  workflows.add(dto);
+      }
     }
 
+    final long count = workflows.size();	  
+	  
     model.put("workflows", workflows);
     model.put("count", count);
 
@@ -105,19 +109,17 @@ public class ViewController {
   @GetMapping("/views/workflows/{key}")
   public String workflowDetail(
       @PathVariable long key, Map<String, Object> model, Pageable pageable) {
-
-    workflowRepository
-        .findByKey(key)
-        .ifPresent(
-            workflow -> {
-              model.put("workflow", toDto(workflow));
-              model.put("resource", workflow.getResource());
-
-              final List<ElementInstanceState> elementInstanceStates =
-                  getElementInstanceStates(key);
-              model.put("instance.elementInstances", elementInstanceStates);
-            });
-
+    
+    List<WorkflowEntity> workflows = workflowRepository.findAllByKey(key);
+    if (null != workflows && !workflows.isEmpty()) {
+    	WorkflowEntity workflow = workflows.get(0);
+        model.put("workflow", toDto(workflow));
+        model.put("resource", workflow.getResource());
+        final List<ElementInstanceState> elementInstanceStates =
+            getElementInstanceStates(key);
+        model.put("instance.elementInstances", elementInstanceStates);
+    }
+    
     final long count = workflowInstanceRepository.countByWorkflowKey(key);
 
     final List<WorkflowInstanceListDto> instances = new ArrayList<>();
@@ -217,11 +219,13 @@ public class ViewController {
         .findByKey(key)
         .ifPresent(
             instance -> {
-              workflowRepository
-                  .findByKey(instance.getWorkflowKey())
-                  .ifPresent(workflow -> model.put("resource", workflow.getResource()));
-
-              model.put("instance", toInstanceDto(instance));
+            	List<WorkflowEntity> workflows = workflowRepository.findAllByKey(instance.getWorkflowKey());
+            	if (null != workflows && !workflows.isEmpty()) {
+            		WorkflowEntity workflow = workflows.get(0);
+            		model.put("resource", workflow.getResource());
+            	}
+              	
+            	model.put("instance", toInstanceDto(instance));
             });
 
     return "instance-detail-view";

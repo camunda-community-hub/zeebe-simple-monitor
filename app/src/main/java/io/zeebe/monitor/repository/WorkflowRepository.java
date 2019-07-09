@@ -19,14 +19,13 @@ import io.zeebe.monitor.entity.ElementInstanceStatistics;
 import io.zeebe.monitor.entity.WorkflowEntity;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface WorkflowRepository extends PagingAndSortingRepository<WorkflowEntity, String> {
 
-  Optional<WorkflowEntity> findByKey(long key);
+  List<WorkflowEntity> findAllByKey(long key);
 
   @Query(
       nativeQuery = true,
