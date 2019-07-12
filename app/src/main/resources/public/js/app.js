@@ -31,9 +31,10 @@ function reload() {
 
 // --------------------------------------------------------------------
 					
-						var stompClient = null;
-						
-						var subscribedWorkflowInstanceKeys = [];
+            var stompClient = null;
+
+            var subscribedWorkflowInstanceKeys = [];
+            var subscribedWorkflowKeys = [];
              
             function connect() {
                 var socket = new SockJS('/notifications');
@@ -57,16 +58,23 @@ function reload() {
             }
              
             function handleMessage(notification) {
-								var workflowInstanceKey = notification.workflowInstanceKey;
-								
-								if (subscribedWorkflowInstanceKeys.includes(workflowInstanceKey)) {
-									showInfo('Workflow instance has changed.');
-								}								
-						}
+
+                if (subscribedWorkflowInstanceKeys.includes(notification.workflowInstanceKey)) {
+                    showInfo('Workflow instance has changed.');
+                }
+
+                if (subscribedWorkflowKeys.includes(notification.workflowKey)) {
+                    showInfo('An instances of the workflow has changed.');
+                }
+            }
 						
-						function subscribeForWorkflowInstance(key) {
-							subscribedWorkflowInstanceKeys.push(key);
-						}
+            function subscribeForWorkflowInstance(key) {
+                subscribedWorkflowInstanceKeys.push(key);
+            }
+
+            function subscribeForWorkflow(key) {
+                subscribedWorkflowKeys.push(key);
+            }
 
 // --------------------------------------------------------------------
 
@@ -104,6 +112,7 @@ function uploadModels() {
 
   // read all selected files
 	if(typeof FileReader === 'function' && fileUpload.files.length > 0) {
+	    var index;
 		for (index = 0; index < fileUpload.files.length; ++index) {	  
 
 		    var reader = new FileReader();
@@ -136,7 +145,7 @@ function createInstance(key) {
 	$.ajax({
        type : 'POST',
        url: '/api/workflows/' + key,
-       data:  document.getElementById("payload").value,
+       data:  getVariablesDocument(),
        contentType: 'application/json; charset=utf-8',
        success: function (result) {
        	showSuccess("New instance created.");	
@@ -288,7 +297,7 @@ function completeJob(jobKey) {
 		$.ajax({
 	             type : 'PUT',
 	             url: '/api/jobs/' + jobKey + '/complete',
-	             data:  document.getElementById("payload-" + jobKey).value,
+	             data:  getVariablesDocument(jobKey),
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
 	             	showSuccess("Job completed.");	
@@ -327,7 +336,7 @@ function publishMessage() {
 		var data = {
 			name: document.getElementById("message-name").value,
 			correlationKey: document.getElementById("message-correlation-key").value,
-			payload: document.getElementById("message-payload").value,
+			payload: getVariablesDocument(),
 			timeToLive: document.getElementById("message-ttl").value
 		};
 		
@@ -356,7 +365,6 @@ function loadDiagram(resource) {
 				             	showError(err);
 							} else {
 								var canvas = viewer.get('canvas');
-								var overlays = viewer.get('overlays');
 
 								container.removeClass('with-error')
 										 .addClass('with-diagram');
@@ -418,3 +426,5 @@ function colorSequenceFlow(graphicsFactory, sequenceFlow, gfx, color) {
 	
 	graphicsFactory.update('connection', sequenceFlow, gfx);
 }
+
+// --------------------------------------------------------------------

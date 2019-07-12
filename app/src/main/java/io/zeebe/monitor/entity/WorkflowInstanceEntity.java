@@ -23,14 +23,11 @@ import javax.persistence.Id;
 public class WorkflowInstanceEntity {
 
   @Id
-  @Column(name = "ID_")
-  private String id;
-
-  @Column(name = "PARTITION_ID_")
-  private int partitionId;
-
   @Column(name = "KEY_")
   private long key;
+
+    @Column(name = "PARTITION_ID_")
+    private int partitionId;
 
   @Column(name = "WORKFLOW_KEY_")
   private long workflowKey;
@@ -64,14 +61,6 @@ public class WorkflowInstanceEntity {
 
   public void setTimestamp(long timestamp) {
     this.start = timestamp;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
   }
 
   public int getPartitionId() {

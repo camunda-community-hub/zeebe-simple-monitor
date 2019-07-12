@@ -282,38 +282,6 @@
 #
 # An example configuration for the elasticsearch exporter:
 #
-[[exporters]]
-id = "simple-monitor"
-className = "io.zeebe.monitor.SimpleMonitorExporter"
-
-[exporters.args]
-  jdbcUrl = "jdbc:h2:tcp://db:1521/zeebe-monitor"
-
-  # The driver name of the jdbc driver implementation. Make sure that the implementation is
-  # available in the exporter/broker classpath (add it to the broker lib folder).
-  # The name is used to load the driver implementation like this
-  # Class.forName(configuration.driverName);
-  #
-  driverName = "org.h2.Driver"
-  userName = "sa"
-  password = ""
-
-  # To configure the amount of records, which has to be reached before the records are exported to
-  # the database. Only counts the records which are in the end actually exported.
-  #
-  # batchSize = 100;
-
-  # To configure the time in milliseconds, when the batch should be executed regardless whether the
-  # batch size was reached or not.
-  #
-  #If the value is less then one, then no timer will be scheduled.
-  #
-  #batchTimerMilli = 1000
-
-[[exporters]]
-id = "hazelcast"
-className = "io.zeebe.hazelcast.exporter.HazelcastExporter"
-
 #id = "elasticsearch"
 #className = "io.zeebe.exporter.ElasticsearchExporter"
 #
@@ -340,3 +308,16 @@ className = "io.zeebe.hazelcast.exporter.HazelcastExporter"
 #  raft = false
 #  workflowInstance = true
 #  workflowInstanceSubscription = false
+
+[[exporters]]
+id = "hazelcast"
+className = "io.zeebe.hazelcast.exporter.HazelcastExporter"
+
+  [exporters.args]
+  # comma separated list of io.zeebe.protocol.record.ValueType
+  enabledValueTypes = "JOB,WORKFLOW_INSTANCE,DEPLOYMENT,INCIDENT,TIMER,VARIABLE,MESSAGE,MESSAGE_SUBSCRIPTION,MESSAGE_START_EVENT_SUBSCRIPTION"
+
+   # If true, the exporter update its position after publish the record to Hazelcast.
+   # Otherwise, it never update its position. On broker start, it will always start from the begin of the log.
+   # CAUTION! The broker can't delete data and may run out of disk space if set to false.
+   updatePosition = false

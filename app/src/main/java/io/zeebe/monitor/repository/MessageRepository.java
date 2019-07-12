@@ -18,4 +18,5 @@ package io.zeebe.monitor.repository;
 import io.zeebe.monitor.entity.MessageEntity;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface MessageRepository extends PagingAndSortingRepository<MessageEntity, String> {}
+public interface MessageRepository extends PagingAndSortingRepository<MessageEntity, Long> {
+}

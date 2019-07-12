@@ -16,6 +16,7 @@
 package io.zeebe.monitor;
 
 import io.zeebe.monitor.zeebe.ZeebeConnectionService;
+import io.zeebe.monitor.zeebe.ZeebeHazelcastService;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -43,7 +44,12 @@ public class ZeebeSimpleMonitorApp {
   @Value("${io.zeebe.monitor.connectionString}")
   private String connectionString;
 
+  @Value("${io.zeebe.monitor.hazelcast.connection}")
+  private String hazelcastConnection;
+
   @Autowired private ZeebeConnectionService connectionService;
+    @Autowired
+    private ZeebeHazelcastService hazelcastService;
 
   public static void main(String... args) {
     SpringApplication.run(ZeebeSimpleMonitorApp.class, args);
@@ -51,14 +57,17 @@ public class ZeebeSimpleMonitorApp {
 
   @PostConstruct
   public void initConnection() {
-    LOG.info("initialize connection");
-
     connectionService.connect(connectionString);
+
+    if (connectionService.isConnected()) {
+      hazelcastService.start(hazelcastConnection);
+    }
   }
 
   @PreDestroy
   public void close() {
     connectionService.disconnect();
+    hazelcastService.close();
   }
 
   @Bean

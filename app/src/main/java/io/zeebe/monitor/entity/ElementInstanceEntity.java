@@ -23,8 +23,8 @@ import javax.persistence.Id;
 public class ElementInstanceEntity {
 
   @Id
-  @Column(name = "ID_")
-  private String id;
+  @Column(name = "POSITION_")
+  private Long position;
 
   @Column(name = "PARTITION_ID_")
   private int partitionId;
@@ -90,14 +90,6 @@ public class ElementInstanceEntity {
     this.flowScopeKey = flowScopeKey;
   }
 
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
   public int getPartitionId() {
     return partitionId;
   }
@@ -121,4 +113,12 @@ public class ElementInstanceEntity {
   public void setWorkflowKey(long workflowKey) {
     this.workflowKey = workflowKey;
   }
+
+    public Long getPosition() {
+        return position;
+    }
+
+    public void setPosition(Long position) {
+        this.position = position;
+    }
 }

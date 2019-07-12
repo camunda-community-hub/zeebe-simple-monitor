@@ -4,73 +4,82 @@
 
 <div class="row">
 
-	<div class="col-md-12 mb-2">
-		
-		<button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#createInstanceModal">
-		  New Instance
-		</button>
-				
-	</div>
+    <div class="col-md-12 mb-2">
 
-	<div class="col-md-2">
-		 		
- 		<table class="table table-striped">
-		{{#workflow}}
-			<tr>
-				<th>Key</th>
-				<td>{{workflowKey}}</td>
-			</tr>
-			<tr>
-				<th>BPMN process id</th>
-				<td>{{bpmnProcessId}}</td>
-			</tr>
-			<tr>
-				<th>Version</th>
-				<td>{{version}}</td>
-			</tr>
-			<tr>
-				<th># active</th>
-				<td>{{countRunning}}</td>
-			</tr>
-			<tr>
-				<th># ended</th>
-				<td>{{countEnded}}</td>
-			</tr>
-		{{/workflow}}
-		</table>	
- 		
-	</div>
+        <button type="button" class="btn btn-primary float-right" data-toggle="modal"
+                data-target="#createInstanceModal">
+            New Instance
+        </button>
 
-	<div class="col-md-10">
-		{{>components/bpmn-diagram}}						
-	</div>	
+    </div>
 
-	<div class="col-md-12">
-	
-		<span>{{count}} instances</span>
-	
-		<table class="table table-striped">
-			<thead>
-			  <th>Workflow Instance Key</th>
-			  <th>State</th>
-			  <th>Start Time</th>
-		</thead>
-		
-		{{#instances}}
-			<tr>
-				<td>
-					<a href="/views/instances/{{workflowInstanceKey}}">{{workflowInstanceKey}}</a>
-				</td>
-	  		<td>{{state}}</td>	  	
-	  		<td>{{startTime}}</td>
-	  	</tr>
-		{{/instances}}
-		
-		</table>		
- 		
-		{{>components/table-pagination}}
-	
-	</div>
+    <div class="col-md-2">
+
+        <table class="table table-striped">
+            {{#workflow}}
+            <tr>
+                <th>Key</th>
+                <td>{{workflowKey}}</td>
+            </tr>
+            <tr>
+                <th>BPMN process id</th>
+                <td>{{bpmnProcessId}}</td>
+            </tr>
+            <tr>
+                <th>Version</th>
+                <td>{{version}}</td>
+            </tr>
+            <tr>
+                <th># active</th>
+                <td>{{countRunning}}</td>
+            </tr>
+            <tr>
+                <th># ended</th>
+                <td>{{countEnded}}</td>
+            </tr>
+            {{/workflow}}
+        </table>
+
+    </div>
+
+    <div class="col-md-10">
+        {{>components/bpmn-diagram}}
+    </div>
+
+    <div class="col-md-12">
+
+        <nav>
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-instances" role="tab"
+                   aria-controls="nav-home" aria-selected="true">Instances</a>
+                <a class="nav-item nav-link" id="nav-message-subscriptions-tab" data-toggle="tab"
+                   href="#nav-message-subscriptions"
+                   role="tab" aria-controls="nav-contact" aria-selected="false">Message Subscriptions</a>
+                <a class="nav-item nav-link" id="nav-timers-tab" data-toggle="tab" href="#nav-timers" role="tab"
+                   aria-controls="nav-contact" aria-selected="false">Timers</a>
+            </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent" style="height:200px;">
+            <div class="tab-pane fade show active" id="nav-instances" role="tabpanel" aria-labelledby="nav-home-tab">
+                {{>instance-list}}
+            </div>
+            <div class="tab-pane fade" id="nav-message-subscriptions" role="tabpanel" aria-labelledby="nav-contact-tab">
+                {{>workflow-message-subscription-list}}
+            </div>
+            <div class="tab-pane fade" id="nav-timers" role="tabpanel" aria-labelledby="nav-contact-tab">
+                {{>workflow-timer-list}}
+            </div>
+
+        </div>
+
+    </div>
 </div>
 
 {{>layout/footer}}
+
+<script>
+	$(document).ready(function(){
+		subscribeForWorkflow({{workflow.workflowKey}});
+	});
+
+</script>

@@ -1,48 +1,53 @@
-<div class="modal fade" id="setVariableModal" tabindex="-1" role="dialog" aria-labelledby="setVariableModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Add Variable</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      
-      <div class="modal-body">
-            
-        <div class="form-group">
-          <label class="col-form-label">Scope Key</label>
-          <select id="variable-scopeKey" class="form-control">
-          	{{#instance.activeScopes}}
-				      <option value="{{scopeKey}}">{{scopeKey}} ({{scopeName}})</option>
-          	{{/instance.activeScopes}}
-			    </select>
-        </div>   
-            
-      	<div class="form-group">
-          <label class="col-form-label">Name</label>
-          <input id="variable-name" class="form-control" type="text" value="" />
+<div class="modal fade" id="setVariableModal" tabindex="-1" role="dialog" aria-labelledby="setVariableModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Variable</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <label class="col-form-label">Scope Key</label>
+                    <select id="variable-scopeKey" class="form-control">
+                        {{#instance.activeScopes}}
+                        <option value="{{scopeKey}}">{{scopeKey}} ({{scopeName}})</option>
+                        {{/instance.activeScopes}}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-form-label">Name</label>
+                    <input id="variable-name" class="form-control" type="text" value=""/>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-form-label">Value</label>
+                    <input id="variable-value" class="form-control" type="text" value=""/>
+                    <small class="form-text text-muted">As JSON string (e.g. `2.1`, `"good"`, `true`).</small>
+                </div>
+
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input" id="variable-local">
+                    <label class="form-check-label" for="variable-local">Local</label>
+                    <small class="form-text text-muted">If set, the variable is created at the given scope and not
+                        propagated to higher or root scope.
+                    </small>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="setVariable()">Set</button>
+            </div>
+
         </div>
-              
-      	<div class="form-group">
-          <label class="col-form-label">Value</label>
-          <input id="variable-value" class="form-control" type="text" value="" />
-        </div>
-        
-        <div class="form-group form-check">
-			    <input type="checkbox" class="form-check-input" id="variable-local">
-			    <label class="form-check-label" for="variable-local">Local (no propagation)</label>
-			  </div>
-      
-      </div>
-      
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      
-      	<button type="button" class="btn btn-primary"  data-dismiss="modal" onclick="setVariable()">Set</button>
-    	</div>
-      
     </div>
-  </div>
 </div>

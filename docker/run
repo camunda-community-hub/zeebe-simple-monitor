@@ -25,10 +25,6 @@ mvn clean install
 docker build -t camunda/zeebe-simple-monitor:latest -f app/Dockerfile app
 echo "Done"
 
-echo "copying jar"
-cp exporter/target/zeebe-simple-monitor-exporter-*.jar docker/local-config/zeebe-simple-monitor-exporter.jar
-echo "Done"
-
 cd docker/local-config/
 echo "starting containers"
 $UP_CMD

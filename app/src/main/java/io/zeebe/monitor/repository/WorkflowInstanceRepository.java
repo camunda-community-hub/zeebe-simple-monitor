@@ -22,7 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface WorkflowInstanceRepository
-    extends PagingAndSortingRepository<WorkflowInstanceEntity, String> {
+        extends PagingAndSortingRepository<WorkflowInstanceEntity, Long> {
 
   Page<WorkflowInstanceEntity> findByWorkflowKey(long workflowKey, Pageable pageable);
 

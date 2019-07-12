@@ -1,0 +1,166 @@
+<div class="form-group">
+    <label class="col-form-label">Variables</label>
+
+    <div id="variable-form">
+        <div class="form-row" id="variable-form-1">
+            <div class="form-group col-md-4">
+                <input id="variable-form-1-name" type="text" class="form-control" placeholder="name">
+            </div>
+            <div class="form-group col-md-7">
+                <input id="variable-form-1-value" type="text" class="form-control" placeholder="value (JSON)">
+            </div>
+            <div class="form-group col-md-1">
+                <button id="variable-form-1-button" class="btn btn-outline-primary" onclick="showVariableForm(2)">+
+                </button>
+            </div>
+        </div>
+        <div class="form-row d-none" id="variable-form-2">
+            <div class="form-group col-md-4">
+                <input id="variable-form-2-name" type="text" class="form-control" placeholder="name">
+            </div>
+            <div class="form-group col-md-7">
+                <input id="variable-form-2-value" type="text" class="form-control" placeholder="value (JSON)">
+            </div>
+            <div class="form-group col-md-1">
+                <button id="variable-form-2-button" class="btn btn-outline-primary" onclick="showVariableForm(3)">+
+                </button>
+            </div>
+        </div>
+        <div class="form-row d-none" id="variable-form-3">
+            <div class="form-group col-md-4">
+                <input id="variable-form-3-name" type="text" class="form-control" placeholder="name">
+            </div>
+            <div class="form-group col-md-7">
+                <input id="variable-form-3-value" type="text" class="form-control" placeholder="value (JSON)">
+            </div>
+            <div class="form-group col-md-1">
+                <button id="variable-form-3-button" class="btn btn-outline-primary" onclick="showVariableForm(4)">+
+                </button>
+            </div>
+        </div>
+        <div class="form-row d-none" id="variable-form-4">
+            <div class="form-group col-md-4">
+                <input id="variable-form-4-name" type="text" class="form-control" placeholder="name">
+            </div>
+            <div class="form-group col-md-7">
+                <input id="variable-form-4-value" type="text" class="form-control" placeholder="value (JSON)">
+            </div>
+            <div class="form-group col-md-1">
+                <button id="variable-form-4-button" class="btn btn-outline-primary" onclick="showVariableForm(5)">+
+                </button>
+            </div>
+        </div>
+        <div class="form-row d-none" id="variable-form-5">
+            <div class="form-group col-md-4">
+                <input id="variable-form-5-name" type="text" class="form-control" placeholder="name">
+            </div>
+            <div class="form-group col-md-7">
+                <input id="variable-form-5-value" type="text" class="form-control" placeholder="value (JSON)">
+            </div>
+            <div class="form-group col-md-1">
+                <button id="variable-form-5-button" class="btn btn-outline-primary" onclick="showVariableForm(6)">+
+                </button>
+            </div>
+        </div>
+        <div class="form-row d-none" id="variable-form-6">
+            <div class="form-group col-md-4">
+                <input id="variable-form-6-name" type="text" class="form-control" placeholder="name">
+            </div>
+            <div class="form-group col-md-7">
+                <input id="variable-form-6-value" type="text" class="form-control" placeholder="value (JSON)">
+            </div>
+            <div class="form-group col-md-1">
+                <button id="variable-form-6-button" class="btn btn-outline-primary" onclick="showVariableForm(7)">+
+                </button>
+            </div>
+        </div>
+        <div class="form-row d-none" id="variable-form-7">
+            <div class="form-group col-md-4">
+                <input id="variable-form-7-name" type="text" class="form-control" placeholder="name">
+            </div>
+            <div class="form-group col-md-7">
+                <input id="variable-form-7-value" type="text" class="form-control" placeholder="value (JSON)">
+            </div>
+            <div class="form-group col-md-1">
+                <button id="variable-form-7-button" class="btn btn-outline-primary" onclick="showVariableForm(8)">+
+                </button>
+            </div>
+        </div>
+        <div class="form-row d-none" id="variable-form-8">
+            <div class="form-group col-md-4">
+                <input id="variable-form-8-name" type="text" class="form-control" placeholder="name">
+            </div>
+            <div class="form-group col-md-7">
+                <input id="variable-form-8-value" type="text" class="form-control" placeholder="value (JSON)">
+            </div>
+            <div class="form-group col-md-1">
+                <button id="variable-form-8-button" class="btn btn-outline-primary" onclick="showVariableForm(9)">+
+                </button>
+            </div>
+        </div>
+        <div class="form-row d-none" id="variable-form-9">
+            <div class="form-group col-md-4">
+                <input id="variable-form-9-name" type="text" class="form-control" placeholder="name">
+            </div>
+            <div class="form-group col-md-7">
+                <input id="variable-form-9-value" type="text" class="form-control" placeholder="value (JSON)">
+            </div>
+            <div class="form-group col-md-1">
+                <button id="variable-form-9-button" class="btn btn-outline-primary" onclick="showVariableForm(10)">+
+                </button>
+            </div>
+        </div>
+        <div class="form-row d-none" id="variable-form-10">
+            <div class="form-group col-md-4">
+                <input id="variable-form-10-name" type="text" class="form-control" placeholder="name">
+            </div>
+            <div class="form-group col-md-7">
+                <input id="variable-form-10-value" type="text" class="form-control" placeholder="value (JSON)">
+            </div>
+            <div class="form-group col-md-1">
+                <button id="variable-form-10-button" class="btn btn-outline-primary" onclick="showVariableForm(11)"
+                        disabled>+
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function showVariableForm(index) {
+        var varForm = document.getElementById('variable-form-' + index);
+        varForm.classList.remove("d-none");
+    }
+
+    function getVariablesDocument() {
+        var formCount = 10;
+        var variableCount = 0;
+        var variableDocument = '{';
+
+        var i;
+        for (i = 1; i <= formCount; i++) {
+          var varName = document.getElementById('variable-form-' + i + '-name').value;
+          var varValue = document.getElementById('variable-form-' + i + '-value').value;
+
+          if (varValue.length == 0) {
+            varValue = null;
+          }
+
+          if (varName.length > 0) {
+            if (variableCount > 0) {
+                variableDocument += ',';
+            }
+            variableDocument += '"' + varName + '":' + varValue;
+            variableCount += 1;
+          }
+        }
+
+        variableDocument += '}';
+
+        return variableDocument;
+    }
+
+
+
+</script>

@@ -23,34 +23,32 @@ import javax.persistence.Id;
 public class TimerEntity {
 
   @Id
-  @Column(name = "ID_")
-  private String id;
-
   @Column(name = "KEY_")
   private long key;
 
-  @Column(name = "ELEMENT_INSTANCE_KEY_")
-  private long elementInstanceKey;
+  @Column(name = "WORKFLOW_KEY_")
+  private long workflowKey;
 
-  @Column(name = "HANDLER_NODE_ID_")
-  private String handlerNodeId;
+  @Column(name = "WORKFLOW_INSTANCE_KEY_")
+  private Long workflowInstanceKey;
+
+  @Column(name = "ELEMENT_INSTANCE_KEY_")
+  private Long elementInstanceKey;
+
+  @Column(name = "TARGET_FLOW_NODE_ID_")
+  private String targetFlowNodeId;
 
   @Column(name = "DUE_DATE_")
   private long dueDate;
+
+    @Column(name = "REPETITIONS")
+    private int repetitions;
 
   @Column(name = "STATE_")
   private String state;
 
   @Column(name = "TIMESTAMP_")
   private long timestamp;
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
 
   public long getKey() {
     return key;
@@ -60,11 +58,11 @@ public class TimerEntity {
     this.key = key;
   }
 
-  public long getElementInstanceKey() {
+  public Long getElementInstanceKey() {
     return elementInstanceKey;
   }
 
-  public void setElementInstanceKey(long elementInstanceKey) {
+  public void setElementInstanceKey(Long elementInstanceKey) {
     this.elementInstanceKey = elementInstanceKey;
   }
 
@@ -84,12 +82,12 @@ public class TimerEntity {
     this.timestamp = timestamp;
   }
 
-  public String getHandlerNodeId() {
-    return handlerNodeId;
+  public String getTargetFlowNodeId() {
+    return targetFlowNodeId;
   }
 
-  public void setHandlerNodeId(String handlerNodeId) {
-    this.handlerNodeId = handlerNodeId;
+  public void setTargetFlowNodeId(String targetFlowNodeId) {
+    this.targetFlowNodeId = targetFlowNodeId;
   }
 
   public long getDueDate() {
@@ -99,4 +97,28 @@ public class TimerEntity {
   public void setDueDate(long dueDate) {
     this.dueDate = dueDate;
   }
+
+  public long getWorkflowKey() {
+    return workflowKey;
+  }
+
+  public void setWorkflowKey(long workflowKey) {
+    this.workflowKey = workflowKey;
+  }
+
+  public Long getWorkflowInstanceKey() {
+    return workflowInstanceKey;
+  }
+
+  public void setWorkflowInstanceKey(Long workflowInstanceKey) {
+    this.workflowInstanceKey = workflowInstanceKey;
+  }
+
+    public int getRepetitions() {
+        return repetitions;
+    }
+
+    public void setRepetitions(int repetitions) {
+        this.repetitions = repetitions;
+    }
 }

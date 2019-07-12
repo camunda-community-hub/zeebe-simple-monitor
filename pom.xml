@@ -16,7 +16,6 @@
     </parent>
 
     <modules>
-        <module>exporter</module>
         <module>app</module>
     </modules>
 
@@ -44,6 +43,7 @@
 
     <dependencyManagement>
         <dependencies>
+
             <dependency>
                 <groupId>io.zeebe</groupId>
                 <artifactId>zeebe-bom</artifactId>

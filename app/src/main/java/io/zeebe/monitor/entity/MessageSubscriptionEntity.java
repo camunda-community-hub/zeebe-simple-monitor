@@ -33,24 +33,22 @@ public class MessageSubscriptionEntity {
   private String correlationKey;
 
   @Column(name = "WORKFLOW_INSTANCE_KEY_")
-  private long workflowInstanceKey;
+  private Long workflowInstanceKey;
 
   @Column(name = "ELEMENT_INSTANCE_KEY_")
-  private long elementInstanceKey;
+  private Long elementInstanceKey;
+
+    @Column(name = "WORKFLOW_KEY_")
+    private Long workflowKey;
+
+    @Column(name = "TARGET_FLOW_NODE_ID_")
+    private String targetFlowNodeId;
 
   @Column(name = "STATE_")
   private String state;
 
   @Column(name = "TIMESTAMP_")
   private long timestamp;
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
 
   public String getCorrelationKey() {
     return correlationKey;
@@ -84,19 +82,43 @@ public class MessageSubscriptionEntity {
     this.messageName = messageName;
   }
 
-  public long getWorkflowInstanceKey() {
-    return workflowInstanceKey;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public void setWorkflowInstanceKey(long workflowInstanceKey) {
-    this.workflowInstanceKey = workflowInstanceKey;
-  }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  public long getElementInstanceKey() {
-    return elementInstanceKey;
-  }
+    public Long getWorkflowKey() {
+        return workflowKey;
+    }
 
-  public void setElementInstanceKey(long elementInstanceKey) {
-    this.elementInstanceKey = elementInstanceKey;
-  }
+    public void setWorkflowKey(Long workflowKey) {
+        this.workflowKey = workflowKey;
+    }
+
+    public String getTargetFlowNodeId() {
+        return targetFlowNodeId;
+    }
+
+    public void setTargetFlowNodeId(String targetFlowNodeId) {
+        this.targetFlowNodeId = targetFlowNodeId;
+    }
+
+    public Long getWorkflowInstanceKey() {
+        return workflowInstanceKey;
+    }
+
+    public void setWorkflowInstanceKey(Long workflowInstanceKey) {
+        this.workflowInstanceKey = workflowInstanceKey;
+    }
+
+    public Long getElementInstanceKey() {
+        return elementInstanceKey;
+    }
+
+    public void setElementInstanceKey(Long elementInstanceKey) {
+        this.elementInstanceKey = elementInstanceKey;
+    }
 }

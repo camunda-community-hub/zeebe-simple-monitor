@@ -24,7 +24,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
-public interface WorkflowRepository extends PagingAndSortingRepository<WorkflowEntity, String> {
+public interface WorkflowRepository extends PagingAndSortingRepository<WorkflowEntity, Long> {
 
   Optional<WorkflowEntity> findByKey(long key);
 

@@ -8,7 +8,6 @@ import io.zeebe.monitor.entity.MessageEntity;
 import io.zeebe.monitor.entity.MessageSubscriptionEntity;
 import io.zeebe.monitor.entity.TimerEntity;
 import io.zeebe.monitor.entity.VariableEntity;
-import io.zeebe.monitor.entity.WorkerEntity;
 import io.zeebe.monitor.entity.WorkflowEntity;
 import io.zeebe.monitor.entity.WorkflowInstanceEntity;
 import io.zeebe.monitor.repository.ElementInstanceRepository;
@@ -18,7 +17,6 @@ import io.zeebe.monitor.repository.MessageRepository;
 import io.zeebe.monitor.repository.MessageSubscriptionRepository;
 import io.zeebe.monitor.repository.TimerRepository;
 import io.zeebe.monitor.repository.VariableRepository;
-import io.zeebe.monitor.repository.WorkerRepository;
 import io.zeebe.monitor.repository.WorkflowInstanceRepository;
 import io.zeebe.monitor.repository.WorkflowRepository;
 import io.zeebe.util.collection.Tuple;
@@ -64,8 +62,6 @@ public class ViewController {
 
   @Autowired private TimerRepository timerRepository;
 
-  @Autowired private WorkerRepository workerRepository;
-
   @Autowired private VariableRepository variableRepository;
 
   @GetMapping("/")
@@ -106,17 +102,16 @@ public class ViewController {
   public String workflowDetail(
       @PathVariable long key, Map<String, Object> model, Pageable pageable) {
 
-    workflowRepository
-        .findByKey(key)
-        .ifPresent(
-            workflow -> {
-              model.put("workflow", toDto(workflow));
-              model.put("resource", workflow.getResource());
+      final WorkflowEntity workflow =
+              workflowRepository
+                      .findByKey(key)
+                      .orElseThrow(() -> new RuntimeException("No workflow found with key: " + key));
 
-              final List<ElementInstanceState> elementInstanceStates =
-                  getElementInstanceStates(key);
-              model.put("instance.elementInstances", elementInstanceStates);
-            });
+      model.put("workflow", toDto(workflow));
+      model.put("resource", workflow.getResource());
+
+      final List<ElementInstanceState> elementInstanceStates = getElementInstanceStates(key);
+      model.put("instance.elementInstances", elementInstanceStates);
 
     final long count = workflowInstanceRepository.countByWorkflowKey(key);
 
@@ -128,6 +123,18 @@ public class ViewController {
 
     model.put("instances", instances);
     model.put("count", count);
+
+      final List<TimerDto> timers =
+              timerRepository.findByWorkflowKeyAndWorkflowInstanceKeyIsNull(key).stream()
+                      .map(this::toDto)
+                      .collect(Collectors.toList());
+      model.put("timers", timers);
+
+      final List<MessageSubscriptionDto> messageSubscriptions =
+              messageSubscriptionRepository.findByWorkflowKeyAndWorkflowInstanceKeyIsNull(key).stream()
+                      .map(this::toDto)
+                      .collect(Collectors.toList());
+      model.put("messageSubscriptions", messageSubscriptions);
 
     addPaginationToModel(model, pageable, count);
 
@@ -149,8 +156,7 @@ public class ViewController {
                     ElementInstanceStatistics::getElementId, ElementInstanceStatistics::getCount));
 
     final List<ElementInstanceState> elementInstanceStates =
-        elementEnteredStatistics
-            .stream()
+            elementEnteredStatistics.stream()
             .map(
                 s -> {
                   final ElementInstanceState state = new ElementInstanceState();
@@ -213,16 +219,16 @@ public class ViewController {
   public String instanceDetail(
       @PathVariable long key, Map<String, Object> model, Pageable pageable) {
 
-    workflowInstanceRepository
-        .findByKey(key)
-        .ifPresent(
-            instance -> {
-              workflowRepository
-                  .findByKey(instance.getWorkflowKey())
-                  .ifPresent(workflow -> model.put("resource", workflow.getResource()));
+      final WorkflowInstanceEntity instance =
+              workflowInstanceRepository
+                      .findByKey(key)
+                      .orElseThrow(() -> new RuntimeException("No workflow instance found with key: " + key));
 
-              model.put("instance", toInstanceDto(instance));
-            });
+      workflowRepository
+              .findByKey(instance.getWorkflowKey())
+              .ifPresent(workflow -> model.put("resource", workflow.getResource()));
+
+      model.put("instance", toInstanceDto(instance));
 
     return "instance-detail-view";
   }
@@ -257,15 +263,13 @@ public class ViewController {
     }
 
     final List<String> completedActivities =
-        events
-            .stream()
+            events.stream()
             .filter(e -> WORKFLOW_INSTANCE_COMPLETED_INTENTS.contains(e.getIntent()))
             .map(ElementInstanceEntity::getElementId)
             .collect(Collectors.toList());
 
     final List<String> activeActivities =
-        events
-            .stream()
+            events.stream()
             .filter(e -> WORKFLOW_INSTANCE_ENTERED_INTENTS.contains(e.getIntent()))
             .map(ElementInstanceEntity::getElementId)
             .filter(id -> !completedActivities.contains(id))
@@ -273,31 +277,26 @@ public class ViewController {
     dto.setActiveActivities(activeActivities);
 
     final List<String> takenSequenceFlows =
-        events
-            .stream()
+            events.stream()
             .filter(e -> e.getIntent().equals("SEQUENCE_FLOW_TAKEN"))
             .map(ElementInstanceEntity::getElementId)
             .collect(Collectors.toList());
     dto.setTakenSequenceFlows(takenSequenceFlows);
 
     final Map<String, Long> completedElementsById =
-        events
-            .stream()
+            events.stream()
             .filter(e -> WORKFLOW_INSTANCE_COMPLETED_INTENTS.contains(e.getIntent()))
             .collect(
                 Collectors.groupingBy(ElementInstanceEntity::getElementId, Collectors.counting()));
 
     final Map<String, Long> enteredElementsById =
-        events
-            .stream()
+            events.stream()
             .filter(e -> WORKFLOW_INSTANCE_ENTERED_INTENTS.contains(e.getIntent()))
             .collect(
                 Collectors.groupingBy(ElementInstanceEntity::getElementId, Collectors.counting()));
 
     final List<ElementInstanceState> elementStates =
-        enteredElementsById
-            .entrySet()
-            .stream()
+            enteredElementsById.entrySet().stream()
             .map(
                 e -> {
                   final String elementId = e.getKey();
@@ -317,8 +316,7 @@ public class ViewController {
     dto.setElementInstances(elementStates);
 
     final List<AuditLogEntry> auditLogEntries =
-        events
-            .stream()
+            events.stream()
             .map(
                 e -> {
                   final AuditLogEntry entry = new AuditLogEntry();
@@ -346,11 +344,10 @@ public class ViewController {
     events.forEach(e -> elementIdsForKeys.put(e.getKey(), e.getElementId()));
 
     final List<IncidentDto> incidentDtos =
-        incidents
-            .stream()
+            incidents.stream()
             .map(
                 i -> {
-                  final Long incidentKey = i.getIncidentKey();
+                    final long incidentKey = i.getKey();
 
                   final IncidentDto incidentDto = new IncidentDto();
                   incidentDto.setKey(incidentKey);
@@ -384,8 +381,7 @@ public class ViewController {
     dto.setIncidents(incidentDtos);
 
     final List<String> activitiesWitIncidents =
-        incidents
-            .stream()
+            incidents.stream()
             .filter(i -> i.getResolved() == null || i.getResolved() <= 0)
             .map(i -> elementIdsForKeys.get(i.getElementInstanceKey()))
             .distinct()
@@ -397,9 +393,7 @@ public class ViewController {
     dto.setActiveActivities(activeActivities);
 
     final Map<Tuple<Long, String>, List<VariableEntity>> variablesByScopeAndName =
-        variableRepository
-            .findByWorkflowInstanceKey(instance.getKey())
-            .stream()
+            variableRepository.findByWorkflowInstanceKey(instance.getKey()).stream()
             .collect(Collectors.groupingBy(v -> new Tuple<>(v.getScopeKey(), v.getName())));
     variablesByScopeAndName.forEach(
         (scopeKeyName, variables) -> {
@@ -416,8 +410,7 @@ public class ViewController {
           variableDto.setTimestamp(Instant.ofEpochMilli(lastUpdate.getTimestamp()).toString());
 
           final List<VariableUpdateEntry> varUpdates =
-              variables
-                  .stream()
+                  variables.stream()
                   .map(
                       v -> {
                         final VariableUpdateEntry varUpdate = new VariableUpdateEntry();
@@ -436,15 +429,13 @@ public class ViewController {
       activeScopes.add(new ActiveScope(instance.getKey(), instance.getBpmnProcessId()));
 
       final List<Long> completedElementInstances =
-          events
-              .stream()
+              events.stream()
               .filter(e -> WORKFLOW_INSTANCE_COMPLETED_INTENTS.contains(e.getIntent()))
               .map(ElementInstanceEntity::getKey)
               .collect(Collectors.toList());
 
       final List<ActiveScope> activeElementInstances =
-          events
-              .stream()
+              events.stream()
               .filter(e -> WORKFLOW_INSTANCE_ENTERED_INTENTS.contains(e.getIntent()))
               .map(ElementInstanceEntity::getKey)
               .filter(id -> !completedElementInstances.contains(id))
@@ -456,9 +447,7 @@ public class ViewController {
     dto.setActiveScopes(activeScopes);
 
     final List<JobDto> jobDtos =
-        jobRepository
-            .findByWorkflowInstanceKey(instance.getKey())
-            .stream()
+            jobRepository.findByWorkflowInstanceKey(instance.getKey()).stream()
             .map(
                 job -> {
                   final JobDto jobDto = toDto(job);
@@ -477,9 +466,7 @@ public class ViewController {
     dto.setJobs(jobDtos);
 
     final List<MessageSubscriptionDto> messageSubscriptions =
-        messageSubscriptionRepository
-            .findByWorkflowInstanceKey(instance.getKey())
-            .stream()
+            messageSubscriptionRepository.findByWorkflowInstanceKey(instance.getKey()).stream()
             .map(
                 subscription -> {
                   final MessageSubscriptionDto subscriptionDto = toDto(subscription);
@@ -492,9 +479,7 @@ public class ViewController {
     dto.setMessageSubscriptions(messageSubscriptions);
 
     final List<TimerDto> timers =
-        timerRepository
-            .findByElementInstanceKeyIn(elementIdsForKeys.keySet())
-            .stream()
+            timerRepository.findByWorkflowInstanceKey(instance.getKey()).stream()
             .map(timer -> toDto(timer))
             .collect(Collectors.toList());
     dto.setTimers(timers);
@@ -523,10 +508,11 @@ public class ViewController {
 
   private IncidentListDto toDto(IncidentEntity incident) {
     final IncidentListDto dto = new IncidentListDto();
-    dto.setKey(incident.getIncidentKey());
+      dto.setKey(incident.getKey());
 
     dto.setBpmnProcessId(incident.getBpmnProcessId());
-    dto.setWorkflowKey(incident.getWorkflowKey());;
+      dto.setWorkflowKey(incident.getWorkflowKey());
+      ;
     dto.setWorkflowInstanceKey(incident.getWorkflowInstanceKey());
 
     dto.setErrorType(incident.getErrorType());
@@ -623,6 +609,8 @@ public class ViewController {
     dto.setWorkflowInstanceKey(subscription.getWorkflowInstanceKey());
     dto.setActivityInstanceKey(subscription.getElementInstanceKey());
 
+      dto.setActivityId(subscription.getTargetFlowNodeId());
+
     dto.setState(subscription.getState());
     dto.setTimestamp(Instant.ofEpochMilli(subscription.getTimestamp()).toString());
 
@@ -634,39 +622,15 @@ public class ViewController {
   private TimerDto toDto(TimerEntity timer) {
     final TimerDto dto = new TimerDto();
 
-    dto.setActivityInstanceKey(timer.getElementInstanceKey());
-    dto.setActivityId(timer.getHandlerNodeId());
+      dto.setActivityId(timer.getTargetFlowNodeId());
     dto.setState(timer.getState());
     dto.setDueDate(Instant.ofEpochMilli(timer.getDueDate()).toString());
     dto.setTimestamp(Instant.ofEpochMilli(timer.getTimestamp()).toString());
+      dto.setActivityInstanceKey(timer.getElementInstanceKey());
 
-    return dto;
-  }
+      final int repetitions = timer.getRepetitions();
+      dto.setRepetitions(repetitions >= 0 ? String.valueOf(repetitions) : "∞");
 
-  @GetMapping("/views/workers")
-  public String workerList(Map<String, Object> model, Pageable pageable) {
-
-    final long count = workerRepository.count();
-
-    final List<WorkerDto> dtos = new ArrayList<>();
-    for (WorkerEntity entity : workerRepository.findAll(pageable)) {
-      final WorkerDto dto = toDto(entity);
-      dtos.add(dto);
-    }
-
-    model.put("workers", dtos);
-    model.put("count", count);
-
-    addPaginationToModel(model, pageable, count);
-
-    return "worker-list-view";
-  }
-
-  private WorkerDto toDto(WorkerEntity entity) {
-    final WorkerDto dto = new WorkerDto();
-    dto.setWorker(entity.getWorker());
-    dto.setJobType(entity.getJobType());
-    dto.setLastPollRequest(Instant.ofEpochMilli(entity.getTimestamp()).toString());
     return dto;
   }
 
