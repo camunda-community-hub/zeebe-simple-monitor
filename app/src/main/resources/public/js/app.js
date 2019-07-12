@@ -112,6 +112,7 @@ function uploadModels() {
 
   // read all selected files
 	if(typeof FileReader === 'function' && fileUpload.files.length > 0) {
+	    var index;
 		for (index = 0; index < fileUpload.files.length; ++index) {	  
 
 		    var reader = new FileReader();
@@ -364,7 +365,6 @@ function loadDiagram(resource) {
 				             	showError(err);
 							} else {
 								var canvas = viewer.get('canvas');
-								var overlays = viewer.get('overlays');
 
 								container.removeClass('with-error')
 										 .addClass('with-diagram');

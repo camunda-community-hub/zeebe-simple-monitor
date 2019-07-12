@@ -138,7 +138,8 @@
         var variableCount = 0;
         var variableDocument = '{';
 
-        for (i = 1; i < formCount; i++) {
+        var i;
+        for (i = 1; i <= formCount; i++) {
           var varName = document.getElementById('variable-form-' + i + '-name').value;
           var varValue = document.getElementById('variable-form-' + i + '-value').value;
 

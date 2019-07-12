@@ -347,7 +347,7 @@ public class ViewController {
             incidents.stream()
             .map(
                 i -> {
-                  final Long incidentKey = i.getIncidentKey();
+                    final long incidentKey = i.getKey();
 
                   final IncidentDto incidentDto = new IncidentDto();
                   incidentDto.setKey(incidentKey);
@@ -508,7 +508,7 @@ public class ViewController {
 
   private IncidentListDto toDto(IncidentEntity incident) {
     final IncidentListDto dto = new IncidentListDto();
-    dto.setKey(incident.getIncidentKey());
+      dto.setKey(incident.getKey());
 
     dto.setBpmnProcessId(incident.getBpmnProcessId());
       dto.setWorkflowKey(incident.getWorkflowKey());

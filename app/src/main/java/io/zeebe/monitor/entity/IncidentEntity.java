@@ -71,7 +71,7 @@ public class IncidentEntity {
     return this;
   }
 
-  public long getIncidentKey() {
+    public long getKey() {
     return key;
   }
 
