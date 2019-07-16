@@ -1,11 +1,13 @@
 Zeebe Simple Monitor
 =========================
 
-A monitoring application for [Zeebe](https://zeebe.io). It is designed for developers and helps to understand how workflows are executed in Zeebe.
+A monitoring application for [Zeebe](https://zeebe.io). It is designed for developers to
 
-![screencast](app/docs/zeebe-simple-monitor.gif)
+* get in touch with Zeebe and workflow execution (BPMN)
+* test workflows manually
+* provide insides how workflows are executed 
 
-The application data is imported from Zeebe using the [Hazelcast exporter](https://github.com/zeebe-io/zeebe-hazelcast-exporter). 
+The application imports the data from Zeebe using the [Hazelcast exporter](https://github.com/zeebe-io/zeebe-hazelcast-exporter). It aggregates the data and store it into a (in-memory) database. The data is display on server-side rendered HTML pages.
 
 ![how-it-works](app/docs/how-it-works.png)
 
@@ -92,3 +94,7 @@ this code. Please report unacceptable behavior to code-of-conduct@zeebe.io.
 ## License
 
 [Apache License, Version 2.0](/LICENSE)
+
+## About
+
+![screencast](app/docs/zeebe-simple-monitor.gif)
