@@ -43,11 +43,6 @@ and try again.
       [exporters.args]
       # comma separated list of io.zeebe.protocol.record.ValueType
       enabledValueTypes = "JOB,WORKFLOW_INSTANCE,DEPLOYMENT,INCIDENT,TIMER,VARIABLE,MESSAGE,MESSAGE_SUBSCRIPTION,MESSAGE_START_EVENT_SUBSCRIPTION"
-    
-      # If true, the exporter update its position after publish the record to Hazelcast.
-      # Otherwise, it never update its position. On broker start, it will always start from the begin of the log. 
-      # CAUTION! The broker can't delete data and may run out of disk space if set to false. 
-      updatePosition = false
     ```
 
 4. Start the broker

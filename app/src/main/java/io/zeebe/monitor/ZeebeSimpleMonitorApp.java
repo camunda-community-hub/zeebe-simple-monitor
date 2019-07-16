@@ -20,6 +20,7 @@ import io.zeebe.monitor.zeebe.ZeebeHazelcastService;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @SpringBootApplication
@@ -48,8 +50,7 @@ public class ZeebeSimpleMonitorApp {
   private String hazelcastConnection;
 
   @Autowired private ZeebeConnectionService connectionService;
-    @Autowired
-    private ZeebeHazelcastService hazelcastService;
+  @Autowired private ZeebeHazelcastService hazelcastService;
 
   public static void main(String... args) {
     SpringApplication.run(ZeebeSimpleMonitorApp.class, args);
@@ -60,7 +61,21 @@ public class ZeebeSimpleMonitorApp {
     connectionService.connect(connectionString);
 
     if (connectionService.isConnected()) {
-      hazelcastService.start(hazelcastConnection);
+      onConnected();
+    } else {
+      tryConnecting();
+    }
+  }
+
+  private void onConnected() {
+    hazelcastService.start(hazelcastConnection);
+  }
+
+  private void tryConnecting() {
+    if (connectionService.checkConnection()) {
+      onConnected();
+    } else {
+      scheduledExecutor().schedule(this::tryConnecting, 100, TimeUnit.MILLISECONDS);
     }
   }
 

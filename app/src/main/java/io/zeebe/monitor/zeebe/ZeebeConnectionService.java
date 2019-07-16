@@ -34,7 +34,6 @@ public class ZeebeConnectionService {
 
     if (checkConnection()) {
         LOG.info("connected to '{}'", connectionString);
-      connected = true;
 
     } else {
         LOG.warn("Failed to connect to '{}'", connectionString);
@@ -59,13 +58,16 @@ public class ZeebeConnectionService {
       try {
         client.newTopologyRequest().send().join();
 
-        return true;
+        if (!connected) {
+          LOG.info("connected to '{}'", client.getConfiguration().getBrokerContactPoint());
+        }
+
+        connected = true;
       } catch (Exception e) {
-        return false;
+        connected = false;
       }
-    } else {
-      return false;
     }
+    return connected;
   }
 
   public void disconnect() {
