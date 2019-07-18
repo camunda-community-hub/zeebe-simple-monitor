@@ -17,18 +17,19 @@ The application imports the data from Zeebe using the [Hazelcast exporter](https
 
 The following command will build the project, pull images and start containers with default settings.
 
-In your terminal (in the root project folder):
+1. Run the following command in your terminal (in the root project folder):
 
-```bash
-docker/run
-```
-Note: You can build the project with maven in a containerized environ by commenting the line 14 and uncommenting the line 15 in the `docker/run` file.
-If you don't have the right to launch `docker/run` try :
+    ```bash
+    docker/run
+    ```
+    
+    If you don't have the right to launch `docker/run` try:
 
-```bash
-chmod +x docker/run
-```
-and try again.
+    ```bash
+    chmod +x docker/run
+    ```
+    
+2. Go to http://localhost:8080
 
 ### Manually
 
