@@ -1,14 +1,6 @@
 version: '2'
 
 services:
-  db:
-    image: oscarfonts/h2
-    container_name: zeebe_db
-    ports:
-      - "1521:1521"
-      - "81:81"
-    networks:
-        - zeebe-network
   zeebe:
     build: .
     environment:
@@ -20,19 +12,15 @@ services:
       - ./zeebe.cfg.toml:/usr/local/zeebe/conf/zeebe.cfg.toml
     networks:
         - zeebe-network
-    depends_on:
-        - db
   monitor:
     container_name: zeebe_monitor
     image: camunda/zeebe-simple-monitor:latest
     environment:
-      - spring.datasource.url=jdbc:h2:tcp://db:1521/zeebe-monitor
       - io.zeebe.monitor.connectionString=zeebe:26500
       - io.zeebe.monitor.hazelcast.connection=zeebe:5701
     ports:
       - "8080:8080"
     depends_on:
-        - db
         - zeebe
     restart: always
     networks:
