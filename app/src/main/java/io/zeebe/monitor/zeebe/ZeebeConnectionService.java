@@ -28,15 +28,16 @@ public class ZeebeConnectionService {
   private boolean connected = false;
 
   public void connect(String connectionString) {
-      LOG.info("Connecting to broker '{}'", connectionString);
+    LOG.info("Connecting to broker '{}'", connectionString);
 
-    this.client = ZeebeClient.newClientBuilder().brokerContactPoint(connectionString).build();
+    this.client =
+        ZeebeClient.newClientBuilder().brokerContactPoint(connectionString).usePlaintext().build();
 
     if (checkConnection()) {
-        LOG.info("connected to '{}'", connectionString);
+      LOG.info("connected to '{}'", connectionString);
 
     } else {
-        LOG.warn("Failed to connect to '{}'", connectionString);
+      LOG.warn("Failed to connect to '{}'", connectionString);
     }
   }
 
