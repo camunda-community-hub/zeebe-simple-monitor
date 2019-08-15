@@ -1,5 +1,8 @@
 package io.zeebe.monitor.rest;
 
+import io.zeebe.model.bpmn.Bpmn;
+import io.zeebe.model.bpmn.instance.FlowElement;
+import io.zeebe.model.bpmn.instance.Process;
 import io.zeebe.monitor.entity.ElementInstanceEntity;
 import io.zeebe.monitor.entity.ElementInstanceStatistics;
 import io.zeebe.monitor.entity.IncidentEntity;
@@ -25,9 +28,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.io.ByteArrayInputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -316,6 +321,17 @@ public class ViewController {
 
     dto.setElementInstances(elementStates);
 
+    final Map<String, String> flowElements =
+        workflowRepository
+            .findByKey(instance.getWorkflowKey())
+            .map(w -> new ByteArrayInputStream(w.getResource().getBytes()))
+            .map(stream -> Bpmn.readModelFromStream(stream))
+            .map(
+                bpmn ->
+                    bpmn.getModelElementsByType(FlowElement.class).stream()
+                        .collect(Collectors.toMap(e -> e.getId(), e -> Optional.ofNullable(e.getName()).orElse(""))))
+            .orElse(Collections.emptyMap());
+
     final List<AuditLogEntry> auditLogEntries =
         events.stream()
             .map(
@@ -325,6 +341,8 @@ public class ViewController {
                   entry.setKey(e.getKey());
                   entry.setFlowScopeKey(e.getFlowScopeKey());
                   entry.setElementId(e.getElementId());
+                  entry.setElementName(flowElements.getOrDefault(e.getElementId(), ""));
+                  entry.setBpmnElementType(e.getBpmnElementType());
                   entry.setState(e.getIntent());
                   entry.setTimestamp(Instant.ofEpochMilli(e.getTimestamp()).toString());
 

@@ -41,6 +41,9 @@ public class ElementInstanceEntity {
   @Column(name = "ELEMENT_ID_")
   private String elementId;
 
+  @Column(name = "BPMN_ELEMENT_TYPE_")
+  private String bpmnElementType;
+
   @Column(name = "FLOW_SCOPE_KEY_")
   private long flowScopeKey;
 
@@ -114,11 +117,19 @@ public class ElementInstanceEntity {
     this.workflowKey = workflowKey;
   }
 
-    public Long getPosition() {
-        return position;
-    }
+  public Long getPosition() {
+    return position;
+  }
 
-    public void setPosition(Long position) {
-        this.position = position;
-    }
+  public void setPosition(Long position) {
+    this.position = position;
+  }
+
+  public String getBpmnElementType() {
+    return bpmnElementType;
+  }
+
+  public void setBpmnElementType(String bpmnElementType) {
+    this.bpmnElementType = bpmnElementType;
+  }
 }

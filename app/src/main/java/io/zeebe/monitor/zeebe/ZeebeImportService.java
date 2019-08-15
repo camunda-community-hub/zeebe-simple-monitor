@@ -171,6 +171,7 @@ public class ZeebeImportService {
             entity.setElementId(record.getElementId());
             entity.setFlowScopeKey(record.getFlowScopeKey());
             entity.setWorkflowKey(record.getWorkflowKey());
+            entity.setBpmnElementType(record.getBpmnElementType().name());
 
             elementInstanceRepository.save(entity);
 

@@ -6,6 +6,9 @@ public class AuditLogEntry {
   private long flowScopeKey;
 
   private String elementId;
+  private String elementName;
+
+  private String bpmnElementType;
 
   private String paylaod;
 
@@ -58,5 +61,21 @@ public class AuditLogEntry {
 
   public void setTimestamp(String timestamp) {
     this.timestamp = timestamp;
+  }
+
+  public String getElementName() {
+    return elementName;
+  }
+
+  public void setElementName(String elementName) {
+    this.elementName = elementName;
+  }
+
+  public String getBpmnElementType() {
+    return bpmnElementType;
+  }
+
+  public void setBpmnElementType(String bpmnElementType) {
+    this.bpmnElementType = bpmnElementType;
   }
 }
