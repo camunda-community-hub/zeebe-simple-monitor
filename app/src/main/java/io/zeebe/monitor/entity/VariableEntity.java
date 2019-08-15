@@ -18,6 +18,7 @@ package io.zeebe.monitor.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 @Entity(name = "VARIABLE")
 public class VariableEntity {
@@ -30,6 +31,7 @@ public class VariableEntity {
   private String name;
 
   @Column(name = "VALUE_")
+  @Lob
   private String value;
 
   @Column(name = "WORKFLOW_INSTANCE_KEY_")

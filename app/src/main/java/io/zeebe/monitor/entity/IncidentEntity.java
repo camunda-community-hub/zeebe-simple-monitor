@@ -18,6 +18,7 @@ package io.zeebe.monitor.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 @Entity(name = "INCIDENT")
 public class IncidentEntity {
@@ -45,6 +46,7 @@ public class IncidentEntity {
   private String errorType;
 
   @Column(name = "ERROR_MSG_")
+  @Lob
   private String errorMessage;
 
   @Column(name = "CREATED_")
