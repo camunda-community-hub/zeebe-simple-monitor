@@ -2,7 +2,6 @@ package io.zeebe.monitor.rest;
 
 import io.zeebe.model.bpmn.Bpmn;
 import io.zeebe.model.bpmn.instance.FlowElement;
-import io.zeebe.model.bpmn.instance.Process;
 import io.zeebe.monitor.entity.ElementInstanceEntity;
 import io.zeebe.monitor.entity.ElementInstanceStatistics;
 import io.zeebe.monitor.entity.IncidentEntity;
@@ -22,6 +21,7 @@ import io.zeebe.monitor.repository.TimerRepository;
 import io.zeebe.monitor.repository.VariableRepository;
 import io.zeebe.monitor.repository.WorkflowInstanceRepository;
 import io.zeebe.monitor.repository.WorkflowRepository;
+import io.zeebe.protocol.record.value.BpmnElementType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -49,6 +49,9 @@ public class ViewController {
 
   private static final List<String> WORKFLOW_INSTANCE_COMPLETED_INTENTS =
       Arrays.asList("ELEMENT_COMPLETED", "ELEMENT_TERMINATED");
+
+  private static final List<String> EXCLUDE_ELEMENT_TYPES =
+      Arrays.asList(BpmnElementType.MULTI_INSTANCE_BODY.name());
 
   private static final List<String> JOB_COMPLETED_INTENTS = Arrays.asList("completed", "canceled");
 
@@ -151,11 +154,12 @@ public class ViewController {
 
     final List<ElementInstanceStatistics> elementEnteredStatistics =
         workflowRepository.getElementInstanceStatisticsByKeyAndIntentIn(
-            key, WORKFLOW_INSTANCE_ENTERED_INTENTS);
+            key, WORKFLOW_INSTANCE_ENTERED_INTENTS, EXCLUDE_ELEMENT_TYPES);
 
     final Map<String, Long> elementCompletedCount =
         workflowRepository
-            .getElementInstanceStatisticsByKeyAndIntentIn(key, WORKFLOW_INSTANCE_COMPLETED_INTENTS)
+            .getElementInstanceStatisticsByKeyAndIntentIn(
+                key, WORKFLOW_INSTANCE_COMPLETED_INTENTS, EXCLUDE_ELEMENT_TYPES)
             .stream()
             .collect(
                 Collectors.toMap(
@@ -292,12 +296,14 @@ public class ViewController {
     final Map<String, Long> completedElementsById =
         events.stream()
             .filter(e -> WORKFLOW_INSTANCE_COMPLETED_INTENTS.contains(e.getIntent()))
+            .filter(e -> !EXCLUDE_ELEMENT_TYPES.contains(e.getBpmnElementType()))
             .collect(
                 Collectors.groupingBy(ElementInstanceEntity::getElementId, Collectors.counting()));
 
     final Map<String, Long> enteredElementsById =
         events.stream()
             .filter(e -> WORKFLOW_INSTANCE_ENTERED_INTENTS.contains(e.getIntent()))
+            .filter(e -> !EXCLUDE_ELEMENT_TYPES.contains(e.getBpmnElementType()))
             .collect(
                 Collectors.groupingBy(ElementInstanceEntity::getElementId, Collectors.counting()));
 
@@ -329,7 +335,9 @@ public class ViewController {
             .map(
                 bpmn ->
                     bpmn.getModelElementsByType(FlowElement.class).stream()
-                        .collect(Collectors.toMap(e -> e.getId(), e -> Optional.ofNullable(e.getName()).orElse(""))))
+                        .collect(
+                            Collectors.toMap(
+                                e -> e.getId(), e -> Optional.ofNullable(e.getName()).orElse(""))))
             .orElse(Collections.emptyMap());
 
     final List<AuditLogEntry> auditLogEntries =

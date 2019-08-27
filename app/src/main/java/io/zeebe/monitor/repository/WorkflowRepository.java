@@ -17,12 +17,13 @@ package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.ElementInstanceStatistics;
 import io.zeebe.monitor.entity.WorkflowEntity;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 public interface WorkflowRepository extends PagingAndSortingRepository<WorkflowEntity, Long> {
 
@@ -33,8 +34,10 @@ public interface WorkflowRepository extends PagingAndSortingRepository<WorkflowE
       value =
           "SELECT ELEMENT_ID_ AS elementId, COUNT(*) AS count "
               + "FROM ELEMENT_INSTANCE "
-              + "WHERE WORKFLOW_KEY_ = :key and INTENT_ in (:intents) "
+              + "WHERE WORKFLOW_KEY_ = :key and INTENT_ in (:intents) and BPMN_ELEMENT_TYPE_ not in (:excludeElementTypes)"
               + "GROUP BY ELEMENT_ID_")
   List<ElementInstanceStatistics> getElementInstanceStatisticsByKeyAndIntentIn(
-      @Param("key") long key, @Param("intents") Collection<String> intents);
+      @Param("key") long key,
+      @Param("intents") Collection<String> intents,
+      @Param("excludeElementTypes") Collection<String> excludeElementTypes);
 }
