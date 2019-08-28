@@ -28,6 +28,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import javax.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -108,6 +109,7 @@ public class ViewController {
   }
 
   @GetMapping("/views/workflows/{key}")
+  @Transactional
   public String workflowDetail(
       @PathVariable long key, Map<String, Object> model, Pageable pageable) {
 
@@ -226,6 +228,7 @@ public class ViewController {
   }
 
   @GetMapping("/views/instances/{key}")
+  @Transactional
   public String instanceDetail(
       @PathVariable long key, Map<String, Object> model, Pageable pageable) {
 

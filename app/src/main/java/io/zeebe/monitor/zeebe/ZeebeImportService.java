@@ -20,6 +20,7 @@ import io.zeebe.monitor.repository.TimerRepository;
 import io.zeebe.monitor.repository.VariableRepository;
 import io.zeebe.monitor.repository.WorkflowInstanceRepository;
 import io.zeebe.monitor.repository.WorkflowRepository;
+import io.zeebe.protocol.Protocol;
 import io.zeebe.protocol.record.intent.DeploymentIntent;
 import io.zeebe.protocol.record.intent.IncidentIntent;
 import io.zeebe.protocol.record.intent.Intent;
@@ -76,9 +77,7 @@ public class ZeebeImportService {
         final DeploymentIntent intent = DeploymentIntent.valueOf(record.getMetadata().getIntent());
         final int partitionId = record.getMetadata().getPartitionId();
 
-        // TODO (saig0): check that partitionId != Protocol.DEPLOYMENT_PARTITION (partition is not set
-        // in protocol version 0.4.0)
-        if (intent != DeploymentIntent.CREATED) {
+        if (intent != DeploymentIntent.CREATED  || partitionId != Protocol.DEPLOYMENT_PARTITION) {
             // ignore deployment event on other partitions to avoid duplicates
             return;
         }
