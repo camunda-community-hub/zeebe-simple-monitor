@@ -64,7 +64,7 @@ function reload() {
                 }
 
                 if (subscribedWorkflowKeys.includes(notification.workflowKey)) {
-                    showInfo('An instances of the workflow has changed.');
+                    showInfo('Instance(s) of this workflow have changed.');
                 }
             }
 						
