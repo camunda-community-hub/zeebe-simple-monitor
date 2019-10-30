@@ -275,6 +275,17 @@ public class ViewController {
       dto.setEndTime(Instant.ofEpochMilli(instance.getEnd()).toString());
     }
 
+    if (instance.getParentElementInstanceKey() > 0) {
+      dto.setParentWorkflowInstanceKey(instance.getParentWorkflowInstanceKey());
+
+      workflowInstanceRepository
+          .findByKey(instance.getParentWorkflowInstanceKey())
+          .ifPresent(
+              parent -> {
+                dto.setParentBpmnProcessId(parent.getBpmnProcessId());
+              });
+    }
+
     final List<String> completedActivities =
         events.stream()
             .filter(e -> WORKFLOW_INSTANCE_COMPLETED_INTENTS.contains(e.getIntent()))
@@ -513,6 +524,27 @@ public class ViewController {
             .map(timer -> toDto(timer))
             .collect(Collectors.toList());
     dto.setTimers(timers);
+
+    final var calledWorkflowInstances =
+        workflowInstanceRepository.findByParentWorkflowInstanceKey(instance.getKey()).stream()
+            .map(
+                childEntity -> {
+                  final var childDto = new CalledWorkflowInstanceDto();
+
+                  childDto.setChildWorkflowInstanceKey(childEntity.getKey());
+                  childDto.setChildBpmnProcessId(childEntity.getBpmnProcessId());
+                  childDto.setChildState(childEntity.getState());
+
+                  childDto.setElementInstanceKey(childEntity.getParentElementInstanceKey());
+
+                  final var callElementId =
+                      elementIdsForKeys.getOrDefault(childEntity.getParentElementInstanceKey(), "");
+                  childDto.setElementId(callElementId);
+
+                  return childDto;
+                })
+            .collect(Collectors.toList());
+    dto.setCalledWorkflowInstances(calledWorkflowInstances);
 
     return dto;
   }

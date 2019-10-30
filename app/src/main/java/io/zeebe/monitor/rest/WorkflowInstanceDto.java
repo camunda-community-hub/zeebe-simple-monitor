@@ -33,6 +33,9 @@ public class WorkflowInstanceDto {
   private String startTime = "";
   private String endTime = "";
 
+  private Long parentWorkflowInstanceKey;
+  private String parentBpmnProcessId = "";
+
   private List<VariableEntry> variables = new ArrayList<>();
   private List<ActiveScope> activeScopes = new ArrayList<>();
 
@@ -48,6 +51,7 @@ public class WorkflowInstanceDto {
   private List<JobDto> jobs = new ArrayList<>();
   private List<MessageSubscriptionDto> messageSubscriptions = new ArrayList<>();
   private List<TimerDto> timers = new ArrayList<>();
+  private List<CalledWorkflowInstanceDto> calledWorkflowInstances = new ArrayList<>();
 
   public int getPartitionId() {
     return partitionId;
@@ -117,16 +121,16 @@ public class WorkflowInstanceDto {
     return startTime;
   }
 
+  public void setStartTime(String startTime) {
+    this.startTime = startTime;
+  }
+
   public String getEndTime() {
     return endTime;
   }
 
   public void setEndTime(String endTime) {
     this.endTime = endTime;
-  }
-
-  public void setStartTime(String startTime) {
-    this.startTime = startTime;
   }
 
   public List<ElementInstanceState> getElementInstances() {
@@ -207,5 +211,33 @@ public class WorkflowInstanceDto {
 
   public void setActiveScopes(List<ActiveScope> activeScopes) {
     this.activeScopes = activeScopes;
+  }
+
+  public Long getParentWorkflowInstanceKey() {
+    return parentWorkflowInstanceKey;
+  }
+
+  public void setParentWorkflowInstanceKey(Long parentWorkflowInstanceKey) {
+    this.parentWorkflowInstanceKey = parentWorkflowInstanceKey;
+  }
+
+  public String getParentBpmnProcessId() {
+    return parentBpmnProcessId;
+  }
+
+  public void setParentBpmnProcessId(String parentBpmnProcessId) {
+    this.parentBpmnProcessId = parentBpmnProcessId;
+  }
+
+  public boolean hasParentWorkflowInstance() {
+    return parentWorkflowInstanceKey != null && parentWorkflowInstanceKey > 0;
+  }
+
+  public List<CalledWorkflowInstanceDto> getCalledWorkflowInstances() {
+    return calledWorkflowInstances;
+  }
+
+  public void setCalledWorkflowInstances(List<CalledWorkflowInstanceDto> calledWorkflowInstances) {
+    this.calledWorkflowInstances = calledWorkflowInstances;
   }
 }

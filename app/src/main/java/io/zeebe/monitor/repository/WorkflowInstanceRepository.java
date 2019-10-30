@@ -16,6 +16,8 @@
 package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.WorkflowInstanceEntity;
+
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,4 +35,6 @@ public interface WorkflowInstanceRepository
   long countByWorkflowKeyAndEndIsNotNull(long workflowKey);
 
   long countByWorkflowKeyAndEndIsNull(long workflowKey);
+
+  List<WorkflowInstanceEntity> findByParentWorkflowInstanceKey(long parentWorkflowInstanceKey);
 }
