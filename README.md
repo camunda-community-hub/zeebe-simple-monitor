@@ -33,7 +33,7 @@ The following command will build the project, pull images and start containers w
 
 ### Manually
 
-1. Download the latest [Hazelcast exporter JAR](https://github.com/zeebe-io/zeebe-hazelcast-exporter/releases)
+1. Download the latest [Hazelcast exporter JAR](https://github.com/zeebe-io/zeebe-hazelcast-exporter/releases) _(zeebe-hazelcast-exporter-%{VERSION}-jar-with-dependencies.jar)_
 
 2. Copy the JAR into the broker folder `~/zeebe-broker-%{VERSION}/lib`
 
