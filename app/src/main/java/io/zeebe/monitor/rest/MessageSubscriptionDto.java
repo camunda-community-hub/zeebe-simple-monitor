@@ -5,8 +5,8 @@ public class MessageSubscriptionDto {
   private String messageName;
   private String correlationKey;
 
-  private String activityId = "";
-  private Long activityInstanceKey;
+  private String elementId = "";
+  private Long elementInstanceKey;
   private Long workflowInstanceKey;
 
   private String state;
@@ -30,12 +30,12 @@ public class MessageSubscriptionDto {
     this.correlationKey = correlationKey;
   }
 
-  public String getActivityId() {
-    return activityId;
+  public String getElementId() {
+    return elementId;
   }
 
-  public void setActivityId(String activityId) {
-    this.activityId = activityId;
+  public void setElementId(String elementId) {
+    this.elementId = elementId;
   }
 
   public String getState() {
@@ -62,12 +62,12 @@ public class MessageSubscriptionDto {
     this.isOpen = isOpen;
   }
 
-  public Long getActivityInstanceKey() {
-    return activityInstanceKey;
+  public Long getElementInstanceKey() {
+    return elementInstanceKey;
   }
 
-  public void setActivityInstanceKey(Long activityInstanceKey) {
-    this.activityInstanceKey = activityInstanceKey;
+  public void setElementInstanceKey(Long elementInstanceKey) {
+    this.elementInstanceKey = elementInstanceKey;
   }
 
   public Long getWorkflowInstanceKey() {

@@ -393,8 +393,8 @@ public class ViewController {
                   final IncidentDto incidentDto = new IncidentDto();
                   incidentDto.setKey(incidentKey);
 
-                  incidentDto.setActivityId(elementIdsForKeys.get(i.getElementInstanceKey()));
-                  incidentDto.setActivityInstanceKey(i.getElementInstanceKey());
+                  incidentDto.setElementId(elementIdsForKeys.get(i.getElementInstanceKey()));
+                  incidentDto.setElementInstanceKey(i.getElementInstanceKey());
 
                   if (i.getJobKey() > 0) {
                     incidentDto.setJobKey(i.getJobKey());
@@ -492,7 +492,7 @@ public class ViewController {
             .map(
                 job -> {
                   final JobDto jobDto = toDto(job);
-                  jobDto.setActivityId(
+                  jobDto.setElementId(
                       elementIdsForKeys.getOrDefault(job.getElementInstanceKey(), ""));
 
                   final boolean isActivatable =
@@ -511,8 +511,8 @@ public class ViewController {
             .map(
                 subscription -> {
                   final MessageSubscriptionDto subscriptionDto = toDto(subscription);
-                  subscriptionDto.setActivityId(
-                      elementIdsForKeys.getOrDefault(subscriptionDto.getActivityInstanceKey(), ""));
+                  subscriptionDto.setElementId(
+                      elementIdsForKeys.getOrDefault(subscriptionDto.getElementInstanceKey(), ""));
 
                   return subscriptionDto;
                 })
@@ -620,7 +620,7 @@ public class ViewController {
     dto.setKey(job.getKey());
     dto.setJobType(job.getJobType());
     dto.setWorkflowInstanceKey(job.getWorkflowInstanceKey());
-    dto.setActivityInstanceKey(job.getElementInstanceKey());
+    dto.setElementInstanceKey(job.getElementInstanceKey());
     dto.setState(job.getState());
     dto.setRetries(job.getRetries());
     Optional.ofNullable(job.getWorker()).ifPresent(dto::setWorker);
@@ -669,9 +669,9 @@ public class ViewController {
     dto.setCorrelationKey(subscription.getCorrelationKey());
 
     dto.setWorkflowInstanceKey(subscription.getWorkflowInstanceKey());
-    dto.setActivityInstanceKey(subscription.getElementInstanceKey());
+    dto.setElementInstanceKey(subscription.getElementInstanceKey());
 
-    dto.setActivityId(subscription.getTargetFlowNodeId());
+    dto.setElementId(subscription.getTargetFlowNodeId());
 
     dto.setState(subscription.getState());
     dto.setTimestamp(Instant.ofEpochMilli(subscription.getTimestamp()).toString());
@@ -684,11 +684,11 @@ public class ViewController {
   private TimerDto toDto(TimerEntity timer) {
     final TimerDto dto = new TimerDto();
 
-    dto.setActivityId(timer.getTargetFlowNodeId());
+    dto.setElementId(timer.getTargetFlowNodeId());
     dto.setState(timer.getState());
     dto.setDueDate(Instant.ofEpochMilli(timer.getDueDate()).toString());
     dto.setTimestamp(Instant.ofEpochMilli(timer.getTimestamp()).toString());
-    dto.setActivityInstanceKey(timer.getElementInstanceKey());
+    dto.setElementInstanceKey(timer.getElementInstanceKey());
 
     final int repetitions = timer.getRepetitions();
     dto.setRepetitions(repetitions >= 0 ? String.valueOf(repetitions) : "∞");

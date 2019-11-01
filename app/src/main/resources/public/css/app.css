@@ -46,9 +46,15 @@
 }
 
 .bpmn-element-active:not(.djs-connection) .djs-visual > :nth-child(1) {
-  stroke: rgba(66, 180, 21, 0.7) !important; 
+  stroke: rgba(66, 180, 21, 0.7) !important;
 }
 
 .bpmn-element-incident:not(.djs-connection) .djs-visual > :nth-child(1) {
   stroke: rgba(255, 47, 0, 0.7) !important;
+}
+
+.bpmn-element-selected:not(.djs-connection) .djs-visual > :nth-child(1) {
+  stroke: rgba(0, 125, 255, 0.7) !important;
+  stroke-dasharray: 5;
+  stroke-width: 4px !important;
 }

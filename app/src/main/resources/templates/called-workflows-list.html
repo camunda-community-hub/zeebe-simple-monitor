@@ -9,7 +9,7 @@
 
     {{#instance.calledWorkflowInstances}}
     <tr>
-        <td>{{elementId}}</td>
+        <td>{{>components/bpmn-element-id}}</td>
         <td>{{elementInstanceKey}}</td>
         <td>
             <a href="/views/instances/{{childWorkflowInstanceKey}}">{{childWorkflowInstanceKey}}</a>
