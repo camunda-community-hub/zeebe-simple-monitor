@@ -1,7 +1,11 @@
 package io.zeebe.monitor.rest;
 
 import io.zeebe.model.bpmn.Bpmn;
+import io.zeebe.model.bpmn.BpmnModelInstance;
 import io.zeebe.model.bpmn.instance.FlowElement;
+import io.zeebe.model.bpmn.instance.SequenceFlow;
+import io.zeebe.model.bpmn.instance.ServiceTask;
+import io.zeebe.model.bpmn.instance.zeebe.ZeebeTaskDefinition;
 import io.zeebe.monitor.entity.ElementInstanceEntity;
 import io.zeebe.monitor.entity.ElementInstanceStatistics;
 import io.zeebe.monitor.entity.IncidentEntity;
@@ -33,7 +37,6 @@ import java.io.ByteArrayInputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -146,6 +149,10 @@ public class ViewController {
             .map(this::toDto)
             .collect(Collectors.toList());
     model.put("messageSubscriptions", messageSubscriptions);
+
+    final var resourceAsStream = new ByteArrayInputStream(workflow.getResource().getBytes());
+    final var bpmn = Bpmn.readModelFromStream(resourceAsStream);
+    model.put("instance.bpmnElementInfos", getBpmnElementInfos(bpmn));
 
     addPaginationToModel(model, pageable, count);
 
@@ -341,18 +348,24 @@ public class ViewController {
 
     dto.setElementInstances(elementStates);
 
-    final Map<String, String> flowElements =
+    final var bpmnModelInstance =
         workflowRepository
             .findByKey(instance.getWorkflowKey())
             .map(w -> new ByteArrayInputStream(w.getResource().getBytes()))
-            .map(stream -> Bpmn.readModelFromStream(stream))
-            .map(
-                bpmn ->
-                    bpmn.getModelElementsByType(FlowElement.class).stream()
-                        .collect(
-                            Collectors.toMap(
-                                e -> e.getId(), e -> Optional.ofNullable(e.getName()).orElse(""))))
-            .orElse(Collections.emptyMap());
+            .map(stream -> Bpmn.readModelFromStream(stream));
+
+    final Map<String, String> flowElements = new HashMap<>();
+
+    bpmnModelInstance.ifPresent(
+        bpmn -> {
+          bpmn.getModelElementsByType(FlowElement.class)
+              .forEach(
+                  e -> {
+                    flowElements.put(e.getId(), Optional.ofNullable(e.getName()).orElse(""));
+                  });
+
+          dto.setBpmnElementInfos(getBpmnElementInfos(bpmn));
+        });
 
     final List<AuditLogEntry> auditLogEntries =
         events.stream()
@@ -547,6 +560,39 @@ public class ViewController {
     dto.setCalledWorkflowInstances(calledWorkflowInstances);
 
     return dto;
+  }
+
+  private List<BpmnElementInfo> getBpmnElementInfos(BpmnModelInstance bpmn) {
+    final List<BpmnElementInfo> infos = new ArrayList<>();
+
+    bpmn.getModelElementsByType(ServiceTask.class)
+        .forEach(
+            t -> {
+              final var info = new BpmnElementInfo();
+              info.setElementId(t.getId());
+              final var jobType = t.getSingleExtensionElement(ZeebeTaskDefinition.class).getType();
+              info.setInfo("job-type: " + jobType);
+
+              infos.add(info);
+            });
+
+    bpmn.getModelElementsByType(SequenceFlow.class)
+        .forEach(
+            s -> {
+              final var conditionExpression = s.getConditionExpression();
+
+              if (conditionExpression != null && !conditionExpression.getTextContent().isEmpty()) {
+
+                final var info = new BpmnElementInfo();
+                info.setElementId(s.getId());
+                final var condition = conditionExpression.getTextContent();
+                info.setInfo("condition: " + condition);
+
+                infos.add(info);
+              }
+            });
+
+    return infos;
   }
 
   @GetMapping("/views/incidents")

@@ -53,6 +53,8 @@ public class WorkflowInstanceDto {
   private List<TimerDto> timers = new ArrayList<>();
   private List<CalledWorkflowInstanceDto> calledWorkflowInstances = new ArrayList<>();
 
+  private List<BpmnElementInfo> bpmnElementInfos = new ArrayList<>();
+
   public int getPartitionId() {
     return partitionId;
   }
@@ -239,5 +241,13 @@ public class WorkflowInstanceDto {
 
   public void setCalledWorkflowInstances(List<CalledWorkflowInstanceDto> calledWorkflowInstances) {
     this.calledWorkflowInstances = calledWorkflowInstances;
+  }
+
+  public List<BpmnElementInfo> getBpmnElementInfos() {
+    return bpmnElementInfos;
+  }
+
+  public void setBpmnElementInfos(List<BpmnElementInfo> bpmnElementInfos) {
+    this.bpmnElementInfos = bpmnElementInfos;
   }
 }

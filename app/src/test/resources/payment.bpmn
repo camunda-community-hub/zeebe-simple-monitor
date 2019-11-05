@@ -25,7 +25,7 @@
       <bpmn:messageEventDefinition messageRef="Message_01tettd" />
     </bpmn:intermediateCatchEvent>
     <bpmn:sequenceFlow id="SequenceFlow_1v57j9n" name="no" sourceRef="ExclusiveGateway_0w2do0f" targetRef="IntermediateCatchEvent_0pcwpf8">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">$.success == false</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">success == false</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:endEvent id="EndEvent_0pzgc9u">
       <bpmn:incoming>SequenceFlow_1hh2j0a</bpmn:incoming>
@@ -35,7 +35,7 @@
   </bpmn:process>
   <bpmn:message id="Message_01tettd" name="Payment Details updated">
     <bpmn:extensionElements>
-      <zeebe:subscription correlationKey="$.paymentId" />
+      <zeebe:subscription correlationKey="paymentId" />
     </bpmn:extensionElements>
   </bpmn:message>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">

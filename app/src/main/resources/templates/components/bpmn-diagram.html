@@ -13,6 +13,8 @@
     viewer = new BpmnViewer({container: '#diagramCanvas', width: '100%', height: '100%'});
 
     canvas = viewer.get('canvas');
+    eventBus = viewer.get("eventBus");
+    overlays = viewer.get("overlays");
 
       viewer.importXML(resource, function(err) {
 			if (err) {
@@ -21,6 +23,34 @@
 				addMarkers(viewer);
 			}
 		});
+
+      var bpmnElementInfo = {};
+      {{#instance.bpmnElementInfos}}
+        bpmnElementInfo['{{elementId}}'] = '{{info}}';
+      {{/instance.bpmnElementInfos}}
+
+      var infoOverlayId;
+
+      eventBus.on("element.hover", function(e) {
+          var elementId = e.element.id;
+
+          var info = bpmnElementInfo[elementId];
+          if (info) {
+              infoOverlayId = overlays.add(elementId, {
+                  position: {
+                      bottom: -5,
+                      left: 0
+                  },
+                  html: '<div class="bpmn-info">' + info + '</div>'
+              });
+          }
+      });
+
+      eventBus.on("element.out", function(e) {
+          if (infoOverlayId) {
+              overlays.remove(infoOverlayId);
+          }
+      });
   }
 
   function addMarkers(viewer) {

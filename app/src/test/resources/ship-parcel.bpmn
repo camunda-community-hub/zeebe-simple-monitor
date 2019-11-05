@@ -31,8 +31,8 @@
       <bpmn:incoming>SequenceFlow_02flt20</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1kauo34</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="SequenceFlow_02flt20" name="$.totalPrice &#62; 100" sourceRef="ExclusiveGateway_0zlm4ir" targetRef="ServiceTask_1gi4zqn">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">$.totalPrice &gt; 100</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="SequenceFlow_02flt20" name="totalPrice &#62; 100" sourceRef="ExclusiveGateway_0zlm4ir" targetRef="ServiceTask_1gi4zqn">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">totalPrice &gt; 100</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:endEvent id="EndEvent_0elt8f8">
       <bpmn:incoming>SequenceFlow_1redtxg</bpmn:incoming>
