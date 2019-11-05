@@ -2,8 +2,10 @@ package io.zeebe.monitor.rest;
 
 public class MessageSubscriptionDto {
 
-  private String messageName;
-  private String correlationKey;
+  private String key = "";
+
+  private String messageName = "";
+  private String correlationKey = "";
 
   private String elementId = "";
   private Long elementInstanceKey;
@@ -76,5 +78,13 @@ public class MessageSubscriptionDto {
 
   public void setWorkflowInstanceKey(Long workflowInstanceKey) {
     this.workflowInstanceKey = workflowInstanceKey;
+  }
+
+  public String getKey() {
+    return key;
+  }
+
+  public void setKey(String key) {
+    this.key = key;
   }
 }

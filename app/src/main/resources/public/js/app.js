@@ -333,12 +333,29 @@ function failJob(jobKey) {
 
 function publishMessage() {
 
-		var data = {
-			name: document.getElementById("message-name").value,
-			correlationKey: document.getElementById("message-correlation-key").value,
-			payload: getVariablesDocument(),
-			timeToLive: document.getElementById("message-ttl").value
-		};
+	var data = {
+		name: document.getElementById("message-name").value,
+		correlationKey: document.getElementById("message-correlation-key").value,
+		payload: getVariablesDocument(),
+		timeToLive: document.getElementById("message-ttl").value
+	};
+
+	publishMessageWithPayload(data);
+}
+
+function publishMessageSubscription(key) {
+
+	var data = {
+		name: document.getElementById("message-name-" + key).value,
+		correlationKey: document.getElementById("message-correlation-key-" + key).value,
+		payload: getVariablesDocument(key),
+		timeToLive: document.getElementById("message-ttl-" + key).value
+	};
+
+	publishMessageWithPayload(data);
+}
+
+function publishMessageWithPayload(data) {
 
 		$.ajax({
 	             type : 'POST',

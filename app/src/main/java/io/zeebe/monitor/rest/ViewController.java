@@ -665,8 +665,9 @@ public class ViewController {
   private MessageSubscriptionDto toDto(MessageSubscriptionEntity subscription) {
     final MessageSubscriptionDto dto = new MessageSubscriptionDto();
 
+    dto.setKey(subscription.getId());
     dto.setMessageName(subscription.getMessageName());
-    dto.setCorrelationKey(subscription.getCorrelationKey());
+    dto.setCorrelationKey(Optional.ofNullable(subscription.getCorrelationKey()).orElse(""));
 
     dto.setWorkflowInstanceKey(subscription.getWorkflowInstanceKey());
     dto.setElementInstanceKey(subscription.getElementInstanceKey());
