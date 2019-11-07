@@ -1,4 +1,4 @@
-<div class="modal fade" id="publishMessageModal" tabindex="-1" role="dialog" aria-labelledby="publishMessageModalLabel"
+<div class="modal fade" id="publishMessageModal-{{key}}" tabindex="-1" role="dialog" aria-labelledby="publishMessageModalLabel"
      aria-hidden="true">
     <div class="modal-dialog" role="document">
 
@@ -14,19 +14,19 @@
 
                 <div class="form-group">
                     <label class="col-form-label">Message Name</label>
-                    <input id="message-name" class="form-control" type="text" />
+                    <input id="message-name-{{key}}" class="form-control" type="text" value="{{messageName}}" />
                 </div>
 
                 <div class="form-group">
                     <label class="col-form-label">Correlation Key</label>
-                    <input id="message-correlation-key" class="form-control" type="text" />
+                    <input id="message-correlation-key-{{key}}" class="form-control" type="text" value="{{correlationKey}}" />
                 </div>
 
-                {{>components/variables-form}}
+                {{>components/variables-form-with-key}}
 
                 <div class="form-group">
                     <label class="col-form-label">Time-to-Live</label>
-                    <input id="message-ttl" class="form-control" type="text" value="PT0S"></input>
+                    <input id="message-ttl-{{key}}" class="form-control" type="text" value="PT0S"></input>
                 </div>
 
             </div>
@@ -34,7 +34,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 
-                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="publishMessage()">Publish</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="publishMessageSubscription('{{key}}')">Publish</button>
             </div>
 
         </div>

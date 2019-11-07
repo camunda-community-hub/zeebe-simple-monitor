@@ -20,7 +20,7 @@ function showErrorResonse(xhr, ajaxOptions, thrownError) {
 	}
 	else {
 		showError(thrownError);
-	}	
+	}
 }
 
 // --------------------------------------------------------------------
@@ -30,7 +30,7 @@ function reload() {
 }
 
 // --------------------------------------------------------------------
-					
+
             var stompClient = null;
 
             var subscribedWorkflowInstanceKeys = [];
@@ -38,7 +38,7 @@ function reload() {
              
             function connect() {
                 var socket = new SockJS('/notifications');
-                stompClient = Stomp.over(socket);  
+                stompClient = Stomp.over(socket); 
                 stompClient.connect({}, function(frame) {
                     stompClient.subscribe('/notifications/workflow-instance', function(message) {
                       handleMessage(JSON.parse(message.body));
@@ -53,7 +53,7 @@ function reload() {
             }
              
             function sendMessage(msg) {
-                stompClient.send("/notifications", {}, 
+                stompClient.send("/notifications", {},
                   JSON.stringify(msg));
             }
              
@@ -67,7 +67,7 @@ function reload() {
                     showInfo('Instance(s) of this workflow have changed.');
                 }
             }
-						
+
             function subscribeForWorkflowInstance(key) {
                 subscribedWorkflowInstanceKeys.push(key);
             }
@@ -79,12 +79,12 @@ function reload() {
 // --------------------------------------------------------------------
 
 function uploadModels() {
-  	
+
 	var fileUpload = document.getElementById('documentToUpload');
 
 	var filesToUpload = {
 		files: []
-	} 
+	}
 
 	var processUploadedFile = function(fileUpload, index) {
 		return function(e) {
@@ -113,14 +113,14 @@ function uploadModels() {
   // read all selected files
 	if(typeof FileReader === 'function' && fileUpload.files.length > 0) {
 	    var index;
-		for (index = 0; index < fileUpload.files.length; ++index) {	  
+		for (index = 0; index < fileUpload.files.length; ++index) {
 
 		    var reader = new FileReader();
 		    reader.onloadend = processUploadedFile(fileUpload, index);
             reader.readAsArrayBuffer(fileUpload.files[index]);
         }
     }
-	    
+
 	var uploadFiles = function() {
 	    $.ajax({
            type : 'POST',
@@ -128,7 +128,7 @@ function uploadModels() {
            data:  JSON.stringify(filesToUpload),
            contentType: 'application/json; charset=utf-8',
            success: function (result) {
-           	showSuccess("New deployment created.");	
+           	showSuccess("New deployment created.");
            },
            error: function (xhr, ajaxOptions, thrownError) {
           	 showErrorResonse(xhr, ajaxOptions, thrownError);
@@ -136,11 +136,11 @@ function uploadModels() {
         	 timeout: 5000,
            crossDomain: true,
 	    });
-	}; 
+	};
 }
 
 // --------------------------------------------------------------------
-	
+
 function createInstance(key) {
 	$.ajax({
        type : 'POST',
@@ -148,7 +148,7 @@ function createInstance(key) {
        data:  getVariablesDocument(),
        contentType: 'application/json; charset=utf-8',
        success: function (result) {
-       	showSuccess("New instance created.");	
+       	showSuccess("New instance created.");
        },
        error: function (xhr, ajaxOptions, thrownError) {
       	 showErrorResonse(xhr, ajaxOptions, thrownError);
@@ -156,8 +156,8 @@ function createInstance(key) {
     	 timeout: 5000,
        crossDomain: true,
     });
-}	
-	
+}
+
 // --------------------------------------------------------------------
 
 function updateVariable(scopeKey, name) {
@@ -172,7 +172,7 @@ function updateVariable(scopeKey, name) {
 	       data:  data,
 	       contentType: 'application/json; charset=utf-8',
 	       success: function (result) {
-	       	showSuccess("Variable updated.");	
+	       	showSuccess("Variable updated.");
 	       },
 	       error: function (xhr, ajaxOptions, thrownError) {
 	      	 showErrorResonse(xhr, ajaxOptions, thrownError);
@@ -183,20 +183,20 @@ function updateVariable(scopeKey, name) {
 }
 
 function setVariable() {
-		
+
 		var scopeKeyElement = document.getElementById("variable-scopeKey");
 		var scopeKey = scopeKeyElement.options[scopeKeyElement.selectedIndex].value;
-		
+
 		var name = document.getElementById("variable-name").value;
 
 		var newValue = document.getElementById("variable-value").value;
 
 		var data = '{"' + name + '":' + newValue + '}';
-		
+
 		var local = document.getElementById("variable-local").checked;
 
 		var url = '/api/instances/' + scopeKey + "/set-variables";
-		
+
 		if (local) {
 			url = url + "-local";
 		}
@@ -207,7 +207,7 @@ function setVariable() {
 	       data:  data,
 	       contentType: 'application/json; charset=utf-8',
 	       success: function (result) {
-	       	showSuccess("Variable set.");	
+	       	showSuccess("Variable set.");
 	       },
 	       error: function (xhr, ajaxOptions, thrownError) {
 	      	 showErrorResonse(xhr, ajaxOptions, thrownError);
@@ -226,7 +226,7 @@ function updateRetries(jobKey) {
 	             data:  document.getElementById("remaining-retries-" + jobKey).value,
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
-	             	showSuccess("Retries updated.");	
+	             	showSuccess("Retries updated.");
 	             },
 	             error: function (xhr, ajaxOptions, thrownError) {
 	            	 showErrorResonse(xhr, ajaxOptions, thrownError);
@@ -241,7 +241,7 @@ function updateRetries(jobKey) {
 function resolveJobIncident(incidentKey, jobKey) {
 
 		var remainingRetries = document.getElementById("remaining-retries-" + incidentKey).value;
-	
+
 		resolveIncident(incidentKey, jobKey, remainingRetries);
 }
 
@@ -255,14 +255,14 @@ function resolveIncident(incidentKey, jobKey, remainingRetries) {
 			jobKey: jobKey,
 			remainingRetries: remainingRetries
 		};
-		
+
 		$.ajax({
 	             type : 'PUT',
 	             url: '/api/instances/' + incidentKey + "/resolve-incident",
 	             data:  JSON.stringify(data),
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
-	             	showSuccess("Incident resolved.");	
+	             	showSuccess("Incident resolved.");
 	             },
 	             error: function (xhr, ajaxOptions, thrownError) {
 	            	 showErrorResonse(xhr, ajaxOptions, thrownError);
@@ -280,7 +280,7 @@ function cancelInstance(key) {
 	             url: '/api/instances/' + key,
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
-	             	showSuccess("Instance canceled.");	
+	             	showSuccess("Instance canceled.");
 	             },
 	             error: function (xhr, ajaxOptions, thrownError) {
 	            	 showErrorResonse(xhr, ajaxOptions, thrownError);
@@ -293,14 +293,14 @@ function cancelInstance(key) {
 // --------------------------------------------------------------------
 
 function completeJob(jobKey) {
-		
+
 		$.ajax({
 	             type : 'PUT',
 	             url: '/api/jobs/' + jobKey + '/complete',
 	             data:  getVariablesDocument(jobKey),
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
-	             	showSuccess("Job completed.");	
+	             	showSuccess("Job completed.");
 	             },
 	             error: function (xhr, ajaxOptions, thrownError) {
 	            	 showErrorResonse(xhr, ajaxOptions, thrownError);
@@ -313,13 +313,13 @@ function completeJob(jobKey) {
 // --------------------------------------------------------------------
 
 function failJob(jobKey) {
-		
+
 		$.ajax({
 	             type : 'PUT',
 	             url: '/api/jobs/' + jobKey + '/fail',
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
-	             	showSuccess("Job failed.");	
+	             	showSuccess("Job failed.");
 	             },
 	             error: function (xhr, ajaxOptions, thrownError) {
 	            	 showErrorResonse(xhr, ajaxOptions, thrownError);
@@ -333,20 +333,37 @@ function failJob(jobKey) {
 
 function publishMessage() {
 
-		var data = {
-			name: document.getElementById("message-name").value,
-			correlationKey: document.getElementById("message-correlation-key").value,
-			payload: getVariablesDocument(),
-			timeToLive: document.getElementById("message-ttl").value
-		};
-		
+	var data = {
+		name: document.getElementById("message-name").value,
+		correlationKey: document.getElementById("message-correlation-key").value,
+		payload: getVariablesDocument(),
+		timeToLive: document.getElementById("message-ttl").value
+	};
+
+	publishMessageWithPayload(data);
+}
+
+function publishMessageSubscription(key) {
+
+	var data = {
+		name: document.getElementById("message-name-" + key).value,
+		correlationKey: document.getElementById("message-correlation-key-" + key).value,
+		payload: getVariablesDocument(key),
+		timeToLive: document.getElementById("message-ttl-" + key).value
+	};
+
+	publishMessageWithPayload(data);
+}
+
+function publishMessageWithPayload(data) {
+
 		$.ajax({
 	             type : 'POST',
 	             url: '/api/messages/',
 	             data:  JSON.stringify(data),
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
-	             	showSuccess("Message published.");	
+	             	showSuccess("Message published.");
 	             },
 	             error: function (xhr, ajaxOptions, thrownError) {
 	            	 showErrorResonse(xhr, ajaxOptions, thrownError);
@@ -375,15 +392,23 @@ function loadDiagram(resource) {
 						});
 }
 
-function addElementInstanceActiveMarker(canvas, elementId) {	
+function addElementInstanceActiveMarker(canvas, elementId) {
 	canvas.addMarker(elementId, 'bpmn-element-active');
 }
 
-function addElementInstanceIncidentMarker(canvas, elementId) {	
+function addElementInstanceIncidentMarker(canvas, elementId) {
 	canvas.addMarker(elementId, 'bpmn-element-incident');
 }
 
-function addElementInstanceCounter(overlays, elemenId, active, ended) {	
+function addElementSelectedMarker(elementId) {
+	canvas.addMarker(elementId, 'bpmn-element-selected');
+}
+
+function removeElementSelectedMarker(elementId) {
+	canvas.removeMarker(elementId, 'bpmn-element-selected');
+}
+
+function addElementInstanceCounter(overlays, elemenId, active, ended) {
 
 		var style = ((active > 0) ? "bpmn-badge-active" : "bpmn-badge-inactive");
 
@@ -392,38 +417,38 @@ function addElementInstanceCounter(overlays, elemenId, active, ended) {
 		    top: -25,
   			left: 0
 		  },
-		  html: '<span class="' + style + '" data-toggle="tooltip" data-placement="bottom" title="active | ended">' 
-		  				+ active + ' | ' + ended 
+		  html: '<span class="' + style + '" data-toggle="tooltip" data-placement="bottom" title="active | ended">'
+		  				+ active + ' | ' + ended
 		  				+ '</span>'
 		});
 }
 
-function addIncidentMarker(overlays, elemenId) {	
+function addIncidentMarker(overlays, elemenId) {
 		overlays.add(elemenId, {
 		  position: {
 		    top: -25,
   			right: 10
 		  },
-		  html: '<span class="bpmn-badge-incident" data-toggle="tooltip" data-placement="bottom" title="incident">' 
+		  html: '<span class="bpmn-badge-incident" data-toggle="tooltip" data-placement="bottom" title="incident">'
 		  				+ "⚡"
 		  				+ '</span>'
 		});
 }
 
-function markSequenceFlow(elementRegistry, graphicsFactory, flow) {				
+function markSequenceFlow(elementRegistry, graphicsFactory, flow) {
 	var element = elementRegistry.get(flow);
 	var gfx = elementRegistry.getGraphics(element);
-		
+
 	colorSequenceFlow(graphicsFactory, element, gfx, '#52b415');
 }
 
 function colorSequenceFlow(graphicsFactory, sequenceFlow, gfx, color) {
 	var businessObject = sequenceFlow.businessObject,
 		di = businessObject.di;
-	
+
 	di.set('stroke', color);
 	di.set('fill', color);
-	
+
 	graphicsFactory.update('connection', sequenceFlow, gfx);
 }
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.zeebe</groupId>
@@ -12,7 +13,7 @@
         <artifactId>camunda-release-parent</artifactId>
         <version>3.7</version>
         <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
-        <relativePath />
+        <relativePath/>
     </parent>
 
     <modules>
@@ -21,15 +22,13 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
 
-        <zeebe.version>0.21.0-alpha1</zeebe.version>
-        <spring.boot.version>2.1.2.RELEASE</spring.boot.version>
-        <hazelcast.exporter.version>0.6.0</hazelcast.exporter.version>
+        <zeebe.version>0.22.0-alpha1</zeebe.version>
+        <spring.boot.version>2.2.0.RELEASE</spring.boot.version>
+        <hazelcast.exporter.version>0.7.0-alpha1</hazelcast.exporter.version>
 
         <!-- release parent settings -->
-        <version.java>1.8</version.java>
+        <version.java>11</version.java>
         <nexus.snapshot.repository>https://app.camunda.com/nexus/content/repositories/zeebe-io-snapshots/
         </nexus.snapshot.repository>
         <nexus.release.repository>https://app.camunda.com/nexus/content/repositories/zeebe-io/
@@ -74,6 +73,26 @@
 
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <release>11</release>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <!-- Override java source version to workaround javadoc bug https://bugs.openjdk.java.net/browse/JDK-8212233 -->
+                    <source>8</source>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
         <profile>

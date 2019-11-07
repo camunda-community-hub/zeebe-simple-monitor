@@ -13,30 +13,30 @@
 
 {{#instance.jobs}}
 	<tr>
-		<td>{{activityId}}</td>
-		<td>{{activityInstanceKey}}</td>
+		<td>{{>components/bpmn-element-id}}</td>
+		<td>{{elementInstanceKey}}</td>
 		<td>{{key}}</td>
 		<td>{{jobType}}</td>
 		<td>{{retries}}</td>
 		<td>{{worker}}</td>
 		<td>{{state}}</td>
 		<td>{{timestamp}}</td>
-		<td>		
+		<td>
 			 {{#isActivatable}}
-			 
-			 		{{>modals/complete-job-modal}}			 		
+
+			 		{{>modals/complete-job-modal}}
 			 		{{>modals/fail-job-modal}}
-			 
+
 			 		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#completeJobModal-{{key}}">
 				  	Complete
 					</button>
-					
+
 					<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#failJobModal-{{key}}">
 				  	Fail
-					</button>	
-					
-			 {{/isActivatable}}		
-			 			 	
+					</button>
+
+			 {{/isActivatable}}
+
 		</td>
 	</tr>
 {{/instance.jobs}}

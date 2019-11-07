@@ -126,6 +126,8 @@ public class ZeebeImportService {
                                     newEntity.setBpmnProcessId(record.getBpmnProcessId());
                                     newEntity.setVersion(record.getVersion());
                                     newEntity.setWorkflowKey(record.getWorkflowKey());
+                                    newEntity.setParentWorkflowInstanceKey(record.getParentWorkflowInstanceKey());
+                                    newEntity.setParentElementInstanceKey(record.getParentElementInstanceKey());
                                     return newEntity;
                                 });
 

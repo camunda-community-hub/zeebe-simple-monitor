@@ -9,16 +9,16 @@
 
     {{#messageSubscriptions}}
     <tr>
-        <td>{{activityId}}</td>
+        <td>{{>components/bpmn-element-id}}</td>
         <td>{{messageName}}</td>
         <td>{{state}}</td>
         <td>{{timestamp}}</td>
         <td>
             {{#isOpen}}
 
-            {{>modals/publish-message-modal}}
+            {{>modals/publish-message-subscription-modal}}
 
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#publishMessageModal">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#publishMessageModal-{{key}}">
                 Publish Message
             </button>
 

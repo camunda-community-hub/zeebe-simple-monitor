@@ -23,8 +23,8 @@ public class JobDto {
   private String worker = "";
   private int retries;
 
-  private String activityId = "";
-  private long activityInstanceKey;
+  private String elementId = "";
+  private long elementInstanceKey;
   private long workflowInstanceKey;
 
   private String timestamp = "";
@@ -71,20 +71,20 @@ public class JobDto {
     this.retries = retries;
   }
 
-  public String getActivityId() {
-    return activityId;
+  public String getElementId() {
+    return elementId;
   }
 
-  public void setActivityId(String activityId) {
-    this.activityId = activityId;
+  public void setElementId(String elementId) {
+    this.elementId = elementId;
   }
 
-  public long getActivityInstanceKey() {
-    return activityInstanceKey;
+  public long getElementInstanceKey() {
+    return elementInstanceKey;
   }
 
-  public void setActivityInstanceKey(long activityInstanceKey) {
-    this.activityInstanceKey = activityInstanceKey;
+  public void setElementInstanceKey(long elementInstanceKey) {
+    this.elementInstanceKey = elementInstanceKey;
   }
 
   public String getTimestamp() {

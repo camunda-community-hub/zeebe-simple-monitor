@@ -1,7 +1,11 @@
 package io.zeebe.monitor.rest;
 
 import io.zeebe.model.bpmn.Bpmn;
+import io.zeebe.model.bpmn.BpmnModelInstance;
 import io.zeebe.model.bpmn.instance.FlowElement;
+import io.zeebe.model.bpmn.instance.SequenceFlow;
+import io.zeebe.model.bpmn.instance.ServiceTask;
+import io.zeebe.model.bpmn.instance.zeebe.ZeebeTaskDefinition;
 import io.zeebe.monitor.entity.ElementInstanceEntity;
 import io.zeebe.monitor.entity.ElementInstanceStatistics;
 import io.zeebe.monitor.entity.IncidentEntity;
@@ -33,7 +37,6 @@ import java.io.ByteArrayInputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -146,6 +149,10 @@ public class ViewController {
             .map(this::toDto)
             .collect(Collectors.toList());
     model.put("messageSubscriptions", messageSubscriptions);
+
+    final var resourceAsStream = new ByteArrayInputStream(workflow.getResource().getBytes());
+    final var bpmn = Bpmn.readModelFromStream(resourceAsStream);
+    model.put("instance.bpmnElementInfos", getBpmnElementInfos(bpmn));
 
     addPaginationToModel(model, pageable, count);
 
@@ -275,6 +282,17 @@ public class ViewController {
       dto.setEndTime(Instant.ofEpochMilli(instance.getEnd()).toString());
     }
 
+    if (instance.getParentElementInstanceKey() > 0) {
+      dto.setParentWorkflowInstanceKey(instance.getParentWorkflowInstanceKey());
+
+      workflowInstanceRepository
+          .findByKey(instance.getParentWorkflowInstanceKey())
+          .ifPresent(
+              parent -> {
+                dto.setParentBpmnProcessId(parent.getBpmnProcessId());
+              });
+    }
+
     final List<String> completedActivities =
         events.stream()
             .filter(e -> WORKFLOW_INSTANCE_COMPLETED_INTENTS.contains(e.getIntent()))
@@ -330,18 +348,24 @@ public class ViewController {
 
     dto.setElementInstances(elementStates);
 
-    final Map<String, String> flowElements =
+    final var bpmnModelInstance =
         workflowRepository
             .findByKey(instance.getWorkflowKey())
             .map(w -> new ByteArrayInputStream(w.getResource().getBytes()))
-            .map(stream -> Bpmn.readModelFromStream(stream))
-            .map(
-                bpmn ->
-                    bpmn.getModelElementsByType(FlowElement.class).stream()
-                        .collect(
-                            Collectors.toMap(
-                                e -> e.getId(), e -> Optional.ofNullable(e.getName()).orElse(""))))
-            .orElse(Collections.emptyMap());
+            .map(stream -> Bpmn.readModelFromStream(stream));
+
+    final Map<String, String> flowElements = new HashMap<>();
+
+    bpmnModelInstance.ifPresent(
+        bpmn -> {
+          bpmn.getModelElementsByType(FlowElement.class)
+              .forEach(
+                  e -> {
+                    flowElements.put(e.getId(), Optional.ofNullable(e.getName()).orElse(""));
+                  });
+
+          dto.setBpmnElementInfos(getBpmnElementInfos(bpmn));
+        });
 
     final List<AuditLogEntry> auditLogEntries =
         events.stream()
@@ -382,8 +406,8 @@ public class ViewController {
                   final IncidentDto incidentDto = new IncidentDto();
                   incidentDto.setKey(incidentKey);
 
-                  incidentDto.setActivityId(elementIdsForKeys.get(i.getElementInstanceKey()));
-                  incidentDto.setActivityInstanceKey(i.getElementInstanceKey());
+                  incidentDto.setElementId(elementIdsForKeys.get(i.getElementInstanceKey()));
+                  incidentDto.setElementInstanceKey(i.getElementInstanceKey());
 
                   if (i.getJobKey() > 0) {
                     incidentDto.setJobKey(i.getJobKey());
@@ -481,7 +505,7 @@ public class ViewController {
             .map(
                 job -> {
                   final JobDto jobDto = toDto(job);
-                  jobDto.setActivityId(
+                  jobDto.setElementId(
                       elementIdsForKeys.getOrDefault(job.getElementInstanceKey(), ""));
 
                   final boolean isActivatable =
@@ -500,8 +524,8 @@ public class ViewController {
             .map(
                 subscription -> {
                   final MessageSubscriptionDto subscriptionDto = toDto(subscription);
-                  subscriptionDto.setActivityId(
-                      elementIdsForKeys.getOrDefault(subscriptionDto.getActivityInstanceKey(), ""));
+                  subscriptionDto.setElementId(
+                      elementIdsForKeys.getOrDefault(subscriptionDto.getElementInstanceKey(), ""));
 
                   return subscriptionDto;
                 })
@@ -514,7 +538,61 @@ public class ViewController {
             .collect(Collectors.toList());
     dto.setTimers(timers);
 
+    final var calledWorkflowInstances =
+        workflowInstanceRepository.findByParentWorkflowInstanceKey(instance.getKey()).stream()
+            .map(
+                childEntity -> {
+                  final var childDto = new CalledWorkflowInstanceDto();
+
+                  childDto.setChildWorkflowInstanceKey(childEntity.getKey());
+                  childDto.setChildBpmnProcessId(childEntity.getBpmnProcessId());
+                  childDto.setChildState(childEntity.getState());
+
+                  childDto.setElementInstanceKey(childEntity.getParentElementInstanceKey());
+
+                  final var callElementId =
+                      elementIdsForKeys.getOrDefault(childEntity.getParentElementInstanceKey(), "");
+                  childDto.setElementId(callElementId);
+
+                  return childDto;
+                })
+            .collect(Collectors.toList());
+    dto.setCalledWorkflowInstances(calledWorkflowInstances);
+
     return dto;
+  }
+
+  private List<BpmnElementInfo> getBpmnElementInfos(BpmnModelInstance bpmn) {
+    final List<BpmnElementInfo> infos = new ArrayList<>();
+
+    bpmn.getModelElementsByType(ServiceTask.class)
+        .forEach(
+            t -> {
+              final var info = new BpmnElementInfo();
+              info.setElementId(t.getId());
+              final var jobType = t.getSingleExtensionElement(ZeebeTaskDefinition.class).getType();
+              info.setInfo("job-type: " + jobType);
+
+              infos.add(info);
+            });
+
+    bpmn.getModelElementsByType(SequenceFlow.class)
+        .forEach(
+            s -> {
+              final var conditionExpression = s.getConditionExpression();
+
+              if (conditionExpression != null && !conditionExpression.getTextContent().isEmpty()) {
+
+                final var info = new BpmnElementInfo();
+                info.setElementId(s.getId());
+                final var condition = conditionExpression.getTextContent();
+                info.setInfo("condition: " + condition);
+
+                infos.add(info);
+              }
+            });
+
+    return infos;
   }
 
   @GetMapping("/views/incidents")
@@ -588,7 +666,7 @@ public class ViewController {
     dto.setKey(job.getKey());
     dto.setJobType(job.getJobType());
     dto.setWorkflowInstanceKey(job.getWorkflowInstanceKey());
-    dto.setActivityInstanceKey(job.getElementInstanceKey());
+    dto.setElementInstanceKey(job.getElementInstanceKey());
     dto.setState(job.getState());
     dto.setRetries(job.getRetries());
     Optional.ofNullable(job.getWorker()).ifPresent(dto::setWorker);
@@ -633,13 +711,14 @@ public class ViewController {
   private MessageSubscriptionDto toDto(MessageSubscriptionEntity subscription) {
     final MessageSubscriptionDto dto = new MessageSubscriptionDto();
 
+    dto.setKey(subscription.getId());
     dto.setMessageName(subscription.getMessageName());
-    dto.setCorrelationKey(subscription.getCorrelationKey());
+    dto.setCorrelationKey(Optional.ofNullable(subscription.getCorrelationKey()).orElse(""));
 
     dto.setWorkflowInstanceKey(subscription.getWorkflowInstanceKey());
-    dto.setActivityInstanceKey(subscription.getElementInstanceKey());
+    dto.setElementInstanceKey(subscription.getElementInstanceKey());
 
-    dto.setActivityId(subscription.getTargetFlowNodeId());
+    dto.setElementId(subscription.getTargetFlowNodeId());
 
     dto.setState(subscription.getState());
     dto.setTimestamp(Instant.ofEpochMilli(subscription.getTimestamp()).toString());
@@ -652,11 +731,11 @@ public class ViewController {
   private TimerDto toDto(TimerEntity timer) {
     final TimerDto dto = new TimerDto();
 
-    dto.setActivityId(timer.getTargetFlowNodeId());
+    dto.setElementId(timer.getTargetFlowNodeId());
     dto.setState(timer.getState());
     dto.setDueDate(Instant.ofEpochMilli(timer.getDueDate()).toString());
     dto.setTimestamp(Instant.ofEpochMilli(timer.getTimestamp()).toString());
-    dto.setActivityInstanceKey(timer.getElementInstanceKey());
+    dto.setElementInstanceKey(timer.getElementInstanceKey());
 
     final int repetitions = timer.getRepetitions();
     dto.setRepetitions(repetitions >= 0 ? String.valueOf(repetitions) : "∞");

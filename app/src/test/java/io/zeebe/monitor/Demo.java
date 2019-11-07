@@ -7,7 +7,7 @@ public class Demo {
 
   public static void main(String[] args) throws InterruptedException {
 
-    final ZeebeClient client = ZeebeClient.newClient();
+    final ZeebeClient client = ZeebeClient.newClientBuilder().usePlaintext().build();
 
     client
         .newDeployCommand()

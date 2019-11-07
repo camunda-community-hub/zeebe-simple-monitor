@@ -2,8 +2,8 @@ package io.zeebe.monitor.rest;
 
 public class TimerDto {
 
-  private String activityId = "";
-  private Long activityInstanceKey;
+  private String elementId = "";
+  private Long elementInstanceKey;
 
   private String dueDate = "";
   private String repetitions = "";
@@ -11,20 +11,20 @@ public class TimerDto {
   private String state;
   private String timestamp = "";
 
-  public String getActivityId() {
-    return activityId;
+  public String getElementId() {
+    return elementId;
   }
 
-  public void setActivityId(String activityId) {
-    this.activityId = activityId;
+  public void setElementId(String elementId) {
+    this.elementId = elementId;
   }
 
-  public Long getActivityInstanceKey() {
-    return activityInstanceKey;
+  public Long getElementInstanceKey() {
+    return elementInstanceKey;
   }
 
-  public void setActivityInstanceKey(Long activityInstanceKey) {
-    this.activityInstanceKey = activityInstanceKey;
+  public void setElementInstanceKey(Long elementInstanceKey) {
+    this.elementInstanceKey = elementInstanceKey;
   }
 
   public String getState() {

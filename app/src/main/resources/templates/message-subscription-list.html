@@ -11,22 +11,22 @@
 
 {{#instance.messageSubscriptions}}
 	<tr>
-		<td>{{activityId}}</td>
-		<td>{{activityInstanceKey}}</td>
+		<td>{{>components/bpmn-element-id}}</td>
+		<td>{{elementInstanceKey}}</td>
 		<td>{{messageName}}</td>
 		<td>{{correlationKey}}</td>
 		<td>{{state}}</td>
 		<td>{{timestamp}}</td>
-		<td>		
+		<td>
 			 {{#isOpen}}
-			 
-			 		{{>modals/publish-message-modal}}			
-			 
-			 		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#publishMessageModal">
+
+			 		{{>modals/publish-message-subscription-modal}}
+
+			 		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#publishMessageModal-{{key}}">
 				  	Publish Message
 					</button>
-					
-			 {{/isOpen}}			
+
+			 {{/isOpen}}
 		</td>
 		</tr>
 {{/instance.messageSubscriptions}}

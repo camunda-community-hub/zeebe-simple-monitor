@@ -4,8 +4,8 @@ public class IncidentDto {
 
   private long key;
 
-  private String activityId;
-  private long activityInstanceKey;
+  private String elementId;
+  private long elementInstanceKey;
   private Long jobKey;
 
   private String payload = "";
@@ -27,12 +27,12 @@ public class IncidentDto {
     this.key = key;
   }
 
-  public long getActivityInstanceKey() {
-    return activityInstanceKey;
+  public long getElementInstanceKey() {
+    return elementInstanceKey;
   }
 
-  public void setActivityInstanceKey(long activityInstanceKey) {
-    this.activityInstanceKey = activityInstanceKey;
+  public void setElementInstanceKey(long elementInstanceKey) {
+    this.elementInstanceKey = elementInstanceKey;
   }
 
   public Long getJobKey() {
@@ -59,12 +59,12 @@ public class IncidentDto {
     this.errorMessage = errorMessage;
   }
 
-  public String getActivityId() {
-    return activityId;
+  public String getElementId() {
+    return elementId;
   }
 
-  public void setActivityId(String activityId) {
-    this.activityId = activityId;
+  public void setElementId(String elementId) {
+    this.elementId = elementId;
   }
 
   public String getState() {

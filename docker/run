@@ -19,7 +19,7 @@ do
 done
 
 # extracting latest hazelcast exporter version
-HAZELCAST_VERSION=$(sed -n 's/\(<hazelcast.exporter.version>\)\([0-9.]\+\)\(<\/hazelcast.exporter.version>\)/\2/p' pom.xml | awk '$1=$1{print}')
+HAZELCAST_VERSION=$(sed -n 's/\(<hazelcast.exporter.version>\)\([a-z0-9.-]\+\)\(<\/hazelcast.exporter.version>\)/\2/p' pom.xml | awk '$1=$1{print}')
 
 # replacing the hazelcadt version in the dockerfile
 sed -i "s/HAZELCAST_EXPORTER_VERSION=.*/HAZELCAST_EXPORTER_VERSION=$HAZELCAST_VERSION/" $DOCKER_FILE

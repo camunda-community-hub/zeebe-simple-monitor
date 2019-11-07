@@ -45,10 +45,28 @@
   white-space: nowrap;
 }
 
+.bpmn-info {
+  background-color: rgba(0, 123, 255, 0.5);
+  color: White;
+  border-radius: 5px;
+  font-family: Arial;
+  font-size: 12px;
+  padding: 5px;
+  min-height: 16px;
+  width: 100px;
+  text-align: center;
+}
+
 .bpmn-element-active:not(.djs-connection) .djs-visual > :nth-child(1) {
-  stroke: rgba(66, 180, 21, 0.7) !important; 
+  stroke: rgba(66, 180, 21, 0.7) !important;
 }
 
 .bpmn-element-incident:not(.djs-connection) .djs-visual > :nth-child(1) {
   stroke: rgba(255, 47, 0, 0.7) !important;
+}
+
+.bpmn-element-selected:not(.djs-connection) .djs-visual > :nth-child(1) {
+  stroke: rgba(0, 125, 255, 0.7) !important;
+  stroke-dasharray: 5;
+  stroke-width: 4px !important;
 }

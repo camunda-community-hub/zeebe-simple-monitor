@@ -26,8 +26,8 @@ public class WorkflowInstanceEntity {
   @Column(name = "KEY_")
   private long key;
 
-    @Column(name = "PARTITION_ID_")
-    private int partitionId;
+  @Column(name = "PARTITION_ID_")
+  private int partitionId;
 
   @Column(name = "WORKFLOW_KEY_")
   private long workflowKey;
@@ -46,6 +46,12 @@ public class WorkflowInstanceEntity {
 
   @Column(name = "END_")
   private Long end;
+
+  @Column(name = "PARENT_WORKFLOW_INSTANCE_KEY_")
+  private Long parentWorkflowInstanceKey;
+
+  @Column(name = "PARENT_ELEMENT_INSTANCE_KEY_")
+  private Long parentElementInstanceKey;
 
   public long getKey() {
     return key;
@@ -117,5 +123,21 @@ public class WorkflowInstanceEntity {
 
   public void setState(String state) {
     this.state = state;
+  }
+
+  public Long getParentWorkflowInstanceKey() {
+    return parentWorkflowInstanceKey;
+  }
+
+  public void setParentWorkflowInstanceKey(Long parentWorkflowInstanceKey) {
+    this.parentWorkflowInstanceKey = parentWorkflowInstanceKey;
+  }
+
+  public Long getParentElementInstanceKey() {
+    return parentElementInstanceKey;
+  }
+
+  public void setParentElementInstanceKey(Long parentElementInstanceKey) {
+    this.parentElementInstanceKey = parentElementInstanceKey;
   }
 }
