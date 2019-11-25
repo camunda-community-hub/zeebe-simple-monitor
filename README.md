@@ -37,7 +37,7 @@ The following command will build the project, pull images and start containers w
 
 2. Copy the JAR into the broker folder `~/zeebe-broker-%{VERSION}/lib`
 
-3. Add the exporter to the broker configuration `~/zeebe-broker-%{VERSION}/config/zeebe.cfg.toml`.
+3. Add the exporter to the broker configuration `~/zeebe-broker-%{VERSION}/conf/zeebe.cfg.toml`.
     ```
     [[exporters]]
     id = "hazelcast"
