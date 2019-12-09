@@ -22,7 +22,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <zeebe.version>0.22.0-alpha1</zeebe.version>
+        <zeebe.version>0.22.0-alpha2</zeebe.version>
         <spring.boot.version>2.2.2.RELEASE</spring.boot.version>
         <hazelcast.exporter.version>0.7.0-alpha1</hazelcast.exporter.version>
 
