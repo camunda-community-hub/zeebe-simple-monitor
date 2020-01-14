@@ -1,7 +1,7 @@
 <table class="table table-striped">
     <thead>
     <th>Scope Key</th>
-    <th>Scope Name</th>
+    <th>Element Id</th>
     <th>Variable Name</th>
     <th>Variable Value</th>
     <th>Time</th>
@@ -11,7 +11,7 @@
     {{#instance.variables}}
     <tr>
         <td>{{scopeKey}}</td>
-        <td>{{scopeName}}</td>
+        <td>{{>components/bpmn-element-id}}</td>
         <td>{{name}}</td>
         <td>{{value}}</td>
         <td>{{timestamp}}</td>

@@ -2,6 +2,11 @@
 	border-bottom: 2px solid #0d8dba!important;
 }
 
+.detail-view-tab-content {
+  height: 400px;
+  overflow: auto;
+}
+
 .bpmn-io-viewer-height {
 	height: 400px;
 }

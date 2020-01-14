@@ -26,6 +26,7 @@
 
 			 		{{>modals/complete-job-modal}}
 			 		{{>modals/fail-job-modal}}
+					{{>modals/throw-error-modal}}
 
 			 		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#completeJobModal-{{key}}">
 				  	Complete
@@ -33,6 +34,10 @@
 
 					<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#failJobModal-{{key}}">
 				  	Fail
+					</button>
+
+					<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#throwErrorModal-{{key}}">
+						Throw Error
 					</button>
 
 			 {{/isActivatable}}
