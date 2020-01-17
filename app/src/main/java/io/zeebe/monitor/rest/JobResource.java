@@ -43,8 +43,7 @@ public class JobResource {
   public void completeJob(@PathVariable("key") long key, @RequestBody String variables) {
 
     final ZeebeClient client = connections.getClient();
-    final ActivatedJob activatedJob = activateJob(key, client);
-    client.newCompleteCommand(activatedJob.getKey()).variables(variables).send().join();
+    client.newCompleteCommand(key).variables(variables).send().join();
   }
 
   @RequestMapping(path = "/{key}/fail", method = RequestMethod.PUT)
@@ -60,15 +59,28 @@ public class JobResource {
         .join();
   }
 
-  private ActivatedJob activateJob(long key, final ZeebeClient client) {
-    final JobEntity job =
-        jobRepository
-            .findByKey(key)
-            .orElseThrow(() -> new RuntimeException("no job found with key: " + key));
+  @RequestMapping(path = "/{key}/throw-error", method = RequestMethod.PUT)
+  public void throwError(@PathVariable("key") long key, @RequestBody ThrowErrorDto dto) {
 
+    final ZeebeClient client = connections.getClient();
+    client
+            .newThrowErrorCommand(key)
+            .errorCode(dto.getErrorCode())
+            .send()
+            .join();
+  }
+
+  private ActivatedJob activateJob(long key, final ZeebeClient client) {
+    final JobEntity job = getJob(key);
     final String jobType = job.getJobType();
 
     return activateJob(client, key, jobType);
+  }
+
+  private JobEntity getJob(long key) {
+    return jobRepository
+        .findByKey(key)
+        .orElseThrow(() -> new RuntimeException("no job found with key: " + key));
   }
 
   private ActivatedJob activateJob(final ZeebeClient client, long key, final String jobType) {

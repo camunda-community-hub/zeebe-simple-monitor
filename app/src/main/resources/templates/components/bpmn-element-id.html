@@ -1,1 +1,6 @@
-<div onmouseover="addElementSelectedMarker(`{{elementId}}`)" onmouseout="removeElementSelectedMarker(`{{elementId}}`)">{{elementId}}</div>
+<div>
+    <span data-toggle="tooltip" data-placement="bottom" title="Highlight element in diagram" onmouseover="addElementSelectedMarker(`{{elementId}}`)" onmouseout="removeElementSelectedMarker(`{{elementId}}`)">
+        <img src="/img/search-24px.svg" height="16px" />
+    </span>
+    {{elementId}}
+</div>

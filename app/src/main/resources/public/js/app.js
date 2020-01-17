@@ -297,7 +297,7 @@ function completeJob(jobKey) {
 		$.ajax({
 	             type : 'PUT',
 	             url: '/api/jobs/' + jobKey + '/complete',
-	             data:  getVariablesDocument(jobKey),
+	             data:  getVariablesDocumentFrom(jobKey),
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
 	             	showSuccess("Job completed.");
@@ -331,6 +331,30 @@ function failJob(jobKey) {
 
 // --------------------------------------------------------------------
 
+function throwError(jobKey) {
+
+	var data = {
+		errorCode: document.getElementById("error-code-" + jobKey).value
+	};
+
+	$.ajax({
+		type : 'PUT',
+		url: '/api/jobs/' + jobKey + '/throw-error',
+		data:  JSON.stringify(data),
+		contentType: 'application/json; charset=utf-8',
+		success: function (result) {
+			showSuccess("Error thrown.");
+		},
+		error: function (xhr, ajaxOptions, thrownError) {
+			showErrorResonse(xhr, ajaxOptions, thrownError);
+		},
+		timeout: 5000,
+		crossDomain: true,
+	});
+}
+
+// --------------------------------------------------------------------
+
 function publishMessage() {
 
 	var data = {
@@ -348,7 +372,7 @@ function publishMessageSubscription(key) {
 	var data = {
 		name: document.getElementById("message-name-" + key).value,
 		correlationKey: document.getElementById("message-correlation-key-" + key).value,
-		payload: getVariablesDocument(key),
+		payload: getVariablesDocumentFrom(key),
 		timeToLive: document.getElementById("message-ttl-" + key).value
 	};
 
@@ -371,6 +395,66 @@ function publishMessageWithPayload(data) {
             	 timeout: 5000,
 	             crossDomain: true,
 	    });
+}
+
+// --------------------------------------------------------------------
+
+function getVariablesDocumentFrom(key) {
+
+	var formCount = 10;
+	var variableCount = 0;
+	var variableDocument = '{';
+
+	var i;
+	for (i = 1; i <= formCount; i++) {
+		var varName = document.getElementById('variable-form-' + i + '-name_' + key).value;
+		var varValue = document.getElementById('variable-form-' + i + '-value_' + key).value;
+
+		if (varValue.length == 0) {
+			varValue = null;
+		}
+
+		if (varName.length > 0) {
+			if (variableCount > 0) {
+				variableDocument += ',';
+			}
+			variableDocument += '"' + varName + '":' + varValue;
+			variableCount += 1;
+		}
+	}
+
+	variableDocument += '}';
+
+	return variableDocument;
+}
+
+function getVariablesDocument() {
+
+	var formCount = 10;
+	var variableCount = 0;
+	var variableDocument = '{';
+
+	var i;
+	for (i = 1; i <= formCount; i++) {
+		var varName = document.getElementById('variable-form-' + i + '-name').value;
+		var varValue = document.getElementById('variable-form-' + i + '-value').value;
+
+		if (varValue.length == 0) {
+			varValue = null;
+		}
+
+		if (varName.length > 0) {
+			if (variableCount > 0) {
+				variableDocument += ',';
+			}
+			variableDocument += '"' + varName + '":' + varValue;
+			variableCount += 1;
+		}
+	}
+
+	variableDocument += '}';
+
+	return variableDocument;
 }
 
 // --------------------------------------------------------------------

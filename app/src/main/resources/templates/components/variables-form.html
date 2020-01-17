@@ -133,34 +133,4 @@
         varForm.classList.remove("d-none");
     }
 
-    function getVariablesDocument() {
-        var formCount = 10;
-        var variableCount = 0;
-        var variableDocument = '{';
-
-        var i;
-        for (i = 1; i <= formCount; i++) {
-          var varName = document.getElementById('variable-form-' + i + '-name').value;
-          var varValue = document.getElementById('variable-form-' + i + '-value').value;
-
-          if (varValue.length == 0) {
-            varValue = null;
-          }
-
-          if (varName.length > 0) {
-            if (variableCount > 0) {
-                variableDocument += ',';
-            }
-            variableDocument += '"' + varName + '":' + varValue;
-            variableCount += 1;
-          }
-        }
-
-        variableDocument += '}';
-
-        return variableDocument;
-    }
-
-
-
 </script>

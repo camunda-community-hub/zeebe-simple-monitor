@@ -2,9 +2,12 @@ package io.zeebe.monitor.rest;
 
 import io.zeebe.model.bpmn.Bpmn;
 import io.zeebe.model.bpmn.BpmnModelInstance;
+import io.zeebe.model.bpmn.instance.CatchEvent;
+import io.zeebe.model.bpmn.instance.ErrorEventDefinition;
 import io.zeebe.model.bpmn.instance.FlowElement;
 import io.zeebe.model.bpmn.instance.SequenceFlow;
 import io.zeebe.model.bpmn.instance.ServiceTask;
+import io.zeebe.model.bpmn.instance.TimerEventDefinition;
 import io.zeebe.model.bpmn.instance.zeebe.ZeebeTaskDefinition;
 import io.zeebe.monitor.entity.ElementInstanceEntity;
 import io.zeebe.monitor.entity.ElementInstanceStatistics;
@@ -26,6 +29,7 @@ import io.zeebe.monitor.repository.VariableRepository;
 import io.zeebe.monitor.repository.WorkflowInstanceRepository;
 import io.zeebe.monitor.repository.WorkflowRepository;
 import io.zeebe.protocol.record.value.BpmnElementType;
+import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -455,7 +459,7 @@ public class ViewController {
           final long scopeKey = scopeKeyName.scopeKey;
 
           variableDto.setScopeKey(scopeKey);
-          variableDto.setScopeName(elementIdsForKeys.get(scopeKey));
+          variableDto.setElementId(elementIdsForKeys.get(scopeKey));
 
           variableDto.setName(scopeKeyName.name);
 
@@ -590,6 +594,41 @@ public class ViewController {
 
                 infos.add(info);
               }
+            });
+
+    bpmn.getModelElementsByType(CatchEvent.class)
+        .forEach(
+            catchEvent -> {
+              final var info = new BpmnElementInfo();
+              info.setElementId(catchEvent.getId());
+
+              catchEvent
+                  .getEventDefinitions()
+                  .forEach(
+                      eventDefinition -> {
+                        if (eventDefinition instanceof ErrorEventDefinition) {
+                          final var errorEventDefinition = (ErrorEventDefinition) eventDefinition;
+                          final var errorCode = errorEventDefinition.getError().getErrorCode();
+
+                          info.setInfo("errorCode: " + errorCode);
+                          infos.add(info);
+                        }
+
+                        if (eventDefinition instanceof TimerEventDefinition) {
+                          final var timerEventDefinition = (TimerEventDefinition) eventDefinition;
+
+                          Optional.<ModelElementInstance>ofNullable(
+                                  timerEventDefinition.getTimeCycle())
+                              .or(() -> Optional.ofNullable(timerEventDefinition.getTimeDate()))
+                              .or(() -> Optional.ofNullable(timerEventDefinition.getTimeDuration()))
+                              .map(ModelElementInstance::getTextContent)
+                              .ifPresent(
+                                  timer -> {
+                                    info.setInfo("timer: " + timer);
+                                    infos.add(info);
+                                  });
+                        }
+                      });
             });
 
     return infos;
