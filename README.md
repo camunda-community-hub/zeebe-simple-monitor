@@ -59,7 +59,7 @@ The following command will build the project, pull images and start containers w
 
 ### Configuration
 
-The configuration of the application can be changes via `application.properties`, `application.yaml` or command line arguments.
+The configuration of the application can be changed via `application.properties`, `application.yaml` or command line arguments.
 
 ```
 # application database
