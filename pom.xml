@@ -24,7 +24,7 @@
 
         <zeebe.version>0.22.2</zeebe.version>
         <spring.boot.version>2.2.6.RELEASE</spring.boot.version>
-        <hazelcast.exporter.version>0.8.0-alpha2</hazelcast.exporter.version>
+        <hazelcast.exporter.version>0.8.0</hazelcast.exporter.version>
 
         <!-- release parent settings -->
         <version.java>11</version.java>
