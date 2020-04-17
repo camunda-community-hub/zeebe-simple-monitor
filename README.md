@@ -15,69 +15,71 @@ The application imports the data from Zeebe using the [Hazelcast exporter](https
 
 ### Docker
 
-The following command will build the project, pull images and start containers with default settings.
+The docker image for the worker is published to [DockerHub](https://hub.docker.com/r/camunda/zeebe-simple-monitor).
 
-1. Run the following command in your terminal (in the root project folder):
+```
+docker pull camunda/zeebe-simple-monitor:latest
+```
 
-    ```bash
-    docker/run
-    ```
-    
-    If you don't have the right to launch `docker/run` try:
+* ensure that a Zeebe broker is running with a Hazelcast exporter (>= 0.8.0-alpha1)  
+* forward the Hazelcast port to the docker container (default: `5701`)
+* configure the connection to the Zeebe broker by setting `zeebe.client.broker.contactPoint` (default: `localhost:26500`) 
+* configure the connection to Hazelcast by setting `zeebe.worker.hazelcast.connection` (default: `localhost:5701`) 
 
-    ```bash
-    chmod +x docker/run
-    ```
-    
-2. Go to http://localhost:8080
+For a local setup, the repository contains a [docker-compose file](docker/docker-compose.yml). It starts a Zeebe broker with the Hazelcast exporter and the application. 
 
-### Manually
+```
+mvn clean install -DskipTests
+cd docker
+docker-compose up
+```
 
-1. Download the latest [Hazelcast exporter JAR](https://github.com/zeebe-io/zeebe-hazelcast-exporter/releases) _(zeebe-hazelcast-exporter-%{VERSION}-jar-with-dependencies.jar)_
+Go to http://localhost:8082
 
-2. Copy the JAR into the broker folder `~/zeebe-broker-%{VERSION}/lib`
+### Manual
 
-3. Add the exporter to the broker configuration `~/zeebe-broker-%{VERSION}/conf/zeebe.cfg.toml`.
-    ```
-    [[exporters]]
-    id = "hazelcast"
-    className = "io.zeebe.hazelcast.exporter.HazelcastExporter"
-    
-      [exporters.args]
-      # comma separated list of io.zeebe.protocol.record.ValueType
-      enabledValueTypes = "JOB,WORKFLOW_INSTANCE,DEPLOYMENT,INCIDENT,TIMER,VARIABLE,MESSAGE,MESSAGE_SUBSCRIPTION,MESSAGE_START_EVENT_SUBSCRIPTION"
-    ```
+1. Download the latest [application JAR](https://github.com/zeebe-io/zeebe-simple-monitor/releases) _(zeebe-simple-monitor-%{VERSION}.jar
+)_
 
-4. Start the broker
-    
-5. Download the latest [application JAR](https://github.com/zeebe-io/zeebe-simple-monitor/releases)    
+1. Start the application
+	`java -jar zeebe-simple-monitor-{VERSION}.jar`
 
-6. Start the application
-    `java -jar zeebe-simple-monitor-app-{VERSION}.jar`
-
-7. Go to http://localhost:8080
+1. Go to http://localhost:8082
 
 ### Configuration
 
-The configuration of the application can be changed via `application.properties`, `application.yaml` or command line arguments.
+The worker is a Spring Boot application that uses the [Spring Zeebe Starter](https://github.com/zeebe-io/spring-zeebe). The configuration can be changed via environment variables or an `application.yaml` file. See also the following resources:
+* [Spring Zeebe Configuration](https://github.com/zeebe-io/spring-zeebe#configuring-zeebe-connection)
+* [Spring Boot Configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config)
+
+By default, the port is set to `8082` and the database is only in-memory (i.e. not persistent).
 
 ```
-# application database
-spring.datasource.url=jdbc:h2:mem:zeebe-monitor;DB_CLOSE_DELAY=-1
-spring.datasource.user=sa
-spring.datasource.password=
-spring.jpa.hibernate.ddl-auto=create
+zeebe:
 
-# connection to Zeebe broker
-io.zeebe.monitor.connectionString=localhost:26500
+  worker:
+    hazelcast:
+      connection: localhost:5701
 
-# connection to Hazelcast
-io.zeebe.monitor.hazelcast.connection=localhost:5701
+  client:
+    broker.contactPoint: 127.0.0.1:26500
+    security.plaintext: true
 
-# logging
-logging.level.io.zeebe.zeebemonitor=DEBUG
-logging.level.com.hazelcast=WARN
+spring:
 
+  datasource:
+    url: jdbc:h2:mem:zeebe-monitor;DB_CLOSE_DELAY=-1
+    user: sa
+    password:
+    driverClassName: org.h2.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+
+server:
+  port: 8082
 ```
 
 ## Build from Source
