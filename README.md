@@ -9,7 +9,7 @@ A monitoring application for [Zeebe](https://zeebe.io). It is designed for devel
 
 The application imports the data from Zeebe using the [Hazelcast exporter](https://github.com/zeebe-io/zeebe-hazelcast-exporter). It aggregates the data and store it into a (in-memory) database. The data is display on server-side rendered HTML pages.
 
-![how-it-works](app/docs/how-it-works.png)
+![how-it-works](docs/how-it-works.png)
 
 ## Install
 
@@ -100,4 +100,4 @@ this code. Please report unacceptable behavior to code-of-conduct@zeebe.io.
 
 ## About
 
-![screencast](app/docs/zeebe-simple-monitor.gif)
+![screencast](docs/zeebe-simple-monitor.gif)
