@@ -37,6 +37,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 @Component
 public class ZeebeImportService {
@@ -70,13 +72,25 @@ public class ZeebeImportService {
 
     final var builder =
         ZeebeHazelcast.newBuilder(hazelcast)
-            .addDeploymentListener(this::importDeployment)
-            .addWorkflowInstanceListener(this::importWorkflowInstance)
-            .addIncidentListener(this::importIncident)
-            .addJobListener(this::importJob)
-            .addVariableListener(this::importVariable)
-            .addTimerListener(this::importTimer)
-            .addMessageListener(this::importMessage)
+            .addDeploymentListener(
+                record ->
+                    withKey(record, Schema.DeploymentRecord::getMetadata, this::importDeployment))
+            .addWorkflowInstanceListener(
+                record ->
+                    withKey(
+                        record,
+                        Schema.WorkflowInstanceRecord::getMetadata,
+                        this::importWorkflowInstance))
+            .addIncidentListener(
+                record -> withKey(record, Schema.IncidentRecord::getMetadata, this::importIncident))
+            .addJobListener(
+                record -> withKey(record, Schema.JobRecord::getMetadata, this::importJob))
+            .addVariableListener(
+                record -> withKey(record, Schema.VariableRecord::getMetadata, this::importVariable))
+            .addTimerListener(
+                record -> withKey(record, Schema.TimerRecord::getMetadata, this::importTimer))
+            .addMessageListener(
+                record -> withKey(record, Schema.MessageRecord::getMetadata, this::importMessage))
             .addMessageSubscriptionListener(this::importMessageSubscription)
             .addMessageStartEventSubscriptionListener(this::importMessageStartEventSubscription)
             .postProcessListener(
@@ -92,6 +106,18 @@ public class ZeebeImportService {
     }
 
     return builder.build();
+  }
+
+  private <T> void withKey(
+      T record, Function<T, Schema.RecordMetadata> extractor, Consumer<T> consumer) {
+    final var metadata = extractor.apply(record);
+    if (!hasKey(metadata)) {
+      consumer.accept(record);
+    }
+  }
+
+  private boolean hasKey(Schema.RecordMetadata metadata) {
+    return metadata.getKey() < 0;
   }
 
   private void importDeployment(final Schema.DeploymentRecord record) {
