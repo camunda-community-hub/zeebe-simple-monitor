@@ -19,9 +19,6 @@ import io.zeebe.client.ZeebeClient;
 import io.zeebe.client.api.response.ActivatedJob;
 import io.zeebe.monitor.entity.JobEntity;
 import io.zeebe.monitor.repository.JobRepository;
-import io.zeebe.monitor.zeebe.ZeebeConnectionService;
-import java.time.Duration;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,29 +26,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Duration;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/jobs")
 public class JobResource {
 
   private static final String WORKER_NAME = "zeebe-simple-monitor";
 
-  @Autowired private ZeebeConnectionService connections;
+  @Autowired private ZeebeClient zeebeClient;
 
   @Autowired private JobRepository jobRepository;
 
   @RequestMapping(path = "/{key}/complete", method = RequestMethod.PUT)
   public void completeJob(@PathVariable("key") long key, @RequestBody String variables) {
 
-    final ZeebeClient client = connections.getClient();
-    client.newCompleteCommand(key).variables(variables).send().join();
+    zeebeClient.newCompleteCommand(key).variables(variables).send().join();
   }
 
   @RequestMapping(path = "/{key}/fail", method = RequestMethod.PUT)
   public void failJob(@PathVariable("key") long key) {
 
-    final ZeebeClient client = connections.getClient();
-    final ActivatedJob activatedJob = activateJob(key, client);
-    client
+    final ActivatedJob activatedJob = activateJob(key, zeebeClient);
+    zeebeClient
         .newFailCommand(activatedJob.getKey())
         .retries(0)
         .errorMessage("Failed by user.")
@@ -62,12 +60,7 @@ public class JobResource {
   @RequestMapping(path = "/{key}/throw-error", method = RequestMethod.PUT)
   public void throwError(@PathVariable("key") long key, @RequestBody ThrowErrorDto dto) {
 
-    final ZeebeClient client = connections.getClient();
-    client
-            .newThrowErrorCommand(key)
-            .errorCode(dto.getErrorCode())
-            .send()
-            .join();
+    zeebeClient.newThrowErrorCommand(key).errorCode(dto.getErrorCode()).send().join();
   }
 
   private ActivatedJob activateJob(long key, final ZeebeClient client) {

@@ -1,0 +1,42 @@
+zeebe:
+
+  worker:
+    hazelcast:
+      connection: localhost:5701
+
+  client:
+    broker.contactPoint: 127.0.0.1:26500
+    security.plaintext: true
+
+spring:
+
+  datasource:
+    url: jdbc:h2:mem:zeebe-monitor;DB_CLOSE_DELAY=-1
+    user: sa
+    password:
+    driverClassName: org.h2.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+
+  mustache:
+    prefix: classpath:/templates/
+    suffix: .html
+    expose-request-attributes: true
+
+  data:
+    web:
+      pageable:
+        default-page-size: 10
+
+server:
+  port: 8082
+
+logging:
+  level:
+    root: ERROR
+    io.zeebe: INFO
+    io.zeebe.monitor: DEBUG
+    com.hazelcast: WARN
