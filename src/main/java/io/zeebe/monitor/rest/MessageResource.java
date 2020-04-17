@@ -15,25 +15,25 @@
  */
 package io.zeebe.monitor.rest;
 
-import io.zeebe.monitor.zeebe.ZeebeConnectionService;
-import java.time.Duration;
+import io.zeebe.client.ZeebeClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Duration;
+
 @RestController
 @RequestMapping("/api/messages")
 public class MessageResource {
 
-  @Autowired private ZeebeConnectionService connections;
+  @Autowired private ZeebeClient zeebeClient;
 
   @RequestMapping(path = "/", method = RequestMethod.POST)
   public void publishMessage(@RequestBody PublishMessageDto dto) {
 
-    connections
-        .getClient()
+    zeebeClient
         .newPublishMessageCommand()
         .messageName(dto.getName())
         .correlationKey(dto.getCorrelationKey())

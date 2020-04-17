@@ -6,18 +6,26 @@ import com.hazelcast.core.HazelcastInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 @Component
 public class ZeebeHazelcastService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ZeebeConnectionService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ZeebeHazelcastService.class);
+
+  @Value("${zeebe.worker.hazelcast.connection}")
+  private String hazelcastConnection;
 
   @Autowired private ZeebeImportService importService;
 
   private AutoCloseable closeable;
 
-  public void start(String hazelcastConnection) {
+  @PostConstruct
+  public void start() {
     final ClientConfig clientConfig = new ClientConfig();
     clientConfig.getNetworkConfig().addAddress(hazelcastConnection);
 
@@ -29,13 +37,10 @@ public class ZeebeHazelcastService {
     closeable = importService.importFrom(hazelcast);
   }
 
-  public void close() {
+  @PreDestroy
+  public void close() throws Exception {
     if (closeable != null) {
-      try {
-        closeable.close();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
+      closeable.close();
     }
   }
 }
