@@ -152,9 +152,9 @@ public class ZeebeImportService {
   private void importWorkflowInstance(final Schema.WorkflowInstanceRecord record) {
     if (record.getWorkflowInstanceKey() == record.getMetadata().getKey()) {
       addOrUpdateWorkflowInstance(record);
-    } else {
-      addElementInstance(record);
     }
+
+    addElementInstance(record);
   }
 
   private void addOrUpdateWorkflowInstance(final Schema.WorkflowInstanceRecord record) {
