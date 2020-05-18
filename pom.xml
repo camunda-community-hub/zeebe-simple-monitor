@@ -23,6 +23,8 @@
 
         <spring.boot.version>2.3.0.RELEASE</spring.boot.version>
         <hazelcast.exporter.version>0.9.0</hazelcast.exporter.version>
+        <!-- pin Hazelcast version because of spring-boot-dependencies -->
+        <version.hazelcast>4.0.1</version.hazelcast>
 
         <!-- release parent settings -->
         <version.java>11</version.java>
@@ -113,6 +115,12 @@
         <dependency>
             <groupId>io.zeebe.hazelcast</groupId>
             <artifactId>zeebe-hazelcast-connector</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast</artifactId>
+            <version>${version.hazelcast}</version>
         </dependency>
 
         <dependency>
@@ -227,6 +235,11 @@
                     <to>
                         <image>docker.io/camunda/zeebe-simple-monitor</image>
                     </to>
+                    <container>
+                        <ports>
+                            <port>8082</port>
+                        </ports>
+                    </container>
                 </configuration>
             </plugin>
 

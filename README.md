@@ -60,6 +60,7 @@ zeebe:
   worker:
     hazelcast:
       connection: localhost:5701
+      connectionTimeout: PT30S
 
   client:
     broker.contactPoint: 127.0.0.1:26500

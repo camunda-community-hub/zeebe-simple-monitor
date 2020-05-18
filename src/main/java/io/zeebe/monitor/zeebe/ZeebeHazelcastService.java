@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.time.Duration;
 
 @Component
 public class ZeebeHazelcastService {
@@ -20,6 +21,9 @@ public class ZeebeHazelcastService {
   @Value("${zeebe.worker.hazelcast.connection}")
   private String hazelcastConnection;
 
+  @Value("${zeebe.client.worker.hazelcast.connectionTimeout}")
+  private String hazelcastConnectionTimeout;
+
   @Autowired private ZeebeImportService importService;
 
   private AutoCloseable closeable;
@@ -28,6 +32,11 @@ public class ZeebeHazelcastService {
   public void start() {
     final ClientConfig clientConfig = new ClientConfig();
     clientConfig.getNetworkConfig().addAddress(hazelcastConnection);
+
+    final var connectionRetryConfig =
+        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig();
+    connectionRetryConfig.setClusterConnectTimeoutMillis(
+        Duration.parse(hazelcastConnectionTimeout).toMillis());
 
     LOG.info("Connecting to Hazelcast '{}'", hazelcastConnection);
 
