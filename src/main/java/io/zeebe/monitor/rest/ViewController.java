@@ -300,12 +300,14 @@ public class ViewController {
     final List<String> completedActivities =
         events.stream()
             .filter(e -> WORKFLOW_INSTANCE_COMPLETED_INTENTS.contains(e.getIntent()))
+            .filter(e -> e.getBpmnElementType() != BpmnElementType.PROCESS.name())
             .map(ElementInstanceEntity::getElementId)
             .collect(Collectors.toList());
 
     final List<String> activeActivities =
         events.stream()
             .filter(e -> WORKFLOW_INSTANCE_ENTERED_INTENTS.contains(e.getIntent()))
+            .filter(e -> e.getBpmnElementType() != BpmnElementType.PROCESS.name())
             .map(ElementInstanceEntity::getElementId)
             .filter(id -> !completedActivities.contains(id))
             .collect(Collectors.toList());

@@ -18,7 +18,7 @@ public class ZeebeHazelcastService {
 
   private static final Logger LOG = LoggerFactory.getLogger(ZeebeHazelcastService.class);
 
-  @Value("${zeebe.worker.hazelcast.connection}")
+  @Value("${zeebe.client.worker.hazelcast.connection}")
   private String hazelcastConnection;
 
   @Value("${zeebe.client.worker.hazelcast.connectionTimeout}")

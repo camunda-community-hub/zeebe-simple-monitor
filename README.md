@@ -24,7 +24,7 @@ docker pull camunda/zeebe-simple-monitor:latest
 * ensure that a Zeebe broker is running with a Hazelcast exporter (>= 0.8.0-alpha1)  
 * forward the Hazelcast port to the docker container (default: `5701`)
 * configure the connection to the Zeebe broker by setting `zeebe.client.broker.contactPoint` (default: `localhost:26500`) 
-* configure the connection to Hazelcast by setting `zeebe.worker.hazelcast.connection` (default: `localhost:5701`) 
+* configure the connection to Hazelcast by setting `zeebe.client.worker.hazelcast.connection` (default: `localhost:5701`) 
 
 For a local setup, the repository contains a [docker-compose file](docker/docker-compose.yml). It starts a Zeebe broker with the Hazelcast exporter and the application. 
 
@@ -57,14 +57,14 @@ By default, the port is set to `8082` and the database is only in-memory (i.e. n
 ```
 zeebe:
 
-  worker:
-    hazelcast:
-      connection: localhost:5701
-      connectionTimeout: PT30S
-
   client:
     broker.contactPoint: 127.0.0.1:26500
     security.plaintext: true
+    
+    worker:
+      hazelcast:
+        connection: localhost:5701
+        connectionTimeout: PT30S
 
 spring:
 
