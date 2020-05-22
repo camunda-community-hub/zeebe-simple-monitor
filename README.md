@@ -83,6 +83,86 @@ server:
   port: 8082
 ```
 
+Using a different database, for example, PostgreSQL:
+
+* change the following database configuration settings
+
+```
+- spring.datasource.url=jdbc:postgresql://db:5432/postgres
+- spring.datasource.username=postgres
+- spring.datasource.password=zeebe
+- spring.datasource.driverClassName=org.postgresql.Driver
+- spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+```
+
+* add the database driver JAR to the classpath 
+  * using docker, the JAR should be mounted to the `/app/libs/` folder (e.g. `/app/libs/postgresql-42.2.12.jar`)
+
+
+<details>
+  <summary>Full docker-compose.yml with PostgreSQL</summary>
+  <p>
+
+```
+version: "2"
+
+networks:
+  zeebe_network:
+    driver: bridge
+
+services:
+  zeebe:
+    container_name: zeebe_broker
+    image: camunda/zeebe:0.23.0
+    environment:
+      - ZEEBE_LOG_LEVEL=debug
+    ports:
+      - "26500:26500"
+      - "9600:9600"
+      - "5701:5701"
+    volumes:
+      - ../target/exporter/zeebe-hazelcast-exporter.jar:/usr/local/zeebe/exporters/zeebe-hazelcast-exporter.jar
+      - ./application.yaml:/usr/local/zeebe/config/application.yaml
+    networks:
+      - zeebe_network
+  monitor:
+    container_name: zeebe-simple-monitor
+    image: camunda/zeebe-simple-monitor:latest
+    environment:
+      - zeebe.client.broker.contactPoint=zeebe:26500
+      - zeebe.worker.hazelcast.connection=zeebe:5701
+      - spring.datasource.url=jdbc:postgresql://db:5432/postgres
+      - spring.datasource.username=postgres
+      - spring.datasource.password=zeebe
+      - spring.datasource.driverClassName=org.postgresql.Driver
+      - spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+    volumes:
+      - ./lib/postgresql-42.2.12.jar:/app/libs/postgresql-42.2.12.jar
+    ports:
+      - "8082:8082"
+    depends_on:
+      - zeebe
+      - db
+    networks:
+      - zeebe_network
+
+  db:
+    image: postgres:12.2
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: zeebe
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+    networks:
+      - zeebe_network
+
+volumes:
+  database-data:
+```
+
+  </p>
+</details>
+
 ## Build from Source
 
 Build with Maven
