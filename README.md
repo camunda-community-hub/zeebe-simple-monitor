@@ -48,7 +48,7 @@ Go to http://localhost:8082
 
 ### Configuration
 
-The worker is a Spring Boot application that uses the [Spring Zeebe Starter](https://github.com/zeebe-io/spring-zeebe). The configuration can be changed via environment variables or an `application.yaml` file. See also the following resources:
+The application is a Spring Boot application that uses the [Spring Zeebe Starter](https://github.com/zeebe-io/spring-zeebe). The configuration can be changed via environment variables or an `application.yaml` file. See also the following resources:
 * [Spring Zeebe Configuration](https://github.com/zeebe-io/spring-zeebe#configuring-zeebe-connection)
 * [Spring Boot Configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config)
 
@@ -70,7 +70,7 @@ spring:
 
   datasource:
     url: jdbc:h2:mem:zeebe-monitor;DB_CLOSE_DELAY=-1
-    user: sa
+    username: sa
     password:
     driverClassName: org.h2.Driver
 
@@ -125,6 +125,7 @@ services:
       - ./application.yaml:/usr/local/zeebe/config/application.yaml
     networks:
       - zeebe_network
+      
   monitor:
     container_name: zeebe-simple-monitor
     image: camunda/zeebe-simple-monitor:latest
