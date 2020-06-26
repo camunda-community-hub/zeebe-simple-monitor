@@ -637,6 +637,7 @@ public class ViewController {
   }
 
   @GetMapping("/views/incidents")
+  @Transactional
   public String incidentList(Map<String, Object> model, Pageable pageable) {
 
     final long count = incidentRepository.countByResolvedIsNull();
