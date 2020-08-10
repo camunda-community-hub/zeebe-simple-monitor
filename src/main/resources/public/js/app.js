@@ -1,5 +1,3 @@
-// var base_path = window.location.pathname+window.location.search;
-
 function showError(message) {
 	document.getElementById("errorText").innerHTML = message;
 	$('#errorPanel').show();
