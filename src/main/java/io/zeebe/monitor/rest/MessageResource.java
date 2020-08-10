@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.Duration;
 
 @RestController
-@RequestMapping("/api/messages")
+@RequestMapping("${server.context-path}api/messages")
 public class MessageResource {
 
   @Autowired private ZeebeClient zeebeClient;

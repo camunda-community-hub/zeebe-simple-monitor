@@ -29,13 +29,15 @@ spring:
     expose-request-attributes: true
 
   data:
+    # rest:
+    #   base-path: /
     web:
       pageable:
         default-page-size: 10
 
 server:
   port: 8082
-
+  context-path: /
 logging:
   level:
     root: ERROR
