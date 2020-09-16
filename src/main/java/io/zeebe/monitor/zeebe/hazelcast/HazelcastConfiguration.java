@@ -2,7 +2,6 @@ package io.zeebe.monitor.zeebe.hazelcast;
 
 import java.time.Duration;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
@@ -17,7 +16,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import io.zeebe.exporter.proto.Schema;
-import io.zeebe.exporter.proto.Schema.DeploymentRecord;
 import io.zeebe.hazelcast.connect.java.ZeebeHazelcast;
 import io.zeebe.monitor.entity.HazelcastConfig;
 import io.zeebe.monitor.repository.HazelcastConfigRepository;
