@@ -6,6 +6,7 @@ target
 .checkstyle
 .settings
 .factorypath
+.vscode
 build.properties
 bin
 .metadata

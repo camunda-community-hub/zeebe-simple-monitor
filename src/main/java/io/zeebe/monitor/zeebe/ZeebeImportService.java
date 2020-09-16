@@ -1,10 +1,14 @@
 package io.zeebe.monitor.zeebe;
 
-import com.hazelcast.core.HazelcastInstance;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import io.zeebe.exporter.proto.Schema;
-import io.zeebe.hazelcast.connect.java.ZeebeHazelcast;
 import io.zeebe.monitor.entity.ElementInstanceEntity;
-import io.zeebe.monitor.entity.HazelcastConfig;
 import io.zeebe.monitor.entity.IncidentEntity;
 import io.zeebe.monitor.entity.JobEntity;
 import io.zeebe.monitor.entity.MessageEntity;
@@ -14,7 +18,6 @@ import io.zeebe.monitor.entity.VariableEntity;
 import io.zeebe.monitor.entity.WorkflowEntity;
 import io.zeebe.monitor.entity.WorkflowInstanceEntity;
 import io.zeebe.monitor.repository.ElementInstanceRepository;
-import io.zeebe.monitor.repository.HazelcastConfigRepository;
 import io.zeebe.monitor.repository.IncidentRepository;
 import io.zeebe.monitor.repository.JobRepository;
 import io.zeebe.monitor.repository.MessageRepository;
@@ -23,6 +26,7 @@ import io.zeebe.monitor.repository.TimerRepository;
 import io.zeebe.monitor.repository.VariableRepository;
 import io.zeebe.monitor.repository.WorkflowInstanceRepository;
 import io.zeebe.monitor.repository.WorkflowRepository;
+import io.zeebe.monitor.zeebe.protobuf.ProtobufSource;
 import io.zeebe.protocol.Protocol;
 import io.zeebe.protocol.record.intent.DeploymentIntent;
 import io.zeebe.protocol.record.intent.IncidentIntent;
@@ -33,12 +37,6 @@ import io.zeebe.protocol.record.intent.MessageStartEventSubscriptionIntent;
 import io.zeebe.protocol.record.intent.MessageSubscriptionIntent;
 import io.zeebe.protocol.record.intent.TimerIntent;
 import io.zeebe.protocol.record.intent.WorkflowInstanceIntent;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.UUID;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 @Component
 public class ZeebeImportService {
@@ -55,71 +53,38 @@ public class ZeebeImportService {
 
   @Autowired private ZeebeNotificationService notificationService;
 
-  @Autowired private HazelcastConfigRepository hazelcastConfigRepository;
+  public void importFrom(ProtobufSource protobufSource) {
+    protobufSource.addDeploymentListener(
+      record ->
+          withKey(record, Schema.DeploymentRecord::getMetadata, this::importDeployment));
 
-  public ZeebeHazelcast importFrom(HazelcastInstance hazelcast) {
+    protobufSource.addWorkflowInstanceListener(
+      record ->
+          withKey(
+              record,
+              Schema.WorkflowInstanceRecord::getMetadata,
+              this::importWorkflowInstance));
 
-    final var hazelcastConfig =
-        hazelcastConfigRepository
-            .findById("cfg")
-            .orElseGet(
-                () -> {
-                  final var config = new HazelcastConfig();
-                  config.setId("cfg");
-                  config.setSequence(-1);
-                  return config;
-                });
+    protobufSource.addIncidentListener(
+      record -> withKey(record, Schema.IncidentRecord::getMetadata, this::importIncident));
+    
+    protobufSource.addJobListener(
+      record -> withKey(record, Schema.JobRecord::getMetadata, this::importJob));
+    protobufSource.addVariableListener(
+      record -> withKey(record, Schema.VariableRecord::getMetadata, this::importVariable));
 
-    final var builder =
-        ZeebeHazelcast.newBuilder(hazelcast)
-            .addDeploymentListener(
-                record ->
-                    withKey(record, Schema.DeploymentRecord::getMetadata, this::importDeployment))
-            .addWorkflowInstanceListener(
-                record ->
-                    withKey(
-                        record,
-                        Schema.WorkflowInstanceRecord::getMetadata,
-                        this::importWorkflowInstance))
-            .addIncidentListener(
-                record -> withKey(record, Schema.IncidentRecord::getMetadata, this::importIncident))
-            .addJobListener(
-                record -> withKey(record, Schema.JobRecord::getMetadata, this::importJob))
-            .addVariableListener(
-                record -> withKey(record, Schema.VariableRecord::getMetadata, this::importVariable))
-            .addTimerListener(
-                record -> withKey(record, Schema.TimerRecord::getMetadata, this::importTimer))
-            .addMessageListener(
-                record -> withKey(record, Schema.MessageRecord::getMetadata, this::importMessage))
-            .addMessageSubscriptionListener(this::importMessageSubscription)
-            .addMessageStartEventSubscriptionListener(this::importMessageStartEventSubscription)
-            .postProcessListener(
-                sequence -> {
-                  hazelcastConfig.setSequence(sequence);
-                  hazelcastConfigRepository.save(hazelcastConfig);
-                });
+    protobufSource.addTimerListener(
+      record -> withKey(record, Schema.TimerRecord::getMetadata, this::importTimer));
+      
+    protobufSource.addMessageListener(
+      record -> withKey(record, Schema.MessageRecord::getMetadata, this::importMessage));
+    
+    protobufSource.addMessageSubscriptionListener(this::importMessageSubscription);
+    
+    protobufSource.addMessageStartEventSubscriptionListener(this::importMessageStartEventSubscription);
 
-    if (hazelcastConfig.getSequence() >= 0) {
-      builder.readFrom(hazelcastConfig.getSequence());
-    } else {
-      builder.readFromHead();
-    }
-
-    return builder.build();
   }
-
-  private <T> void withKey(
-      T record, Function<T, Schema.RecordMetadata> extractor, Consumer<T> consumer) {
-    final var metadata = extractor.apply(record);
-    if (!hasKey(metadata)) {
-      consumer.accept(record);
-    }
-  }
-
-  private boolean hasKey(Schema.RecordMetadata metadata) {
-    return metadata.getKey() < 0;
-  }
-
+  
   private void importDeployment(final Schema.DeploymentRecord record) {
 
     final DeploymentIntent intent = DeploymentIntent.valueOf(record.getMetadata().getIntent());
@@ -417,4 +382,18 @@ public class ZeebeImportService {
   private String generateId() {
     return UUID.randomUUID().toString();
   }
+
+
+  private <T> void withKey(
+      T record, Function<T, Schema.RecordMetadata> extractor, Consumer<T> consumer) {
+    final var metadata = extractor.apply(record);
+    if (!hasKey(metadata)) {
+      consumer.accept(record);
+    }
+  }
+
+  private boolean hasKey(Schema.RecordMetadata metadata) {
+    return metadata.getKey() < 0;
+  }
+  
 }

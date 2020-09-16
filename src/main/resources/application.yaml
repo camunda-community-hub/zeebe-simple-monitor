@@ -1,5 +1,5 @@
+#DEBUG: true
 zeebe:
-
 
   client:
     broker.contactPoint: 127.0.0.1:26500
@@ -7,8 +7,15 @@ zeebe:
 
     worker:
       hazelcast:
+        enabled: true
         connection: localhost:5701
         connectionTimeout: PT30S
+      kafka:
+        enabled: false
+        consumerProperties: |
+          bootstrap.servers=kafka:9093
+          group.id=zeebe-simple-monitor
+          auto.offset.reset=earliest
 
 spring:
 
@@ -42,3 +49,4 @@ logging:
     io.zeebe: INFO
     io.zeebe.monitor: DEBUG
     com.hazelcast: WARN
+

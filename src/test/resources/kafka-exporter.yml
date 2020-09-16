@@ -1,0 +1,59 @@
+zeebe:
+  broker:
+    exporters:
+      kafka:
+        className: io.zeebe.exporters.kafka.KafkaExporter
+        args:
+          # Controls how many records can have been sent to the Kafka broker without
+          # any acknowledgment Once the limit is reached the exporter will block and
+          # wait until either one record is acknowledged
+          maxInFlightRecords: 1000
+          # How often should the exporter drain the in flight records' queue of completed
+          # requests and update the broker with the guaranteed latest exported position
+          inFlightRecordCheckIntervalMs: 1000
+
+          # Producer specific configuration
+          producer:
+            format: protobuf
+            # Controls how long the producer will wait for a request to be acknowledged by
+            # the Kafka broker before retrying it
+            # Maps to ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG
+            requestTimeoutMs: 5000
+            # Grace period when shutting down the producer in milliseconds
+            closeTimeoutMs: 5000
+            # Producer client identifier
+            clientId: zeebe
+            # Max concurrent requests to the Kafka broker; note that in flight records are batched such that
+            # in one request you can easily have a thousand records, depending on the producer's batch
+            # configuration.
+            maxConcurrentRequests: 3
+
+            # Any setting under the following section will be passed verbatim to
+            # ProducerConfig; you can use this to configure authentication, compression,
+            # etc. Note that you can overwrite some important settings, so avoid changing
+            # idempotency, delivery timeout, and retries, unless you know what you're doing
+            # The expected format is that of a standard Java properties file. Every line should
+            # contain a single property definition, e.g. key=value. If you want to define this as an
+            # environment variable, you can do so by passing a string such as
+            # "linger.ms=5\nbuffer.memory=8388608" as the value.
+            config: |
+              linger.ms=5
+              buffer.memory=8388608
+              batch.size=32768
+              max.block.ms=5000
+
+          # Controls which records are pushed to Kafka and to which topic
+          # Each entry is a sub-map which can contain two entries:
+          #     type => [string]
+          #     topic => string
+          #
+          # Topic is the topic to which the record with the given value type
+          # should be sent to, e.g. for a deployment record below we would
+          # send the record to "zeebe-deployment" topic.
+          #
+          # Type is a list of accepted record types, allowing you to filter
+          # if you want nothing ([]), commands (["command"]), events (["events"]),
+          # or rejections (["rejection"]), or a combination of the three, e.g.
+          # ["command", "event"].
+          #
+          # To omit certain records entirely, set type to an empty list.
