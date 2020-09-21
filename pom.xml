@@ -20,6 +20,7 @@
 
         <zeebe.version>0.24.3</zeebe.version>
         <version.zeebe.spring>0.24.0</version.zeebe.spring>
+        <version.kafka>2.3.0</version.kafka>
 
         <spring.boot.version>2.3.3.RELEASE</spring.boot.version>
         <hazelcast.exporter.version>0.9.1</hazelcast.exporter.version>
@@ -103,7 +104,13 @@
               <artifactId>zeebe-test-container</artifactId>
               <version>0.33.0</version>
             </dependency>
-        
+
+            <dependency>
+              <groupId>org.apache.kafka</groupId>
+              <artifactId>kafka-clients</artifactId>
+              <version>${version.kafka}</version>
+            </dependency>
+      
         </dependencies>
     </dependencyManagement>
 
@@ -258,7 +265,12 @@
           <artifactId>mysql-connector-java</artifactId>
           <version>8.0.15</version>
         </dependency>
-    
+        
+        <dependency>
+          <groupId>org.apache.kafka</groupId>
+          <artifactId>kafka-clients</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
