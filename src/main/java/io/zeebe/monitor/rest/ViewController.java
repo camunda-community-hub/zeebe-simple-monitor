@@ -31,10 +31,12 @@ import io.zeebe.monitor.repository.WorkflowRepository;
 import io.zeebe.protocol.record.value.BpmnElementType;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.transaction.Transactional;
 import java.io.ByteArrayInputStream;
@@ -81,8 +83,12 @@ public class ViewController {
 
   @Autowired private VariableRepository variableRepository;
 
+  @Value("${server.servlet.context-path}")
+  private String base_path;
+
   @GetMapping("/")
   public String index(Map<String, Object> model, Pageable pageable) {
+    model.put("context-path", base_path);
     return workflowList(model, pageable);
   }
 
@@ -99,6 +105,7 @@ public class ViewController {
 
     model.put("workflows", workflows);
     model.put("count", count);
+    model.put("context-path", base_path);
 
     addPaginationToModel(model, pageable, count);
 
@@ -125,6 +132,7 @@ public class ViewController {
             .findByKey(key)
             .orElseThrow(() -> new RuntimeException("No workflow found with key: " + key));
 
+    model.put("context-path", base_path);
     model.put("workflow", toDto(workflow));
     model.put("resource", workflow.getResource());
 
@@ -230,6 +238,7 @@ public class ViewController {
       instances.add(dto);
     }
 
+    model.put("context-path", base_path);
     model.put("instances", instances);
     model.put("count", count);
 
@@ -253,6 +262,7 @@ public class ViewController {
         .ifPresent(workflow -> model.put("resource", workflow.getResource()));
 
     model.put("instance", toInstanceDto(instance));
+    model.put("context-path", base_path);
 
     return "instance-detail-view";
   }
@@ -650,6 +660,7 @@ public class ViewController {
 
     model.put("incidents", incidents);
     model.put("count", count);
+    model.put("context-path", base_path);
 
     addPaginationToModel(model, pageable, count);
 
@@ -696,6 +707,7 @@ public class ViewController {
 
     model.put("jobs", dtos);
     model.put("count", count);
+    model.put("context-path", base_path);
 
     addPaginationToModel(model, pageable, count);
 
@@ -730,6 +742,7 @@ public class ViewController {
 
     model.put("messages", dtos);
     model.put("count", count);
+    model.put("context-path", base_path);
 
     addPaginationToModel(model, pageable, count);
 

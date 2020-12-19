@@ -2,9 +2,9 @@
 
 <div class="row">
 	<div class="col-md-12">
-	
+
 		<span>{{count}} open jobs</span>
-		
+
 		<table class="table table-striped">
 			<thead>
 			 	<th>Job Key</th>
@@ -14,24 +14,24 @@
 			  <th>State</th>
 				<th>Time</th>
 		</thead>
-		
+
 		{{#jobs}}
 			<tr>
 				<td>{{key}}</td>
 				<td>{{jobType}}</td>
 				<td>
-					<a href="/views/instances/{{workflowInstanceKey}}">{{workflowInstanceKey}}</a>
+					<a href="{{context-path}}views/instances/{{workflowInstanceKey}}">{{workflowInstanceKey}}</a>
 				</td>
 				<td>{{retries}}</td>
 				<td>{{state}}</td>
 				<td>{{timestamp}}</td>
 			</tr>
 		{{/jobs}}
-		
-		</table>		
- 		
+
+		</table>
+
 		{{>components/table-pagination}}
-	
+
 	</div>
 </div>
 

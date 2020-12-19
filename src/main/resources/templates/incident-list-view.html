@@ -2,9 +2,9 @@
 
 <div class="row">
 	<div class="col-md-12">
-	
+
 		<span>{{count}} open incidents</span>
-		
+
 		<table class="table table-striped">
 			<thead>
 				<th>Incident Key</th>
@@ -15,27 +15,27 @@
 			  <th>State</th>
 				<th>Created Time</th>
 		</thead>
-		
+
 		{{#incidents}}
 			<tr>
 				<td>{{key}}</td>
 				<td>
-					<a href="/views/instances/{{workflowInstanceKey}}">{{workflowInstanceKey}}</a>
+					<a href="{{context-path}}views/instances/{{workflowInstanceKey}}">{{workflowInstanceKey}}</a>
 				</td>
 				<td>{{bpmnProcessId}}</td>
 				<td>
-					<a href="/views/workflows/{{workflowKey}}">{{workflowKey}}</a>
+					<a href="{{context-path}}views/workflows/{{workflowKey}}">{{workflowKey}}</a>
 				</td>
 				<td>{{errorType}}</td>
 				<td>{{state}}</td>
 				<td>{{createdTime}}</td>
 			</tr>
 		{{/incidents}}
-		
-		</table>		
- 		
+
+		</table>
+
 		{{>components/table-pagination}}
-	
+
 	</div>
 </div>
 

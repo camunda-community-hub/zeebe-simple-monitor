@@ -149,9 +149,9 @@
             <version>4.5.3</version>
         </dependency>
         <dependency>
-            <groupId>org.webjars.bower</groupId>
+            <groupId>org.webjars</groupId>
             <artifactId>popper.js</artifactId>
-            <version>1.16.1</version>
+            <version>1.16.0</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>

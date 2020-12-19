@@ -30,7 +30,7 @@ import java.time.Duration;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/jobs")
+@RequestMapping("${server.servlet.context-path}api/jobs")
 public class JobResource {
 
   private static final String WORKER_NAME = "zeebe-simple-monitor";
