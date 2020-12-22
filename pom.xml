@@ -24,7 +24,7 @@
         <spring.boot.version>2.4.1</spring.boot.version>
         <hazelcast.exporter.version>0.10.0</hazelcast.exporter.version>
         <!-- pin Hazelcast version because of spring-boot-dependencies -->
-        <version.hazelcast>4.1</version.hazelcast>
+        <version.hazelcast>4.1.1</version.hazelcast>
 
         <!-- release parent settings -->
         <version.java>11</version.java>
