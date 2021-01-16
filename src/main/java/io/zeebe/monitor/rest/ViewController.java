@@ -88,7 +88,7 @@ public class ViewController {
 
   @GetMapping("/")
   public String index(Map<String, Object> model, Pageable pageable) {
-    model.put("context-path", base_path);
+    addContextPathToModel(model);
     return workflowList(model, pageable);
   }
 
@@ -105,8 +105,8 @@ public class ViewController {
 
     model.put("workflows", workflows);
     model.put("count", count);
-    model.put("context-path", base_path);
 
+    addContextPathToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "workflow-list-view";
@@ -132,7 +132,6 @@ public class ViewController {
             .findByKey(key)
             .orElseThrow(() -> new RuntimeException("No workflow found with key: " + key));
 
-    model.put("context-path", base_path);
     model.put("workflow", toDto(workflow));
     model.put("resource", workflow.getResource());
 
@@ -166,6 +165,7 @@ public class ViewController {
     final var bpmn = Bpmn.readModelFromStream(resourceAsStream);
     model.put("instance.bpmnElementInfos", getBpmnElementInfos(bpmn));
 
+    addContextPathToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "workflow-detail-view";
@@ -238,10 +238,10 @@ public class ViewController {
       instances.add(dto);
     }
 
-    model.put("context-path", base_path);
     model.put("instances", instances);
     model.put("count", count);
 
+    addContextPathToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "instance-list-view";
@@ -262,7 +262,8 @@ public class ViewController {
         .ifPresent(workflow -> model.put("resource", workflow.getResource()));
 
     model.put("instance", toInstanceDto(instance));
-    model.put("context-path", base_path);
+
+    addContextPathToModel(model);
 
     return "instance-detail-view";
   }
@@ -660,8 +661,8 @@ public class ViewController {
 
     model.put("incidents", incidents);
     model.put("count", count);
-    model.put("context-path", base_path);
 
+    addContextPathToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "incident-list-view";
@@ -707,8 +708,8 @@ public class ViewController {
 
     model.put("jobs", dtos);
     model.put("count", count);
-    model.put("context-path", base_path);
 
+    addContextPathToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "job-list-view";
@@ -742,8 +743,8 @@ public class ViewController {
 
     model.put("messages", dtos);
     model.put("count", count);
-    model.put("context-path", base_path);
 
+    addContextPathToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "message-list-view";
@@ -810,6 +811,10 @@ public class ViewController {
       model.put("nextPage", currentPage + 1);
     }
   }
+
+    private void addContextPathToModel(Map<String, Object> model) {
+      model.put("context-path", base_path);
+    }
 
   private static class VariableTuple {
     private final long scopeKey;
