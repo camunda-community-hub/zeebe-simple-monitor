@@ -31,10 +31,12 @@ import io.zeebe.monitor.repository.WorkflowRepository;
 import io.zeebe.protocol.record.value.BpmnElementType;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.transaction.Transactional;
 import java.io.ByteArrayInputStream;
@@ -81,8 +83,12 @@ public class ViewController {
 
   @Autowired private VariableRepository variableRepository;
 
+  @Value("${server.servlet.context-path}")
+  private String base_path;
+
   @GetMapping("/")
   public String index(Map<String, Object> model, Pageable pageable) {
+    addContextPathToModel(model);
     return workflowList(model, pageable);
   }
 
@@ -100,6 +106,7 @@ public class ViewController {
     model.put("workflows", workflows);
     model.put("count", count);
 
+    addContextPathToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "workflow-list-view";
@@ -158,6 +165,7 @@ public class ViewController {
     final var bpmn = Bpmn.readModelFromStream(resourceAsStream);
     model.put("instance.bpmnElementInfos", getBpmnElementInfos(bpmn));
 
+    addContextPathToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "workflow-detail-view";
@@ -233,6 +241,7 @@ public class ViewController {
     model.put("instances", instances);
     model.put("count", count);
 
+    addContextPathToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "instance-list-view";
@@ -253,6 +262,8 @@ public class ViewController {
         .ifPresent(workflow -> model.put("resource", workflow.getResource()));
 
     model.put("instance", toInstanceDto(instance));
+
+    addContextPathToModel(model);
 
     return "instance-detail-view";
   }
@@ -651,6 +662,7 @@ public class ViewController {
     model.put("incidents", incidents);
     model.put("count", count);
 
+    addContextPathToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "incident-list-view";
@@ -697,6 +709,7 @@ public class ViewController {
     model.put("jobs", dtos);
     model.put("count", count);
 
+    addContextPathToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "job-list-view";
@@ -731,6 +744,7 @@ public class ViewController {
     model.put("messages", dtos);
     model.put("count", count);
 
+    addContextPathToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "message-list-view";
@@ -797,6 +811,10 @@ public class ViewController {
       model.put("nextPage", currentPage + 1);
     }
   }
+
+    private void addContextPathToModel(Map<String, Object> model) {
+      model.put("context-path", base_path);
+    }
 
   private static class VariableTuple {
     private final long scopeKey;

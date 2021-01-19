@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/instances")
+@RequestMapping("${server.servlet.context-path}api/instances")
 public class WorkflowInstanceResource {
 
   @Autowired private ZeebeClient zeebeClient;
