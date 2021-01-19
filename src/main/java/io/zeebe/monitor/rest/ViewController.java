@@ -813,7 +813,7 @@ public class ViewController {
   }
 
     private void addContextPathToModel(Map<String, Object> model) {
-      model.put("context-path", base_path);
+      model.put("context-path", base_path + "/");
     }
 
   private static class VariableTuple {

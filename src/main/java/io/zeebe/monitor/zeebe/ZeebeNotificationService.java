@@ -48,6 +48,6 @@ public class ZeebeNotificationService {
 
   private void sendNotification(final WorkflowInstanceNotification notification) {
     webSocket.convertAndSend(String.format(
-            "%snotifications/workflow-instance", base_path), notification);
+            "%s/notifications/workflow-instance", base_path), notification);
   }
 }

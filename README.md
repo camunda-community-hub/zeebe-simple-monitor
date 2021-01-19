@@ -81,9 +81,25 @@ spring:
 
 server:
   port: 8082
+  servlet:
+    context-path: /
 ```
 
-Using a different database, for example, PostgreSQL:
+#### Change the Context-Path
+
+The context-path or base-path of the application can be changed using the following property:
+
+``` 
+server:
+  servlet:
+    context-path: /monitor/
+```
+
+It is then available under http://localhost:8082/monitor.
+
+#### Change the Database
+
+For example, using PostgreSQL:
 
 * change the following database configuration settings
 

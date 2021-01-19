@@ -28,7 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "${server.servlet.context-path}api/workflows")
+@RequestMapping(path = "/api/workflows")
 public class WorkflowResource {
 
   @Autowired private ZeebeClient zeebeClient;
