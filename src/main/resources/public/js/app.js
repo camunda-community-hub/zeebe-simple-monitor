@@ -23,6 +23,10 @@ function showErrorResonse(xhr, ajaxOptions, thrownError) {
 	}
 }
 
+function buildPath(resource) {
+	return base_path + resource;
+}
+
 // --------------------------------------------------------------------
 
 function reload() {
@@ -37,10 +41,10 @@ function reload() {
             var subscribedWorkflowKeys = [];
              
             function connect() {
-                var socket = new SockJS('/notifications');
+                var socket = new SockJS(buildPath('notifications'));
                 stompClient = Stomp.over(socket); 
                 stompClient.connect({}, function(frame) {
-                    stompClient.subscribe('/notifications/workflow-instance', function(message) {
+                    stompClient.subscribe(buildPath('notifications/workflow-instance'), function(message) {
                       handleMessage(JSON.parse(message.body));
                     });
                 });
@@ -53,7 +57,7 @@ function reload() {
             }
              
             function sendMessage(msg) {
-                stompClient.send("/notifications", {},
+                stompClient.send(buildPath('notifications'), {},
                   JSON.stringify(msg));
             }
              
@@ -124,7 +128,7 @@ function uploadModels() {
 	var uploadFiles = function() {
 	    $.ajax({
            type : 'POST',
-           url: '/api/workflows/',
+           url: buildPath('api/workflows/'),
            data:  JSON.stringify(filesToUpload),
            contentType: 'application/json; charset=utf-8',
            success: function (result) {
@@ -144,7 +148,7 @@ function uploadModels() {
 function createInstance(key) {
 	$.ajax({
        type : 'POST',
-       url: '/api/workflows/' + key,
+       url: buildPath('api/workflows/' + key),
        data:  getVariablesDocument(),
        contentType: 'application/json; charset=utf-8',
        success: function (result) {
@@ -168,7 +172,7 @@ function updateVariable(scopeKey, name) {
 
 		$.ajax({
 	       type : 'PUT',
-	       url:  '/api/instances/' + scopeKey + "/set-variables",
+	       url: buildPath('api/instances/' + scopeKey + '/set-variables'),
 	       data:  data,
 	       contentType: 'application/json; charset=utf-8',
 	       success: function (result) {
@@ -195,7 +199,7 @@ function setVariable() {
 
 		var local = document.getElementById("variable-local").checked;
 
-		var url = '/api/instances/' + scopeKey + "/set-variables";
+		var url = buildPath('api/instances/' + scopeKey + '/set-variables');
 
 		if (local) {
 			url = url + "-local";
@@ -222,7 +226,7 @@ function setVariable() {
 function updateRetries(jobKey) {
 		$.ajax({
 	             type : 'PUT',
-	             url: '/api/instances/' + jobKey + "/update-retries",
+	             url: buildPath('api/instances/' + jobKey + '/update-retries'),
 	             data:  document.getElementById("remaining-retries-" + jobKey).value,
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
@@ -258,7 +262,7 @@ function resolveIncident(incidentKey, jobKey, remainingRetries) {
 
 		$.ajax({
 	             type : 'PUT',
-	             url: '/api/instances/' + incidentKey + "/resolve-incident",
+	             url: buildPath('api/instances/' + incidentKey + '/resolve-incident'),
 	             data:  JSON.stringify(data),
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
@@ -277,7 +281,7 @@ function resolveIncident(incidentKey, jobKey, remainingRetries) {
 function cancelInstance(key) {
 		$.ajax({
 	             type : 'DELETE',
-	             url: '/api/instances/' + key,
+	             url: buildPath('api/instances/' + key),
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
 	             	showSuccess("Instance canceled.");
@@ -296,7 +300,7 @@ function completeJob(jobKey) {
 
 		$.ajax({
 	             type : 'PUT',
-	             url: '/api/jobs/' + jobKey + '/complete',
+	             url: buildPath('api/jobs/' + jobKey + '/complete'),
 	             data:  getVariablesDocumentFrom(jobKey),
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
@@ -316,7 +320,7 @@ function failJob(jobKey) {
 
 		$.ajax({
 	             type : 'PUT',
-	             url: '/api/jobs/' + jobKey + '/fail',
+	             url: buildPath('api/jobs/' + jobKey + '/fail'),
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
 	             	showSuccess("Job failed.");
@@ -339,7 +343,7 @@ function throwError(jobKey) {
 
 	$.ajax({
 		type : 'PUT',
-		url: '/api/jobs/' + jobKey + '/throw-error',
+		url: buildPath('api/jobs/' + jobKey + '/throw-error'),
 		data:  JSON.stringify(data),
 		contentType: 'application/json; charset=utf-8',
 		success: function (result) {
@@ -383,7 +387,7 @@ function publishMessageWithPayload(data) {
 
 		$.ajax({
 	             type : 'POST',
-	             url: '/api/messages/',
+	             url: buildPath('api/messages/'),
 	             data:  JSON.stringify(data),
 	             contentType: 'application/json; charset=utf-8',
 	             success: function (result) {
