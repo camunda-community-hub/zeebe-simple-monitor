@@ -36,7 +36,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.transaction.Transactional;
 import java.io.ByteArrayInputStream;
@@ -83,8 +82,11 @@ public class ViewController {
 
   @Autowired private VariableRepository variableRepository;
 
-  @Value("${server.servlet.context-path}")
-  private String base_path;
+  private final String base_path;
+
+  public ViewController(@Value("${server.servlet.context-path}") final String base_path) {
+      this.base_path = base_path.endsWith("/") ? base_path : base_path + "/";
+  }
 
   @GetMapping("/")
   public String index(Map<String, Object> model, Pageable pageable) {
@@ -813,7 +815,7 @@ public class ViewController {
   }
 
     private void addContextPathToModel(Map<String, Object> model) {
-      model.put("context-path", base_path + "/");
+      model.put("context-path", base_path);
     }
 
   private static class VariableTuple {
