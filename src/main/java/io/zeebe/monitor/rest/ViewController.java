@@ -804,14 +804,22 @@ public class ViewController {
   private void addPaginationToModel(
       Map<String, Object> model, Pageable pageable, final long count) {
 
-    final int currentPage = pageable.getPageNumber();
-    model.put("page", currentPage + 1);
-    if (currentPage > 0) {
-      model.put("prevPage", currentPage - 1);
-    }
-    if (count > (1 + currentPage) * pageable.getPageSize()) {
-      model.put("nextPage", currentPage + 1);
-    }
+      final int currentPage = pageable.getPageNumber();
+      model.put("page", currentPage + 1);
+      if (currentPage > 0) {
+          model.put("prevPage", currentPage - 1);
+      }
+      if (count > (1 + currentPage) * pageable.getPageSize()) {
+          model.put("nextPage", currentPage + 1);
+      }
+
+      if(pageable.getPageSize() > 0) {
+          long lastPage = count / pageable.getPageSize();
+          if(count % pageable.getPageSize() == 0) {
+              lastPage--;
+          }
+          model.put("lastPage", lastPage);
+      }
   }
 
     private void addContextPathToModel(Map<String, Object> model) {
