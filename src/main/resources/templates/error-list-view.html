@@ -1,0 +1,42 @@
+{{>layout/header}}
+
+<div class="row">
+    <div class="col-md-12">
+
+        <span>{{count}} errors</span>
+
+        <table class="table table-striped">
+            <thead>
+            <th>Position</th>
+            <th>Error Event Position</th>
+            <th>Workflow Instance Key</th>
+            <th>Exception Message</th>
+            <th style="width: 40%;">Stacktrace</th>
+            <th>Time</th>
+            </thead>
+
+            {{#errors}}
+            <tr>
+                <td>{{position}}</td>
+                <td>{{errorEventPosition}}</td>
+                <td>
+                    {{#workflowInstanceKey}}
+                    <a href="{{context-path}}views/instances/{{workflowInstanceKey}}">{{workflowInstanceKey}}</a>
+                    {{/workflowInstanceKey}}
+                </td>
+                <td>{{exceptionMessage}}</td>
+                <td>
+                    <pre>{{stacktrace}}</pre>
+                </td>
+                <td>{{timestamp}}</td>
+            </tr>
+            {{/errors}}
+
+        </table>
+
+        {{>components/table-pagination}}
+
+    </div>
+</div>
+
+{{>layout/footer}}

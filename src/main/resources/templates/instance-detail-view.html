@@ -108,6 +108,9 @@
                 <a class="nav-item nav-link" id="nav-called-workflows-tab" data-toggle="tab"
                    href="#nav-called-workflows" role="tab"
                    aria-controls="nav-contact" aria-selected="false">Called Workflow Instances</a>
+                <a class="nav-item nav-link" id="nav-errors-tab" data-toggle="tab"
+                   href="#nav-errors" role="tab"
+                   aria-controls="nav-contact" aria-selected="false">Errors</a>
             </div>
         </nav>
         <div class="tab-content detail-view-tab-content" id="nav-tabContent">
@@ -131,6 +134,9 @@
             </div>
             <div class="tab-pane fade" id="nav-called-workflows" role="tabpanel" aria-labelledby="nav-contact-tab">
                 {{>called-workflows-list}}
+            </div>
+            <div class="tab-pane fade" id="nav-errors" role="tabpanel" aria-labelledby="nav-contact-tab">
+                {{>error-list}}
             </div>
 
         </div>

@@ -1,0 +1,22 @@
+<table class="table table-striped">
+    <thead>
+    <th>Position</th>
+    <th>Error Event Position</th>
+    <th>Exception Message</th>
+    <th style="width: 40%;">Stacktrace</th>
+    <th>Time</th>
+    </thead>
+
+    {{#instance.errors}}
+    <tr>
+        <td>{{position}}</td>
+        <td>{{errorEventPosition}}</td>
+        <td>{{exceptionMessage}}</td>
+        <td>
+            <pre>{{stacktrace}}</pre>
+        </td>
+        <td>{{timestamp}}</td>
+    </tr>
+    {{/instance.errors}}
+
+</table>
