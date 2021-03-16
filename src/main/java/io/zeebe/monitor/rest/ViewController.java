@@ -48,12 +48,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 @Controller
 public class ViewController {
 
-  private static final List<String> WORKFLOW_INSTANCE_ENTERED_INTENTS =
+    private static final List<String> WORKFLOW_INSTANCE_ENTERED_INTENTS =
       Arrays.asList("ELEMENT_ACTIVATED");
 
   private static final List<String> WORKFLOW_INSTANCE_COMPLETED_INTENTS =
@@ -83,8 +84,10 @@ public class ViewController {
   @Autowired private VariableRepository variableRepository;
 
   private final String base_path;
+    public static final int FIRST_PAGE = 0;
+    public static final int PAGE_RANGE = 2;
 
-  public ViewController(@Value("${server.servlet.context-path}") final String base_path) {
+    public ViewController(@Value("${server.servlet.context-path}") final String base_path) {
       this.base_path = base_path.endsWith("/") ? base_path : base_path + "/";
   }
 
@@ -805,20 +808,57 @@ public class ViewController {
       Map<String, Object> model, Pageable pageable, final long count) {
 
       final int currentPage = pageable.getPageNumber();
-      model.put("page", currentPage + 1);
+      final int prevPage = currentPage - 1;
+      final int nextPage = currentPage + 1;
+      final int lastPage = getLastPage(pageable, count);
+
+      final var prevPages = IntStream.range(currentPage - PAGE_RANGE, currentPage).filter(p -> p > FIRST_PAGE).boxed().map(Page::new).collect(Collectors.toList());
+      final var nextPages = IntStream.rangeClosed(currentPage + 1, currentPage + PAGE_RANGE).filter(p -> p < lastPage).boxed().map(Page::new).collect(Collectors.toList());
+      final var hasPrevGap = !prevPages.isEmpty() && prevPages.stream().allMatch(p -> p.pageNumber > FIRST_PAGE + 1);
+      final var hasNextGap = !nextPages.isEmpty() && nextPages.stream().allMatch(p -> p.pageNumber < lastPage - 1);
+
+      model.put("page", new Page(currentPage));
+      model.put("prevPages", prevPages);
+      model.put("nextPages", nextPages);
+      model.put("hasPrevPagesGap", hasPrevGap);
+      model.put("hasNextPagesGap", hasNextGap);
+
       if (currentPage > 0) {
-          model.put("prevPage", currentPage - 1);
+          model.put("prevPage", new Page(prevPage));
+          model.put("firstPage", new Page(FIRST_PAGE));
       }
-      if (count > (1 + currentPage) * pageable.getPageSize()) {
-          model.put("nextPage", currentPage + 1);
+      if(lastPage > currentPage) {
+          model.put("nextPage", new Page(nextPage));
+          model.put("lastPage", new Page(lastPage));
+      }
+  }
+
+    private int getLastPage(Pageable pageable, long count) {
+        int lastPage = 0;
+        if(pageable.getPageSize() > 0) {
+            lastPage = (int) count / pageable.getPageSize();
+            if(count % pageable.getPageSize() == 0) {
+                lastPage--;
+            }
+        }
+        return lastPage;
+    }
+
+    private static class Page {
+      private final int pageNumber;
+      private final int displayNumber;
+
+      private Page(int pageNumber) {
+          this.pageNumber = pageNumber;
+          this.displayNumber = pageNumber + 1;
       }
 
-      if(pageable.getPageSize() > 0) {
-          long lastPage = count / pageable.getPageSize();
-          if(count % pageable.getPageSize() == 0) {
-              lastPage--;
-          }
-          model.put("lastPage", lastPage);
+      public int getPageNumber() {
+          return pageNumber;
+      }
+
+      public int getDisplayNumber() {
+          return displayNumber;
       }
   }
 
