@@ -14,8 +14,11 @@ public class ZeebeNotificationService {
 
   private static final Logger LOG = LoggerFactory.getLogger(ZeebeNotificationService.class);
 
-  @Value("${server.servlet.context-path}")
-  private String base_path;
+  private final String base_path;
+
+  public ZeebeNotificationService(@Value("${server.servlet.context-path}") final String base_path) {
+    this.base_path = base_path.endsWith("/") ? base_path : base_path + "/";
+  }
 
   @Autowired private SimpMessagingTemplate webSocket;
 
@@ -47,7 +50,8 @@ public class ZeebeNotificationService {
   }
 
   private void sendNotification(final WorkflowInstanceNotification notification) {
-    webSocket.convertAndSend(String.format(
-            "%s/notifications/workflow-instance", base_path), notification);
+    final var destination = base_path +
+            "notifications/workflow-instance";
+    webSocket.convertAndSend(destination, notification);
   }
 }
