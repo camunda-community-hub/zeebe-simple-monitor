@@ -4,6 +4,7 @@ import com.hazelcast.core.HazelcastInstance;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.hazelcast.connect.java.ZeebeHazelcast;
 import io.zeebe.monitor.entity.ElementInstanceEntity;
+import io.zeebe.monitor.entity.ErrorEntity;
 import io.zeebe.monitor.entity.HazelcastConfig;
 import io.zeebe.monitor.entity.IncidentEntity;
 import io.zeebe.monitor.entity.JobEntity;
@@ -14,6 +15,7 @@ import io.zeebe.monitor.entity.VariableEntity;
 import io.zeebe.monitor.entity.WorkflowEntity;
 import io.zeebe.monitor.entity.WorkflowInstanceEntity;
 import io.zeebe.monitor.repository.ElementInstanceRepository;
+import io.zeebe.monitor.repository.ErrorRepository;
 import io.zeebe.monitor.repository.HazelcastConfigRepository;
 import io.zeebe.monitor.repository.IncidentRepository;
 import io.zeebe.monitor.repository.JobRepository;
@@ -52,6 +54,7 @@ public class ZeebeImportService {
   @Autowired private MessageRepository messageRepository;
   @Autowired private MessageSubscriptionRepository messageSubscriptionRepository;
   @Autowired private TimerRepository timerRepository;
+  @Autowired private ErrorRepository errorRepository;
 
   @Autowired private ZeebeNotificationService notificationService;
 
@@ -93,6 +96,7 @@ public class ZeebeImportService {
                 record -> withKey(record, Schema.MessageRecord::getMetadata, this::importMessage))
             .addMessageSubscriptionListener(this::importMessageSubscription)
             .addMessageStartEventSubscriptionListener(this::importMessageStartEventSubscription)
+            .addErrorListener(this::importError)
             .postProcessListener(
                 sequence -> {
                   hazelcastConfig.setSequence(sequence);
@@ -412,6 +416,29 @@ public class ZeebeImportService {
       entity.setState(record.getMetadata().getIntent().toLowerCase());
       variableRepository.save(entity);
     }
+  }
+
+  private void importError(final Schema.ErrorRecord record) {
+
+    final var metadata = record.getMetadata();
+    final var position = metadata.getPosition();
+
+    final var entity =
+        errorRepository
+            .findById(position)
+            .orElseGet(
+                () -> {
+                  final var newEntity = new ErrorEntity();
+                  newEntity.setPosition(position);
+                  newEntity.setErrorEventPosition(record.getErrorEventPosition());
+                  newEntity.setWorkflowInstanceKey(record.getWorkflowInstanceKey());
+                  newEntity.setExceptionMessage(record.getExceptionMessage());
+                  newEntity.setStacktrace(record.getStacktrace());
+                  newEntity.setTimestamp(metadata.getTimestamp());
+                  return newEntity;
+                });
+
+    errorRepository.save(entity);
   }
 
   private String generateId() {

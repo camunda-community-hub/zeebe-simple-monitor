@@ -52,6 +52,7 @@ public class WorkflowInstanceDto {
   private List<MessageSubscriptionDto> messageSubscriptions = new ArrayList<>();
   private List<TimerDto> timers = new ArrayList<>();
   private List<CalledWorkflowInstanceDto> calledWorkflowInstances = new ArrayList<>();
+  private List<ErrorDto> errors = new ArrayList<>();
 
   private List<BpmnElementInfo> bpmnElementInfos = new ArrayList<>();
 
@@ -249,5 +250,13 @@ public class WorkflowInstanceDto {
 
   public void setBpmnElementInfos(List<BpmnElementInfo> bpmnElementInfos) {
     this.bpmnElementInfos = bpmnElementInfos;
+  }
+
+  public List<ErrorDto> getErrors() {
+    return errors;
+  }
+
+  public void setErrors(List<ErrorDto> errors) {
+    this.errors = errors;
   }
 }
