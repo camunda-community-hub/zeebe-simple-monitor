@@ -1,6 +1,11 @@
 Zeebe Simple Monitor
 =========================
 
+[![](https://img.shields.io/badge/Community%20Extension-An%20open%20source%20community%20maintained%20project-FF4700)](https://github.com/camunda-community-hub/community)
+
+[![](https://img.shields.io/badge/Lifecycle-Stable-brightgreen)](https://github.com/Camunda-Community-Hub/community/blob/main/extension-lifecycle.md#stable-)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 A monitoring application for [Zeebe](https://zeebe.io). It is designed for developers to
 
 * get in touch with Zeebe and workflow execution (BPMN)
