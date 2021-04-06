@@ -131,7 +131,7 @@ public class ViewController {
             .orElseThrow(() -> new RuntimeException("No workflow found with key: " + key));
 
     model.put("workflow", toDto(workflow));
-    model.put("resource", workflow.getResource());
+    model.put("resource", getWorkflowResource(workflow));
 
     final List<ElementInstanceState> elementInstanceStates = getElementInstanceStates(key);
     model.put("instance.elementInstances", elementInstanceStates);
@@ -258,7 +258,7 @@ public class ViewController {
 
     workflowRepository
         .findByKey(instance.getWorkflowKey())
-        .ifPresent(workflow -> model.put("resource", workflow.getResource()));
+        .ifPresent(workflow -> model.put("resource", getWorkflowResource(workflow)));
 
     model.put("instance", toInstanceDto(instance));
 
@@ -837,6 +837,12 @@ public class ViewController {
     }
 
     return dto;
+  }
+
+  private String getWorkflowResource(final WorkflowEntity workflow) {
+    final var resource = workflow.getResource();
+    // replace all backticks because they are used to enclose the content of the BPMN in the HTML
+    return resource.replaceAll("`", "\"");
   }
 
   private void addContextPathToModel(final Map<String, Object> model) {
