@@ -23,7 +23,7 @@
         <version.zeebe.spring>0.26.2</version.zeebe.spring>
 
         <spring.boot.version>2.4.5</spring.boot.version>
-        <hazelcast.exporter.version>0.10.0</hazelcast.exporter.version>
+        <hazelcast.exporter.version>1.0.0</hazelcast.exporter.version>
         <!-- pin Hazelcast version because of spring-boot-dependencies -->
         <version.hazelcast>4.2</version.hazelcast>
 
