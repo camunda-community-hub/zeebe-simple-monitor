@@ -1,0 +1,17 @@
+version: 2
+updates:
+- package-ecosystem: maven
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: com.google.cloud.tools:jib-maven-plugin
+    versions:
+    - 3.0.0
+  - dependency-name: io.zeebe:zeebe-test-container
+    versions:
+    - 2.0.0
+  - dependency-name: com.graphql-java-kickstart:graphql-java-tools
+    versions:
+    - 11.0.0
