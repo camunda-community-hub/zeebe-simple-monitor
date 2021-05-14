@@ -1,0 +1,25 @@
+name: Build project with Maven
+on:
+  pull_request:
+  schedule:
+  - cron: '2 2 * * 1-5' # run nightly master builds on weekdays
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@f1d3225b5376a0791fdee5a0e8eac5289355e43a # pin@v2
+    - name: Java setup
+      uses: actions/setup-java@e54a62b3df9364d4b4c1c29c7225e57fe605d7dd # pin@v1
+      with:
+        java-version: 11
+    - name: Cache
+      uses: actions/cache@99d99cd262b87f5f8671407a1e5c1ddfa36ad5ba # pin@v1
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    - name: Run Maven
+      run: mvn -B clean verify com.mycila:license-maven-plugin:check

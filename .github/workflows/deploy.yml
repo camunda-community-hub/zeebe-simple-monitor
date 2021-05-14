@@ -1,0 +1,63 @@
+# If this workflow is triggered by a push to master, it
+#        deploys a SNAPSHOT
+# If this workflow is triggered by publishing a Release, it
+#        deploys a RELEASE with the selected version
+#        updates the project version by incrementing the patch version
+#        commits the version update change to the repository's default branch.
+name: Deploy artifacts with Maven
+on:
+  push:
+    branches: [ master ]
+  release:
+    types: [ published ]
+jobs:
+  publish:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@f1d3225b5376a0791fdee5a0e8eac5289355e43a # pin@v2
+      - name: Cache
+        uses: actions/cache@0781355a23dac32fd3bac414512f4b903437991a # pin@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Set up Java environment
+        uses: actions/setup-java@e54a62b3df9364d4b4c1c29c7225e57fe605d7dd # pin@v1
+        with:
+          java-version: 11
+          gpg-private-key: ${{ secrets.MAVEN_CENTRAL_GPG_SIGNING_KEY_SEC }}
+          gpg-passphrase: MAVEN_CENTRAL_GPG_PASSPHRASE
+      - name: Set environment variable RELEASE_VERSION to SNAPSHOT
+        run: |
+          echo "RELEASE_VERSION=snapshot" >> $GITHUB_ENV
+      - name: Set environment variable RELEASE_VERSION to the GitHub Release (Release only)
+        if: github.event.release
+        run: |
+          echo "RELEASE_VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+      - name: Login to Docker
+        run: |
+          # new login with new container registry url and PAT
+          echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+      - name: Deploy SNAPSHOT / Release
+        uses: camunda-community-hub/community-action-maven-release@a9e964bf56978eef9bca81551cecceebb246a8e5 # pin@v1
+        with:
+          release-version: ${{ github.event.release.tag_name }}
+          release-profile: community-action-maven-release
+          nexus-usr: ${{ secrets.NEXUS_USR }}
+          nexus-psw: ${{ secrets.NEXUS_PSW }}
+          maven-usr: ${{ secrets.MAVEN_CENTRAL_DEPLOYMENT_USR }}
+          maven-psw: ${{ secrets.MAVEN_CENTRAL_DEPLOYMENT_PSW }}
+          maven-gpg-passphrase: ${{ secrets.MAVEN_CENTRAL_GPG_SIGNING_KEY_PASSPHRASE }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        id: release
+      - if: github.event.release
+        name: Attach artifacts to GitHub Release (Release only)
+        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # pin@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ steps.release.outputs.artifacts_archive_path }}
+          asset_name: ${{ steps.release.outputs.artifacts_archive_path }}
+          asset_content_type: application/zip
