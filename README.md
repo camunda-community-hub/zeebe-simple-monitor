@@ -20,13 +20,13 @@ The application imports the data from Zeebe using the [Hazelcast exporter](https
 
 ### Docker
 
-The docker image for the worker is published to [DockerHub](https://hub.docker.com/r/camunda/zeebe-simple-monitor).
+The docker image for the worker is published to [GitHub Packages](https://github.com/orgs/camunda-community-hub/packages/container/package/zeebe-simple-monitor).
 
 ```
-docker pull camunda/zeebe-simple-monitor:latest
+docker pull ghcr.io/camunda-community-hub/zeebe-simple-monitor:latest
 ```
 
-* ensure that a Zeebe broker is running with a Hazelcast exporter (>= 0.8.0-alpha1)  
+* ensure that a Zeebe broker is running with a Hazelcast exporter (>= `1.0.0`)  
 * forward the Hazelcast port to the docker container (default: `5701`)
 * configure the connection to the Zeebe broker by setting `zeebe.client.broker.contactPoint` (default: `localhost:26500`) 
 * configure the connection to Hazelcast by setting `zeebe.client.worker.hazelcast.connection` (default: `localhost:5701`) 
@@ -134,7 +134,7 @@ networks:
 services:
   zeebe:
     container_name: zeebe_broker
-    image: camunda/zeebe:0.23.0
+    image: camunda/zeebe:1.0.0
     environment:
       - ZEEBE_LOG_LEVEL=debug
     ports:
