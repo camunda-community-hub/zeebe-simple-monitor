@@ -15,31 +15,31 @@
  */
 package io.zeebe.monitor.rest;
 
-public class WorkflowInstanceListDto {
+public class ProcessInstanceListDto {
 
-  private long workflowInstanceKey;
+  private long processInstanceKey;
 
   private String bpmnProcessId;
-  private long workflowKey;
+  private long processDefinitionKey;
 
   private String state;
 
   private String startTime = "";
   private String endTime = "";
 
-  public long getWorkflowInstanceKey() {
-    return workflowInstanceKey;
+  public long getProcessInstanceKey() {
+    return processInstanceKey;
   }
 
-  public void setWorkflowInstanceKey(long workflowInstanceKey) {
-    this.workflowInstanceKey = workflowInstanceKey;
+  public void setProcessInstanceKey(final long processInstanceKey) {
+    this.processInstanceKey = processInstanceKey;
   }
 
   public String getStartTime() {
     return startTime;
   }
 
-  public void setStartTime(String startTime) {
+  public void setStartTime(final String startTime) {
     this.startTime = startTime;
   }
 
@@ -47,7 +47,7 @@ public class WorkflowInstanceListDto {
     return endTime;
   }
 
-  public void setEndTime(String endTime) {
+  public void setEndTime(final String endTime) {
     this.endTime = endTime;
   }
 
@@ -55,7 +55,7 @@ public class WorkflowInstanceListDto {
     return state;
   }
 
-  public void setState(String state) {
+  public void setState(final String state) {
     this.state = state;
   }
 
@@ -63,15 +63,15 @@ public class WorkflowInstanceListDto {
     return bpmnProcessId;
   }
 
-  public void setBpmnProcessId(String bpmnProcessId) {
+  public void setBpmnProcessId(final String bpmnProcessId) {
     this.bpmnProcessId = bpmnProcessId;
   }
 
-  public long getWorkflowKey() {
-    return workflowKey;
+  public long getProcessDefinitionKey() {
+    return processDefinitionKey;
   }
 
-  public void setWorkflowKey(long workflowKey) {
-    this.workflowKey = workflowKey;
+  public void setProcessDefinitionKey(final long processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
   }
 }

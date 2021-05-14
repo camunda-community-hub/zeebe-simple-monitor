@@ -5,8 +5,8 @@ public class IncidentListDto {
   private long key;
 
   private String bpmnProcessId;
-  private long workflowInstanceKey;
-  private long workflowKey;
+  private long processInstanceKey;
+  private long processDefinitionKey;
 
   private String errorType;
   private String errorMessage;
@@ -19,7 +19,7 @@ public class IncidentListDto {
     return key;
   }
 
-  public void setKey(long key) {
+  public void setKey(final long key) {
     this.key = key;
   }
 
@@ -27,7 +27,7 @@ public class IncidentListDto {
     return errorType;
   }
 
-  public void setErrorType(String errorType) {
+  public void setErrorType(final String errorType) {
     this.errorType = errorType;
   }
 
@@ -35,7 +35,7 @@ public class IncidentListDto {
     return errorMessage;
   }
 
-  public void setErrorMessage(String errorMessage) {
+  public void setErrorMessage(final String errorMessage) {
     this.errorMessage = errorMessage;
   }
 
@@ -43,7 +43,7 @@ public class IncidentListDto {
     return state;
   }
 
-  public void setState(String state) {
+  public void setState(final String state) {
     this.state = state;
   }
 
@@ -51,7 +51,7 @@ public class IncidentListDto {
     return createdTime;
   }
 
-  public void setCreatedTime(String createdTime) {
+  public void setCreatedTime(final String createdTime) {
     this.createdTime = createdTime;
   }
 
@@ -59,7 +59,7 @@ public class IncidentListDto {
     return resolvedTime;
   }
 
-  public void setResolvedTime(String resolvedTime) {
+  public void setResolvedTime(final String resolvedTime) {
     this.resolvedTime = resolvedTime;
   }
 
@@ -67,23 +67,23 @@ public class IncidentListDto {
     return bpmnProcessId;
   }
 
-  public void setBpmnProcessId(String bpmnProcessId) {
+  public void setBpmnProcessId(final String bpmnProcessId) {
     this.bpmnProcessId = bpmnProcessId;
   }
 
-  public long getWorkflowInstanceKey() {
-    return workflowInstanceKey;
+  public long getProcessInstanceKey() {
+    return processInstanceKey;
   }
 
-  public void setWorkflowInstanceKey(long workflowInstanceKey) {
-    this.workflowInstanceKey = workflowInstanceKey;
+  public void setProcessInstanceKey(final long processInstanceKey) {
+    this.processInstanceKey = processInstanceKey;
   }
 
-  public long getWorkflowKey() {
-    return workflowKey;
+  public long getProcessDefinitionKey() {
+    return processDefinitionKey;
   }
 
-  public void setWorkflowKey(long workflowKey) {
-    this.workflowKey = workflowKey;
+  public void setProcessDefinitionKey(final long processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
   }
 }

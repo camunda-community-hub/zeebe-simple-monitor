@@ -1,42 +1,42 @@
 {{>layout/header}}
 
 <div class="row">
-	<div class="col-md-12">
+    <div class="col-md-12">
 
-		<span>{{count}} open incidents</span>
+        <span>{{count}} open incidents</span>
 
-		<table class="table table-striped">
-			<thead>
-				<th>Incident Key</th>
-			  <th>Workflow Instance Key</th>
-			  <th>BPMN process id</th>
-			  <th>Workflow Key</th>
-			  <th>Error Type</th>
-			  <th>State</th>
-				<th>Created Time</th>
-		</thead>
+        <table class="table table-striped">
+            <thead>
+            <th>Incident Key</th>
+            <th>Process Instance Key</th>
+            <th>BPMN process id</th>
+            <th>Process Definition Key</th>
+            <th>Error Type</th>
+            <th>State</th>
+            <th>Created Time</th>
+            </thead>
 
-		{{#incidents}}
-			<tr>
-				<td>{{key}}</td>
-				<td>
-					<a href="{{context-path}}views/instances/{{workflowInstanceKey}}">{{workflowInstanceKey}}</a>
-				</td>
-				<td>{{bpmnProcessId}}</td>
-				<td>
-					<a href="{{context-path}}views/workflows/{{workflowKey}}">{{workflowKey}}</a>
-				</td>
-				<td>{{errorType}}</td>
-				<td>{{state}}</td>
-				<td>{{createdTime}}</td>
-			</tr>
-		{{/incidents}}
+            {{#incidents}}
+            <tr>
+                <td>{{key}}</td>
+                <td>
+                    <a href="{{context-path}}views/instances/{{processInstanceKey}}">{{processInstanceKey}}</a>
+                </td>
+                <td>{{bpmnProcessId}}</td>
+                <td>
+                    <a href="{{context-path}}views/processes/{{processDefinitionKey}}">{{processDefinitionKey}}</a>
+                </td>
+                <td>{{errorType}}</td>
+                <td>{{state}}</td>
+                <td>{{createdTime}}</td>
+            </tr>
+            {{/incidents}}
 
-		</table>
+        </table>
 
-		{{>components/table-pagination}}
+        {{>components/table-pagination}}
 
-	</div>
+    </div>
 </div>
 
 {{>layout/footer}}

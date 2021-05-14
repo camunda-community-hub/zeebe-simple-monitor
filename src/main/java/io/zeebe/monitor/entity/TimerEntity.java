@@ -26,23 +26,23 @@ public class TimerEntity {
   @Column(name = "KEY_")
   private long key;
 
-  @Column(name = "WORKFLOW_KEY_")
-  private long workflowKey;
+  @Column(name = "PROCESS_DEFINITION_KEY_")
+  private long processDefinitionKey;
 
-  @Column(name = "WORKFLOW_INSTANCE_KEY_")
-  private Long workflowInstanceKey;
+  @Column(name = "PROCESS_INSTANCE_KEY_")
+  private Long processInstanceKey;
 
   @Column(name = "ELEMENT_INSTANCE_KEY_")
   private Long elementInstanceKey;
 
-  @Column(name = "TARGET_FLOW_NODE_ID_")
-  private String targetFlowNodeId;
+  @Column(name = "TARGET_ELEMENT_ID_")
+  private String targetElementId;
 
   @Column(name = "DUE_DATE_")
   private long dueDate;
 
-    @Column(name = "REPETITIONS")
-    private int repetitions;
+  @Column(name = "REPETITIONS")
+  private int repetitions;
 
   @Column(name = "STATE_")
   private String state;
@@ -54,7 +54,7 @@ public class TimerEntity {
     return key;
   }
 
-  public void setKey(long key) {
+  public void setKey(final long key) {
     this.key = key;
   }
 
@@ -62,7 +62,7 @@ public class TimerEntity {
     return elementInstanceKey;
   }
 
-  public void setElementInstanceKey(Long elementInstanceKey) {
+  public void setElementInstanceKey(final Long elementInstanceKey) {
     this.elementInstanceKey = elementInstanceKey;
   }
 
@@ -70,7 +70,7 @@ public class TimerEntity {
     return state;
   }
 
-  public void setState(String state) {
+  public void setState(final String state) {
     this.state = state;
   }
 
@@ -78,47 +78,47 @@ public class TimerEntity {
     return timestamp;
   }
 
-  public void setTimestamp(long timestamp) {
+  public void setTimestamp(final long timestamp) {
     this.timestamp = timestamp;
   }
 
-  public String getTargetFlowNodeId() {
-    return targetFlowNodeId;
+  public String getTargetElementId() {
+    return targetElementId;
   }
 
-  public void setTargetFlowNodeId(String targetFlowNodeId) {
-    this.targetFlowNodeId = targetFlowNodeId;
+  public void setTargetElementId(final String targetFlowNodeId) {
+    this.targetElementId = targetFlowNodeId;
   }
 
   public long getDueDate() {
     return dueDate;
   }
 
-  public void setDueDate(long dueDate) {
+  public void setDueDate(final long dueDate) {
     this.dueDate = dueDate;
   }
 
-  public long getWorkflowKey() {
-    return workflowKey;
+  public long getProcessDefinitionKey() {
+    return processDefinitionKey;
   }
 
-  public void setWorkflowKey(long workflowKey) {
-    this.workflowKey = workflowKey;
+  public void setProcessDefinitionKey(final long processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
   }
 
-  public Long getWorkflowInstanceKey() {
-    return workflowInstanceKey;
+  public Long getProcessInstanceKey() {
+    return processInstanceKey;
   }
 
-  public void setWorkflowInstanceKey(Long workflowInstanceKey) {
-    this.workflowInstanceKey = workflowInstanceKey;
+  public void setProcessInstanceKey(final Long processInstanceKey) {
+    this.processInstanceKey = processInstanceKey;
   }
 
-    public int getRepetitions() {
-        return repetitions;
-    }
+  public int getRepetitions() {
+    return repetitions;
+  }
 
-    public void setRepetitions(int repetitions) {
-        this.repetitions = repetitions;
-    }
+  public void setRepetitions(final int repetitions) {
+    this.repetitions = repetitions;
+  }
 }

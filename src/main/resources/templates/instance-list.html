@@ -2,7 +2,7 @@
 
 <table class="table table-striped">
     <thead>
-    <th>Workflow Instance Key</th>
+    <th>Process Instance Key</th>
     <th>State</th>
     <th>Start Time</th>
     </thead>
@@ -10,7 +10,7 @@
     {{#instances}}
     <tr>
         <td>
-            <a href="{{context-path}}views/instances/{{workflowInstanceKey}}">{{workflowInstanceKey}}</a>
+            <a href="{{context-path}}views/instances/{{processInstanceKey}}">{{processInstanceKey}}</a>
         </td>
         <td>{{state}}</td>
         <td>{{startTime}}</td>

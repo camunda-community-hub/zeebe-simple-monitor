@@ -15,7 +15,7 @@
  */
 package io.zeebe.monitor.rest;
 
-import io.zeebe.client.ZeebeClient;
+import io.camunda.zeebe.client.ZeebeClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,29 +25,30 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/instances")
-public class WorkflowInstanceResource {
+public class ProcessInstanceResource {
 
   @Autowired private ZeebeClient zeebeClient;
 
   @RequestMapping(path = "/{key}", method = RequestMethod.DELETE)
-  public void cancelWorkflowInstance(@PathVariable("key") long key) throws Exception {
+  public void cancelProcessInstance(@PathVariable("key") final long key) throws Exception {
     zeebeClient.newCancelInstanceCommand(key).send().join();
   }
 
   @RequestMapping(path = "/{key}/set-variables", method = RequestMethod.PUT)
-  public void setVariables(@PathVariable("key") long key, @RequestBody String payload)
+  public void setVariables(@PathVariable("key") final long key, @RequestBody final String payload)
       throws Exception {
     zeebeClient.newSetVariablesCommand(key).variables(payload).send().join();
   }
 
   @RequestMapping(path = "/{key}/set-variables-local", method = RequestMethod.PUT)
-  public void setVariablesLocal(@PathVariable("key") long key, @RequestBody String payload)
-      throws Exception {
+  public void setVariablesLocal(
+      @PathVariable("key") final long key, @RequestBody final String payload) throws Exception {
     zeebeClient.newSetVariablesCommand(key).variables(payload).local(true).send().join();
   }
 
   @RequestMapping(path = "/{key}/resolve-incident", method = RequestMethod.PUT)
-  public void resolveIncident(@PathVariable("key") long key, @RequestBody ResolveIncidentDto dto)
+  public void resolveIncident(
+      @PathVariable("key") final long key, @RequestBody final ResolveIncidentDto dto)
       throws Exception {
 
     if (dto.getJobKey() != null && dto.getJobKey() > 0) {

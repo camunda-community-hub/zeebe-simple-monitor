@@ -16,15 +16,11 @@
 package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.ErrorEntity;
-import io.zeebe.monitor.entity.IncidentEntity;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
 
 public interface ErrorRepository extends PagingAndSortingRepository<ErrorEntity, Long> {
 
-    List<ErrorEntity> findByWorkflowInstanceKey(long workflowInstanceKey);
-
+  List<ErrorEntity> findByProcessInstanceKey(long processInstanceKey);
 }

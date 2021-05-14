@@ -16,20 +16,22 @@
 package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.MessageSubscriptionEntity;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface MessageSubscriptionRepository
-        extends PagingAndSortingRepository<MessageSubscriptionEntity, Long> {
+import java.util.List;
+import java.util.Optional;
 
-  List<MessageSubscriptionEntity> findByWorkflowInstanceKey(long workflowInstanceKey);
+public interface MessageSubscriptionRepository
+    extends PagingAndSortingRepository<MessageSubscriptionEntity, Long> {
+
+  List<MessageSubscriptionEntity> findByProcessInstanceKey(long processInstanceKey);
 
   Optional<MessageSubscriptionEntity> findByElementInstanceKeyAndMessageName(
-          long elementInstanceKey, String messageName);
+      long elementInstanceKey, String messageName);
 
-  Optional<MessageSubscriptionEntity> findByWorkflowKeyAndMessageName(
-          long workflowKey, String messageName);
+  Optional<MessageSubscriptionEntity> findByProcessDefinitionKeyAndMessageName(
+      long processDefinitionKey, String messageName);
 
-  List<MessageSubscriptionEntity> findByWorkflowKeyAndWorkflowInstanceKeyIsNull(long workflowKey);
+  List<MessageSubscriptionEntity> findByProcessDefinitionKeyAndProcessInstanceKeyIsNull(
+      long processDefinitionKey);
 }

@@ -15,7 +15,7 @@
  */
 package io.zeebe.monitor;
 
-import io.zeebe.spring.client.EnableZeebeClient;
+import io.camunda.zeebe.spring.client.EnableZeebeClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -35,7 +35,7 @@ import java.util.concurrent.ScheduledExecutorService;
 @EnableSpringDataWebSupport
 public class ZeebeSimpleMonitorApp {
 
-  public static void main(String... args) {
+  public static void main(final String... args) {
     SpringApplication.run(ZeebeSimpleMonitorApp.class, args);
   }
 

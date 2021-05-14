@@ -20,8 +20,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 
-@Entity(name = "WORKFLOW")
-public class WorkflowEntity {
+@Entity(name = "PROCESS")
+public class ProcessEntity {
   @Id
   @Column(name = "KEY_")
   private long key;
@@ -43,7 +43,7 @@ public class WorkflowEntity {
     return resource;
   }
 
-  public void setResource(String resource) {
+  public void setResource(final String resource) {
     this.resource = resource;
   }
 
@@ -51,7 +51,7 @@ public class WorkflowEntity {
     return bpmnProcessId;
   }
 
-  public void setBpmnProcessId(String bpmnProcessId) {
+  public void setBpmnProcessId(final String bpmnProcessId) {
     this.bpmnProcessId = bpmnProcessId;
   }
 
@@ -59,7 +59,7 @@ public class WorkflowEntity {
     return version;
   }
 
-  public void setVersion(int version) {
+  public void setVersion(final int version) {
     this.version = version;
   }
 
@@ -67,7 +67,7 @@ public class WorkflowEntity {
     return key;
   }
 
-  public void setKey(long key) {
+  public void setKey(final long key) {
     this.key = key;
   }
 
@@ -75,7 +75,7 @@ public class WorkflowEntity {
     return timestamp;
   }
 
-  public void setTimestamp(long timestamp) {
+  public void setTimestamp(final long timestamp) {
     this.timestamp = timestamp;
   }
 }

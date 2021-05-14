@@ -35,8 +35,8 @@ public class ElementInstanceEntity {
   @Column(name = "INTENT_")
   private String intent;
 
-  @Column(name = "WORKFLOW_INSTANCE_KEY_")
-  private long workflowInstanceKey;
+  @Column(name = "PROCESS_INSTANCE_KEY_")
+  private long processInstanceKey;
 
   @Column(name = "ELEMENT_ID_")
   private String elementId;
@@ -47,8 +47,8 @@ public class ElementInstanceEntity {
   @Column(name = "FLOW_SCOPE_KEY_")
   private long flowScopeKey;
 
-  @Column(name = "WORKFLOW_KEY_")
-  private long workflowKey;
+  @Column(name = "PROCESS_DEFINITION_KEY_")
+  private long processDefinitionKey;
 
   @Column(name = "TIMESTAMP_")
   private long timestamp;
@@ -57,7 +57,7 @@ public class ElementInstanceEntity {
     return key;
   }
 
-  public void setKey(long key) {
+  public void setKey(final long key) {
     this.key = key;
   }
 
@@ -65,7 +65,7 @@ public class ElementInstanceEntity {
     return intent;
   }
 
-  public void setIntent(String intent) {
+  public void setIntent(final String intent) {
     this.intent = intent;
   }
 
@@ -73,7 +73,7 @@ public class ElementInstanceEntity {
     return timestamp;
   }
 
-  public void setTimestamp(long timestamp) {
+  public void setTimestamp(final long timestamp) {
     this.timestamp = timestamp;
   }
 
@@ -81,7 +81,7 @@ public class ElementInstanceEntity {
     return elementId;
   }
 
-  public void setElementId(String elementId) {
+  public void setElementId(final String elementId) {
     this.elementId = elementId;
   }
 
@@ -89,7 +89,7 @@ public class ElementInstanceEntity {
     return flowScopeKey;
   }
 
-  public void setFlowScopeKey(long flowScopeKey) {
+  public void setFlowScopeKey(final long flowScopeKey) {
     this.flowScopeKey = flowScopeKey;
   }
 
@@ -97,31 +97,31 @@ public class ElementInstanceEntity {
     return partitionId;
   }
 
-  public void setPartitionId(int partitionId) {
+  public void setPartitionId(final int partitionId) {
     this.partitionId = partitionId;
   }
 
-  public long getWorkflowInstanceKey() {
-    return workflowInstanceKey;
+  public long getProcessInstanceKey() {
+    return processInstanceKey;
   }
 
-  public void setWorkflowInstanceKey(long workflowInstanceKey) {
-    this.workflowInstanceKey = workflowInstanceKey;
+  public void setProcessInstanceKey(final long processInstanceKey) {
+    this.processInstanceKey = processInstanceKey;
   }
 
-  public long getWorkflowKey() {
-    return workflowKey;
+  public long getProcessDefinitionKey() {
+    return processDefinitionKey;
   }
 
-  public void setWorkflowKey(long workflowKey) {
-    this.workflowKey = workflowKey;
+  public void setProcessDefinitionKey(final long processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
   }
 
   public Long getPosition() {
     return position;
   }
 
-  public void setPosition(Long position) {
+  public void setPosition(final Long position) {
     this.position = position;
   }
 
@@ -129,7 +129,7 @@ public class ElementInstanceEntity {
     return bpmnElementType;
   }
 
-  public void setBpmnElementType(String bpmnElementType) {
+  public void setBpmnElementType(final String bpmnElementType) {
     this.bpmnElementType = bpmnElementType;
   }
 }

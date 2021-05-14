@@ -15,26 +15,27 @@
  */
 package io.zeebe.monitor.repository;
 
-import io.zeebe.monitor.entity.WorkflowInstanceEntity;
-
-import java.util.List;
-import java.util.Optional;
+import io.zeebe.monitor.entity.ProcessInstanceEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface WorkflowInstanceRepository
-        extends PagingAndSortingRepository<WorkflowInstanceEntity, Long> {
+import java.util.List;
+import java.util.Optional;
 
-  Page<WorkflowInstanceEntity> findByWorkflowKey(long workflowKey, Pageable pageable);
+public interface ProcessInstanceRepository
+    extends PagingAndSortingRepository<ProcessInstanceEntity, Long> {
 
-  Optional<WorkflowInstanceEntity> findByKey(long key);
+  Page<ProcessInstanceEntity> findByProcessDefinitionKey(
+      long processDefinitionKey, Pageable pageable);
 
-  long countByWorkflowKey(long workflowKey);
+  Optional<ProcessInstanceEntity> findByKey(long key);
 
-  long countByWorkflowKeyAndEndIsNotNull(long workflowKey);
+  long countByProcessDefinitionKey(long processDefinitionKey);
 
-  long countByWorkflowKeyAndEndIsNull(long workflowKey);
+  long countByProcessDefinitionKeyAndEndIsNotNull(long processDefinitionKey);
 
-  List<WorkflowInstanceEntity> findByParentWorkflowInstanceKey(long parentWorkflowInstanceKey);
+  long countByProcessDefinitionKeyAndEndIsNull(long processDefinitionKey);
+
+  List<ProcessInstanceEntity> findByParentProcessInstanceKey(long parentProcessInstanceKey);
 }

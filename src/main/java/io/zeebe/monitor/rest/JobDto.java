@@ -25,7 +25,7 @@ public class JobDto {
 
   private String elementId = "";
   private long elementInstanceKey;
-  private long workflowInstanceKey;
+  private long processInstanceKey;
 
   private String timestamp = "";
 
@@ -35,7 +35,7 @@ public class JobDto {
     return key;
   }
 
-  public void setKey(long key) {
+  public void setKey(final long key) {
     this.key = key;
   }
 
@@ -43,7 +43,7 @@ public class JobDto {
     return jobType;
   }
 
-  public void setJobType(String jobType) {
+  public void setJobType(final String jobType) {
     this.jobType = jobType;
   }
 
@@ -51,7 +51,7 @@ public class JobDto {
     return state;
   }
 
-  public void setState(String state) {
+  public void setState(final String state) {
     this.state = state;
   }
 
@@ -59,7 +59,7 @@ public class JobDto {
     return worker;
   }
 
-  public void setWorker(String worker) {
+  public void setWorker(final String worker) {
     this.worker = worker;
   }
 
@@ -67,7 +67,7 @@ public class JobDto {
     return retries;
   }
 
-  public void setRetries(int retries) {
+  public void setRetries(final int retries) {
     this.retries = retries;
   }
 
@@ -75,7 +75,7 @@ public class JobDto {
     return elementId;
   }
 
-  public void setElementId(String elementId) {
+  public void setElementId(final String elementId) {
     this.elementId = elementId;
   }
 
@@ -83,7 +83,7 @@ public class JobDto {
     return elementInstanceKey;
   }
 
-  public void setElementInstanceKey(long elementInstanceKey) {
+  public void setElementInstanceKey(final long elementInstanceKey) {
     this.elementInstanceKey = elementInstanceKey;
   }
 
@@ -91,23 +91,23 @@ public class JobDto {
     return timestamp;
   }
 
-  public void setTimestamp(String timestamp) {
+  public void setTimestamp(final String timestamp) {
     this.timestamp = timestamp;
   }
 
-  public long getWorkflowInstanceKey() {
-    return workflowInstanceKey;
+  public long getProcessInstanceKey() {
+    return processInstanceKey;
   }
 
-  public void setWorkflowInstanceKey(long workflowInstanceKey) {
-    this.workflowInstanceKey = workflowInstanceKey;
+  public void setProcessInstanceKey(final long processInstanceKey) {
+    this.processInstanceKey = processInstanceKey;
   }
 
   public boolean isActivatable() {
     return isActivatable;
   }
 
-  public void setActivatable(boolean isActivatable) {
+  public void setActivatable(final boolean isActivatable) {
     this.isActivatable = isActivatable;
   }
 }

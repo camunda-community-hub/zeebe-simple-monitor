@@ -34,8 +34,8 @@ public class VariableEntity {
   @Lob
   private String value;
 
-  @Column(name = "WORKFLOW_INSTANCE_KEY_")
-  private long workflowInstanceKey;
+  @Column(name = "PROCESS_INSTANCE_KEY_")
+  private long processInstanceKey;
 
   @Column(name = "SCOPE_KEY_")
   private long scopeKey;
@@ -50,7 +50,7 @@ public class VariableEntity {
     return state;
   }
 
-  public void setState(String state) {
+  public void setState(final String state) {
     this.state = state;
   }
 
@@ -58,23 +58,23 @@ public class VariableEntity {
     return timestamp;
   }
 
-  public void setTimestamp(long timestamp) {
+  public void setTimestamp(final long timestamp) {
     this.timestamp = timestamp;
   }
 
-  public long getWorkflowInstanceKey() {
-    return workflowInstanceKey;
+  public long getProcessInstanceKey() {
+    return processInstanceKey;
   }
 
-  public void setWorkflowInstanceKey(long workflowInstanceKey) {
-    this.workflowInstanceKey = workflowInstanceKey;
+  public void setProcessInstanceKey(final long processInstanceKey) {
+    this.processInstanceKey = processInstanceKey;
   }
 
   public String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
@@ -82,7 +82,7 @@ public class VariableEntity {
     return value;
   }
 
-  public void setValue(String value) {
+  public void setValue(final String value) {
     this.value = value;
   }
 
@@ -90,7 +90,7 @@ public class VariableEntity {
     return scopeKey;
   }
 
-  public void setScopeKey(long scopeKey) {
+  public void setScopeKey(final long scopeKey) {
     this.scopeKey = scopeKey;
   }
 
@@ -98,7 +98,7 @@ public class VariableEntity {
     return position;
   }
 
-  public void setPosition(Long position) {
+  public void setPosition(final Long position) {
     this.position = position;
   }
 }

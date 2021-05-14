@@ -1,6 +1,16 @@
 package io.zeebe.monitor.zeebe;
 
 import com.hazelcast.core.HazelcastInstance;
+import io.camunda.zeebe.protocol.Protocol;
+import io.camunda.zeebe.protocol.record.intent.DeploymentIntent;
+import io.camunda.zeebe.protocol.record.intent.IncidentIntent;
+import io.camunda.zeebe.protocol.record.intent.Intent;
+import io.camunda.zeebe.protocol.record.intent.JobIntent;
+import io.camunda.zeebe.protocol.record.intent.MessageIntent;
+import io.camunda.zeebe.protocol.record.intent.MessageStartEventSubscriptionIntent;
+import io.camunda.zeebe.protocol.record.intent.MessageSubscriptionIntent;
+import io.camunda.zeebe.protocol.record.intent.ProcessInstanceIntent;
+import io.camunda.zeebe.protocol.record.intent.TimerIntent;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.hazelcast.connect.java.ZeebeHazelcast;
 import io.zeebe.monitor.entity.ElementInstanceEntity;
@@ -10,10 +20,10 @@ import io.zeebe.monitor.entity.IncidentEntity;
 import io.zeebe.monitor.entity.JobEntity;
 import io.zeebe.monitor.entity.MessageEntity;
 import io.zeebe.monitor.entity.MessageSubscriptionEntity;
+import io.zeebe.monitor.entity.ProcessEntity;
+import io.zeebe.monitor.entity.ProcessInstanceEntity;
 import io.zeebe.monitor.entity.TimerEntity;
 import io.zeebe.monitor.entity.VariableEntity;
-import io.zeebe.monitor.entity.WorkflowEntity;
-import io.zeebe.monitor.entity.WorkflowInstanceEntity;
 import io.zeebe.monitor.repository.ElementInstanceRepository;
 import io.zeebe.monitor.repository.ErrorRepository;
 import io.zeebe.monitor.repository.HazelcastConfigRepository;
@@ -21,20 +31,10 @@ import io.zeebe.monitor.repository.IncidentRepository;
 import io.zeebe.monitor.repository.JobRepository;
 import io.zeebe.monitor.repository.MessageRepository;
 import io.zeebe.monitor.repository.MessageSubscriptionRepository;
+import io.zeebe.monitor.repository.ProcessInstanceRepository;
+import io.zeebe.monitor.repository.ProcessRepository;
 import io.zeebe.monitor.repository.TimerRepository;
 import io.zeebe.monitor.repository.VariableRepository;
-import io.zeebe.monitor.repository.WorkflowInstanceRepository;
-import io.zeebe.monitor.repository.WorkflowRepository;
-import io.zeebe.protocol.Protocol;
-import io.zeebe.protocol.record.intent.DeploymentIntent;
-import io.zeebe.protocol.record.intent.IncidentIntent;
-import io.zeebe.protocol.record.intent.Intent;
-import io.zeebe.protocol.record.intent.JobIntent;
-import io.zeebe.protocol.record.intent.MessageIntent;
-import io.zeebe.protocol.record.intent.MessageStartEventSubscriptionIntent;
-import io.zeebe.protocol.record.intent.MessageSubscriptionIntent;
-import io.zeebe.protocol.record.intent.TimerIntent;
-import io.zeebe.protocol.record.intent.WorkflowInstanceIntent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -45,8 +45,8 @@ import java.util.function.Function;
 @Component
 public class ZeebeImportService {
 
-  @Autowired private WorkflowRepository workflowRepository;
-  @Autowired private WorkflowInstanceRepository workflowInstanceRepository;
+  @Autowired private ProcessRepository processRepository;
+  @Autowired private ProcessInstanceRepository processInstanceRepository;
   @Autowired private ElementInstanceRepository elementInstanceRepository;
   @Autowired private VariableRepository variableRepository;
   @Autowired private JobRepository jobRepository;
@@ -60,7 +60,7 @@ public class ZeebeImportService {
 
   @Autowired private HazelcastConfigRepository hazelcastConfigRepository;
 
-  public ZeebeHazelcast importFrom(HazelcastInstance hazelcast) {
+  public ZeebeHazelcast importFrom(final HazelcastInstance hazelcast) {
 
     final var hazelcastConfig =
         hazelcastConfigRepository
@@ -78,12 +78,12 @@ public class ZeebeImportService {
             .addDeploymentListener(
                 record ->
                     withKey(record, Schema.DeploymentRecord::getMetadata, this::importDeployment))
-            .addWorkflowInstanceListener(
+            .addProcessInstanceListener(
                 record ->
                     withKey(
                         record,
-                        Schema.WorkflowInstanceRecord::getMetadata,
-                        this::importWorkflowInstance))
+                        Schema.ProcessInstanceRecord::getMetadata,
+                        this::importProcessInstance))
             .addIncidentListener(
                 record -> withKey(record, Schema.IncidentRecord::getMetadata, this::importIncident))
             .addJobListener(
@@ -113,14 +113,16 @@ public class ZeebeImportService {
   }
 
   private <T> void withKey(
-      T record, Function<T, Schema.RecordMetadata> extractor, Consumer<T> consumer) {
+      final T record,
+      final Function<T, Schema.RecordMetadata> extractor,
+      final Consumer<T> consumer) {
     final var metadata = extractor.apply(record);
     if (!hasKey(metadata)) {
       consumer.accept(record);
     }
   }
 
-  private boolean hasKey(Schema.RecordMetadata metadata) {
+  private boolean hasKey(final Schema.RecordMetadata metadata) {
     return metadata.getKey() < 0;
   }
 
@@ -138,78 +140,78 @@ public class ZeebeImportService {
         .getResourcesList()
         .forEach(
             resource -> {
-              record.getDeployedWorkflowsList().stream()
+              record.getProcessMetadataList().stream()
                   .filter(w -> w.getResourceName().equals(resource.getResourceName()))
                   .forEach(
-                      deployedWorkflow -> {
-                        final WorkflowEntity entity = new WorkflowEntity();
-                        entity.setKey(deployedWorkflow.getWorkflowKey());
-                        entity.setBpmnProcessId(deployedWorkflow.getBpmnProcessId());
-                        entity.setVersion(deployedWorkflow.getVersion());
+                      processMetadata -> {
+                        final ProcessEntity entity = new ProcessEntity();
+                        entity.setKey(processMetadata.getProcessDefinitionKey());
+                        entity.setBpmnProcessId(processMetadata.getBpmnProcessId());
+                        entity.setVersion(processMetadata.getVersion());
                         entity.setResource(resource.getResource().toStringUtf8());
                         entity.setTimestamp(record.getMetadata().getTimestamp());
-                        workflowRepository.save(entity);
+                        processRepository.save(entity);
                       });
             });
   }
 
-  private void importWorkflowInstance(final Schema.WorkflowInstanceRecord record) {
-    if (record.getWorkflowInstanceKey() == record.getMetadata().getKey()) {
-      addOrUpdateWorkflowInstance(record);
+  private void importProcessInstance(final Schema.ProcessInstanceRecord record) {
+    if (record.getProcessInstanceKey() == record.getMetadata().getKey()) {
+      addOrUpdateProcessInstance(record);
     }
 
     addElementInstance(record);
   }
 
-  private void addOrUpdateWorkflowInstance(final Schema.WorkflowInstanceRecord record) {
+  private void addOrUpdateProcessInstance(final Schema.ProcessInstanceRecord record) {
 
-    final Intent intent = WorkflowInstanceIntent.valueOf(record.getMetadata().getIntent());
+    final Intent intent = ProcessInstanceIntent.valueOf(record.getMetadata().getIntent());
     final long timestamp = record.getMetadata().getTimestamp();
-    final long workflowInstanceKey = record.getWorkflowInstanceKey();
+    final long processInstanceKey = record.getProcessInstanceKey();
 
-    final WorkflowInstanceEntity entity =
-        workflowInstanceRepository
-            .findById(workflowInstanceKey)
+    final ProcessInstanceEntity entity =
+        processInstanceRepository
+            .findById(processInstanceKey)
             .orElseGet(
                 () -> {
-                  final WorkflowInstanceEntity newEntity = new WorkflowInstanceEntity();
+                  final ProcessInstanceEntity newEntity = new ProcessInstanceEntity();
                   newEntity.setPartitionId(record.getMetadata().getPartitionId());
-                  newEntity.setKey(workflowInstanceKey);
+                  newEntity.setKey(processInstanceKey);
                   newEntity.setBpmnProcessId(record.getBpmnProcessId());
                   newEntity.setVersion(record.getVersion());
-                  newEntity.setWorkflowKey(record.getWorkflowKey());
-                  newEntity.setParentWorkflowInstanceKey(record.getParentWorkflowInstanceKey());
+                  newEntity.setProcessDefinitionKey(record.getProcessDefinitionKey());
+                  newEntity.setParentProcessInstanceKey(record.getParentProcessInstanceKey());
                   newEntity.setParentElementInstanceKey(record.getParentElementInstanceKey());
                   return newEntity;
                 });
 
-    if (intent == WorkflowInstanceIntent.ELEMENT_ACTIVATED) {
+    if (intent == ProcessInstanceIntent.ELEMENT_ACTIVATED) {
       entity.setState("Active");
       entity.setStart(timestamp);
-      workflowInstanceRepository.save(entity);
+      processInstanceRepository.save(entity);
 
-      notificationService.sendCreatedWorkflowInstance(
-          record.getWorkflowInstanceKey(), record.getWorkflowKey());
+      notificationService.sendCreatedProcessInstance(
+          record.getProcessInstanceKey(), record.getProcessDefinitionKey());
 
-    } else if (intent == WorkflowInstanceIntent.ELEMENT_COMPLETED) {
+    } else if (intent == ProcessInstanceIntent.ELEMENT_COMPLETED) {
       entity.setState("Completed");
       entity.setEnd(timestamp);
-      workflowInstanceRepository.save(entity);
+      processInstanceRepository.save(entity);
 
-      notificationService.sendEndedWorkflowInstance(
-          record.getWorkflowInstanceKey(), record.getWorkflowKey());
+      notificationService.sendEndedProcessInstance(
+          record.getProcessInstanceKey(), record.getProcessDefinitionKey());
 
-    } else if (intent == WorkflowInstanceIntent.ELEMENT_TERMINATED) {
+    } else if (intent == ProcessInstanceIntent.ELEMENT_TERMINATED) {
       entity.setState("Terminated");
       entity.setEnd(timestamp);
-      workflowInstanceRepository.save(entity);
+      processInstanceRepository.save(entity);
 
-      notificationService.sendEndedWorkflowInstance(
-          record.getWorkflowInstanceKey(), record.getWorkflowKey());
+      notificationService.sendEndedProcessInstance(
+          record.getProcessInstanceKey(), record.getProcessDefinitionKey());
     }
   }
 
-  private void addElementInstance(final Schema.WorkflowInstanceRecord record) {
+  private void addElementInstance(final Schema.ProcessInstanceRecord record) {
 
     final long position = record.getMetadata().getPosition();
     if (!elementInstanceRepository.existsById(position)) {
@@ -220,16 +222,16 @@ public class ZeebeImportService {
       entity.setKey(record.getMetadata().getKey());
       entity.setIntent(record.getMetadata().getIntent());
       entity.setTimestamp(record.getMetadata().getTimestamp());
-      entity.setWorkflowInstanceKey(record.getWorkflowInstanceKey());
+      entity.setProcessInstanceKey(record.getProcessInstanceKey());
       entity.setElementId(record.getElementId());
       entity.setFlowScopeKey(record.getFlowScopeKey());
-      entity.setWorkflowKey(record.getWorkflowKey());
-      entity.setBpmnElementType(record.getBpmnElementType().name());
+      entity.setProcessDefinitionKey(record.getProcessDefinitionKey());
+      entity.setBpmnElementType(record.getBpmnElementType());
 
       elementInstanceRepository.save(entity);
 
-      notificationService.sendWorkflowInstanceUpdated(
-          record.getWorkflowInstanceKey(), record.getWorkflowKey());
+      notificationService.sendProcessInstanceUpdated(
+          record.getProcessInstanceKey(), record.getProcessDefinitionKey());
     }
   }
 
@@ -247,8 +249,8 @@ public class ZeebeImportService {
                   final IncidentEntity newEntity = new IncidentEntity();
                   newEntity.setKey(key);
                   newEntity.setBpmnProcessId(record.getBpmnProcessId());
-                  newEntity.setWorkflowKey(record.getWorkflowKey());
-                  newEntity.setWorkflowInstanceKey(record.getWorkflowInstanceKey());
+                  newEntity.setProcessDefinitionKey(record.getProcessDefinitionKey());
+                  newEntity.setProcessInstanceKey(record.getProcessInstanceKey());
                   newEntity.setElementInstanceKey(record.getElementInstanceKey());
                   newEntity.setJobKey(record.getJobKey());
                   newEntity.setErrorType(record.getErrorType());
@@ -279,7 +281,7 @@ public class ZeebeImportService {
                 () -> {
                   final JobEntity newEntity = new JobEntity();
                   newEntity.setKey(key);
-                  newEntity.setWorkflowInstanceKey(record.getWorkflowInstanceKey());
+                  newEntity.setProcessInstanceKey(record.getProcessInstanceKey());
                   newEntity.setElementInstanceKey(record.getElementInstanceKey());
                   newEntity.setJobType(record.getType());
                   return newEntity;
@@ -335,7 +337,7 @@ public class ZeebeImportService {
                   newEntity.setElementInstanceKey(record.getElementInstanceKey());
                   newEntity.setMessageName(record.getMessageName());
                   newEntity.setCorrelationKey(record.getCorrelationKey());
-                  newEntity.setWorkflowInstanceKey(record.getWorkflowInstanceKey());
+                  newEntity.setProcessInstanceKey(record.getProcessInstanceKey());
                   return newEntity;
                 });
 
@@ -353,14 +355,15 @@ public class ZeebeImportService {
 
     final MessageSubscriptionEntity entity =
         messageSubscriptionRepository
-            .findByWorkflowKeyAndMessageName(record.getWorkflowKey(), record.getMessageName())
+            .findByProcessDefinitionKeyAndMessageName(
+                record.getProcessDefinitionKey(), record.getMessageName())
             .orElseGet(
                 () -> {
                   final MessageSubscriptionEntity newEntity = new MessageSubscriptionEntity();
                   newEntity.setId(
                       generateId()); // message subscription doesn't have a key - it is always '-1'
                   newEntity.setMessageName(record.getMessageName());
-                  newEntity.setWorkflowKey(record.getWorkflowKey());
+                  newEntity.setProcessDefinitionKey(record.getProcessDefinitionKey());
                   newEntity.setTargetFlowNodeId(record.getStartEventId());
                   return newEntity;
                 });
@@ -383,13 +386,13 @@ public class ZeebeImportService {
                 () -> {
                   final TimerEntity newEntity = new TimerEntity();
                   newEntity.setKey(key);
-                  newEntity.setWorkflowKey(record.getWorkflowKey());
-                  newEntity.setTargetFlowNodeId(record.getTargetFlowNodeId());
+                  newEntity.setProcessDefinitionKey(record.getProcessDefinitionKey());
+                  newEntity.setTargetElementId(record.getTargetElementId());
                   newEntity.setDueDate(record.getDueDate());
                   newEntity.setRepetitions(record.getRepetitions());
 
-                  if (record.getWorkflowInstanceKey() > 0) {
-                    newEntity.setWorkflowInstanceKey(record.getWorkflowInstanceKey());
+                  if (record.getProcessInstanceKey() > 0) {
+                    newEntity.setProcessInstanceKey(record.getProcessInstanceKey());
                     newEntity.setElementInstanceKey(record.getElementInstanceKey());
                   }
 
@@ -409,7 +412,7 @@ public class ZeebeImportService {
       final VariableEntity entity = new VariableEntity();
       entity.setPosition(position);
       entity.setTimestamp(record.getMetadata().getTimestamp());
-      entity.setWorkflowInstanceKey(record.getWorkflowInstanceKey());
+      entity.setProcessInstanceKey(record.getProcessInstanceKey());
       entity.setName(record.getName());
       entity.setValue(record.getValue());
       entity.setScopeKey(record.getScopeKey());
@@ -431,7 +434,7 @@ public class ZeebeImportService {
                   final var newEntity = new ErrorEntity();
                   newEntity.setPosition(position);
                   newEntity.setErrorEventPosition(record.getErrorEventPosition());
-                  newEntity.setWorkflowInstanceKey(record.getWorkflowInstanceKey());
+                  newEntity.setProcessInstanceKey(record.getProcessInstanceKey());
                   newEntity.setExceptionMessage(record.getExceptionMessage());
                   newEntity.setStacktrace(record.getStacktrace());
                   newEntity.setTimestamp(metadata.getTimestamp());

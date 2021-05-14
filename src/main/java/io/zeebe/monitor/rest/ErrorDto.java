@@ -4,7 +4,7 @@ public final class ErrorDto {
 
   private long position;
   private long errorEventPosition;
-  private Long workflowInstanceKey;
+  private Long processInstanceKey;
   private String exceptionMessage;
   private String stacktrace;
   private String timestamp;
@@ -13,7 +13,7 @@ public final class ErrorDto {
     return position;
   }
 
-  public void setPosition(long position) {
+  public void setPosition(final long position) {
     this.position = position;
   }
 
@@ -21,23 +21,23 @@ public final class ErrorDto {
     return errorEventPosition;
   }
 
-  public void setErrorEventPosition(long errorEventPosition) {
+  public void setErrorEventPosition(final long errorEventPosition) {
     this.errorEventPosition = errorEventPosition;
   }
 
-  public Long getWorkflowInstanceKey() {
-    return workflowInstanceKey;
+  public Long getProcessInstanceKey() {
+    return processInstanceKey;
   }
 
-  public void setWorkflowInstanceKey(Long workflowInstanceKey) {
-    this.workflowInstanceKey = workflowInstanceKey;
+  public void setProcessInstanceKey(final Long processInstanceKey) {
+    this.processInstanceKey = processInstanceKey;
   }
 
   public String getExceptionMessage() {
     return exceptionMessage;
   }
 
-  public void setExceptionMessage(String exceptionMessage) {
+  public void setExceptionMessage(final String exceptionMessage) {
     this.exceptionMessage = exceptionMessage;
   }
 
@@ -45,7 +45,7 @@ public final class ErrorDto {
     return stacktrace;
   }
 
-  public void setStacktrace(String stacktrace) {
+  public void setStacktrace(final String stacktrace) {
     this.stacktrace = stacktrace;
   }
 
@@ -53,7 +53,7 @@ public final class ErrorDto {
     return timestamp;
   }
 
-  public void setTimestamp(String timestamp) {
+  public void setTimestamp(final String timestamp) {
     this.timestamp = timestamp;
   }
 }

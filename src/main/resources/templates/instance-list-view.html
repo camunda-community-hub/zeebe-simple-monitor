@@ -1,38 +1,38 @@
 {{>layout/header}}
 
 <div class="row">
-	<div class="col-md-12">
+    <div class="col-md-12">
 
-		<span>{{count}} instances</span>
+        <span>{{count}} instances</span>
 
-		<table class="table table-striped">
-			<thead>
-			  <th>Workflow Instance Key</th>
-			  <th>BPMN process id</th>
-			  <th>Workflow Key</th>
-			  <th>State</th>
-				<th>Start Time</th>
-		</thead>
+        <table class="table table-striped">
+            <thead>
+            <th>Process Instance Key</th>
+            <th>BPMN process id</th>
+            <th>Process Definition Key</th>
+            <th>State</th>
+            <th>Start Time</th>
+            </thead>
 
-		{{#instances}}
-			<tr>
-			<td>
-				<a href="{{context-path}}views/instances/{{workflowInstanceKey}}">{{workflowInstanceKey}}</a>
-			</td>
-			<td>{{bpmnProcessId}}</td>
-			<td>
-				<a href="{{context-path}}views/workflows/{{workflowKey}}">{{workflowKey}}</a>
-			</td>
-			<td>{{state}}</td>
-			<td>{{startTime}}</td>
-			</tr>
-		{{/instances}}
+            {{#instances}}
+            <tr>
+                <td>
+                    <a href="{{context-path}}views/instances/{{processInstanceKey}}">{{processInstanceKey}}</a>
+                </td>
+                <td>{{bpmnProcessId}}</td>
+                <td>
+                    <a href="{{context-path}}views/processes/{{processDefinitionKey}}">{{processDefinitionKey}}</a>
+                </td>
+                <td>{{state}}</td>
+                <td>{{startTime}}</td>
+            </tr>
+            {{/instances}}
 
-		</table>
+        </table>
 
-		{{>components/table-pagination}}
+        {{>components/table-pagination}}
 
-	</div>
+    </div>
 </div>
 
 {{>layout/footer}}

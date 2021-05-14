@@ -15,7 +15,7 @@
  */
 package io.zeebe.monitor.rest;
 
-import io.zeebe.client.ZeebeClient;
+import io.camunda.zeebe.client.ZeebeClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +31,7 @@ public class MessageResource {
   @Autowired private ZeebeClient zeebeClient;
 
   @RequestMapping(path = "/", method = RequestMethod.POST)
-  public void publishMessage(@RequestBody PublishMessageDto dto) {
+  public void publishMessage(@RequestBody final PublishMessageDto dto) {
 
     zeebeClient
         .newPublishMessageCommand()

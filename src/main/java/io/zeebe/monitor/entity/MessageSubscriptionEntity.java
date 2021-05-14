@@ -32,17 +32,17 @@ public class MessageSubscriptionEntity {
   @Column(name = "CORRELATION_KEY_")
   private String correlationKey;
 
-  @Column(name = "WORKFLOW_INSTANCE_KEY_")
-  private Long workflowInstanceKey;
+  @Column(name = "PROCESS_INSTANCE_KEY_")
+  private Long processInstanceKey;
 
   @Column(name = "ELEMENT_INSTANCE_KEY_")
   private Long elementInstanceKey;
 
-    @Column(name = "WORKFLOW_KEY_")
-    private Long workflowKey;
+  @Column(name = "PROCESS_DEFINITION_KEY_")
+  private Long processDefinitionKey;
 
-    @Column(name = "TARGET_FLOW_NODE_ID_")
-    private String targetFlowNodeId;
+  @Column(name = "TARGET_FLOW_NODE_ID_")
+  private String targetFlowNodeId;
 
   @Column(name = "STATE_")
   private String state;
@@ -54,7 +54,7 @@ public class MessageSubscriptionEntity {
     return correlationKey;
   }
 
-  public void setCorrelationKey(String correlationKey) {
+  public void setCorrelationKey(final String correlationKey) {
     this.correlationKey = correlationKey;
   }
 
@@ -62,7 +62,7 @@ public class MessageSubscriptionEntity {
     return state;
   }
 
-  public void setState(String state) {
+  public void setState(final String state) {
     this.state = state;
   }
 
@@ -70,7 +70,7 @@ public class MessageSubscriptionEntity {
     return timestamp;
   }
 
-  public void setTimestamp(long timestamp) {
+  public void setTimestamp(final long timestamp) {
     this.timestamp = timestamp;
   }
 
@@ -78,47 +78,47 @@ public class MessageSubscriptionEntity {
     return messageName;
   }
 
-  public void setMessageName(String messageName) {
+  public void setMessageName(final String messageName) {
     this.messageName = messageName;
   }
 
-    public String getId() {
-        return id;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+  public void setId(final String id) {
+    this.id = id;
+  }
 
-    public Long getWorkflowKey() {
-        return workflowKey;
-    }
+  public Long getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
 
-    public void setWorkflowKey(Long workflowKey) {
-        this.workflowKey = workflowKey;
-    }
+  public void setProcessDefinitionKey(final Long processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
+  }
 
-    public String getTargetFlowNodeId() {
-        return targetFlowNodeId;
-    }
+  public String getTargetFlowNodeId() {
+    return targetFlowNodeId;
+  }
 
-    public void setTargetFlowNodeId(String targetFlowNodeId) {
-        this.targetFlowNodeId = targetFlowNodeId;
-    }
+  public void setTargetFlowNodeId(final String targetFlowNodeId) {
+    this.targetFlowNodeId = targetFlowNodeId;
+  }
 
-    public Long getWorkflowInstanceKey() {
-        return workflowInstanceKey;
-    }
+  public Long getProcessInstanceKey() {
+    return processInstanceKey;
+  }
 
-    public void setWorkflowInstanceKey(Long workflowInstanceKey) {
-        this.workflowInstanceKey = workflowInstanceKey;
-    }
+  public void setProcessInstanceKey(final Long processInstanceKey) {
+    this.processInstanceKey = processInstanceKey;
+  }
 
-    public Long getElementInstanceKey() {
-        return elementInstanceKey;
-    }
+  public Long getElementInstanceKey() {
+    return elementInstanceKey;
+  }
 
-    public void setElementInstanceKey(Long elementInstanceKey) {
-        this.elementInstanceKey = elementInstanceKey;
-    }
+  public void setElementInstanceKey(final Long elementInstanceKey) {
+    this.elementInstanceKey = elementInstanceKey;
+  }
 }
