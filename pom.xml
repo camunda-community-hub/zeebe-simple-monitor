@@ -19,7 +19,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <zeebe.version>0.26.1</zeebe.version>
+        <zeebe.version>0.26.3</zeebe.version>
         <version.zeebe.spring>0.26.2</version.zeebe.spring>
 
         <spring.boot.version>2.4.4</spring.boot.version>
