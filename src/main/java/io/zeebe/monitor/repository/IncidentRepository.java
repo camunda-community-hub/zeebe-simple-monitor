@@ -22,7 +22,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface IncidentRepository extends PagingAndSortingRepository<IncidentEntity, Long> {
 
-  Iterable<IncidentEntity> findByWorkflowInstanceKey(long workflowInstanceKey);
+  Iterable<IncidentEntity> findByProcessInstanceKey(long processInstanceKey);
 
   Page<IncidentEntity> findByResolvedIsNull(Pageable pageable);
 

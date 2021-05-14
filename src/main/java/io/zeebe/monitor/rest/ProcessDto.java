@@ -15,11 +15,11 @@
  */
 package io.zeebe.monitor.rest;
 
-import io.zeebe.monitor.entity.WorkflowEntity;
+import io.zeebe.monitor.entity.ProcessEntity;
 
-public class WorkflowDto {
+public class ProcessDto {
 
-  private long workflowKey;
+  private long processDefinitionKey;
   private String bpmnProcessId;
   private int version;
   private String resource;
@@ -27,10 +27,11 @@ public class WorkflowDto {
   private long countRunning;
   private long countEnded;
 
-  public static WorkflowDto from(WorkflowEntity entity, long countRunning, long countEnded) {
-    final WorkflowDto dto = new WorkflowDto();
+  public static ProcessDto from(
+      final ProcessEntity entity, final long countRunning, final long countEnded) {
+    final ProcessDto dto = new ProcessDto();
 
-    dto.workflowKey = entity.getKey();
+    dto.processDefinitionKey = entity.getKey();
     dto.bpmnProcessId = entity.getBpmnProcessId();
     dto.version = entity.getVersion();
     dto.resource = entity.getResource();
@@ -41,19 +42,19 @@ public class WorkflowDto {
     return dto;
   }
 
-  public long getWorkflowKey() {
-    return workflowKey;
+  public long getProcessDefinitionKey() {
+    return processDefinitionKey;
   }
 
-  public void setWorkflowKey(long workflowKey) {
-    this.workflowKey = workflowKey;
+  public void setProcessDefinitionKey(final long processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
   }
 
   public String getBpmnProcessId() {
     return bpmnProcessId;
   }
 
-  public void setBpmnProcessId(String bpmnProcessId) {
+  public void setBpmnProcessId(final String bpmnProcessId) {
     this.bpmnProcessId = bpmnProcessId;
   }
 
@@ -61,7 +62,7 @@ public class WorkflowDto {
     return version;
   }
 
-  public void setVersion(int version) {
+  public void setVersion(final int version) {
     this.version = version;
   }
 
@@ -69,7 +70,7 @@ public class WorkflowDto {
     return resource;
   }
 
-  public void setResource(String resource) {
+  public void setResource(final String resource) {
     this.resource = resource;
   }
 
@@ -77,7 +78,7 @@ public class WorkflowDto {
     return countRunning;
   }
 
-  public void setCountRunning(long countRunning) {
+  public void setCountRunning(final long countRunning) {
     this.countRunning = countRunning;
   }
 
@@ -85,7 +86,7 @@ public class WorkflowDto {
     return countEnded;
   }
 
-  public void setCountEnded(long countEnded) {
+  public void setCountEnded(final long countEnded) {
     this.countEnded = countEnded;
   }
 }

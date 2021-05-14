@@ -16,12 +16,13 @@
 package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.TimerEntity;
-import java.util.List;
 import org.springframework.data.repository.PagingAndSortingRepository;
+
+import java.util.List;
 
 public interface TimerRepository extends PagingAndSortingRepository<TimerEntity, Long> {
 
-  List<TimerEntity> findByWorkflowInstanceKey(Long workflowInstanceKey);
+  List<TimerEntity> findByProcessInstanceKey(Long processInstanceKey);
 
-  List<TimerEntity> findByWorkflowKeyAndWorkflowInstanceKeyIsNull(Long workflowInstanceKey);
+  List<TimerEntity> findByProcessDefinitionKeyAndProcessInstanceKeyIsNull(Long processInstanceKey);
 }

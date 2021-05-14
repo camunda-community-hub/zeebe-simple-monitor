@@ -1,11 +1,12 @@
 package io.zeebe.monitor;
 
-import io.zeebe.client.ZeebeClient;
+import io.camunda.zeebe.client.ZeebeClient;
+
 import java.util.Collections;
 
 public class Demo {
 
-  public static void main(String[] args) throws InterruptedException {
+  public static void main(final String[] args) throws InterruptedException {
 
     final ZeebeClient client = ZeebeClient.newClientBuilder().usePlaintext().build();
 

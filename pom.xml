@@ -19,11 +19,11 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <zeebe.version>0.26.1</zeebe.version>
-        <version.zeebe.spring>0.26.2</version.zeebe.spring>
+        <zeebe.version>1.0.0</zeebe.version>
+        <version.zeebe.spring>1.0.0</version.zeebe.spring>
+        <hazelcast.exporter.version>1.0.0</hazelcast.exporter.version>
 
         <spring.boot.version>2.4.5</spring.boot.version>
-        <hazelcast.exporter.version>0.10.0</hazelcast.exporter.version>
         <!-- pin Hazelcast version because of spring-boot-dependencies -->
         <version.hazelcast>4.2</version.hazelcast>
 
@@ -49,7 +49,7 @@
         <dependencies>
 
             <dependency>
-                <groupId>io.zeebe</groupId>
+                <groupId>io.camunda</groupId>
                 <artifactId>zeebe-bom</artifactId>
                 <version>${zeebe.version}</version>
                 <scope>import</scope>
@@ -83,7 +83,7 @@
 
         <!-- spring deps-->
         <dependency>
-            <groupId>io.zeebe.spring</groupId>
+            <groupId>io.camunda</groupId>
             <artifactId>spring-zeebe-starter</artifactId>
             <version>${version.zeebe.spring}</version>
         </dependency>

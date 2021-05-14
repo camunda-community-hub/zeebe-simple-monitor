@@ -15,8 +15,8 @@
  */
 package io.zeebe.monitor.rest;
 
-import io.zeebe.client.ZeebeClient;
-import io.zeebe.client.api.response.ActivatedJob;
+import io.camunda.zeebe.client.ZeebeClient;
+import io.camunda.zeebe.client.api.response.ActivatedJob;
 import io.zeebe.monitor.entity.JobEntity;
 import io.zeebe.monitor.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,13 +40,13 @@ public class JobResource {
   @Autowired private JobRepository jobRepository;
 
   @RequestMapping(path = "/{key}/complete", method = RequestMethod.PUT)
-  public void completeJob(@PathVariable("key") long key, @RequestBody String variables) {
+  public void completeJob(@PathVariable("key") final long key, @RequestBody final String variables) {
 
     zeebeClient.newCompleteCommand(key).variables(variables).send().join();
   }
 
   @RequestMapping(path = "/{key}/fail", method = RequestMethod.PUT)
-  public void failJob(@PathVariable("key") long key) {
+  public void failJob(@PathVariable("key") final long key) {
 
     final ActivatedJob activatedJob = activateJob(key, zeebeClient);
     zeebeClient
@@ -58,25 +58,25 @@ public class JobResource {
   }
 
   @RequestMapping(path = "/{key}/throw-error", method = RequestMethod.PUT)
-  public void throwError(@PathVariable("key") long key, @RequestBody ThrowErrorDto dto) {
+  public void throwError(@PathVariable("key") final long key, @RequestBody final ThrowErrorDto dto) {
 
     zeebeClient.newThrowErrorCommand(key).errorCode(dto.getErrorCode()).send().join();
   }
 
-  private ActivatedJob activateJob(long key, final ZeebeClient client) {
+  private ActivatedJob activateJob(final long key, final ZeebeClient client) {
     final JobEntity job = getJob(key);
     final String jobType = job.getJobType();
 
     return activateJob(client, key, jobType);
   }
 
-  private JobEntity getJob(long key) {
+  private JobEntity getJob(final long key) {
     return jobRepository
         .findByKey(key)
         .orElseThrow(() -> new RuntimeException("no job found with key: " + key));
   }
 
-  private ActivatedJob activateJob(final ZeebeClient client, long key, final String jobType) {
+  private ActivatedJob activateJob(final ZeebeClient client, final long key, final String jobType) {
 
     final List<ActivatedJob> jobs =
         client

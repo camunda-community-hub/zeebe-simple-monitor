@@ -9,7 +9,7 @@ public class MessageSubscriptionDto {
 
   private String elementId = "";
   private Long elementInstanceKey;
-  private Long workflowInstanceKey;
+  private Long processInstanceKey;
 
   private String state;
   private String timestamp = "";
@@ -20,7 +20,7 @@ public class MessageSubscriptionDto {
     return messageName;
   }
 
-  public void setMessageName(String messageName) {
+  public void setMessageName(final String messageName) {
     this.messageName = messageName;
   }
 
@@ -28,7 +28,7 @@ public class MessageSubscriptionDto {
     return correlationKey;
   }
 
-  public void setCorrelationKey(String correlationKey) {
+  public void setCorrelationKey(final String correlationKey) {
     this.correlationKey = correlationKey;
   }
 
@@ -36,7 +36,7 @@ public class MessageSubscriptionDto {
     return elementId;
   }
 
-  public void setElementId(String elementId) {
+  public void setElementId(final String elementId) {
     this.elementId = elementId;
   }
 
@@ -44,7 +44,7 @@ public class MessageSubscriptionDto {
     return state;
   }
 
-  public void setState(String state) {
+  public void setState(final String state) {
     this.state = state;
   }
 
@@ -52,7 +52,7 @@ public class MessageSubscriptionDto {
     return timestamp;
   }
 
-  public void setTimestamp(String timestamp) {
+  public void setTimestamp(final String timestamp) {
     this.timestamp = timestamp;
   }
 
@@ -60,7 +60,7 @@ public class MessageSubscriptionDto {
     return isOpen;
   }
 
-  public void setOpen(boolean isOpen) {
+  public void setOpen(final boolean isOpen) {
     this.isOpen = isOpen;
   }
 
@@ -68,23 +68,23 @@ public class MessageSubscriptionDto {
     return elementInstanceKey;
   }
 
-  public void setElementInstanceKey(Long elementInstanceKey) {
+  public void setElementInstanceKey(final Long elementInstanceKey) {
     this.elementInstanceKey = elementInstanceKey;
   }
 
-  public Long getWorkflowInstanceKey() {
-    return workflowInstanceKey;
+  public Long getProcessInstanceKey() {
+    return processInstanceKey;
   }
 
-  public void setWorkflowInstanceKey(Long workflowInstanceKey) {
-    this.workflowInstanceKey = workflowInstanceKey;
+  public void setProcessInstanceKey(final Long processInstanceKey) {
+    this.processInstanceKey = processInstanceKey;
   }
 
   public String getKey() {
     return key;
   }
 
-  public void setKey(String key) {
+  public void setKey(final String key) {
     this.key = key;
   }
 }

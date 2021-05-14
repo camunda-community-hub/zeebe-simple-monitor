@@ -9,7 +9,7 @@
             <thead>
             <th>Position</th>
             <th>Error Event Position</th>
-            <th>Workflow Instance Key</th>
+            <th>Process Instance Key</th>
             <th>Exception Message</th>
             <th style="width: 40%;">Stacktrace</th>
             <th>Time</th>
@@ -20,9 +20,9 @@
                 <td>{{position}}</td>
                 <td>{{errorEventPosition}}</td>
                 <td>
-                    {{#workflowInstanceKey}}
-                    <a href="{{context-path}}views/instances/{{workflowInstanceKey}}">{{workflowInstanceKey}}</a>
-                    {{/workflowInstanceKey}}
+                    {{#processInstanceKey}}
+                    <a href="{{context-path}}views/instances/{{processInstanceKey}}">{{processInstanceKey}}</a>
+                    {{/processInstanceKey}}
                 </td>
                 <td>{{exceptionMessage}}</td>
                 <td>

@@ -2,21 +2,21 @@
     <thead>
     <th>Element Id</th>
     <th>Element Instance Key</th>
-    <th>Called Workflow Instance Key</th>
+    <th>Called Process Instance Key</th>
     <th>Called BPMN process id</th>
-    <th>Called Workflow Instance State</th>
+    <th>Called Process Instance State</th>
     </thead>
 
-    {{#instance.calledWorkflowInstances}}
+    {{#instance.calledProcessInstances}}
     <tr>
         <td>{{>components/bpmn-element-id}}</td>
         <td>{{elementInstanceKey}}</td>
         <td>
-            <a href="{{context-path}}views/instances/{{childWorkflowInstanceKey}}">{{childWorkflowInstanceKey}}</a>
+            <a href="{{context-path}}views/instances/{{childProcessInstanceKey}}">{{childProcessInstanceKey}}</a>
         </td>
         <td>{{childBpmnProcessId}}</td>
         <td>{{childState}}</td>
     </tr>
-    {{/instance.calledWorkflowInstances}}
+    {{/instance.calledProcessInstances}}
 
 </table>

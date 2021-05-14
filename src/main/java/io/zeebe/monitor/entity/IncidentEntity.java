@@ -30,11 +30,11 @@ public class IncidentEntity {
   @Column(name = "BPMN_PROCESS_ID_")
   private String bpmnProcessId;
 
-  @Column(name = "WORKFLOW_KEY_")
-  private long workflowKey;
+  @Column(name = "PROCESS_DEFINITION_KEY_")
+  private long processDefinitionKey;
 
-  @Column(name = "WORKFLOW_INSTANCE_KEY_")
-  private long workflowInstanceKey;
+  @Column(name = "PROCESS_INSTANCE_KEY_")
+  private long processInstanceKey;
 
   @Column(name = "ELEMENT_INSTANCE_KEY_")
   private long elementInstanceKey;
@@ -59,7 +59,7 @@ public class IncidentEntity {
     return errorType;
   }
 
-  public IncidentEntity setErrorType(String errorType) {
+  public IncidentEntity setErrorType(final String errorType) {
     this.errorType = errorType;
     return this;
   }
@@ -68,16 +68,16 @@ public class IncidentEntity {
     return errorMessage;
   }
 
-  public IncidentEntity setErrorMessage(String errorMessage) {
+  public IncidentEntity setErrorMessage(final String errorMessage) {
     this.errorMessage = errorMessage;
     return this;
   }
 
-    public long getKey() {
+  public long getKey() {
     return key;
   }
 
-  public void setKey(long incidentKey) {
+  public void setKey(final long incidentKey) {
     this.key = incidentKey;
   }
 
@@ -85,33 +85,33 @@ public class IncidentEntity {
     return bpmnProcessId;
   }
 
-  public IncidentEntity setBpmnProcessId(String bpmnProcessId) {
+  public IncidentEntity setBpmnProcessId(final String bpmnProcessId) {
     this.bpmnProcessId = bpmnProcessId;
     return this;
   }
 
-  public long getWorkflowKey() {
-    return workflowKey;
+  public long getProcessDefinitionKey() {
+    return processDefinitionKey;
   }
 
-  public IncidentEntity setWorkflowKey(long workflowKey) {
-    this.workflowKey = workflowKey;
+  public IncidentEntity setProcessDefinitionKey(final long processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
     return this;
   }
 
-  public long getWorkflowInstanceKey() {
-    return workflowInstanceKey;
+  public long getProcessInstanceKey() {
+    return processInstanceKey;
   }
 
-  public void setWorkflowInstanceKey(long workflowInstanceKey) {
-    this.workflowInstanceKey = workflowInstanceKey;
+  public void setProcessInstanceKey(final long processInstanceKey) {
+    this.processInstanceKey = processInstanceKey;
   }
 
   public long getElementInstanceKey() {
     return elementInstanceKey;
   }
 
-  public void setElementInstanceKey(long elementInstanceKey) {
+  public void setElementInstanceKey(final long elementInstanceKey) {
     this.elementInstanceKey = elementInstanceKey;
   }
 
@@ -119,7 +119,7 @@ public class IncidentEntity {
     return jobKey;
   }
 
-  public void setJobKey(long jobKey) {
+  public void setJobKey(final long jobKey) {
     this.jobKey = jobKey;
   }
 
@@ -127,7 +127,7 @@ public class IncidentEntity {
     return created;
   }
 
-  public void setCreated(long created) {
+  public void setCreated(final long created) {
     this.created = created;
   }
 
@@ -135,7 +135,7 @@ public class IncidentEntity {
     return resolved;
   }
 
-  public void setResolved(Long resolved) {
+  public void setResolved(final Long resolved) {
     this.resolved = resolved;
   }
 }

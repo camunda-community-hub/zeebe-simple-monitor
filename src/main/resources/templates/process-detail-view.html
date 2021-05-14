@@ -16,10 +16,10 @@
     <div class="col-md-2">
 
         <table class="table table-striped">
-            {{#workflow}}
+            {{#process}}
             <tr>
                 <th>Key</th>
-                <td>{{workflowKey}}</td>
+                <td>{{processDefinitionKey}}</td>
             </tr>
             <tr>
                 <th>BPMN process id</th>
@@ -37,7 +37,7 @@
                 <th># ended</th>
                 <td>{{countEnded}}</td>
             </tr>
-            {{/workflow}}
+            {{/process}}
         </table>
 
     </div>
@@ -64,10 +64,10 @@
                 {{>instance-list}}
             </div>
             <div class="tab-pane fade" id="nav-message-subscriptions" role="tabpanel" aria-labelledby="nav-contact-tab">
-                {{>workflow-message-subscription-list}}
+                {{>process-message-subscription-list}}
             </div>
             <div class="tab-pane fade" id="nav-timers" role="tabpanel" aria-labelledby="nav-contact-tab">
-                {{>workflow-timer-list}}
+                {{>process-timer-list}}
             </div>
 
         </div>
@@ -78,8 +78,8 @@
 {{>layout/footer}}
 
 <script>
-	$(document).ready(function(){
-		subscribeForWorkflow({{workflow.workflowKey}});
-	});
+    $(document).ready(function () {
+        subscribeForProcessDefinition({{process.processDefinitionKey}});
+    });
 
 </script>

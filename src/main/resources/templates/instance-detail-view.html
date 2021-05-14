@@ -38,7 +38,7 @@
             {{#instance}}
             <tr>
                 <th>Key</th>
-                <td>{{workflowInstanceKey}}</td>
+                <td>{{processInstanceKey}}</td>
             </tr>
             <tr>
                 <th>BPMN process id</th>
@@ -49,9 +49,9 @@
                 <td>{{version}}</td>
             </tr>
             <tr>
-                <th>Workflow Key</th>
+                <th>Process Definition Key</th>
                 <td>
-                    <a href="{{context-path}}views/workflows/{{workflowKey}}">{{workflowKey}}</a>
+                    <a href="{{context-path}}views/processes/{{processDefinitionKey}}">{{processDefinitionKey}}</a>
                 </td>
             </tr>
             <tr>
@@ -67,17 +67,17 @@
                 <td>{{endTime}}</td>
             </tr>
 
-            {{#hasParentWorkflowInstance}}
+            {{#hasParentProcessInstance}}
 
             <tr>
-                <th>Parent Workflow Instance</th>
+                <th>Parent Process Instance</th>
                 <td>
-                    <a href="{{context-path}}views/instances/{{parentWorkflowInstanceKey}}">{{parentWorkflowInstanceKey}}</a>
+                    <a href="{{context-path}}views/instances/{{parentProcessInstanceKey}}">{{parentProcessInstanceKey}}</a>
                     ({{parentBpmnProcessId}})
                 </td>
             </tr>
 
-            {{/hasParentWorkflowInstance}}
+            {{/hasParentProcessInstance}}
 
             {{/instance}}
         </table>
@@ -105,9 +105,9 @@
                     Subscriptions</a>
                 <a class="nav-item nav-link" id="nav-timers-tab" data-toggle="tab" href="#nav-timers" role="tab"
                    aria-controls="nav-contact" aria-selected="false">Timers</a>
-                <a class="nav-item nav-link" id="nav-called-workflows-tab" data-toggle="tab"
-                   href="#nav-called-workflows" role="tab"
-                   aria-controls="nav-contact" aria-selected="false">Called Workflow Instances</a>
+                <a class="nav-item nav-link" id="nav-called-processes-tab" data-toggle="tab"
+                   href="#nav-called-processes" role="tab"
+                   aria-controls="nav-contact" aria-selected="false">Called Process Instances</a>
                 <a class="nav-item nav-link" id="nav-errors-tab" data-toggle="tab"
                    href="#nav-errors" role="tab"
                    aria-controls="nav-contact" aria-selected="false">Errors</a>
@@ -132,8 +132,8 @@
             <div class="tab-pane fade" id="nav-timers" role="tabpanel" aria-labelledby="nav-contact-tab">
                 {{>timer-list}}
             </div>
-            <div class="tab-pane fade" id="nav-called-workflows" role="tabpanel" aria-labelledby="nav-contact-tab">
-                {{>called-workflows-list}}
+            <div class="tab-pane fade" id="nav-called-processes" role="tabpanel" aria-labelledby="nav-contact-tab">
+                {{>called-processes-list}}
             </div>
             <div class="tab-pane fade" id="nav-errors" role="tabpanel" aria-labelledby="nav-contact-tab">
                 {{>error-list}}
@@ -147,7 +147,7 @@
 {{>layout/footer}}
 
 <script>
-    $(document).ready(function(){
-        subscribeForWorkflowInstance({{instance.workflowInstanceKey}});
+    $(document).ready(function () {
+        subscribeForProcessInstance({{instance.processInstanceKey}});
     });
 </script>

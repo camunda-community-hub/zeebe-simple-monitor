@@ -1,11 +1,11 @@
 package io.zeebe.monitor.rest;
 
-public class CalledWorkflowInstanceDto {
+public class CalledProcessInstanceDto {
 
   private String elementId;
   private long elementInstanceKey;
 
-  private long childWorkflowInstanceKey;
+  private long childProcessInstanceKey;
   private String childBpmnProcessId;
 
   private String childState;
@@ -14,7 +14,7 @@ public class CalledWorkflowInstanceDto {
     return elementId;
   }
 
-  public void setElementId(String elementId) {
+  public void setElementId(final String elementId) {
     this.elementId = elementId;
   }
 
@@ -22,23 +22,23 @@ public class CalledWorkflowInstanceDto {
     return elementInstanceKey;
   }
 
-  public void setElementInstanceKey(long elementInstanceKey) {
+  public void setElementInstanceKey(final long elementInstanceKey) {
     this.elementInstanceKey = elementInstanceKey;
   }
 
-  public long getChildWorkflowInstanceKey() {
-    return childWorkflowInstanceKey;
+  public long getChildProcessInstanceKey() {
+    return childProcessInstanceKey;
   }
 
-  public void setChildWorkflowInstanceKey(long childWorkflowInstanceKey) {
-    this.childWorkflowInstanceKey = childWorkflowInstanceKey;
+  public void setChildProcessInstanceKey(final long childProcessInstanceKey) {
+    this.childProcessInstanceKey = childProcessInstanceKey;
   }
 
   public String getChildBpmnProcessId() {
     return childBpmnProcessId;
   }
 
-  public void setChildBpmnProcessId(String childBpmnProcessId) {
+  public void setChildBpmnProcessId(final String childBpmnProcessId) {
     this.childBpmnProcessId = childBpmnProcessId;
   }
 
@@ -46,7 +46,7 @@ public class CalledWorkflowInstanceDto {
     return childState;
   }
 
-  public void setChildState(String childState) {
+  public void setChildState(final String childState) {
     this.childState = childState;
   }
 }

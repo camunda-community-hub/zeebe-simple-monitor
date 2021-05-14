@@ -19,8 +19,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-@Entity(name = "WORKFLOW_INSTANCE")
-public class WorkflowInstanceEntity {
+@Entity(name = "PROCESS_INSTANCE")
+public class ProcessInstanceEntity {
 
   @Id
   @Column(name = "KEY_")
@@ -29,8 +29,8 @@ public class WorkflowInstanceEntity {
   @Column(name = "PARTITION_ID_")
   private int partitionId;
 
-  @Column(name = "WORKFLOW_KEY_")
-  private long workflowKey;
+  @Column(name = "PROCESS_DEFINITION_KEY_")
+  private long processDefinitionKey;
 
   @Column(name = "BPMN_PROCESS_ID_")
   private String bpmnProcessId;
@@ -47,8 +47,8 @@ public class WorkflowInstanceEntity {
   @Column(name = "END_")
   private Long end;
 
-  @Column(name = "PARENT_WORKFLOW_INSTANCE_KEY_")
-  private Long parentWorkflowInstanceKey;
+  @Column(name = "PARENT_PROCESS_INSTANCE_KEY_")
+  private Long parentProcessInstanceKey;
 
   @Column(name = "PARENT_ELEMENT_INSTANCE_KEY_")
   private Long parentElementInstanceKey;
@@ -57,7 +57,7 @@ public class WorkflowInstanceEntity {
     return key;
   }
 
-  public void setKey(long key) {
+  public void setKey(final long key) {
     this.key = key;
   }
 
@@ -65,7 +65,7 @@ public class WorkflowInstanceEntity {
     return start;
   }
 
-  public void setTimestamp(long timestamp) {
+  public void setTimestamp(final long timestamp) {
     this.start = timestamp;
   }
 
@@ -73,23 +73,23 @@ public class WorkflowInstanceEntity {
     return partitionId;
   }
 
-  public void setPartitionId(int partitionId) {
+  public void setPartitionId(final int partitionId) {
     this.partitionId = partitionId;
   }
 
-  public long getWorkflowKey() {
-    return workflowKey;
+  public long getProcessDefinitionKey() {
+    return processDefinitionKey;
   }
 
-  public void setWorkflowKey(long workflowKey) {
-    this.workflowKey = workflowKey;
+  public void setProcessDefinitionKey(final long processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
   }
 
   public String getBpmnProcessId() {
     return bpmnProcessId;
   }
 
-  public void setBpmnProcessId(String bpmnProcessId) {
+  public void setBpmnProcessId(final String bpmnProcessId) {
     this.bpmnProcessId = bpmnProcessId;
   }
 
@@ -97,7 +97,7 @@ public class WorkflowInstanceEntity {
     return version;
   }
 
-  public void setVersion(int version) {
+  public void setVersion(final int version) {
     this.version = version;
   }
 
@@ -105,7 +105,7 @@ public class WorkflowInstanceEntity {
     return start;
   }
 
-  public void setStart(long start) {
+  public void setStart(final long start) {
     this.start = start;
   }
 
@@ -113,7 +113,7 @@ public class WorkflowInstanceEntity {
     return end;
   }
 
-  public void setEnd(Long end) {
+  public void setEnd(final Long end) {
     this.end = end;
   }
 
@@ -121,23 +121,23 @@ public class WorkflowInstanceEntity {
     return state;
   }
 
-  public void setState(String state) {
+  public void setState(final String state) {
     this.state = state;
   }
 
-  public Long getParentWorkflowInstanceKey() {
-    return parentWorkflowInstanceKey;
+  public Long getParentProcessInstanceKey() {
+    return parentProcessInstanceKey;
   }
 
-  public void setParentWorkflowInstanceKey(Long parentWorkflowInstanceKey) {
-    this.parentWorkflowInstanceKey = parentWorkflowInstanceKey;
+  public void setParentProcessInstanceKey(final Long parentprocessInstanceKey) {
+    this.parentProcessInstanceKey = parentprocessInstanceKey;
   }
 
   public Long getParentElementInstanceKey() {
     return parentElementInstanceKey;
   }
 
-  public void setParentElementInstanceKey(Long parentElementInstanceKey) {
+  public void setParentElementInstanceKey(final Long parentElementInstanceKey) {
     this.parentElementInstanceKey = parentElementInstanceKey;
   }
 }

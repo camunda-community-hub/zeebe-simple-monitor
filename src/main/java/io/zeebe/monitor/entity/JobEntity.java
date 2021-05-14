@@ -26,8 +26,8 @@ public class JobEntity {
   @Column(name = "KEY_")
   private long key;
 
-  @Column(name = "WORKFLOW_INSTANCE_KEY_")
-  private long workflowInstanceKey;
+  @Column(name = "PROCESS_INSTANCE_KEY_")
+  private long processInstanceKey;
 
   @Column(name = "ELEMENT_INSTANCE_KEY_")
   private long elementInstanceKey;
@@ -51,23 +51,23 @@ public class JobEntity {
     return key;
   }
 
-  public void setKey(long key) {
+  public void setKey(final long key) {
     this.key = key;
   }
 
-  public long getWorkflowInstanceKey() {
-    return workflowInstanceKey;
+  public long getProcessInstanceKey() {
+    return processInstanceKey;
   }
 
-  public void setWorkflowInstanceKey(long workflowInstanceKey) {
-    this.workflowInstanceKey = workflowInstanceKey;
+  public void setProcessInstanceKey(final long processInstanceKey) {
+    this.processInstanceKey = processInstanceKey;
   }
 
   public long getElementInstanceKey() {
     return elementInstanceKey;
   }
 
-  public void setElementInstanceKey(long elementInstanceKey) {
+  public void setElementInstanceKey(final long elementInstanceKey) {
     this.elementInstanceKey = elementInstanceKey;
   }
 
@@ -75,7 +75,7 @@ public class JobEntity {
     return jobType;
   }
 
-  public void setJobType(String jobType) {
+  public void setJobType(final String jobType) {
     this.jobType = jobType;
   }
 
@@ -83,7 +83,7 @@ public class JobEntity {
     return worker;
   }
 
-  public void setWorker(String worker) {
+  public void setWorker(final String worker) {
     this.worker = worker;
   }
 
@@ -91,7 +91,7 @@ public class JobEntity {
     return state;
   }
 
-  public void setState(String state) {
+  public void setState(final String state) {
     this.state = state;
   }
 
@@ -99,7 +99,7 @@ public class JobEntity {
     return retries;
   }
 
-  public void setRetries(int retries) {
+  public void setRetries(final int retries) {
     this.retries = retries;
   }
 
@@ -107,7 +107,7 @@ public class JobEntity {
     return timestamp;
   }
 
-  public void setTimestamp(long timestamp) {
+  public void setTimestamp(final long timestamp) {
     this.timestamp = timestamp;
   }
 }

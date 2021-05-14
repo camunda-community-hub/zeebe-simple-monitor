@@ -20,5 +20,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface ElementInstanceRepository extends CrudRepository<ElementInstanceEntity, Long> {
 
-  Iterable<ElementInstanceEntity> findByWorkflowInstanceKey(long workflowInstanceKey);
+  Iterable<ElementInstanceEntity> findByProcessInstanceKey(long processInstanceKey);
 }

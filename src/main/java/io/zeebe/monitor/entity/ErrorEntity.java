@@ -30,8 +30,8 @@ public class ErrorEntity {
   @Column(name = "ERROR_EVENT_POSITION_")
   private long errorEventPosition;
 
-  @Column(name = "WORKFLOW_INSTANCE_KEY_")
-  private long workflowInstanceKey;
+  @Column(name = "PROCESS_INSTANCE_KEY_")
+  private long processInstanceKey;
 
   @Column(name = "EXCEPTION_MESSAGE_")
   @Lob
@@ -48,7 +48,7 @@ public class ErrorEntity {
     return position;
   }
 
-  public void setPosition(long position) {
+  public void setPosition(final long position) {
     this.position = position;
   }
 
@@ -56,23 +56,23 @@ public class ErrorEntity {
     return errorEventPosition;
   }
 
-  public void setErrorEventPosition(long errorEventPosition) {
+  public void setErrorEventPosition(final long errorEventPosition) {
     this.errorEventPosition = errorEventPosition;
   }
 
-  public long getWorkflowInstanceKey() {
-    return workflowInstanceKey;
+  public long getProcessInstanceKey() {
+    return processInstanceKey;
   }
 
-  public void setWorkflowInstanceKey(long workflowInstanceKey) {
-    this.workflowInstanceKey = workflowInstanceKey;
+  public void setProcessInstanceKey(final long processInstanceKey) {
+    this.processInstanceKey = processInstanceKey;
   }
 
   public String getExceptionMessage() {
     return exceptionMessage;
   }
 
-  public void setExceptionMessage(String exceptionMessage) {
+  public void setExceptionMessage(final String exceptionMessage) {
     this.exceptionMessage = exceptionMessage;
   }
 
@@ -80,7 +80,7 @@ public class ErrorEntity {
     return stacktrace;
   }
 
-  public void setStacktrace(String stacktrace) {
+  public void setStacktrace(final String stacktrace) {
     this.stacktrace = stacktrace;
   }
 
@@ -88,7 +88,7 @@ public class ErrorEntity {
     return timestamp;
   }
 
-  public void setTimestamp(long timestamp) {
+  public void setTimestamp(final long timestamp) {
     this.timestamp = timestamp;
   }
 }

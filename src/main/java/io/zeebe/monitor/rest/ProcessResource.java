@@ -15,8 +15,7 @@
  */
 package io.zeebe.monitor.rest;
 
-import io.zeebe.client.ZeebeClient;
-import io.zeebe.client.api.command.DeployWorkflowCommandStep1;
+import io.camunda.zeebe.client.ZeebeClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,25 +27,26 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/api/workflows")
-public class WorkflowResource {
+@RequestMapping(path = "/api/processes")
+public class ProcessResource {
 
   @Autowired private ZeebeClient zeebeClient;
 
-  @RequestMapping(path = "/{workflowKey}", method = RequestMethod.POST)
-  public void createWorkflowInstance(
-      @PathVariable("workflowKey") long workflowKey, @RequestBody String payload) {
+  @RequestMapping(path = "/{processDefinitionKey}", method = RequestMethod.POST)
+  public void createProcessInstance(
+      @PathVariable("processDefinitionKey") final long processDefinitionKey,
+      @RequestBody final String payload) {
 
     zeebeClient
         .newCreateInstanceCommand()
-        .workflowKey(workflowKey)
+        .processDefinitionKey(processDefinitionKey)
         .variables(payload)
         .send()
         .join();
   }
 
   @RequestMapping(path = "/", method = RequestMethod.POST)
-  public void uploadModel(@RequestBody DeploymentDto deployment)
+  public void uploadModel(@RequestBody final DeploymentDto deployment)
       throws UnsupportedEncodingException {
 
     final List<FileDto> files = deployment.getFiles();
@@ -56,12 +56,12 @@ public class WorkflowResource {
 
     final FileDto firstFile = files.get(0);
 
-    final DeployWorkflowCommandStep1.DeployWorkflowCommandBuilderStep2 cmd =
+    final var cmd =
         zeebeClient
             .newDeployCommand()
             .addResourceBytes(firstFile.getContent(), firstFile.getFilename());
 
-    for (FileDto file : files.subList(1, files.size())) {
+    for (final FileDto file : files.subList(1, files.size())) {
       cmd.addResourceBytes(file.getContent(), file.getFilename());
     }
 
