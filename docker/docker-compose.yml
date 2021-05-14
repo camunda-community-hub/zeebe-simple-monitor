@@ -7,7 +7,7 @@ networks:
 services:
   zeebe:
     container_name: zeebe_broker
-    image: camunda/zeebe:0.23.0
+    image: camunda/zeebe:0.26.3
     environment:
       - ZEEBE_LOG_LEVEL=debug
     ports:
