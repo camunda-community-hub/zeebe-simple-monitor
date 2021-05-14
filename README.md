@@ -12,7 +12,7 @@ A monitoring application for [Zeebe](https://zeebe.io). It is designed for devel
 * test workflows manually
 * provide insides on how workflows are executed 
 
-The application imports the data from Zeebe using the [Hazelcast exporter](https://github.com/zeebe-io/zeebe-hazelcast-exporter). It aggregates the data and stores it into a (in-memory) database. The data is displayed on server-side rendered HTML pages.
+The application imports the data from Zeebe using the [Hazelcast exporter](https://github.com/camunda-community-hub/zeebe-hazelcast-exporter). It aggregates the data and stores it into a (in-memory) database. The data is displayed on server-side rendered HTML pages.
 
 ![how-it-works](docs/how-it-works.png)
 
