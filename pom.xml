@@ -235,7 +235,7 @@
                 <configuration>
                     <to>
                         <image>ghcr.io/camunda-community-hub/zeebe-simple-monitor</image>
-                        <tags>${dockerTags}</tags>
+                        <tags>${project.version}</tags>
                     </to>
                     <container>
                         <ports>
@@ -310,30 +310,6 @@
             </build>
         </profile>
 
-        <profile>
-            <id>snapshot</id>
-            <activation>
-                <property>
-                    <name>RELEASE_VERSION</name>
-                    <value>snapshot</value>
-                </property>
-            </activation>
-            <properties>
-                <dockerTags>${project.version}</dockerTags>
-            </properties>
-        </profile>
-        <profile>
-            <id>release</id>
-            <activation>
-                <property>
-                    <name>RELEASE_VERSION</name>
-                    <value>!snapshot</value>
-                </property>
-            </activation>
-            <properties>
-                <dockerTags>latest,${project.version}</dockerTags>
-            </properties>
-        </profile>
     </profiles>
 
     <repositories>

@@ -28,13 +28,6 @@ jobs:
           java-version: 11
           gpg-private-key: ${{ secrets.MAVEN_CENTRAL_GPG_SIGNING_KEY_SEC }}
           gpg-passphrase: MAVEN_CENTRAL_GPG_PASSPHRASE
-      - name: Set environment variable RELEASE_VERSION to SNAPSHOT
-        run: |
-          echo "RELEASE_VERSION=snapshot" >> $GITHUB_ENV
-      - name: Set environment variable RELEASE_VERSION to the GitHub Release (Release only)
-        if: github.event.release
-        run: |
-          echo "RELEASE_VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
       - name: Login to Docker
         run: |
           # new login with new container registry url and PAT
