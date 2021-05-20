@@ -23,7 +23,7 @@ The application imports the data from Zeebe using the [Hazelcast exporter](https
 The docker image for the worker is published to [GitHub Packages](https://github.com/orgs/camunda-community-hub/packages/container/package/zeebe-simple-monitor).
 
 ```
-docker pull ghcr.io/camunda-community-hub/zeebe-simple-monitor:latest
+docker pull ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.0.0
 ```
 
 * ensure that a Zeebe broker is running with a Hazelcast exporter (>= `1.0.0`)  
