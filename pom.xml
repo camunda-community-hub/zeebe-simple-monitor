@@ -18,7 +18,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <zeebe.version>1.1.0</zeebe.version>
+        <zeebe.version>1.1.1</zeebe.version>
         <version.zeebe.spring>1.1.0</version.zeebe.spring>
         <hazelcast.exporter.version>1.0.0</hazelcast.exporter.version>
 
