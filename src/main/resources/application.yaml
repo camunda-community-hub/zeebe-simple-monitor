@@ -47,6 +47,7 @@ logging:
 
 white-label:
   logo.path: img/logo.png
-  custom.title: Zeebe Simple Monitor
-  custom.css.path: css/custom.css
-  custom.js.path: js/custom.js
+  custom:
+    title: Zeebe Simple Monitor
+    css.path: css/custom.css
+    js.path: js/custom.js
