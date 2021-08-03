@@ -1,5 +1,6 @@
 package io.zeebe.monitor.rest;
 
+import io.zeebe.monitor.entity.ProcessEntity;
 import io.zeebe.monitor.repository.ElementInstanceRepository;
 import io.zeebe.monitor.repository.ErrorRepository;
 import io.zeebe.monitor.repository.HazelcastConfigRepository;
@@ -20,11 +21,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -36,6 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "white-label.custom.js.path: js/test-custom.js",
         })
 @AutoConfigureMockMvc
+@EnableSpringDataWebSupport
 public class ViewControllerTest {
 
   @Autowired
@@ -106,8 +114,21 @@ public class ViewControllerTest {
 	}
 
 	@Test
-	public void testModelAttributesContextPathIsPresent() throws Exception {
-		mockMvc.perform(get("/"))
+	public void testModelAttributesContextPathIsPresentOnGetProcesses() throws Exception {
+		//GIVEN
+		String bpmn = Files.readString(Paths.get(this.getClass().getClassLoader().getResource("orderProcess.bpmn").getPath()));
+		ProcessEntity processEntity = mock(ProcessEntity.class, RETURNS_MOCKS);
+		when(processEntity.getResource()).thenReturn(bpmn);
+		
+		when(processRepository.findByKey(anyLong()))
+				.thenReturn(Optional.of(processEntity));
+		when(processInstanceRepository.findByProcessDefinitionKey(anyLong(), any(Pageable.class)))
+				.thenReturn(mock(Page.class, RETURNS_MOCKS));
+
+
+		//WHEN
+		mockMvc.perform(get("/views/processes/111"))
+				//THEN
 				.andExpect(model().attributeExists("context-path"))
 				.andExpect(model().attributeExists("logo-path"))
 				.andExpect(model().attributeExists("custom-css-path"))
