@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.transaction.Transactional;
@@ -99,7 +100,6 @@ public class ViewController {
 
   @GetMapping("/")
   public String index(final Map<String, Object> model, final Pageable pageable) {
-    addCommonVariablesToModel(model);
     return processList(model, pageable);
   }
 
@@ -117,7 +117,6 @@ public class ViewController {
     model.put("processes", processes);
     model.put("count", count);
 
-    addCommonVariablesToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "process-list-view";
@@ -180,7 +179,6 @@ public class ViewController {
     final var bpmn = Bpmn.readModelFromStream(resourceAsStream);
     model.put("instance.bpmnElementInfos", getBpmnElementInfos(bpmn));
 
-    addCommonVariablesToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "process-detail-view";
@@ -256,7 +254,6 @@ public class ViewController {
     model.put("instances", instances);
     model.put("count", count);
 
-    addCommonVariablesToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "instance-list-view";
@@ -277,8 +274,6 @@ public class ViewController {
         .ifPresent(process -> model.put("resource", getProcessResource(process)));
 
     model.put("instance", toInstanceDto(instance));
-
-    addCommonVariablesToModel(model);
 
     return "instance-detail-view";
   }
@@ -680,7 +675,6 @@ public class ViewController {
     model.put("incidents", incidents);
     model.put("count", count);
 
-    addCommonVariablesToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "incident-list-view";
@@ -727,7 +721,6 @@ public class ViewController {
     model.put("jobs", dtos);
     model.put("count", count);
 
-    addCommonVariablesToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "job-list-view";
@@ -762,7 +755,6 @@ public class ViewController {
     model.put("messages", dtos);
     model.put("count", count);
 
-    addCommonVariablesToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "message-list-view";
@@ -782,7 +774,6 @@ public class ViewController {
     model.put("errors", dtos);
     model.put("count", count);
 
-    addCommonVariablesToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "error-list-view";
@@ -858,21 +849,30 @@ public class ViewController {
     return resource.replaceAll("`", "\"");
   }
 
-  private void addCommonVariablesToModel(final Map<String, Object> model) {
-    addContextPathToModel(model);
-    addWhitelabelingOptionsToModel(model);
-  }
+    @ModelAttribute("context-path")
+    public String getBasePath() {
+        return basePath;
+    }
 
-  private void addContextPathToModel(final Map<String, Object> model) {
-    model.put("context-path", basePath);
-  }
+    @ModelAttribute("logo-path")
+    public String getLogoPath() {
+        return logoPath;
+    }
 
-  private void addWhitelabelingOptionsToModel(final Map<String, Object> model) {
-    model.put("logo-path", logoPath);
-    model.put("custom-css-path", customCssPath);
-    model.put("custom-js-path", customJsPath);
-    model.put("custom-title", customTitle);
-  }
+    @ModelAttribute("custom-css-path")
+    public String getCustomCssPath() {
+        return customCssPath;
+    }
+
+    @ModelAttribute("custom-js-path")
+    public String getCustomJsPath() {
+        return customJsPath;
+    }
+
+    @ModelAttribute("custom-title")
+    public String getCustomTitle() {
+        return customTitle;
+    }
 
   private void addPaginationToModel(
       final Map<String, Object> model, final Pageable pageable, final long count) {
