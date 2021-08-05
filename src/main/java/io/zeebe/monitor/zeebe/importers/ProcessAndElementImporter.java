@@ -44,7 +44,6 @@ public class ProcessAndElementImporter {
     if (record.getProcessInstanceKey() == record.getMetadata().getKey()) {
       addOrUpdateProcessInstance(record);
     }
-
     addElementInstance(record);
   }
 
@@ -97,27 +96,19 @@ public class ProcessAndElementImporter {
   }
 
   private void addElementInstance(final Schema.ProcessInstanceRecord record) {
-
-    final long position = record.getMetadata().getPosition();
-    if (!elementInstanceRepository.existsById(position)) {
-
-      final ElementInstanceEntity entity = new ElementInstanceEntity();
-      entity.setPosition(position);
-      entity.setPartitionId(record.getMetadata().getPartitionId());
-      entity.setKey(record.getMetadata().getKey());
-      entity.setIntent(record.getMetadata().getIntent());
-      entity.setTimestamp(record.getMetadata().getTimestamp());
-      entity.setProcessInstanceKey(record.getProcessInstanceKey());
-      entity.setElementId(record.getElementId());
-      entity.setFlowScopeKey(record.getFlowScopeKey());
-      entity.setProcessDefinitionKey(record.getProcessDefinitionKey());
-      entity.setBpmnElementType(record.getBpmnElementType());
-
-      elementInstanceRepository.save(entity);
-
-      notificationService.sendProcessInstanceUpdated(
-          record.getProcessInstanceKey(), record.getProcessDefinitionKey());
-    }
+    final ElementInstanceEntity entity = new ElementInstanceEntity();
+    entity.setPosition(record.getMetadata().getPosition());
+    entity.setPartitionId(record.getMetadata().getPartitionId());
+    entity.setKey(record.getMetadata().getKey());
+    entity.setIntent(record.getMetadata().getIntent());
+    entity.setTimestamp(record.getMetadata().getTimestamp());
+    entity.setProcessInstanceKey(record.getProcessInstanceKey());
+    entity.setElementId(record.getElementId());
+    entity.setFlowScopeKey(record.getFlowScopeKey());
+    entity.setProcessDefinitionKey(record.getProcessDefinitionKey());
+    entity.setBpmnElementType(record.getBpmnElementType());
+    elementInstanceRepository.save(entity);
+    notificationService.sendProcessInstanceUpdated(record.getProcessInstanceKey(), record.getProcessDefinitionKey());
   }
 
 }

@@ -15,14 +15,20 @@
  */
 package io.zeebe.monitor.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity(name = "ELEMENT_INSTANCE")
+@Table(indexes = {
+    // performance reason, because we use it in the ElementInstanceRepository.findByProcessInstanceKey()
+    @Index(name = "element_instance_processInstanceKeyIndex", columnList = "PROCESS_INSTANCE_KEY_"),
+})
 public class ElementInstanceEntity {
 
   @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  @Column(name = "ID")
+  private long id;
+
   @Column(name = "POSITION_")
   private Long position;
 
@@ -52,6 +58,14 @@ public class ElementInstanceEntity {
 
   @Column(name = "TIMESTAMP_")
   private long timestamp;
+
+  public long getId() {
+    return id;
+  }
+
+  public void setId(final long id) {
+    this.id = id;
+  }
 
   public long getKey() {
     return key;

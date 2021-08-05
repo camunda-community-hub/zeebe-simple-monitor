@@ -12,20 +12,16 @@ public class VariableImporter {
   @Autowired private VariableRepository variableRepository;
 
   public void importVariable(final Schema.VariableRecord record) {
-
-    final long position = record.getMetadata().getPosition();
-    if (!variableRepository.existsById(position)) {
-
-      final VariableEntity entity = new VariableEntity();
-      entity.setPosition(position);
-      entity.setTimestamp(record.getMetadata().getTimestamp());
-      entity.setProcessInstanceKey(record.getProcessInstanceKey());
-      entity.setName(record.getName());
-      entity.setValue(record.getValue());
-      entity.setScopeKey(record.getScopeKey());
-      entity.setState(record.getMetadata().getIntent().toLowerCase());
-      variableRepository.save(entity);
-    }
+    final VariableEntity entity = new VariableEntity();
+    entity.setPosition(record.getMetadata().getPosition());
+    entity.setPartitionId(record.getMetadata().getPartitionId());
+    entity.setTimestamp(record.getMetadata().getTimestamp());
+    entity.setProcessInstanceKey(record.getProcessInstanceKey());
+    entity.setName(record.getName());
+    entity.setValue(record.getValue());
+    entity.setScopeKey(record.getScopeKey());
+    entity.setState(record.getMetadata().getIntent().toLowerCase());
+    variableRepository.save(entity);
   }
 
 }
