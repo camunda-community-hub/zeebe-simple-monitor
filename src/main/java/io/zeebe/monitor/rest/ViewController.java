@@ -34,7 +34,6 @@ import io.zeebe.monitor.repository.TimerRepository;
 import io.zeebe.monitor.repository.VariableRepository;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -69,12 +68,7 @@ public class ViewController {
       Arrays.asList(BpmnElementType.MULTI_INSTANCE_BODY.name());
   private static final List<String> JOB_COMPLETED_INTENTS = Arrays.asList("completed", "canceled");
 
-  private final String basePath;
-  private final String logoPath;
-  private final String customCssPath;
-  private final String customJsPath;
-  private final String customTitle;
-
+  @Autowired private WhitelabelProperties whitelabelProperties;
   @Autowired private ProcessRepository processRepository;
   @Autowired private ProcessInstanceRepository processInstanceRepository;
   @Autowired private ElementInstanceRepository activityInstanceRepository;
@@ -85,18 +79,6 @@ public class ViewController {
   @Autowired private TimerRepository timerRepository;
   @Autowired private VariableRepository variableRepository;
   @Autowired private ErrorRepository errorRepository;
-
-  public ViewController(@Value("${server.servlet.context-path}") final String basePath,
-                        @Value("${white-label.logo.path}") final String logoPath,
-                        @Value("${white-label.custom.title}") final String customTitle,
-                        @Value("${white-label.custom.css.path}") final String customCssPath,
-                        @Value("${white-label.custom.js.path}") final String customJsPath){
-    this.basePath = basePath.endsWith("/") ? basePath : basePath + "/";
-    this.logoPath = logoPath;
-    this.customTitle = customTitle;
-    this.customCssPath = customCssPath;
-    this.customJsPath = customJsPath;
-  }
 
   @GetMapping("/")
   public String index(final Map<String, Object> model, final Pageable pageable) {
@@ -851,27 +833,27 @@ public class ViewController {
 
     @ModelAttribute("context-path")
     public String getBasePath() {
-        return basePath;
+        return whitelabelProperties.getBasePath();
     }
 
     @ModelAttribute("logo-path")
     public String getLogoPath() {
-        return logoPath;
+        return whitelabelProperties.getLogoPath();
     }
 
     @ModelAttribute("custom-css-path")
     public String getCustomCssPath() {
-        return customCssPath;
+        return whitelabelProperties.getCustomCssPath();
     }
 
     @ModelAttribute("custom-js-path")
     public String getCustomJsPath() {
-        return customJsPath;
+        return whitelabelProperties.getCustomJsPath();
     }
 
     @ModelAttribute("custom-title")
     public String getCustomTitle() {
-        return customTitle;
+        return whitelabelProperties.getCustomTitle();
     }
 
   private void addPaginationToModel(
