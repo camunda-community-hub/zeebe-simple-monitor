@@ -20,7 +20,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
 
-public interface VariableRepository extends PagingAndSortingRepository<VariableEntity, Long> {
+public interface VariableRepository extends PagingAndSortingRepository<VariableEntity, String> {
 
   List<VariableEntity> findByProcessInstanceKey(long processInstanceKey);
 }

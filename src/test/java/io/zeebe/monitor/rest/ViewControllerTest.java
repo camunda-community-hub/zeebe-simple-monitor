@@ -22,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.file.Files;
@@ -41,8 +42,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "white-label.custom.title: Test Zeebe Simple Monitor",
                 "white-label.custom.css.path: css/test-custom.css",
                 "white-label.custom.js.path: js/test-custom.js",
+								"logging.level.io.zeebe.monitor: info",
         })
 @AutoConfigureMockMvc
+@ActiveProfiles("junittest")
 public class ViewControllerTest {
 
   @Autowired

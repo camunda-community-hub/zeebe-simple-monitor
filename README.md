@@ -16,7 +16,11 @@ The application imports the data from Zeebe using the [Hazelcast exporter](https
 
 ![how-it-works](docs/how-it-works.png)
 
-## Install
+## Upgrading from prior version
+
+See [upgrade instructions](./UPGRADE.md)
+
+## Fresh install
 
 ### Docker
 

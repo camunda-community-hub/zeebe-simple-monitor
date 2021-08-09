@@ -9,22 +9,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class VariableImporter {
 
-  @Autowired private VariableRepository variableRepository;
+  @Autowired
+  private VariableRepository variableRepository;
 
   public void importVariable(final Schema.VariableRecord record) {
-
-    final long position = record.getMetadata().getPosition();
-    if (!variableRepository.existsById(position)) {
-
-      final VariableEntity entity = new VariableEntity();
-      entity.setPosition(position);
-      entity.setTimestamp(record.getMetadata().getTimestamp());
-      entity.setProcessInstanceKey(record.getProcessInstanceKey());
-      entity.setName(record.getName());
-      entity.setValue(record.getValue());
-      entity.setScopeKey(record.getScopeKey());
-      entity.setState(record.getMetadata().getIntent().toLowerCase());
-      variableRepository.save(entity);
+    final VariableEntity newVariable = new VariableEntity();
+    newVariable.setPosition(record.getMetadata().getPosition());
+    newVariable.setPartitionId(record.getMetadata().getPartitionId());
+    if (!variableRepository.existsById(newVariable.getGeneratedIdentifier())) {
+      newVariable.setTimestamp(record.getMetadata().getTimestamp());
+      newVariable.setProcessInstanceKey(record.getProcessInstanceKey());
+      newVariable.setName(record.getName());
+      newVariable.setValue(record.getValue());
+      newVariable.setScopeKey(record.getScopeKey());
+      newVariable.setState(record.getMetadata().getIntent().toLowerCase());
+      variableRepository.save(newVariable);
     }
   }
 

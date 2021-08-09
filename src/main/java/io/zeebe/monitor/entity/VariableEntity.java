@@ -15,17 +15,24 @@
  */
 package io.zeebe.monitor.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
+import javax.persistence.*;
 
 @Entity(name = "VARIABLE")
+@Table(indexes = {
+    // performance reason, because we use it in the VariableRepository.findByProcessInstanceKey()
+    @Index(name = "variable_processInstanceKeyIndex", columnList = "PROCESS_INSTANCE_KEY_"),
+})
 public class VariableEntity {
 
   @Id
+  @Column(name = "ID")
+  private String id;
+
   @Column(name = "POSITION_")
   private Long position;
+
+  @Column(name = "PARTITION_ID_")
+  private int partitionId;
 
   @Column(name = "NAME_")
   private String name;
@@ -45,6 +52,24 @@ public class VariableEntity {
 
   @Column(name = "TIMESTAMP_")
   private long timestamp;
+
+  public String getId() {
+    return id;
+  }
+
+  private void setId(final String id) {
+    // made private, to avoid accidental changes
+    this.id = id;
+  }
+
+  public final String getGeneratedIdentifier() {
+    return this.partitionId + "-" + this.position;
+  }
+
+  @PrePersist
+  private void prePersistDeriveIdField(){
+    setId(getGeneratedIdentifier());
+  }
 
   public String getState() {
     return state;
@@ -100,5 +125,13 @@ public class VariableEntity {
 
   public void setPosition(final Long position) {
     this.position = position;
+  }
+
+  public int getPartitionId() {
+    return partitionId;
+  }
+
+  public void setPartitionId(final int partitionId) {
+    this.partitionId = partitionId;
   }
 }
