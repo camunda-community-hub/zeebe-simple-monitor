@@ -203,6 +203,32 @@ Build with Maven
    
 `mvn clean install`
 
+## Development hints
+
+#### Zeebe cluster backend for local development
+
+There's a file ```docker/docker-compose.yml``` prepared in this repo,
+which can be used with recent Docker version to provide a backend.
+You just need to alter this file and comment out the ```monitor``` service.
+What remains is the ```zeebe``` service, which then can be started
+via ```docker compose up``` command.
+
+With such a backend running,
+you can simply start debugging the ```ZeebeSimpleMonitorApp``` class
+in your IDE of choice.
+
+#### Reading 'text' fields in PostgreSQL
+
+Some attributes in the entities are marked with ```@Lob``` annotation.
+This makes the JPA mapper use e.g. data type ```text``` in PostgreSQL.
+This type needs some special treatment.
+
+**Problem**: when you run SQL commands manually, e.g. 
+```select value_ from variable```
+you will see just some 5-digit numbers.\
+**Solution**: you need to convert the large object like this\
+```SELECT convert_from(lo_get(value_::oid), 'UTF8') FROM variable```
+
 ## Code of Conduct
 
 This project adheres to the Contributor Covenant [Code of
