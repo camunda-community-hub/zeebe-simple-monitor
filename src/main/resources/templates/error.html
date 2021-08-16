@@ -4,10 +4,12 @@
     <div class="col-md-12">
 
         <div class="alert alert-danger" role="alert">
-            <h4 class="alert-heading">Error {{status}} - {{error}}</h4>
+            <h4 class="alert-heading">{{error}}</h4>
             <p>{{message}}</p>
             <hr>
-            <p class="mb-0" style="white-space: pre-line;">{{trace}}</p>
+            <pre>
+                {{trace}}
+            </pre>
         </div>
 
     </div>

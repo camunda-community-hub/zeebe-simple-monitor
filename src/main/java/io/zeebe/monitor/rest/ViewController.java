@@ -34,10 +34,10 @@ import io.zeebe.monitor.repository.TimerRepository;
 import io.zeebe.monitor.repository.VariableRepository;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.transaction.Transactional;
@@ -68,12 +68,7 @@ public class ViewController {
       Arrays.asList(BpmnElementType.MULTI_INSTANCE_BODY.name());
   private static final List<String> JOB_COMPLETED_INTENTS = Arrays.asList("completed", "canceled");
 
-  private final String basePath;
-  private final String logoPath;
-  private final String customCssPath;
-  private final String customJsPath;
-  private final String customTitle;
-
+  @Autowired private WhitelabelProperties whitelabelProperties;
   @Autowired private ProcessRepository processRepository;
   @Autowired private ProcessInstanceRepository processInstanceRepository;
   @Autowired private ElementInstanceRepository activityInstanceRepository;
@@ -85,21 +80,8 @@ public class ViewController {
   @Autowired private VariableRepository variableRepository;
   @Autowired private ErrorRepository errorRepository;
 
-  public ViewController(@Value("${server.servlet.context-path}") final String basePath,
-                        @Value("${white-label.logo.path}") final String logoPath,
-                        @Value("${white-label.custom.title}") final String customTitle,
-                        @Value("${white-label.custom.css.path}") final String customCssPath,
-                        @Value("${white-label.custom.js.path}") final String customJsPath){
-    this.basePath = basePath.endsWith("/") ? basePath : basePath + "/";
-    this.logoPath = logoPath;
-    this.customTitle = customTitle;
-    this.customCssPath = customCssPath;
-    this.customJsPath = customJsPath;
-  }
-
   @GetMapping("/")
   public String index(final Map<String, Object> model, final Pageable pageable) {
-    addCommonVariablesToModel(model);
     return processList(model, pageable);
   }
 
@@ -117,7 +99,6 @@ public class ViewController {
     model.put("processes", processes);
     model.put("count", count);
 
-    addCommonVariablesToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "process-list-view";
@@ -180,7 +161,6 @@ public class ViewController {
     final var bpmn = Bpmn.readModelFromStream(resourceAsStream);
     model.put("instance.bpmnElementInfos", getBpmnElementInfos(bpmn));
 
-    addCommonVariablesToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "process-detail-view";
@@ -256,7 +236,6 @@ public class ViewController {
     model.put("instances", instances);
     model.put("count", count);
 
-    addCommonVariablesToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "instance-list-view";
@@ -277,8 +256,6 @@ public class ViewController {
         .ifPresent(process -> model.put("resource", getProcessResource(process)));
 
     model.put("instance", toInstanceDto(instance));
-
-    addCommonVariablesToModel(model);
 
     return "instance-detail-view";
   }
@@ -680,7 +657,6 @@ public class ViewController {
     model.put("incidents", incidents);
     model.put("count", count);
 
-    addCommonVariablesToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "incident-list-view";
@@ -727,7 +703,6 @@ public class ViewController {
     model.put("jobs", dtos);
     model.put("count", count);
 
-    addCommonVariablesToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "job-list-view";
@@ -762,7 +737,6 @@ public class ViewController {
     model.put("messages", dtos);
     model.put("count", count);
 
-    addCommonVariablesToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "message-list-view";
@@ -782,7 +756,6 @@ public class ViewController {
     model.put("errors", dtos);
     model.put("count", count);
 
-    addCommonVariablesToModel(model);
     addPaginationToModel(model, pageable, count);
 
     return "error-list-view";
@@ -858,21 +831,30 @@ public class ViewController {
     return resource.replaceAll("`", "\"");
   }
 
-  private void addCommonVariablesToModel(final Map<String, Object> model) {
-    addContextPathToModel(model);
-    addWhitelabelingOptionsToModel(model);
-  }
+    @ModelAttribute("context-path")
+    public String getBasePath() {
+        return whitelabelProperties.getBasePath();
+    }
 
-  private void addContextPathToModel(final Map<String, Object> model) {
-    model.put("context-path", basePath);
-  }
+    @ModelAttribute("logo-path")
+    public String getLogoPath() {
+        return whitelabelProperties.getLogoPath();
+    }
 
-  private void addWhitelabelingOptionsToModel(final Map<String, Object> model) {
-    model.put("logo-path", logoPath);
-    model.put("custom-css-path", customCssPath);
-    model.put("custom-js-path", customJsPath);
-    model.put("custom-title", customTitle);
-  }
+    @ModelAttribute("custom-css-path")
+    public String getCustomCssPath() {
+        return whitelabelProperties.getCustomCssPath();
+    }
+
+    @ModelAttribute("custom-js-path")
+    public String getCustomJsPath() {
+        return whitelabelProperties.getCustomJsPath();
+    }
+
+    @ModelAttribute("custom-title")
+    public String getCustomTitle() {
+        return whitelabelProperties.getCustomTitle();
+    }
 
   private void addPaginationToModel(
       final Map<String, Object> model, final Pageable pageable, final long count) {
