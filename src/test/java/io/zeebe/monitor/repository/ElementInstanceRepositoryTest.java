@@ -1,7 +1,7 @@
 package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.ElementInstanceEntity;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;

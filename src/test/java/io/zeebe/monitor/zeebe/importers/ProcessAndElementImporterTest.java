@@ -6,7 +6,7 @@ import io.zeebe.monitor.entity.ElementInstanceEntity;
 import io.zeebe.monitor.repository.ElementInstanceRepository;
 import io.zeebe.monitor.repository.ZeebeRepositoryTest;
 import io.zeebe.monitor.zeebe.ZeebeNotificationService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -49,6 +49,8 @@ public class ProcessAndElementImporterTest extends ZeebeRepositoryTest {
     return Schema.ProcessInstanceRecord.newBuilder()
         .setElementId(elementId)
         .setMetadata(Schema.RecordMetadata.newBuilder()
+            .setPosition(333L)
+            .setPartitionId(55555)
             .setIntent(ProcessInstanceIntent.ELEMENT_ACTIVATED.name()))
         .build();
   }
