@@ -39,6 +39,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.io.ByteArrayInputStream;
@@ -54,11 +55,15 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
 @Controller
 public class ViewController {
 
   private static final int FIRST_PAGE = 0;
   private static final int PAGE_RANGE = 2;
+
+  private static final String WARNING_NO_XML_RESOURCE_FOUND = "WARNING-NO-XML-RESOURCE-FOUND";
 
   private static final List<String> PROCESS_INSTANCE_ENTERED_INTENTS =
       Arrays.asList("ELEMENT_ACTIVATED");
@@ -124,7 +129,7 @@ public class ViewController {
     final ProcessEntity process =
         processRepository
             .findByKey(key)
-            .orElseThrow(() -> new RuntimeException("No process found with key: " + key));
+            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No process found with key: " + key));
 
     model.put("process", toDto(process));
     model.put("resource", getProcessResource(process));
@@ -249,8 +254,9 @@ public class ViewController {
     final ProcessInstanceEntity instance =
         processInstanceRepository
             .findByKey(key)
-            .orElseThrow(() -> new RuntimeException("No process instance found with key: " + key));
+            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No process instance found with key: " + key));
 
+    model.put("resource", WARNING_NO_XML_RESOURCE_FOUND);
     processRepository
         .findByKey(instance.getProcessDefinitionKey())
         .ifPresent(process -> model.put("resource", getProcessResource(process)));
