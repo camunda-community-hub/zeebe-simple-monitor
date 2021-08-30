@@ -17,11 +17,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProcessAndElementImporter {
 
-  @Autowired private ProcessRepository processRepository;
-  @Autowired private ProcessInstanceRepository processInstanceRepository;
-  @Autowired private ElementInstanceRepository elementInstanceRepository;
+  @Autowired
+  private ProcessRepository processRepository;
+  @Autowired
+  private ProcessInstanceRepository processInstanceRepository;
+  @Autowired
+  private ElementInstanceRepository elementInstanceRepository;
 
-  @Autowired private ZeebeNotificationService notificationService;
+  @Autowired
+  private ZeebeNotificationService notificationService;
 
   public void importProcess(final Schema.ProcessRecord record) {
     final int partitionId = record.getMetadata().getPartitionId();
@@ -44,7 +48,6 @@ public class ProcessAndElementImporter {
     if (record.getProcessInstanceKey() == record.getMetadata().getKey()) {
       addOrUpdateProcessInstance(record);
     }
-
     addElementInstance(record);
   }
 
@@ -97,13 +100,10 @@ public class ProcessAndElementImporter {
   }
 
   private void addElementInstance(final Schema.ProcessInstanceRecord record) {
-
-    final long position = record.getMetadata().getPosition();
-    if (!elementInstanceRepository.existsById(position)) {
-
-      final ElementInstanceEntity entity = new ElementInstanceEntity();
-      entity.setPosition(position);
-      entity.setPartitionId(record.getMetadata().getPartitionId());
+    final ElementInstanceEntity entity = new ElementInstanceEntity();
+    entity.setPartitionId(record.getMetadata().getPartitionId());
+    entity.setPosition(record.getMetadata().getPosition());
+    if (!elementInstanceRepository.existsById(entity.getGeneratedIdentifier())) {
       entity.setKey(record.getMetadata().getKey());
       entity.setIntent(record.getMetadata().getIntent());
       entity.setTimestamp(record.getMetadata().getTimestamp());
@@ -112,11 +112,8 @@ public class ProcessAndElementImporter {
       entity.setFlowScopeKey(record.getFlowScopeKey());
       entity.setProcessDefinitionKey(record.getProcessDefinitionKey());
       entity.setBpmnElementType(record.getBpmnElementType());
-
       elementInstanceRepository.save(entity);
-
-      notificationService.sendProcessInstanceUpdated(
-          record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+      notificationService.sendProcessInstanceUpdated(record.getProcessInstanceKey(), record.getProcessDefinitionKey());
     }
   }
 
