@@ -11,7 +11,11 @@
             <th>BPMN process id</th>
             <th>Process Definition Key</th>
             <th>State</th>
-            <th>Start Time</th>
+            <th>Start Time
+                <a id="instance-start-time" href="#" class="badge badge-secondary" data-toggle="tooltip" data-placement="top"
+                   title="Sort by Start Time">
+                </a>
+            </th>
             </thead>
 
             {{#instances}}
@@ -36,3 +40,9 @@
 </div>
 
 {{>layout/footer}}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        listSort('start','instance-start-time')
+    }, false);
+</script>
