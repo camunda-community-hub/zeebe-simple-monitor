@@ -2,7 +2,7 @@
     <ul class="pagination justify-content-center">
         {{#prevPage}}
         <li class="page-item">
-            <a class="page-link" href="?page={{pageNumber}}" tabindex="-1">Previous</a>
+            <a id="previous-page" class="page-link" href="#" tabindex="-1">Previous</a>
         </li>
         {{/prevPage}}
         {{^prevPage}}
@@ -13,7 +13,7 @@
 
         {{#firstPage}}
         <li class="page-item">
-            <a class="page-link" href="?page={{pageNumber}}" tabindex="-1">{{displayNumber}}</a>
+            <a id="first-page" class="page-link" href="#" tabindex="-1">{{displayNumber}}</a>
         </li>
         {{/firstPage}}
 
@@ -28,7 +28,7 @@
 
         {{#prevPages}}
         <li class="page-item">
-            <a class="page-link" href="?page={{pageNumber}}">{{displayNumber}}</a>
+            <a id="page-{{pageNumber}}" class="page-link" href="#">{{displayNumber}}</a>
         </li>
         {{/prevPages}}
 
@@ -40,7 +40,7 @@
 
         {{#nextPages}}
         <li class="page-item">
-            <a class="page-link" href="?page={{pageNumber}}">{{displayNumber}}</a>
+            <a id="page-{{pageNumber}}" class="page-link" href="#">{{displayNumber}}</a>
         </li>
         {{/nextPages}}
 
@@ -55,13 +55,13 @@
 
         {{#lastPage}}
         <li class="page-item">
-            <a class="page-link" href="?page={{pageNumber}}" tabindex="-1">{{displayNumber}}</a>
+            <a id="last-page" class="page-link" href="#" tabindex="-1">{{displayNumber}}</a>
         </li>
         {{/lastPage}}
 
         {{#nextPage}}
         <li class="page-item">
-            <a class="page-link" href="?page={{pageNumber}}" tabindex="-1">Next</a>
+            <a id="next-page" class="page-link" href="#" tabindex="-1">Next</a>
         </li>
         {{/nextPage}}
         {{^nextPage}}
@@ -71,3 +71,41 @@
         {{/nextPage}}
     </ul>
 </nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+
+        console.log("prevPage")
+        {{#prevPage}}
+            listPage('previous-page',{{pageNumber}})
+        {{/prevPage}}
+
+            console.log("firstPage")
+        {{#firstPage}}
+            listPage('first-page',{{pageNumber}})
+        {{/firstPage}}
+
+            console.log("prevPages")
+        {{#prevPages}}
+            console.log("page-{{pageNumber}}")
+          listPage('page-{{pageNumber}}',{{pageNumber}})
+        {{/prevPages}}
+
+            console.log("nextPages")
+        {{#nextPages}}
+            console.log("page-{{pageNumber}}")
+            listPage('page-{{pageNumber}}',{{pageNumber}})
+        {{/nextPages}}
+
+            console.log("lastPage")
+        {{#lastPage}}
+            listPage('last-page',{{pageNumber}})
+        {{/lastPage}}
+
+            console.log("nextPage")
+        {{#nextPage}}
+        listPage('next-page',{{pageNumber}})
+        {{/nextPage}}
+
+    }, false);
+</script>

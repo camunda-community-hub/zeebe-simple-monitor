@@ -4,7 +4,11 @@
     <thead>
     <th>Process Instance Key</th>
     <th>State</th>
-    <th>Start Time</th>
+    <th>Start Time
+        <a id="instance-start-time" href="#" class="badge badge-secondary" data-toggle="tooltip" data-placement="top"
+           title="Sort by Start Time">
+        </a>
+    </th>
     </thead>
 
     {{#instances}}
@@ -20,3 +24,9 @@
 </table>
 
 {{>components/table-pagination}}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        listSort('start','instance-start-time')
+    }, false);
+</script>
