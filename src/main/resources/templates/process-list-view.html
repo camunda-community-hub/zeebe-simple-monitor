@@ -22,7 +22,11 @@
             <th>Version</th>
             <th># active</th>
             <th># ended</th>
-            <th>Deployment Time</th>
+            <th>Deployment Time
+                <a id="process-deployment-time" href="#" class="badge badge-secondary" data-toggle="tooltip" data-placement="top"
+                   title="Sort by Deployment Time">
+                </a>
+            </th>
             </thead>
 
             {{#processes}}
@@ -44,3 +48,9 @@
 </div>
 
 {{>layout/footer}}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        listSort('timestamp','process-deployment-time')
+    }, false);
+</script>
