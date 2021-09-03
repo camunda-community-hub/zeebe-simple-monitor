@@ -35,6 +35,12 @@ docker pull ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.1.0
 * configure the connection to the Zeebe broker by setting `zeebe.client.broker.contactPoint` (default: `localhost:26500`) 
 * configure the connection to Hazelcast by setting `zeebe.client.worker.hazelcast.connection` (default: `localhost:5701`) 
 
+If the Zeebe broker runs on your local machine with the default configs then start the container with the following command:  
+
+```
+docker run --network="host" ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.1.0
+```
+
 For a local setup, the repository contains a [docker-compose file](docker/docker-compose.yml). It starts a Zeebe broker with the Hazelcast exporter and the application. 
 
 ```
