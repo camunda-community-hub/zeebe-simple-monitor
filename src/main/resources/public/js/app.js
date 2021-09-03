@@ -539,3 +539,41 @@ function colorSequenceFlow(graphicsFactory, sequenceFlow, gfx, color) {
 }
 
 // --------------------------------------------------------------------
+
+function listPage(pageElement, page) {
+    let pageParam = "page=" + page
+    let search = window.location.search
+
+    if(search.includes("page")) {
+        let withNewPage = search.replace(/page=\d+/, pageParam)
+        document.getElementById(pageElement).href = withNewPage
+    } else if(search) {
+        document.getElementById(pageElement).href = search + "&" + pageParam
+    } else {
+        document.getElementById(pageElement).href = "?" + pageParam
+    }
+}
+
+function listSort(sortProperty, sortElement) {
+    let sortAsc = "sort=" + sortProperty + ",asc"
+    let sortDesc = "sort=" + sortProperty + ",desc"
+
+    let search = window.location.search
+    if(search.includes(sortAsc)) {
+        let withReverseOrder = search.replace(sortAsc, sortDesc)
+        document.getElementById(sortElement).href = withReverseOrder
+        document.getElementById(sortElement).innerHTML = "▼"
+    } else if(search.includes(sortDesc)) {
+        let withReverseOrder = search.replace(sortDesc, sortAsc)
+        document.getElementById(sortElement).href = withReverseOrder
+        document.getElementById(sortElement).innerHTML = "▲"
+    } else if(search) {
+        document.getElementById(sortElement).href = search + "&" + sortDesc
+        document.getElementById(sortElement).innerHTML = "▼"
+    } else {
+        document.getElementById(sortElement).href = "?" + sortDesc
+        document.getElementById(sortElement).innerHTML = "▼"
+    }
+}
+
+// --------------------------------------------------------------------
