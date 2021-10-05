@@ -30,11 +30,6 @@ public class ProcessAndElementImporter {
   public void importProcess(final Schema.ProcessRecord record) {
     final int partitionId = record.getMetadata().getPartitionId();
 
-    if (partitionId != Protocol.DEPLOYMENT_PARTITION) {
-      // ignore process event on other partitions to avoid duplicates
-      return;
-    }
-
     final ProcessEntity entity = new ProcessEntity();
     entity.setKey(record.getProcessDefinitionKey());
     entity.setBpmnProcessId(record.getBpmnProcessId());
