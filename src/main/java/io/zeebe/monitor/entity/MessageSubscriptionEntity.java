@@ -15,11 +15,14 @@
  */
 package io.zeebe.monitor.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity(name = "MESSAGE_SUBSCRIPTION")
+@Table(indexes = {
+    // performance reason, because we use it in the
+    // {@link io.zeebe.monitor.repository.MessageSubscriptionRepository#findByProcessInstanceKey(long)}
+    @Index(name = "message_subscription_processInstanceKeyIndex", columnList = "PROCESS_INSTANCE_KEY_"),
+})
 public class MessageSubscriptionEntity {
 
   @Id
