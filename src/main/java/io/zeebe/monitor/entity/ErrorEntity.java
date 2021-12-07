@@ -15,12 +15,14 @@
  */
 package io.zeebe.monitor.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
+import javax.persistence.*;
 
 @Entity(name = "ERROR")
+@Table(indexes = {
+    // performance reason, because we use it in the
+    // {@link io.zeebe.monitor.repository.ErrorRepository#findByProcessInstanceKey(long)}
+    @Index(name = "error_processInstanceKeyIndex", columnList = "PROCESS_INSTANCE_KEY_"),
+})
 public class ErrorEntity {
 
   @Id
