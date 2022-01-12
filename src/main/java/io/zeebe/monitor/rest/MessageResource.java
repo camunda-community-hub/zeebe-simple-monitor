@@ -16,6 +16,7 @@
 package io.zeebe.monitor.rest;
 
 import io.camunda.zeebe.client.ZeebeClient;
+import io.zeebe.monitor.rest.dto.PublishMessageDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

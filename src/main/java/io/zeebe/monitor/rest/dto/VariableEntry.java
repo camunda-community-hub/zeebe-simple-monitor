@@ -1,4 +1,4 @@
-package io.zeebe.monitor.rest;
+package io.zeebe.monitor.rest.dto;
 
 import java.util.ArrayList;
 import java.util.List;

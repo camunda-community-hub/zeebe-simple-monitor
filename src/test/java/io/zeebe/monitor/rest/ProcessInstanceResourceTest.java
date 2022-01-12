@@ -1,6 +1,7 @@
 package io.zeebe.monitor.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.zeebe.monitor.rest.dto.ResolveIncidentDto;
 import io.zeebe.monitor.zeebe.ZeebeNotificationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package io.zeebe.monitor.rest;
+package io.zeebe.monitor.rest.dto;
 
 public final class ErrorDto {
 

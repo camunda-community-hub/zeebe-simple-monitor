@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.zeebe.monitor.rest;
+package io.zeebe.monitor.rest.dto;
+
+import io.zeebe.monitor.rest.dto.FileDto;
 
 import java.util.List;
 

@@ -16,6 +16,8 @@
 package io.zeebe.monitor.rest;
 
 import io.camunda.zeebe.client.ZeebeClient;
+import io.zeebe.monitor.rest.dto.DeploymentDto;
+import io.zeebe.monitor.rest.dto.FileDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;

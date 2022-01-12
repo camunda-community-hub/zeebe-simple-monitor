@@ -16,6 +16,7 @@
 package io.zeebe.monitor.rest;
 
 import io.camunda.zeebe.client.ZeebeClient;
+import io.zeebe.monitor.rest.dto.ResolveIncidentDto;
 import io.zeebe.monitor.zeebe.ZeebeNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
