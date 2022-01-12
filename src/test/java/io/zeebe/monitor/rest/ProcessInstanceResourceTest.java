@@ -1,11 +1,11 @@
 package io.zeebe.monitor.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.zeebe.monitor.zeebe.ZeebeNotificationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
