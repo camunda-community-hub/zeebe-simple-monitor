@@ -2,28 +2,10 @@ package io.zeebe.monitor.rest;
 
 import io.zeebe.monitor.entity.ProcessEntity;
 import io.zeebe.monitor.entity.ProcessInstanceEntity;
-import io.zeebe.monitor.repository.ElementInstanceRepository;
-import io.zeebe.monitor.repository.ErrorRepository;
-import io.zeebe.monitor.repository.HazelcastConfigRepository;
-import io.zeebe.monitor.repository.IncidentRepository;
-import io.zeebe.monitor.repository.JobRepository;
-import io.zeebe.monitor.repository.MessageRepository;
-import io.zeebe.monitor.repository.MessageSubscriptionRepository;
-import io.zeebe.monitor.repository.ProcessInstanceRepository;
-import io.zeebe.monitor.repository.ProcessRepository;
-import io.zeebe.monitor.repository.TimerRepository;
-import io.zeebe.monitor.repository.VariableRepository;
-import io.zeebe.monitor.zeebe.ZeebeHazelcastService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -36,48 +18,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {
-                "white-label.logo.path: img/test-logo.png",
-                "white-label.custom.title: Test Zeebe Simple Monitor",
-                "white-label.custom.css.path: css/test-custom.css",
-                "white-label.custom.js.path: js/test-custom.js",
-								"logging.level.io.zeebe.monitor: info",
-        })
-@AutoConfigureMockMvc
-@ActiveProfiles("junittest")
-public class ViewControllerTest {
-
-  @Autowired
-  private ViewController controller;
-
-  @Autowired
-  private MockMvc mockMvc;
-
-  @MockBean
-  private HazelcastConfigRepository hazelcastConfigRepository;
-  @MockBean
-  private ZeebeHazelcastService zeebeHazelcastService;
-  @MockBean
-  private ProcessRepository processRepository;
-  @MockBean
-  private ProcessInstanceRepository processInstanceRepository;
-  @MockBean
-  private ElementInstanceRepository activityInstanceRepository;
-  @MockBean
-  private IncidentRepository incidentRepository;
-  @MockBean
-  private JobRepository jobRepository;
-  @MockBean
-  private MessageRepository messageRepository;
-  @MockBean
-  private MessageSubscriptionRepository messageSubscriptionRepository;
-  @MockBean
-  private TimerRepository timerRepository;
-  @MockBean
-  private VariableRepository variableRepository;
-  @MockBean
-  private ErrorRepository errorRepository;
+public class ViewControllerTest extends AbstractViewOrResourceTest {
 
   @BeforeEach
   public void setUp() throws Exception {

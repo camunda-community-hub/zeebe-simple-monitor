@@ -16,6 +16,7 @@
 package io.zeebe.monitor.rest;
 
 import io.camunda.zeebe.client.ZeebeClient;
+import io.zeebe.monitor.zeebe.ZeebeNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProcessInstanceResource {
 
   @Autowired private ZeebeClient zeebeClient;
+  @Autowired private ZeebeNotificationService zeebeNotificationService;
 
   @RequestMapping(path = "/{key}", method = RequestMethod.DELETE)
   public void cancelProcessInstance(@PathVariable("key") final long key) throws Exception {
@@ -56,6 +58,13 @@ public class ProcessInstanceResource {
           .newUpdateRetriesCommand(dto.getJobKey())
           .retries(dto.getRemainingRetries())
           .send()
+          .exceptionally(e -> {
+            // catch this exception and forward to the user
+            zeebeNotificationService.sendZeebeClusterError(e.getMessage());
+            // AND continue with second Zeebe command below
+            return null;
+          })
+          .toCompletableFuture()
           .join();
     }
 
