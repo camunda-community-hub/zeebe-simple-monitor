@@ -27,18 +27,30 @@
 function appendAndSowMessageToElement(elementId, title, message) {
     var dataTexts = jQuery("#" + elementId + " [data-text]");
     var length = dataTexts.length;
+    // skip duplicates
+    if (length > 0) {
+        if (jQuery(dataTexts[length - 1]).text().endsWith(message)) {
+            return;
+        }
+    }
+    // drop the top of the stack == the oldest entries
     for (var i = 0; i < Math.max(0, length - 3); i++) {
         jQuery(dataTexts[i]).fadeOut(dataTexts[i].remove);
     }
-    var newTextElement = jQuery(jQuery("<div/>"));
+    var newTextElement = jQuery("<div/>");
     newTextElement.hide();
     newTextElement.attr("data-text", "");
     newTextElement.append(jQuery("<strong>" + title + "</strong>"));
     var textSpanElement = jQuery("<span/>");
     textSpanElement.text(message);
     newTextElement.append(textSpanElement);
-    jQuery("#" + elementId + " button").before(newTextElement);
-    jQuery("#" + elementId).show();
+    var panelElement = jQuery("#" + elementId);
+    if (length === 0) {
+        panelElement.prepend(newTextElement);
+    } else {
+        jQuery(dataTexts[dataTexts.length - 1]).after(newTextElement);
+    }
+    panelElement.show();
     newTextElement.fadeIn();
 }
 
