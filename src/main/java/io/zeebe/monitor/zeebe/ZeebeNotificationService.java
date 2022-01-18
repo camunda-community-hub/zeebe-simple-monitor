@@ -1,7 +1,8 @@
 package io.zeebe.monitor.zeebe;
 
-import io.zeebe.monitor.rest.ProcessInstanceNotification;
-import io.zeebe.monitor.rest.ProcessInstanceNotification.Type;
+import io.zeebe.monitor.rest.ui.ProcessInstanceNotification;
+import io.zeebe.monitor.rest.ui.ProcessInstanceNotification.Type;
+import io.zeebe.monitor.rest.ui.ZeebeClusterNotification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -48,8 +49,20 @@ public class ZeebeNotificationService {
     sendNotification(notification);
   }
 
+  public void sendZeebeClusterError(final String message) {
+    final ZeebeClusterNotification notification = new ZeebeClusterNotification();
+    notification.setMessage(message);
+    notification.setType(ZeebeClusterNotification.Type.ERROR);
+    sendNotification(notification);
+  }
+
   private void sendNotification(final ProcessInstanceNotification notification) {
     final var destination = basePath + "notifications/process-instance";
+    webSocket.convertAndSend(destination, notification);
+  }
+
+  private void sendNotification(final ZeebeClusterNotification notification) {
+    final var destination = basePath + "notifications/zeebe-cluster";
     webSocket.convertAndSend(destination, notification);
   }
 }

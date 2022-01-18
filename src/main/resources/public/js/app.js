@@ -1,21 +1,85 @@
+/**
+ * @typedef ErrorMessage
+ * @type {object}
+ * @property {string} message
+ */
+
+/**
+ * @typedef ProcessInstanceNotification
+ * @type {object}
+ * @property {number} processInstanceKey
+ * @property {number} processDefinitionKey
+ * @property {string} type
+ */
+
+/**
+ * @typedef ZeebeClusterNotification
+ * @type {object}
+ * @property {string} message
+ * @property {string} type
+ */
+
+/**
+ * @param {string} elementId - the HTML element ID to attach the text to
+ * @param {string} title - the title for the message
+ * @param {string} message - the actual text message
+ */
+function appendAndSowMessageToElement(elementId, title, message) {
+    var dataTexts = jQuery("#" + elementId + " [data-text]");
+    var length = dataTexts.length;
+    // skip duplicates
+    if (length > 0) {
+        if (jQuery(dataTexts[length - 1]).text().endsWith(message)) {
+            return;
+        }
+    }
+    // drop the top of the stack == the oldest entries
+    for (var i = 0; i < Math.max(0, length - 3); i++) {
+        jQuery(dataTexts[i]).fadeOut(dataTexts[i].remove);
+    }
+    var newTextElement = jQuery("<div/>");
+    newTextElement.hide();
+    newTextElement.attr("data-text", "");
+    newTextElement.append(jQuery("<strong>" + title + "</strong>"));
+    var textSpanElement = jQuery("<span/>");
+    textSpanElement.text(message);
+    newTextElement.append(textSpanElement);
+    var panelElement = jQuery("#" + elementId);
+    if (length === 0) {
+        panelElement.prepend(newTextElement);
+    } else {
+        jQuery(dataTexts[dataTexts.length - 1]).after(newTextElement);
+    }
+    panelElement.show();
+    newTextElement.fadeIn();
+}
+
+/**
+ * @param {string} message - the actual text message
+ */
 function showError(message) {
-    document.getElementById("errorText").innerHTML = message;
-    $('#errorPanel').show();
+    appendAndSowMessageToElement("errorPanel", "Error: ", message);
 }
 
+/**
+ * @param {string} message - the actual text message
+ */
 function showSuccess(message) {
-    document.getElementById("successText").innerHTML = message;
-    $('#successPanel').show();
+    appendAndSowMessageToElement("successPanel", "Success: ", message);
 }
 
+/**
+ * @param {string} message - the actual text message
+ */
 function showInfo(message) {
-    document.getElementById("infoText").innerHTML = message;
-    $('#infoPanel').show();
+    appendAndSowMessageToElement("infoPanel", "Info: ", message);
 }
 
 function showErrorResonse(xhr, ajaxOptions, thrownError) {
     if (xhr.responseJSON) {
-        showError(xhr.responseJSON.message);
+        /** @type {ErrorMessage} */
+        let errorMessage = xhr.responseJSON;
+        showError(errorMessage.message);
     } else {
         showError(thrownError);
     }
@@ -43,7 +107,10 @@ function connect() {
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
         stompClient.subscribe(buildPath('notifications/process-instance'), function (message) {
-            handleMessage(JSON.parse(message.body));
+            handleProcessInstanceNotification(JSON.parse(message.body));
+        });
+        stompClient.subscribe(buildPath('notifications/zeebe-cluster'), function (message) {
+            handleZeebeClusterNotification(JSON.parse(message.body));
         });
     });
 }
@@ -59,7 +126,10 @@ function sendMessage(msg) {
         JSON.stringify(msg));
 }
 
-function handleMessage(notification) {
+/**
+ * @param notification {ProcessInstanceNotification}
+ */
+function handleProcessInstanceNotification(notification) {
 
     if (subscribedProcessInstanceKeys.includes(notification.processInstanceKey)) {
         showInfo('Process instance has changed.');
@@ -68,6 +138,13 @@ function handleMessage(notification) {
     if (subscribedProcessDefinitionKeys.includes(notification.processDefinitionKey)) {
         showInfo('Instance(s) of this process have changed.');
     }
+}
+
+/**
+ * @param notification {ZeebeClusterNotification}
+ */
+function handleZeebeClusterNotification(notification) {
+    showError(notification.message)
 }
 
 function subscribeForProcessInstance(key) {
