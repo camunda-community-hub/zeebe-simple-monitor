@@ -19,34 +19,27 @@ public class ZeebeNotificationService {
 
   @Autowired private SimpMessagingTemplate webSocket;
 
-  public void sendProcessInstanceUpdated(
+  public void sendUpdatedProcessInstance(
       final long processInstanceKey, final long processDefinitionKey) {
-    final ProcessInstanceNotification notification = new ProcessInstanceNotification();
-    notification.setProcessInstanceKey(processInstanceKey);
-    notification.setProcessDefinitionKey(processDefinitionKey);
-    notification.setType(Type.UPDATED);
-
-    sendNotification(notification);
+    sendNotification(createProcessInstanceNotification(processInstanceKey, processDefinitionKey, Type.UPDATED));
   }
 
   public void sendCreatedProcessInstance(
       final long processInstanceKey, final long processDefinitionKey) {
-    final ProcessInstanceNotification notification = new ProcessInstanceNotification();
-    notification.setProcessInstanceKey(processInstanceKey);
-    notification.setProcessDefinitionKey(processDefinitionKey);
-    notification.setType(Type.CREATED);
-
-    sendNotification(notification);
+    sendNotification(createProcessInstanceNotification(processInstanceKey, processDefinitionKey, Type.CREATED));
   }
 
   public void sendEndedProcessInstance(
       final long processInstanceKey, final long processDefinitionKey) {
+    sendNotification(createProcessInstanceNotification(processInstanceKey, processDefinitionKey, Type.REMOVED));
+  }
+
+  private ProcessInstanceNotification createProcessInstanceNotification(long processInstanceKey, long processDefinitionKey, Type type) {
     final ProcessInstanceNotification notification = new ProcessInstanceNotification();
     notification.setProcessInstanceKey(processInstanceKey);
     notification.setProcessDefinitionKey(processDefinitionKey);
-    notification.setType(Type.REMOVED);
-
-    sendNotification(notification);
+    notification.setType(type);
+    return notification;
   }
 
   public void sendZeebeClusterError(final String message) {
