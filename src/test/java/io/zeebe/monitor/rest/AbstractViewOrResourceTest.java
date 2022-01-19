@@ -30,7 +30,7 @@ public abstract class AbstractViewOrResourceTest {
   @Autowired
   protected TestRestTemplate restTemplate;
   @Autowired
-  protected ViewController controller;
+  protected InstancesViewController controller;
 
 
   @MockBean
