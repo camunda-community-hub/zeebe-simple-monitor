@@ -11,18 +11,18 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-public class InstancesViewControllerTest extends AbstractViewOrResourceTest {
+public class InstancesVariableListControllerTest extends AbstractViewOrResourceTest {
 
   @BeforeEach
-  public void setUp() throws Exception {
+  public void setUp() {
 	  when(processRepository.findAll(any(Pageable.class))).thenReturn(Page.empty());
+		when(elementInstanceRepository.findByProcessInstanceKey(anyLong())).thenReturn(Page.empty());
   }
 
 	@Test

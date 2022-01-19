@@ -30,7 +30,9 @@ public abstract class AbstractViewOrResourceTest {
   @Autowired
   protected TestRestTemplate restTemplate;
   @Autowired
-  protected InstancesViewController controller;
+  protected InstancesViewController instancesViewController;
+  @Autowired
+  protected InstancesVariableListController instancesVariableListController;
 
 
   @MockBean
@@ -42,7 +44,7 @@ public abstract class AbstractViewOrResourceTest {
   @MockBean
   protected ProcessInstanceRepository processInstanceRepository;
   @MockBean
-  protected ElementInstanceRepository activityInstanceRepository;
+  protected ElementInstanceRepository elementInstanceRepository;
   @MockBean
   protected IncidentRepository incidentRepository;
   @MockBean
