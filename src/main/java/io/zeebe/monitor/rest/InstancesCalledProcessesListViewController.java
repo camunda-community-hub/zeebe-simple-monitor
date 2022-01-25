@@ -5,16 +5,15 @@ import io.zeebe.monitor.entity.IncidentEntity;
 import io.zeebe.monitor.entity.ProcessInstanceEntity;
 import io.zeebe.monitor.rest.dto.CalledProcessInstanceDto;
 import io.zeebe.monitor.rest.dto.ProcessInstanceDto;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import javax.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
-import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Controller
 public class InstancesCalledProcessesListViewController extends AbstractInstanceViewController {
@@ -22,7 +21,9 @@ public class InstancesCalledProcessesListViewController extends AbstractInstance
   @GetMapping("/views/instances/{key}/called-processes-list")
   @Transactional
   public String instanceDetailCalledProcessesList(
-      @PathVariable final long key, final Map<String, Object> model, @PageableDefault(size = DETAIL_LIST_SIZE) final Pageable pageable) {
+      @PathVariable final long key,
+      final Map<String, Object> model,
+      @PageableDefault(size = DETAIL_LIST_SIZE) final Pageable pageable) {
 
     initializeProcessInstanceDto(key, model, pageable);
     model.put("content-called-processes-list-view", new EnableConditionalViewRenderer());
@@ -30,9 +31,18 @@ public class InstancesCalledProcessesListViewController extends AbstractInstance
   }
 
   @Override
-  protected void fillViewDetailsIntoDto(ProcessInstanceEntity instance, List<ElementInstanceEntity> events, List<IncidentEntity> incidents, Map<Long, String> elementIdsForKeys, Map<String, Object> model, Pageable pageable, ProcessInstanceDto dto) {
+  protected void fillViewDetailsIntoDto(
+      ProcessInstanceEntity instance,
+      List<ElementInstanceEntity> events,
+      List<IncidentEntity> incidents,
+      Map<Long, String> elementIdsForKeys,
+      Map<String, Object> model,
+      Pageable pageable,
+      ProcessInstanceDto dto) {
     final var calledProcessInstances =
-        processInstanceRepository.findByParentProcessInstanceKey(instance.getKey(), pageable).stream()
+        processInstanceRepository
+            .findByParentProcessInstanceKey(instance.getKey(), pageable)
+            .stream()
             .map(
                 childEntity -> {
                   final var childDto = new CalledProcessInstanceDto();

@@ -1,19 +1,23 @@
 package io.zeebe.monitor.rest;
 
+import static io.zeebe.monitor.rest.ProcessesViewController.EXCLUDE_ELEMENT_TYPES;
+import static io.zeebe.monitor.rest.ProcessesViewController.PROCESS_INSTANCE_COMPLETED_INTENTS;
+import static io.zeebe.monitor.rest.ProcessesViewController.PROCESS_INSTANCE_ENTERED_INTENTS;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template;
 import io.camunda.zeebe.protocol.record.value.BpmnElementType;
 import io.zeebe.monitor.entity.ElementInstanceEntity;
 import io.zeebe.monitor.entity.IncidentEntity;
 import io.zeebe.monitor.entity.ProcessInstanceEntity;
-import io.zeebe.monitor.repository.*;
+import io.zeebe.monitor.repository.ElementInstanceRepository;
+import io.zeebe.monitor.repository.IncidentRepository;
+import io.zeebe.monitor.repository.ProcessInstanceRepository;
+import io.zeebe.monitor.repository.ProcessRepository;
 import io.zeebe.monitor.rest.dto.ActiveScope;
 import io.zeebe.monitor.rest.dto.ElementInstanceState;
 import io.zeebe.monitor.rest.dto.ProcessInstanceDto;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
-import org.springframework.web.server.ResponseStatusException;
-
 import java.io.IOException;
 import java.io.Writer;
 import java.time.Instant;
@@ -23,26 +27,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
-import static io.zeebe.monitor.rest.ProcessesViewController.*;
-import static io.zeebe.monitor.rest.ProcessesViewController.EXCLUDE_ELEMENT_TYPES;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.server.ResponseStatusException;
 
 public abstract class AbstractInstanceViewController extends AbstractViewController {
 
   protected static final int DETAIL_LIST_SIZE = 100;
   protected static final String WARNING_NO_XML_RESOURCE_FOUND = "WARNING-NO-XML-RESOURCE-FOUND";
 
-  @Autowired
-  protected ProcessRepository processRepository;
-  @Autowired
-  protected ProcessInstanceRepository processInstanceRepository;
-  @Autowired
-  protected ElementInstanceRepository elementInstanceRepository;
-  @Autowired
-  protected IncidentRepository incidentRepository;
+  @Autowired protected ProcessRepository processRepository;
+  @Autowired protected ProcessInstanceRepository processInstanceRepository;
+  @Autowired protected ElementInstanceRepository elementInstanceRepository;
+  @Autowired protected IncidentRepository incidentRepository;
 
-  protected void initializeProcessInstanceDto(long key, Map<String, Object> model, Pageable pageable) {
+  protected void initializeProcessInstanceDto(
+      long key, Map<String, Object> model, Pageable pageable) {
     final ProcessInstanceEntity instance = loadProcessInstanceEntity(key);
 
     fillBpmnDataIntoModel(model, instance);
@@ -71,14 +71,18 @@ public abstract class AbstractInstanceViewController extends AbstractViewControl
   protected ProcessInstanceEntity loadProcessInstanceEntity(long key) {
     return processInstanceRepository
         .findByKey(key)
-        .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No process instance found with key: " + key));
+        .orElseThrow(
+            () ->
+                new ResponseStatusException(
+                    NOT_FOUND, "No process instance found with key: " + key));
   }
 
   private void fillBpmnDataIntoModel(Map<String, Object> model, ProcessInstanceEntity instance) {
     model.put("resource", WARNING_NO_XML_RESOURCE_FOUND);
     processRepository
         .findByKey(instance.getProcessDefinitionKey())
-        .ifPresent(process -> model.put("resource", ProcessesViewController.getProcessResource(process)));
+        .ifPresent(
+            process -> model.put("resource", ProcessesViewController.getProcessResource(process)));
   }
 
   private List<IncidentEntity> loadIncidents(ProcessInstanceEntity instance) {
@@ -113,7 +117,11 @@ public abstract class AbstractInstanceViewController extends AbstractViewControl
     return dto;
   }
 
-  private void fillActivityInformationForDiagramAnnotationIntoDto(List<ElementInstanceEntity> events, ProcessInstanceDto dto, List<IncidentEntity> incidents, Map<Long, String> elementIdsForKeys) {
+  private void fillActivityInformationForDiagramAnnotationIntoDto(
+      List<ElementInstanceEntity> events,
+      ProcessInstanceDto dto,
+      List<IncidentEntity> incidents,
+      Map<Long, String> elementIdsForKeys) {
     final List<String> completedActivities =
         events.stream()
             .filter(e -> PROCESS_INSTANCE_COMPLETED_INTENTS.contains(e.getIntent()))
@@ -184,9 +192,20 @@ public abstract class AbstractInstanceViewController extends AbstractViewControl
     dto.setActiveActivities(activeActivities);
   }
 
-  protected abstract void fillViewDetailsIntoDto(final ProcessInstanceEntity instance, List<ElementInstanceEntity> events, List<IncidentEntity> incidents, Map<Long, String> elementIdsForKeys, Map<String, Object> model, Pageable pageable, ProcessInstanceDto dto);
+  protected abstract void fillViewDetailsIntoDto(
+      final ProcessInstanceEntity instance,
+      List<ElementInstanceEntity> events,
+      List<IncidentEntity> incidents,
+      Map<Long, String> elementIdsForKeys,
+      Map<String, Object> model,
+      Pageable pageable,
+      ProcessInstanceDto dto);
 
-  protected void fillActiveScopesIntoDto(ProcessInstanceEntity instance, List<ElementInstanceEntity> events, Map<Long, String> elementIdsForKeys, ProcessInstanceDto dto) {
+  protected void fillActiveScopesIntoDto(
+      ProcessInstanceEntity instance,
+      List<ElementInstanceEntity> events,
+      Map<Long, String> elementIdsForKeys,
+      ProcessInstanceDto dto) {
     final List<ActiveScope> activeScopes = new ArrayList<>();
     if (dto.isRunning()) {
       activeScopes.add(new ActiveScope(instance.getKey(), instance.getBpmnProcessId()));
@@ -212,16 +231,12 @@ public abstract class AbstractInstanceViewController extends AbstractViewControl
 
   private List<ElementInstanceEntity> loadElementInstanceEntities(ProcessInstanceEntity instance) {
     return StreamSupport.stream(
-            elementInstanceRepository
-                .findByProcessInstanceKey(instance.getKey())
-                .spliterator(),
+            elementInstanceRepository.findByProcessInstanceKey(instance.getKey()).spliterator(),
             false)
         .collect(Collectors.toList());
   }
 
-  /**
-   * helper class to allow conditional server side rendering in the mustache templates
-   */
+  /** helper class to allow conditional server side rendering in the mustache templates */
   static class EnableConditionalViewRenderer implements Mustache.Lambda {
     @Override
     public void execute(Template.Fragment frag, Writer out) throws IOException {

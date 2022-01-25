@@ -1,17 +1,40 @@
 package io.zeebe.monitor.rest;
 
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
 import io.camunda.zeebe.model.bpmn.Bpmn;
 import io.camunda.zeebe.model.bpmn.BpmnModelInstance;
-import io.camunda.zeebe.model.bpmn.instance.*;
+import io.camunda.zeebe.model.bpmn.instance.CatchEvent;
+import io.camunda.zeebe.model.bpmn.instance.ErrorEventDefinition;
+import io.camunda.zeebe.model.bpmn.instance.SequenceFlow;
+import io.camunda.zeebe.model.bpmn.instance.ServiceTask;
+import io.camunda.zeebe.model.bpmn.instance.TimerEventDefinition;
 import io.camunda.zeebe.model.bpmn.instance.zeebe.ZeebeTaskDefinition;
 import io.camunda.zeebe.protocol.record.intent.MessageSubscriptionIntent;
 import io.camunda.zeebe.protocol.record.value.BpmnElementType;
-import io.zeebe.monitor.entity.*;
+import io.zeebe.monitor.entity.ElementInstanceStatistics;
+import io.zeebe.monitor.entity.MessageSubscriptionEntity;
+import io.zeebe.monitor.entity.ProcessEntity;
+import io.zeebe.monitor.entity.ProcessInstanceEntity;
+import io.zeebe.monitor.entity.TimerEntity;
 import io.zeebe.monitor.repository.MessageSubscriptionRepository;
 import io.zeebe.monitor.repository.ProcessInstanceRepository;
 import io.zeebe.monitor.repository.ProcessRepository;
 import io.zeebe.monitor.repository.TimerRepository;
-import io.zeebe.monitor.rest.dto.*;
+import io.zeebe.monitor.rest.dto.BpmnElementInfo;
+import io.zeebe.monitor.rest.dto.ElementInstanceState;
+import io.zeebe.monitor.rest.dto.MessageSubscriptionDto;
+import io.zeebe.monitor.rest.dto.ProcessDto;
+import io.zeebe.monitor.rest.dto.ProcessInstanceListDto;
+import io.zeebe.monitor.rest.dto.TimerDto;
+import java.io.ByteArrayInputStream;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.transaction.Transactional;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -20,19 +43,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.transaction.Transactional;
-import java.io.ByteArrayInputStream;
-import java.time.Instant;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-
 @Controller
 public class ProcessesViewController extends AbstractViewController {
 
-  static final List<String> PROCESS_INSTANCE_ENTERED_INTENTS =
-      List.of("ELEMENT_ACTIVATED");
+  static final List<String> PROCESS_INSTANCE_ENTERED_INTENTS = List.of("ELEMENT_ACTIVATED");
   static final List<String> PROCESS_INSTANCE_COMPLETED_INTENTS =
       List.of("ELEMENT_COMPLETED", "ELEMENT_TERMINATED");
   static final List<String> EXCLUDE_ELEMENT_TYPES =
@@ -76,7 +90,8 @@ public class ProcessesViewController extends AbstractViewController {
     final ProcessEntity process =
         processRepository
             .findByKey(key)
-            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No process found with key: " + key));
+            .orElseThrow(
+                () -> new ResponseStatusException(NOT_FOUND, "No process found with key: " + key));
 
     model.put("process", toDto(process));
     model.put("resource", getProcessResource(process));
@@ -294,5 +309,4 @@ public class ProcessesViewController extends AbstractViewController {
 
     return infos;
   }
-
 }

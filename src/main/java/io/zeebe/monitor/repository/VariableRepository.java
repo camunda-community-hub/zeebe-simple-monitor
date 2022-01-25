@@ -20,8 +20,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import java.util.List;
-
 public interface VariableRepository extends PagingAndSortingRepository<VariableEntity, String> {
 
   Page<VariableEntity> findByProcessInstanceKey(long processInstanceKey, Pageable pageable);

@@ -3,20 +3,18 @@ package io.zeebe.monitor.rest;
 import io.zeebe.monitor.entity.ProcessInstanceEntity;
 import io.zeebe.monitor.repository.ProcessInstanceRepository;
 import io.zeebe.monitor.rest.dto.ProcessInstanceListDto;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 @Controller
 public class InstancesViewController extends AbstractViewController {
 
-  @Autowired
-  protected ProcessInstanceRepository processInstanceRepository;
+  @Autowired protected ProcessInstanceRepository processInstanceRepository;
 
   @GetMapping("/views/instances")
   public String instanceList(final Map<String, Object> model, final Pageable pageable) {
@@ -37,5 +35,4 @@ public class InstancesViewController extends AbstractViewController {
 
     return "instance-list-view";
   }
-
 }

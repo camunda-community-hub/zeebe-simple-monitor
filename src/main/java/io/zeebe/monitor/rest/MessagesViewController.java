@@ -3,21 +3,19 @@ package io.zeebe.monitor.rest;
 import io.zeebe.monitor.entity.MessageEntity;
 import io.zeebe.monitor.repository.MessageRepository;
 import io.zeebe.monitor.rest.dto.MessageDto;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 @Controller
 public class MessagesViewController extends AbstractViewController {
 
-  @Autowired
-  private MessageRepository messageRepository;
+  @Autowired private MessageRepository messageRepository;
 
   @GetMapping("/views/messages")
   public String messageList(final Map<String, Object> model, final Pageable pageable) {

@@ -1,19 +1,18 @@
 package io.zeebe.monitor.rest;
 
-import io.zeebe.monitor.entity.IncidentEntity;
 import io.zeebe.monitor.entity.JobEntity;
-import io.zeebe.monitor.repository.IncidentRepository;
 import io.zeebe.monitor.repository.JobRepository;
-import io.zeebe.monitor.rest.dto.IncidentListDto;
 import io.zeebe.monitor.rest.dto.JobDto;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import javax.transaction.Transactional;
-import java.time.Instant;
-import java.util.*;
 
 @Controller
 public class JobsViewController extends AbstractViewController {
@@ -57,5 +56,4 @@ public class JobsViewController extends AbstractViewController {
 
     return dto;
   }
-
 }

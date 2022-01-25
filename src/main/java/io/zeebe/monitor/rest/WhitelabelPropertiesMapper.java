@@ -1,9 +1,8 @@
 package io.zeebe.monitor.rest;
 
+import java.util.Map;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
-
-import java.util.Map;
 
 @Component
 public class WhitelabelPropertiesMapper {
@@ -22,12 +21,12 @@ public class WhitelabelPropertiesMapper {
     model.addAttribute(CUSTOM_JS_PATH, whitelabelProperties.getCustomJsPath());
   }
 
-  public void addPropertiesToModel(Map<String, Object> model, WhitelabelProperties whitelabelProperties) {
+  public void addPropertiesToModel(
+      Map<String, Object> model, WhitelabelProperties whitelabelProperties) {
     model.put(CUSTOM_TITLE, whitelabelProperties.getCustomTitle());
     model.put(CONTEXT_PATH, whitelabelProperties.getBasePath());
     model.put(LOGO_PATH, whitelabelProperties.getLogoPath());
     model.put(CUSTOM_CSS_PATH, whitelabelProperties.getCustomCssPath());
     model.put(CUSTOM_JS_PATH, whitelabelProperties.getCustomJsPath());
   }
-
 }

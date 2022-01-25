@@ -16,17 +16,17 @@
 package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.MessageSubscriptionEntity;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import java.util.List;
-import java.util.Optional;
-
 public interface MessageSubscriptionRepository
     extends PagingAndSortingRepository<MessageSubscriptionEntity, Long> {
 
-  Page<MessageSubscriptionEntity> findByProcessInstanceKey(long processInstanceKey, Pageable pageable);
+  Page<MessageSubscriptionEntity> findByProcessInstanceKey(
+      long processInstanceKey, Pageable pageable);
 
   long countByProcessInstanceKey(long processInstanceKey);
 

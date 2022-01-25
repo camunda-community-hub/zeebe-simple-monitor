@@ -59,12 +59,13 @@ public class ProcessInstanceResource {
           .newUpdateRetriesCommand(dto.getJobKey())
           .retries(dto.getRemainingRetries())
           .send()
-          .exceptionally(e -> {
-            // catch this exception and forward to the user
-            zeebeNotificationService.sendZeebeClusterError(e.getMessage());
-            // AND continue with second Zeebe command below
-            return null;
-          })
+          .exceptionally(
+              e -> {
+                // catch this exception and forward to the user
+                zeebeNotificationService.sendZeebeClusterError(e.getMessage());
+                // AND continue with second Zeebe command below
+                return null;
+              })
           .toCompletableFuture()
           .join();
     }

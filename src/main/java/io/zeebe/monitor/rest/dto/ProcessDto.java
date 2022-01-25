@@ -16,7 +16,6 @@
 package io.zeebe.monitor.rest.dto;
 
 import io.zeebe.monitor.entity.ProcessEntity;
-
 import java.time.Instant;
 
 public class ProcessDto {

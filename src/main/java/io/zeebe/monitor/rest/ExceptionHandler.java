@@ -20,16 +20,18 @@ public class ExceptionHandler {
   private final WhitelabelProperties whitelabelProperties;
   private final WhitelabelPropertiesMapper whitelabelPropertiesMapper;
 
-  public ExceptionHandler(WhitelabelProperties whitelabelProperties, WhitelabelPropertiesMapper whitelabelPropertiesMapper) {
+  public ExceptionHandler(
+      WhitelabelProperties whitelabelProperties,
+      WhitelabelPropertiesMapper whitelabelPropertiesMapper) {
     this.whitelabelProperties = whitelabelProperties;
     this.whitelabelPropertiesMapper = whitelabelPropertiesMapper;
   }
 
   @org.springframework.web.bind.annotation.ExceptionHandler(value = {ClientException.class})
-  protected ResponseEntity<Object> handleZeebeClientException(final RuntimeException ex, final WebRequest request) {
+  protected ResponseEntity<Object> handleZeebeClientException(
+      final RuntimeException ex, final WebRequest request) {
     LOG.debug("Zeebe Client Exception caught and forwarding to UI.", ex);
-    return ResponseEntity
-        .status(HttpStatus.FAILED_DEPENDENCY)
+    return ResponseEntity.status(HttpStatus.FAILED_DEPENDENCY)
         .contentType(MediaType.APPLICATION_JSON)
         .body(new ErrorMessage(ex.getMessage()));
   }
@@ -45,5 +47,4 @@ public class ExceptionHandler {
     whitelabelPropertiesMapper.addPropertiesToModel(model, whitelabelProperties);
     return "error";
   }
-
 }

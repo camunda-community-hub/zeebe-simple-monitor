@@ -3,15 +3,14 @@ package io.zeebe.monitor.rest;
 import io.zeebe.monitor.entity.ErrorEntity;
 import io.zeebe.monitor.repository.ErrorRepository;
 import io.zeebe.monitor.rest.dto.ErrorDto;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class ErrorsViewController extends AbstractViewController {
@@ -52,5 +51,4 @@ public class ErrorsViewController extends AbstractViewController {
 
     return dto;
   }
-
 }

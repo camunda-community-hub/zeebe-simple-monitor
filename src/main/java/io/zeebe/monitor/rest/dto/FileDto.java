@@ -27,41 +27,33 @@
  */
 package io.zeebe.monitor.rest.dto;
 
-public class FileDto
-{
+public class FileDto {
 
-    protected String filename;
-    protected String mimeType;
-    protected byte[] content;
+  protected String filename;
+  protected String mimeType;
+  protected byte[] content;
 
-    public String getFilename()
-    {
-        return filename;
-    }
+  public String getFilename() {
+    return filename;
+  }
 
-    public void setFilename(String filename)
-    {
-        this.filename = filename;
-    }
+  public void setFilename(String filename) {
+    this.filename = filename;
+  }
 
-    public String getMimeType()
-    {
-        return mimeType;
-    }
+  public String getMimeType() {
+    return mimeType;
+  }
 
-    public void setMimeType(String mimeType)
-    {
-        this.mimeType = mimeType;
-    }
+  public void setMimeType(String mimeType) {
+    this.mimeType = mimeType;
+  }
 
-    public byte[] getContent()
-    {
-        return content;
-    }
+  public byte[] getContent() {
+    return content;
+  }
 
-    public void setContent(byte[] content)
-    {
-        this.content = content;
-    }
-
+  public void setContent(byte[] content) {
+    this.content = content;
+  }
 }

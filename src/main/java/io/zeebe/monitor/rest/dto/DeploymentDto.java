@@ -15,8 +15,6 @@
  */
 package io.zeebe.monitor.rest.dto;
 
-import io.zeebe.monitor.rest.dto.FileDto;
-
 import java.util.List;
 
 public class DeploymentDto {

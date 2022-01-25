@@ -1,5 +1,7 @@
 package io.zeebe.monitor.rest;
 
+import static io.zeebe.monitor.rest.ProcessesViewController.getBpmnElementInfos;
+
 import io.camunda.zeebe.model.bpmn.Bpmn;
 import io.camunda.zeebe.model.bpmn.instance.FlowElement;
 import io.zeebe.monitor.entity.ElementInstanceEntity;
@@ -7,13 +9,6 @@ import io.zeebe.monitor.entity.IncidentEntity;
 import io.zeebe.monitor.entity.ProcessInstanceEntity;
 import io.zeebe.monitor.rest.dto.AuditLogEntry;
 import io.zeebe.monitor.rest.dto.ProcessInstanceDto;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-
-import javax.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.time.Instant;
 import java.util.HashMap;
@@ -21,8 +16,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static io.zeebe.monitor.rest.ProcessesViewController.getBpmnElementInfos;
+import javax.transaction.Transactional;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class InstancesAuditLogViewController extends AbstractInstanceViewController {
@@ -30,14 +29,23 @@ public class InstancesAuditLogViewController extends AbstractInstanceViewControl
   @GetMapping("/views/instances/{key}/audit-log")
   @Transactional
   public String instanceDetailAuditLog(
-      @PathVariable final long key, final Map<String, Object> model, @PageableDefault(size = DETAIL_LIST_SIZE) final Pageable pageable) {
+      @PathVariable final long key,
+      final Map<String, Object> model,
+      @PageableDefault(size = DETAIL_LIST_SIZE) final Pageable pageable) {
     initializeProcessInstanceDto(key, model, pageable);
     model.put("content-audit-log-view", new EnableConditionalViewRenderer());
     return "instance-detail-view";
   }
 
   @Override
-  protected void fillViewDetailsIntoDto(ProcessInstanceEntity instance, List<ElementInstanceEntity> events, List<IncidentEntity> incidents, Map<Long, String> elementIdsForKeys, Map<String, Object> model, Pageable pageable, ProcessInstanceDto dto) {
+  protected void fillViewDetailsIntoDto(
+      ProcessInstanceEntity instance,
+      List<ElementInstanceEntity> events,
+      List<IncidentEntity> incidents,
+      Map<Long, String> elementIdsForKeys,
+      Map<String, Object> model,
+      Pageable pageable,
+      ProcessInstanceDto dto) {
 
     final var bpmnModelInstance =
         processRepository
@@ -59,24 +67,24 @@ public class InstancesAuditLogViewController extends AbstractInstanceViewControl
     final List<AuditLogEntry> auditLogEntries =
         events.stream()
             .skip((long) pageable.getPageSize() * pageable.getPageNumber())
-            .map(e -> {
-              final AuditLogEntry entry = new AuditLogEntry();
+            .map(
+                e -> {
+                  final AuditLogEntry entry = new AuditLogEntry();
 
-              entry.setKey(e.getKey());
-              entry.setFlowScopeKey(e.getFlowScopeKey());
-              entry.setElementId(e.getElementId());
-              entry.setElementName(flowElements.getOrDefault(e.getElementId(), ""));
-              entry.setBpmnElementType(e.getBpmnElementType());
-              entry.setState(e.getIntent());
-              entry.setTimestamp(Instant.ofEpochMilli(e.getTimestamp()).toString());
+                  entry.setKey(e.getKey());
+                  entry.setFlowScopeKey(e.getFlowScopeKey());
+                  entry.setElementId(e.getElementId());
+                  entry.setElementName(flowElements.getOrDefault(e.getElementId(), ""));
+                  entry.setBpmnElementType(e.getBpmnElementType());
+                  entry.setState(e.getIntent());
+                  entry.setTimestamp(Instant.ofEpochMilli(e.getTimestamp()).toString());
 
-              return entry;
-            })
+                  return entry;
+                })
             .limit(pageable.getPageSize())
             .collect(Collectors.toList());
     dto.setAuditLogEntries(auditLogEntries);
 
     addPaginationToModel(model, pageable, events.size());
   }
-
 }

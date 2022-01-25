@@ -1,15 +1,14 @@
 package io.zeebe.monitor.rest;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.ui.Model;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.ui.Model;
 
 class WhitelabelPropertiesMapperTest {
 
@@ -22,12 +21,9 @@ class WhitelabelPropertiesMapperTest {
 
   @Test
   void properties_mapping_is_in_synch_between_both_overloaded_methods() {
-    final WhitelabelProperties properties = new WhitelabelProperties(
-        "basePath",
-        "logoPath",
-        "customTitle",
-        "customCssPath",
-        "customJsPath");
+    final WhitelabelProperties properties =
+        new WhitelabelProperties(
+            "basePath", "logoPath", "customTitle", "customCssPath", "customJsPath");
 
     Model model = new ModelMock();
     Map<String, Object> modelMap = new HashMap<>();
