@@ -41,6 +41,7 @@ abstract class AbstractViewController {
         !nextPages.isEmpty() && nextPages.stream().allMatch(p -> p.pageNumber < lastPage - 1);
 
     model.put("page", new Page(currentPage));
+    model.put("pageSize", pageable.getPageSize());
     model.put("prevPages", prevPages);
     model.put("nextPages", nextPages);
     model.put("hasPrevPagesGap", hasPrevGap);

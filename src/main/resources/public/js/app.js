@@ -617,17 +617,31 @@ function colorSequenceFlow(graphicsFactory, sequenceFlow, gfx, color) {
 
 // --------------------------------------------------------------------
 
-function listPage(pageElement, page) {
-    let pageParam = "page=" + page
-    let search = window.location.search
+/**
+ *
+ * @param pageElement mandatory, the element's ID
+ * @param page mandatory, the page number
+ * @param size optional, the size value to be added to the URL
+ */
+function listPage(pageElement, page, size) {
+    let pageParam = "page=" + page;
+    let search = window.location.search;
+
+    if (typeof size === "number" && size > 0) {
+        if (search.includes("size")) {
+            pageParam = pageParam.replace(/size=\d+/, ("size=" + size));
+        } else {
+            pageParam = pageParam + "&size=" + size;
+        }
+    }
 
     if(search.includes("page")) {
-        let withNewPage = search.replace(/page=\d+/, pageParam)
-        document.getElementById(pageElement).href = withNewPage
+        let withNewPage = search.replace(/page=\d+/, pageParam);
+        document.getElementById(pageElement).href = withNewPage;
     } else if(search) {
-        document.getElementById(pageElement).href = search + "&" + pageParam
+        document.getElementById(pageElement).href = search + "&" + pageParam;
     } else {
-        document.getElementById(pageElement).href = "?" + pageParam
+        document.getElementById(pageElement).href = "?" + pageParam;
     }
 }
 

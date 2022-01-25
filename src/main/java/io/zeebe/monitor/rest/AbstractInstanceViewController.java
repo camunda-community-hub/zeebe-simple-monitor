@@ -30,8 +30,8 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 public abstract class AbstractInstanceViewController extends AbstractViewController {
 
+  protected static final int DETAIL_LIST_SIZE = 100;
   protected static final String WARNING_NO_XML_RESOURCE_FOUND = "WARNING-NO-XML-RESOURCE-FOUND";
-  protected static final int DETAIL_VIEWS_PAGE_SIZE = 100;
 
   @Autowired
   protected ProcessRepository processRepository;
@@ -41,16 +41,6 @@ public abstract class AbstractInstanceViewController extends AbstractViewControl
   protected ElementInstanceRepository elementInstanceRepository;
   @Autowired
   protected IncidentRepository incidentRepository;
-  @Autowired
-  protected JobRepository jobRepository;
-  @Autowired
-  protected MessageSubscriptionRepository messageSubscriptionRepository;
-  @Autowired
-  protected TimerRepository timerRepository;
-  @Autowired
-  protected VariableRepository variableRepository;
-  @Autowired
-  protected ErrorRepository errorRepository;
 
   protected void initializeProcessInstanceDto(long key, Map<String, Object> model, Pageable pageable) {
     final ProcessInstanceEntity instance = loadProcessInstanceEntity(key);
@@ -62,7 +52,7 @@ public abstract class AbstractInstanceViewController extends AbstractViewControl
     final Map<Long, String> elementIdsForKeys = new HashMap<>();
     elementIdsForKeys.put(instance.getKey(), instance.getBpmnProcessId());
 
-    final List<ElementInstanceEntity> events = loadElementInstanceEntities(instance, pageable);
+    final List<ElementInstanceEntity> events = loadElementInstanceEntities(instance);
     events.forEach(e -> elementIdsForKeys.put(e.getKey(), e.getElementId()));
 
     final List<IncidentEntity> incidents = loadIncidents(instance);
@@ -92,11 +82,9 @@ public abstract class AbstractInstanceViewController extends AbstractViewControl
   }
 
   private List<IncidentEntity> loadIncidents(ProcessInstanceEntity instance) {
-    final List<IncidentEntity> incidents =
-        StreamSupport.stream(
-                incidentRepository.findByProcessInstanceKey(instance.getKey()).spliterator(), false)
-            .collect(Collectors.toList());
-    return incidents;
+    return StreamSupport.stream(
+            incidentRepository.findByProcessInstanceKey(instance.getKey()).spliterator(), false)
+        .collect(Collectors.toList());
   }
 
   private ProcessInstanceDto fillBpmnDetailsIntoDto(ProcessInstanceEntity instance) {
@@ -222,7 +210,7 @@ public abstract class AbstractInstanceViewController extends AbstractViewControl
     dto.setActiveScopes(activeScopes);
   }
 
-  private List<ElementInstanceEntity> loadElementInstanceEntities(ProcessInstanceEntity instance, Pageable pageable) {
+  private List<ElementInstanceEntity> loadElementInstanceEntities(ProcessInstanceEntity instance) {
     return StreamSupport.stream(
             elementInstanceRepository
                 .findByProcessInstanceKey(instance.getKey())

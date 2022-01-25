@@ -26,7 +26,9 @@ import java.util.Optional;
 
 public interface JobRepository extends PagingAndSortingRepository<JobEntity, Long> {
 
-  List<JobEntity> findByProcessInstanceKey(long processInstanceKey);
+  Page<JobEntity> findByProcessInstanceKey(long processInstanceKey, Pageable pageable);
+
+  long countByProcessInstanceKey(long processInstanceKey);
 
   Optional<JobEntity> findByKey(long key);
 

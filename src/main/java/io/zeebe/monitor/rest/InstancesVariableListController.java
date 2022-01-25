@@ -4,10 +4,13 @@ import io.zeebe.monitor.entity.ElementInstanceEntity;
 import io.zeebe.monitor.entity.IncidentEntity;
 import io.zeebe.monitor.entity.ProcessInstanceEntity;
 import io.zeebe.monitor.entity.VariableEntity;
+import io.zeebe.monitor.repository.VariableRepository;
 import io.zeebe.monitor.rest.dto.ProcessInstanceDto;
 import io.zeebe.monitor.rest.dto.VariableEntry;
 import io.zeebe.monitor.rest.dto.VariableUpdateEntry;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,10 +25,13 @@ import java.util.stream.Collectors;
 @Controller
 public class InstancesVariableListController extends AbstractInstanceViewController {
 
+  @Autowired
+  private VariableRepository variableRepository;
+
   @GetMapping("/views/instances/{key}")
   @Transactional
   public String instanceVariableList(
-      @PathVariable final long key, final Map<String, Object> model, final Pageable pageable) {
+      @PathVariable final long key, final Map<String, Object> model, @PageableDefault(size = DETAIL_LIST_SIZE) final Pageable pageable) {
     return instanceDetailVariableList(key, model, pageable);
   }
 
@@ -42,7 +48,7 @@ public class InstancesVariableListController extends AbstractInstanceViewControl
   @Override
   protected void fillViewDetailsIntoDto(ProcessInstanceEntity instance, List<ElementInstanceEntity> events, List<IncidentEntity> incidents, Map<Long, String> elementIdsForKeys, Map<String, Object> model, Pageable pageable, ProcessInstanceDto dto) {
     final Map<VariableTuple, List<VariableEntity>> variablesByScopeAndName =
-        variableRepository.findByProcessInstanceKey(instance.getKey()).stream()
+        variableRepository.findByProcessInstanceKey(instance.getKey(), pageable).stream()
             .collect(Collectors.groupingBy(v -> new VariableTuple(v.getScopeKey(), v.getName())));
     variablesByScopeAndName.forEach(
         (scopeKeyName, variables) -> {
@@ -73,6 +79,8 @@ public class InstancesVariableListController extends AbstractInstanceViewControl
           dto.getVariables().add(variableDto);
         });
 
+    final long count = variableRepository.countByProcessInstanceKey(instance.getKey());
+    addPaginationToModel(model, pageable, count);
   }
 
   private static class VariableTuple {

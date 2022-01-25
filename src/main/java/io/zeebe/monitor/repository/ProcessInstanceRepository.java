@@ -37,5 +37,7 @@ public interface ProcessInstanceRepository
 
   long countByProcessDefinitionKeyAndEndIsNull(long processDefinitionKey);
 
-  List<ProcessInstanceEntity> findByParentProcessInstanceKey(long parentProcessInstanceKey);
+  Page<ProcessInstanceEntity> findByParentProcessInstanceKey(long parentProcessInstanceKey, Pageable pageable);
+
+  long countByParentProcessInstanceKey(long parentProcessInstanceKey);
 }

@@ -77,34 +77,34 @@
 
         console.log("prevPage")
         {{#prevPage}}
-            listPage('previous-page',{{pageNumber}})
+            listPage('previous-page',{{pageNumber}}{{#pageSize}},{{pageSize}}{{/pageSize}})
         {{/prevPage}}
 
             console.log("firstPage")
         {{#firstPage}}
-            listPage('first-page',{{pageNumber}})
+            listPage('first-page',{{pageNumber}}{{#pageSize}},{{pageSize}}{{/pageSize}})
         {{/firstPage}}
 
             console.log("prevPages")
         {{#prevPages}}
             console.log("page-{{pageNumber}}")
-          listPage('page-{{pageNumber}}',{{pageNumber}})
+          listPage('page-{{pageNumber}}',{{pageNumber}}{{#pageSize}},{{pageSize}}{{/pageSize}})
         {{/prevPages}}
 
             console.log("nextPages")
         {{#nextPages}}
             console.log("page-{{pageNumber}}")
-            listPage('page-{{pageNumber}}',{{pageNumber}})
+            listPage('page-{{pageNumber}}',{{pageNumber}}{{#pageSize}},{{pageSize}}{{/pageSize}})
         {{/nextPages}}
 
             console.log("lastPage")
         {{#lastPage}}
-            listPage('last-page',{{pageNumber}})
+            listPage('last-page',{{pageNumber}}{{#pageSize}},{{pageSize}}{{/pageSize}})
         {{/lastPage}}
 
             console.log("nextPage")
         {{#nextPage}}
-        listPage('next-page',{{pageNumber}})
+            listPage('next-page',{{pageNumber}}{{#pageSize}},{{pageSize}}{{/pageSize}})
         {{/nextPage}}
 
     }, false);
