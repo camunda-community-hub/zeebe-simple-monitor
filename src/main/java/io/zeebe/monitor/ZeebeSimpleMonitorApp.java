@@ -15,6 +15,7 @@
  */
 package io.zeebe.monitor;
 
+import com.samskivert.mustache.Mustache;
 import io.camunda.zeebe.spring.client.EnableZeebeClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -52,5 +53,11 @@ public class ZeebeSimpleMonitorApp {
     executor.setQueueCapacity(32);
     executor.initialize();
     return executor;
+  }
+
+  @Bean
+  public Mustache.Compiler configureFallbackValueForMissingVariablesInMustacheTemplates(
+      Mustache.TemplateLoader templateLoader) {
+    return Mustache.compiler().defaultValue("⍰").withLoader(templateLoader);
   }
 }
