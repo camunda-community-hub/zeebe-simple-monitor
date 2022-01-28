@@ -113,7 +113,7 @@ public class ProcessAndElementImporter {
       entity.setProcessDefinitionKey(record.getProcessDefinitionKey());
       entity.setBpmnElementType(record.getBpmnElementType());
       elementInstanceRepository.save(entity);
-      notificationService.sendProcessInstanceUpdated(record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+      notificationService.sendUpdatedProcessInstance(record.getProcessInstanceKey(), record.getProcessDefinitionKey());
     }
   }
 

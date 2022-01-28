@@ -18,16 +18,20 @@ public class ExceptionHandler {
   private static final Logger LOG = LoggerFactory.getLogger(ExceptionHandler.class);
 
   private final WhitelabelProperties whitelabelProperties;
+  private final WhitelabelPropertiesMapper whitelabelPropertiesMapper;
 
-  public ExceptionHandler(WhitelabelProperties whitelabelProperties) {
+  public ExceptionHandler(
+      WhitelabelProperties whitelabelProperties,
+      WhitelabelPropertiesMapper whitelabelPropertiesMapper) {
     this.whitelabelProperties = whitelabelProperties;
+    this.whitelabelPropertiesMapper = whitelabelPropertiesMapper;
   }
 
   @org.springframework.web.bind.annotation.ExceptionHandler(value = {ClientException.class})
-  protected ResponseEntity<Object> handleZeebeClientException(final RuntimeException ex, final WebRequest request) {
+  protected ResponseEntity<Object> handleZeebeClientException(
+      final RuntimeException ex, final WebRequest request) {
     LOG.debug("Zeebe Client Exception caught and forwarding to UI.", ex);
-    return ResponseEntity
-        .status(HttpStatus.FAILED_DEPENDENCY)
+    return ResponseEntity.status(HttpStatus.FAILED_DEPENDENCY)
         .contentType(MediaType.APPLICATION_JSON)
         .body(new ErrorMessage(ex.getMessage()));
   }
@@ -40,13 +44,7 @@ public class ExceptionHandler {
     model.addAttribute("message", exc.getMessage());
     model.addAttribute("trace", ExceptionUtils.getStackTrace(exc));
 
-    model.addAttribute("custom-title", whitelabelProperties.getCustomTitle());
-    model.addAttribute("context-path", whitelabelProperties.getBasePath());
-    model.addAttribute("logo-path", whitelabelProperties.getLogoPath());
-    model.addAttribute("custom-css-path", whitelabelProperties.getCustomCssPath());
-    model.addAttribute("custom-js-path", whitelabelProperties.getCustomCssPath());
-
+    whitelabelPropertiesMapper.addPropertiesToModel(model, whitelabelProperties);
     return "error";
   }
-
 }

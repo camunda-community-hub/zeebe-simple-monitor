@@ -19,15 +19,15 @@ import io.camunda.zeebe.client.ZeebeClient;
 import io.camunda.zeebe.client.api.response.ActivatedJob;
 import io.zeebe.monitor.entity.JobEntity;
 import io.zeebe.monitor.repository.JobRepository;
+import io.zeebe.monitor.rest.dto.ThrowErrorDto;
+import java.time.Duration;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.Duration;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/jobs")
@@ -40,7 +40,8 @@ public class JobResource {
   @Autowired private JobRepository jobRepository;
 
   @RequestMapping(path = "/{key}/complete", method = RequestMethod.PUT)
-  public void completeJob(@PathVariable("key") final long key, @RequestBody final String variables) {
+  public void completeJob(
+      @PathVariable("key") final long key, @RequestBody final String variables) {
 
     zeebeClient.newCompleteCommand(key).variables(variables).send().join();
   }
@@ -58,7 +59,8 @@ public class JobResource {
   }
 
   @RequestMapping(path = "/{key}/throw-error", method = RequestMethod.PUT)
-  public void throwError(@PathVariable("key") final long key, @RequestBody final ThrowErrorDto dto) {
+  public void throwError(
+      @PathVariable("key") final long key, @RequestBody final ThrowErrorDto dto) {
 
     zeebeClient.newThrowErrorCommand(key).errorCode(dto.getErrorCode()).send().join();
   }
