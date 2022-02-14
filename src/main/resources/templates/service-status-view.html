@@ -1,0 +1,76 @@
+{{>layout/header}}
+
+{{>modals/deployment-modal}}
+
+<table class="table w-auto table-sm table-borderless">
+    <tbody>
+        <tr>
+            <td>Simple Monitor Version</td>
+            <td>{{status.simpleMonitorVersion}}</td>
+        </tr>
+        <tr>
+            <td>Simple Monitor Build Time</td>
+            <td>{{status.simpleMonitorBuildTime}}</td>
+        </tr>
+        <tr>
+            <td>Gateway Version</td>
+            <td>{{status.gatewayVersion}}</td>
+        </tr>
+        <tr>
+            <td>Cluster Size</td>
+            <td>{{status.clusterSize}}</td>
+        </tr>
+        <tr>
+            <td>Cluster Replication Factor</td>
+            <td>{{status.replicationFactor}}</td>
+        </tr>
+        <tr>
+            <td>Cluster Partition Count</td>
+            <td>{{status.partitionsCount}}</td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="table w-50 table-sm">
+    <thead>
+        <tr>
+            <td>Node ID</td>
+            <td>Host</td>
+            <td>Port</td>
+            <td>Version</td>
+            <td>Partitions</td>
+        </tr>
+    </thead>
+    <tbody>
+        {{# status.brokers }}
+        <tr>
+            <td>{{ nodeId }}</td>
+            <td>{{ host }}</td>
+            <td>{{ port }}</td>
+            <td>{{ version }}</td>
+            <td>
+                <table class="table table-light table-borderless">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Role</th>
+                            <th>Health</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{# partitionInfos }}
+                        <tr>
+                            <td>{{ partitionId }}</td>
+                            <td>{{ role }}</td>
+                            <td>{{ health }}</td>
+                        <tr>
+                        {{/ partitionInfos }}
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        {{/ status.brokers }}
+    </tbody>
+</table>
+
+{{>layout/footer}}
