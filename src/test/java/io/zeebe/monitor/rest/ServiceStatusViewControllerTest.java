@@ -1,21 +1,18 @@
 package io.zeebe.monitor.rest;
 
-import io.camunda.zeebe.client.api.response.BrokerInfo;
-import io.camunda.zeebe.client.api.response.Topology;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
-import java.util.List;
-
+import static io.zeebe.monitor.ZeebeSimpleMonitorApp.REPLACEMENT_CHARACTER_QUESTIONMARK;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.mockito.ArgumentMatchers.any;
+import static org.hamcrest.CoreMatchers.not;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import io.camunda.zeebe.client.api.response.BrokerInfo;
+import io.camunda.zeebe.client.api.response.Topology;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ServiceStatusViewControllerTest extends AbstractViewOrResourceTest {
 
@@ -30,6 +27,13 @@ public class ServiceStatusViewControllerTest extends AbstractViewOrResourceTest 
         .perform(get("/views/service-status"))
         .andExpect(content().string(containsString("development build")))
         .andExpect(content().string(containsString("gateway-version")));
+  }
+
+  @Test
+  public void status_page_all_DTO_fields_in_template_can_be_resolved() throws Exception {
+    mockMvc
+        .perform(get("/views/service-status"))
+        .andExpect(content().string(not(containsString(REPLACEMENT_CHARACTER_QUESTIONMARK))));
   }
 
   private static class TopologyMock implements Topology {

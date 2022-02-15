@@ -15,8 +15,14 @@
  */
 package io.zeebe.monitor;
 
+import static java.time.Instant.now;
+
 import com.samskivert.mustache.Mustache;
 import io.camunda.zeebe.spring.client.EnableZeebeClient;
+import java.util.Properties;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -27,19 +33,14 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.util.Properties;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-
-import static java.time.Instant.now;
-
 @SpringBootApplication
 @EnableZeebeClient
 @EnableScheduling
 @EnableAsync
 @EnableSpringDataWebSupport
 public class ZeebeSimpleMonitorApp {
+
+  public static final String REPLACEMENT_CHARACTER_QUESTIONMARK = "\u2370"; // == ⍰ character
 
   public static void main(final String... args) {
     SpringApplication.run(ZeebeSimpleMonitorApp.class, args);
@@ -63,7 +64,9 @@ public class ZeebeSimpleMonitorApp {
   @Bean
   public Mustache.Compiler configureFallbackValueForMissingVariablesInMustacheTemplates(
       Mustache.TemplateLoader templateLoader) {
-    return Mustache.compiler().defaultValue("⍰").withLoader(templateLoader);
+    return Mustache.compiler()
+        .defaultValue(REPLACEMENT_CHARACTER_QUESTIONMARK)
+        .withLoader(templateLoader);
   }
 
   @Bean
