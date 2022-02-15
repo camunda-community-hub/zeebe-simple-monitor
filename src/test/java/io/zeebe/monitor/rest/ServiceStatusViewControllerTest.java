@@ -1,5 +1,12 @@
 package io.zeebe.monitor.rest;
 
+import io.camunda.zeebe.client.api.response.BrokerInfo;
+import io.camunda.zeebe.client.api.response.Topology;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
 import static io.zeebe.monitor.ZeebeSimpleMonitorApp.REPLACEMENT_CHARACTER_QUESTIONMARK;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -8,25 +15,11 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
-import io.camunda.zeebe.client.api.response.BrokerInfo;
-import io.camunda.zeebe.client.api.response.Topology;
-import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 public class ServiceStatusViewControllerTest extends AbstractViewOrResourceTest {
 
   @BeforeEach
   public void setUp() throws Exception {
     when(zeebeStatusService.getTopology()).thenReturn(new TopologyMock());
-  }
-
-  @Test
-  public void status_page_contains_default_version_string_if_not_packaged() throws Exception {
-    mockMvc
-        .perform(get("/views/service-status"))
-        .andExpect(content().string(containsString("development build")))
-        .andExpect(content().string(containsString("gateway-version")));
   }
 
   @Test
