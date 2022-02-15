@@ -15,23 +15,19 @@
  */
 package io.zeebe.monitor;
 
-import static java.time.Instant.now;
-
 import com.samskivert.mustache.Mustache;
 import io.camunda.zeebe.spring.client.EnableZeebeClient;
-import java.util.Properties;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 @SpringBootApplication
 @EnableZeebeClient
@@ -69,19 +65,4 @@ public class ZeebeSimpleMonitorApp {
         .withLoader(templateLoader);
   }
 
-  @Bean
-  @ConditionalOnMissingBean(BuildProperties.class)
-  BuildProperties buildProperties() {
-    return new BuildProperties(developmentBuildProperties());
-  }
-
-  private Properties developmentBuildProperties() {
-    final Properties entries = new Properties();
-    entries.setProperty("group", "io.zeebe");
-    entries.setProperty("artifact", "zeebe-simple-monitor");
-    entries.setProperty("name", "Zeebe Simple Monitor");
-    entries.setProperty("version", "development build");
-    entries.setProperty("time", now().toString());
-    return entries;
-  }
 }

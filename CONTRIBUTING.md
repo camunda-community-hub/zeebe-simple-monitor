@@ -100,3 +100,34 @@ type ```text``` in PostgreSQL. This type needs some special treatment.
 you will see just some 5-digit numbers.\
 **Solution**: you need to convert the large object like this\
 ```SELECT convert_from(lo_get(value_::oid), 'UTF8') FROM variable```
+
+### Known Issue: Application Failed To Start, required bean 'BuildProperties' could not be found 
+
+If you're about to run the application locally (e.g. via IntelliJ 'run'),
+you might run into the issue
+
+```
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Field buildProperties in io.zeebe.monitor.rest.ServiceStatusViewController required a bean of type 'org.springframework.boot.info.BuildProperties' that could not be found.
+```
+
+#### Solution
+
+Simply compile the application via maven command.
+```shell
+mvn -DskipTests compile
+```
+
+#### Root cause
+
+The Spring framework supports injecting build information at runtime.
+This requires a file ```META-INF/build-info.properties``` to be present in the classpath.
+This file is created by Maven during the compile phase, via ```spring-boot-maven-plugin``` (see pom.xml).
+When using e.g. IntelliJ 'run' command, Maven is not used by default, to build the application,
+and thus, the file is missing and the bean can't be created.
+The error message is completely miss-leading.
