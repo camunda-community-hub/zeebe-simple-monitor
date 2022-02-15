@@ -31,6 +31,7 @@ docs/book
 docs/mdbook
 
 hs_err*.log
+replay_pid*.log
 /data/
 /metrics/
 docker/**/*.jar
