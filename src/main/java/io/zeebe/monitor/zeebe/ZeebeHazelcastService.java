@@ -21,6 +21,9 @@ public class ZeebeHazelcastService {
   @Value("${zeebe.client.worker.hazelcast.connection}")
   private String hazelcastConnection;
 
+  @Value("${zeebe.client.worker.hazelcast.clusterName}")
+  private String hazelcastClusterName;
+
   @Value("${zeebe.client.worker.hazelcast.connectionTimeout}")
   private String hazelcastConnectionTimeout;
 
@@ -32,7 +35,7 @@ public class ZeebeHazelcastService {
   public void start() {
     final ClientConfig clientConfig = new ClientConfig();
     clientConfig.getNetworkConfig().addAddress(hazelcastConnection);
-
+    clientConfig.setClusterName(hazelcastClusterName);
     final var connectionRetryConfig =
         clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig();
     connectionRetryConfig.setClusterConnectTimeoutMillis(

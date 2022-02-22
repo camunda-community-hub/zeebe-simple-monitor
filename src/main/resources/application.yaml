@@ -9,6 +9,7 @@ zeebe:
       hazelcast:
         connection: localhost:5701
         connectionTimeout: PT30S
+        clusterName: zeebe
 
 spring:
 
