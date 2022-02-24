@@ -27,7 +27,7 @@
         <version.hazelcast>5.0.2</version.hazelcast>
 
         <!-- release parent settings -->
-        <version.java>11</version.java>
+        <version.java>17</version.java>
         <java.version>${version.java}</java.version>
 
         <maven.compiler.source>${java.version}</maven.compiler.source>
