@@ -668,3 +668,52 @@ function listSort(sortProperty, sortElement) {
 }
 
 // --------------------------------------------------------------------
+
+function openSaveFileDialog (data, filename, mimetype) {
+    'use strict';
+
+    if (!data) return;
+
+    var blob = data.constructor !== Blob
+        ? new Blob([data], {type: mimetype || 'application/octet-stream'})
+        : data ;
+
+    if (navigator.msSaveBlob) {
+        navigator.msSaveBlob(blob, filename);
+        return;
+    }
+
+    var lnk = document.createElement('a'),
+        url = window.URL,
+        objectURL;
+
+    if (mimetype) {
+        lnk.type = mimetype;
+    }
+
+    lnk.download = filename || 'untitled';
+    lnk.href = objectURL = url.createObjectURL(blob);
+    lnk.dispatchEvent(new MouseEvent('click'));
+    setTimeout(url.revokeObjectURL.bind(url, objectURL));
+
+}
+
+function onBpmnDownloadClicked(){
+    'use strict';
+    var filename = $('#bpmnDownloadLink').attr('download');
+    openSaveFileDialog(RAW_BPMN_RESOURCE, filename, 'application/bpmn+xml');
+}
+
+(function checkIfBpmnExistsOrDisableDownloadButton() {
+    'use strict';
+    if (RAW_BPMN_RESOURCE === 'WARNING-NO-XML-RESOURCE-FOUND') {
+        var link = $('#bpmnDownloadLink');
+        link.attr('title', 'BPMN definition not found or broken :-( ');
+        link.removeAttr('href');
+        link.removeAttr('onclick');
+        link.css('color', 'grey');
+        link.css('cursor', 'not-allowed');
+    }
+})();
+
+// --------------------------------------------------------------------
