@@ -37,6 +37,10 @@
                 <th># ended</th>
                 <td>{{countEnded}}</td>
             </tr>
+            <tr>
+                <th>BPMN file</th>
+                <td><a id="bpmnDownloadLink" onclick="onBpmnDownloadClicked();" style="cursor: pointer" download="{{bpmnProcessId}}-v{{version}}.bpmn">&#x2913; download</a></td>
+            </tr>
             {{/process}}
         </table>
 
