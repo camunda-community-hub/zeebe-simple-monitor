@@ -33,9 +33,9 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
-        <nexus.snapshot.repository>https://app.camunda.com/nexus/content/repositories/zeebe-io-snapshots/
+        <nexus.snapshot.repository>https://artifacts.camunda.com/artifactory/zeebe-io-snapshots/
         </nexus.snapshot.repository>
-        <nexus.release.repository>https://app.camunda.com/nexus/content/repositories/zeebe-io/
+        <nexus.release.repository>https://artifacts.camunda.com/artifactory/zeebe-io/
         </nexus.release.repository>
 
         <!-- disable jdk8 javadoc checks on release build -->
@@ -347,7 +347,7 @@
         <repository>
             <id>zeebe</id>
             <name>Zeebe Repository</name>
-            <url>https://app.camunda.com/nexus/content/repositories/zeebe-io/</url>
+            <url>https://artifacts.camunda.com/artifactory/zeebe-io/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -359,7 +359,7 @@
         <repository>
             <id>zeebe-snapshots</id>
             <name>Zeebe Snapshot Repository</name>
-            <url>https://app.camunda.com/nexus/content/repositories/zeebe-io-snapshots/</url>
+            <url>https://artifacts.camunda.com/artifactory/zeebe-io-snapshots/</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
