@@ -16,28 +16,15 @@
 package io.zeebe.monitor.rest;
 
 import io.camunda.zeebe.client.ZeebeClient;
-import io.camunda.zeebe.client.api.response.ActivatedJob;
-import io.zeebe.monitor.entity.JobEntity;
-import io.zeebe.monitor.repository.JobRepository;
 import io.zeebe.monitor.rest.dto.ThrowErrorDto;
-import java.time.Duration;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/jobs")
 public class JobResource {
 
-  private static final String WORKER_NAME = "zeebe-simple-monitor";
-
   @Autowired private ZeebeClient zeebeClient;
-
-  @Autowired private JobRepository jobRepository;
 
   @RequestMapping(path = "/{key}/complete", method = RequestMethod.PUT)
   public void completeJob(
@@ -49,9 +36,8 @@ public class JobResource {
   @RequestMapping(path = "/{key}/fail", method = RequestMethod.PUT)
   public void failJob(@PathVariable("key") final long key) {
 
-    final ActivatedJob activatedJob = activateJob(key, zeebeClient);
     zeebeClient
-        .newFailCommand(activatedJob.getKey())
+        .newFailCommand(key)
         .retries(0)
         .errorMessage("Failed by user.")
         .send()
@@ -65,39 +51,4 @@ public class JobResource {
     zeebeClient.newThrowErrorCommand(key).errorCode(dto.getErrorCode()).send().join();
   }
 
-  private ActivatedJob activateJob(final long key, final ZeebeClient client) {
-    final JobEntity job = getJob(key);
-    final String jobType = job.getJobType();
-
-    return activateJob(client, key, jobType);
-  }
-
-  private JobEntity getJob(final long key) {
-    return jobRepository
-        .findByKey(key)
-        .orElseThrow(() -> new RuntimeException("no job found with key: " + key));
-  }
-
-  private ActivatedJob activateJob(final ZeebeClient client, final long key, final String jobType) {
-
-    final List<ActivatedJob> jobs =
-        client
-            .newActivateJobsCommand()
-            .jobType(jobType)
-            .maxJobsToActivate(10)
-            .timeout(Duration.ofSeconds(10))
-            .workerName(WORKER_NAME)
-            .send()
-            .join()
-            .getJobs();
-
-    if (jobs.isEmpty()) {
-      throw new RuntimeException("no activatable job found with key: " + key);
-    } else {
-      return jobs.stream()
-          .filter(activatedJob -> activatedJob.getKey() == key)
-          .findFirst()
-          .orElseGet(() -> activateJob(client, key, jobType));
-    }
-  }
 }
