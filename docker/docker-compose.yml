@@ -19,7 +19,7 @@ services:
 
   simple-monitor-in-memory:
     container_name: zeebe-simple-monitor-in-memory
-    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.4.0
+    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.4.1
     environment:
       - zeebe.client.broker.gateway-address=zeebe:26500
       - zeebe.client.worker.hazelcast.connection=zeebe:5701
@@ -34,7 +34,7 @@ services:
 
   simple-monitor-postgres:
     container_name: zeebe-simple-monitor-postgres
-    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.4.0
+    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.4.1
     environment:
       - zeebe.client.broker.gateway-address=zeebe:26500
       - zeebe.client.worker.hazelcast.connection=zeebe:5701
