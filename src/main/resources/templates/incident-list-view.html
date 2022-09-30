@@ -9,11 +9,20 @@
             <thead>
             <th>Incident Key</th>
             <th>Process Instance Key</th>
-            <th>BPMN process id</th>
+            <th>BPMN process id
+                <a id="bpmn-process-id" href="#" class="badge badge-secondary" data-toggle="tooltip" data-placement="top"
+                                          title="Sort by BPMN process id"></a>
+            </th>
             <th>Process Definition Key</th>
-            <th>Error Type</th>
+            <th>Error Type
+                <a id="error-type" href="#" class="badge badge-secondary" data-toggle="tooltip" data-placement="top"
+                             title="Sort by Error Type"></a>
+            </th>
             <th>State</th>
-            <th>Created Time</th>
+            <th>Created Time
+                <a id="created-time" href="#" class="badge badge-secondary" data-toggle="tooltip" data-placement="top"
+                   title="Sort by Created Time"></a>
+            </th>
             </thead>
 
             {{#incidents}}
@@ -35,6 +44,18 @@
         </table>
 
         {{>components/table-pagination}}
+
+        <script type="application/javascript">
+            document.addEventListener('DOMContentLoaded', function(){
+                listSort('bpmnProcessId','bpmn-process-id')
+            }, false);
+            document.addEventListener('DOMContentLoaded', function(){
+                listSort('errorType','error-type')
+            }, false);
+            document.addEventListener('DOMContentLoaded', function(){
+                listSort('created','created-time')
+            }, false);
+        </script>
 
     </div>
 </div>
