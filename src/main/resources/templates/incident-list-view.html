@@ -2,27 +2,52 @@
 
 <div class="row">
     <div class="col-md-12">
+        <form method="get">
+            <div class="form-row align-items-center">
+                <div class="col-auto">
+                    <div class="input-group mb-2">
+                        <input type="text" class="form-control" id="filter-process-id" name="bpmnProcessId" placeholder="Process ID">
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="input-group mb-2">
+                        <input type="text" class="form-control" id="filter-error-type" name="errorType" placeholder="Error Type">
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary mb-2"><svg class="bi" width="12" height="12" fill="silver"><use xlink:href="/img/bootstrap-icons.svg#funnel"/></svg> Filter</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
+<div class="row">
+    <div class="col-md-12">
         <span>{{count}} open incidents</span>
 
         <table class="table table-striped">
             <thead>
-            <th>Incident Key</th>
-            <th>Process Instance Key</th>
-            <th>BPMN process id
-                <a id="bpmn-process-id" href="#" class="badge badge-secondary" data-toggle="tooltip" data-placement="top"
-                                          title="Sort by BPMN process id"></a>
-            </th>
-            <th>Process Definition Key</th>
-            <th>Error Type
-                <a id="error-type" href="#" class="badge badge-secondary" data-toggle="tooltip" data-placement="top"
-                             title="Sort by Error Type"></a>
-            </th>
-            <th>State</th>
-            <th>Created Time
-                <a id="created-time" href="#" class="badge badge-secondary" data-toggle="tooltip" data-placement="top"
-                   title="Sort by Created Time"></a>
-            </th>
+                <tr>
+                    <th>Incident Key</th>
+                    <th>Process Instance Key</th>
+                    <th>BPMN process id
+                        <a id="bpmn-process-id" href="#" class="badge badge-secondary" data-toggle="tooltip"
+                           data-placement="top"
+                           title="Sort by BPMN process id"></a>
+                    </th>
+                    <th>Process Definition Key</th>
+                    <th>Error Type
+                        <a id="error-type" href="#" class="badge badge-secondary" data-toggle="tooltip" data-placement="top"
+                           title="Sort by Error Type"></a>
+                    </th>
+                    <th>State</th>
+                    <th>Created Time
+                        <a id="created-time" href="#" class="badge badge-secondary" data-toggle="tooltip"
+                           data-placement="top"
+                           title="Sort by Created Time"></a>
+                    </th>
+                </tr>
             </thead>
 
             {{#incidents}}
@@ -57,6 +82,12 @@
             }, false);
         </script>
 
+        <script type="application/javascript">
+            document.addEventListener('DOMContentLoaded', function() {
+                bindQueryParamToElement("filter-process-id", "bpmnProcessId");
+                bindQueryParamToElement("filter-error-type", "errorType");
+            }, false);
+        </script>
     </div>
 </div>
 
