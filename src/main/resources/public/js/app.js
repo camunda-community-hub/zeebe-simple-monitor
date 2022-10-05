@@ -673,60 +673,6 @@ function listSort(sortProperty, sortElement) {
 
 // --------------------------------------------------------------------
 
-var autoRefreshTimerHandle;
-
-function ensureTimerActivated() {
-    if (window.location.href.endsWith("#auto-refresh")) {
-        autoRefreshTimerHandle = setTimeout(function () {
-            window.location.reload();
-        }, 5000);
-    }
-}
-
-function enableAutoRefresh() {
-    if (!window.location.href.endsWith("#auto-refresh")) {
-        window.location.href = window.location.href + "#auto-refresh"
-    }
-    ensureTimerActivated();
-}
-
-function disableAutoRefresh() {
-    if (typeof autoRefreshTimerHandle !== 'undefined') {
-        clearTimeout(autoRefreshTimerHandle);
-        autoRefreshTimerHandle = undefined;
-    }
-    if (window.location.href.endsWith("#auto-refresh")) {
-        // this unfortunately triggers again a page reload
-        window.location.href = window.location.href.replace("#auto-refresh", "")
-    }
-}
-
-<!-- Bootstrap 'Bootstrap 4 Toggle' enable the plugin -->
-(function(){
-    'use strict';
-    let toggle = $('#toggle-auto-refresh');
-    toggle.bootstrapToggle();
-    toggle.change(function () {
-        if ($(this).prop('checked')) {
-            enableAutoRefresh();
-        } else {
-            disableAutoRefresh();
-        }
-    })
-})();
-
-function ensureButtonAndTimerActivated() {
-    if (window.location.href.endsWith("#auto-refresh")) {
-        // will also fire the change event
-        $('#toggle-auto-refresh').bootstrapToggle('on');
-    }
-}
-
-// important to check, when page was reloaded
-ensureButtonAndTimerActivated();
-
-// --------------------------------------------------------------------
-
 function openSaveFileDialog (data, filename, mimetype) {
     'use strict';
 
