@@ -17,6 +17,19 @@
                 <div class="col-auto">
                     <div class="input-group mb-2">
                         <input type="text" class="form-control" id="filter-created-after" name="createdAfter" placeholder="created after" style="width: 15em">
+                        <div class="btn-group dropleft">
+                            <button id="dropdownMenuButton" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <svg class="bi" width="12" height="12" fill="silver"><use xlink:href="/img/bootstrap-icons.svg#clock-history"/></svg>
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" id="last-7-days" href="#">last 7 days</a>
+                                <a class="dropdown-item" id="last-24-hours" href="#">last 24 hours</a>
+                                <a class="dropdown-item" id="last-12-hours" href="#">last 12 hours</a>
+                                <a class="dropdown-item" id="last-6-hours" href="#">last 6 hours</a>
+                                <a class="dropdown-item" id="last-1-hour" href="#">last 1 hour</a>
+                                <a class="dropdown-item" id="last-10-minutes" href="#">last 10 minutes</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-auto">
@@ -95,6 +108,22 @@
                 bindQueryParamToElement("filter-error-type", "errorType");
                 bindQueryParamToElement("filter-created-after", "createdAfter");
                 bindQueryParamToElement("filter-created-before", "createdBefore");
+            }, false);
+            document.addEventListener('DOMContentLoaded', function() {
+                function createLastTimeHandler(timeDiff) {
+                    return function() {
+                        'use strict';
+                        let past = new Date().getTime() - timeDiff;
+                        let newVal = new Date(past).toISOString();
+                        document.getElementById("filter-created-after").setAttribute("value", newVal);
+                    }
+                }
+                $("#last-7-days").click(createLastTimeHandler(1000*60*60*24*7));
+                $("#last-24-hours").click(createLastTimeHandler(1000*60*60*24));
+                $("#last-12-hours").click(createLastTimeHandler(1000*60*60*12));
+                $("#last-6-hours").click(createLastTimeHandler(1000*60*60*6));
+                $("#last-1-hour").click(createLastTimeHandler(1000*60*60));
+                $("#last-10-minutes").click(createLastTimeHandler(1000*60*10));
             }, false);
         </script>
     </div>
