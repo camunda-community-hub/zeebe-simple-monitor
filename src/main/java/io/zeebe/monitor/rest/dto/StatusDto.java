@@ -11,7 +11,6 @@ public class StatusDto {
   private int replicationFactor;
   private int partitionsCount;
   private List<BrokerDto> brokers = new ArrayList<>();
-  private String simpleMonitorBuildTime;
 
   public void setClusterSize(int clusterSize) {
     this.clusterSize = clusterSize;
@@ -61,11 +60,4 @@ public class StatusDto {
     return simpleMonitorVersion;
   }
 
-  public void setSimpleMonitorBuildTime(String simpleMonitorBuildTime) {
-    this.simpleMonitorBuildTime = simpleMonitorBuildTime;
-  }
-
-  public String getSimpleMonitorBuildTime() {
-    return simpleMonitorBuildTime;
-  }
 }
