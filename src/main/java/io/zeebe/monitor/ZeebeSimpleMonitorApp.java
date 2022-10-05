@@ -25,9 +25,15 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 @SpringBootApplication
 @EnableZeebeClient
@@ -63,6 +69,18 @@ public class ZeebeSimpleMonitorApp {
     return Mustache.compiler()
         .defaultValue(REPLACEMENT_CHARACTER_QUESTIONMARK)
         .withLoader(templateLoader);
+  }
+
+  @Bean
+  public Attributes loadAttributesFromManifest() {
+    URLClassLoader cl = (URLClassLoader) ZeebeSimpleMonitorApp.class.getClassLoader();
+    URL url = cl.findResource("META-INF/MANIFEST.MF");
+    try (InputStream is = url.openStream()) {
+      Manifest manifest = new Manifest(is);
+      return manifest.getMainAttributes();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
 }

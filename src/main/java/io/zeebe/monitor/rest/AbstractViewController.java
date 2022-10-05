@@ -1,20 +1,20 @@
 package io.zeebe.monitor.rest;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import io.camunda.zeebe.client.api.response.BrokerInfo;
 import io.camunda.zeebe.client.api.response.PartitionInfo;
 import io.camunda.zeebe.client.api.response.Topology;
-import io.zeebe.monitor.ZeebeSimpleMonitorApp;
 import io.zeebe.monitor.rest.dto.BrokerDto;
-import io.zeebe.monitor.rest.dto.PartitionInfoDto;
 import io.zeebe.monitor.rest.dto.ClusterStatusDto;
+import io.zeebe.monitor.rest.dto.PartitionInfoDto;
 import io.zeebe.monitor.zeebe.status.ClusterStatus;
 import io.zeebe.monitor.zeebe.status.ZeebeStatusKeeper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+
+import java.util.Map;
+import java.util.jar.Attributes;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 abstract class AbstractViewController {
 
@@ -24,6 +24,7 @@ abstract class AbstractViewController {
   @Autowired private WhitelabelProperties whitelabelProperties;
   @Autowired private WhitelabelPropertiesMapper whitelabelPropertiesMapper;
   @Autowired private ZeebeStatusKeeper zeebeStatusKeeper;
+  @Autowired private Attributes applicationAttributes;
 
   protected void addPaginationToModel(
       final Map<String, Object> model, final Pageable pageable, final long count) {
@@ -84,7 +85,7 @@ abstract class AbstractViewController {
   protected void addDefaultAttributesToModel(Map<String, Object> model) {
     whitelabelPropertiesMapper.addPropertiesToModel(model, whitelabelProperties);
     final ClusterStatus status = zeebeStatusKeeper.getStatus();
-    final String version = ZeebeSimpleMonitorApp.class.getPackage().getImplementationVersion();
+    final String version = applicationAttributes.getValue("Implementation-Version");
     model.put("status", toStatusDto(status, version));
   }
 
