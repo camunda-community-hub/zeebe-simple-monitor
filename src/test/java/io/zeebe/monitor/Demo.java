@@ -11,7 +11,7 @@ public class Demo {
     final ZeebeClient client = ZeebeClient.newClientBuilder().usePlaintext().build();
 
     client
-        .newDeployCommand()
+        .newDeployResourceCommand()
         .addResourceFromClasspath("orderProcess.bpmn")
         .addResourceFromClasspath("ship-parcel.bpmn")
         .addResourceFromClasspath("payment.bpmn")
