@@ -1,16 +1,34 @@
 package io.zeebe.monitor.rest.dto;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StatusDto {
+public class ClusterStatusDto {
+
+  private boolean healthy;
+  private String healthyString;
   private String gatewayVersion;
   private String simpleMonitorVersion;
   private int clusterSize;
   private int replicationFactor;
   private int partitionsCount;
   private List<BrokerDto> brokers = new ArrayList<>();
+
+  public boolean isHealthy() {
+    return healthy;
+  }
+
+  public void setHealthy(boolean healthy) {
+    this.healthy = healthy;
+  }
+
+  public String getHealthyString() {
+    return healthyString;
+  }
+
+  public void setHealthyString(String healthyString) {
+    this.healthyString = healthyString;
+  }
 
   public void setClusterSize(int clusterSize) {
     this.clusterSize = clusterSize;

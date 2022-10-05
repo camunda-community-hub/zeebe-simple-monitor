@@ -1,0 +1,83 @@
+<div id="clusterStatusModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Cluster Status</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table w-auto table-sm table-borderless">
+                    <tbody>
+                    <tr>
+                        <td>Simple Monitor Version</td>
+                        <td>{{status.simpleMonitorVersion}}</td>
+                    </tr>
+                    <tr>
+                        <td>Gateway Version</td>
+                        <td>{{status.gatewayVersion}}</td>
+                    </tr>
+                    <tr>
+                        <td>Cluster Size</td>
+                        <td>{{status.clusterSize}}</td>
+                    </tr>
+                    <tr>
+                        <td>Cluster Replication Factor</td>
+                        <td>{{status.replicationFactor}}</td>
+                    </tr>
+                    <tr>
+                        <td>Cluster Partition Count</td>
+                        <td>{{status.partitionsCount}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <table class="table table-sm">
+                    <thead>
+                    <tr>
+                        <td>Node ID</td>
+                        <td>Host</td>
+                        <td>Port</td>
+                        <td>Version</td>
+                        <td>Partitions</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{# status.brokers }}
+                    <tr>
+                        <td>{{ nodeId }}</td>
+                        <td>{{ host }}</td>
+                        <td>{{ port }}</td>
+                        <td>{{ version }}</td>
+                        <td>
+                            <table class="table table-light table-borderless">
+                                <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Role</th>
+                                    <th>Health</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {{# partitionInfos }}
+                                <tr>
+                                    <td>{{ partitionId }}</td>
+                                    <td>{{ role }}</td>
+                                    <td>{{ health }}</td>
+                                <tr>
+                                    {{/ partitionInfos }}
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    {{/ status.brokers }}
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>

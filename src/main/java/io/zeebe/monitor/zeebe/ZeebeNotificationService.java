@@ -1,5 +1,6 @@
 package io.zeebe.monitor.zeebe;
 
+import io.zeebe.monitor.rest.ui.ClusterHealthyNotification;
 import io.zeebe.monitor.rest.ui.ProcessInstanceNotification;
 import io.zeebe.monitor.rest.ui.ProcessInstanceNotification.Type;
 import io.zeebe.monitor.rest.ui.ZeebeClusterNotification;
@@ -57,5 +58,10 @@ public class ZeebeNotificationService {
   private void sendNotification(final ZeebeClusterNotification notification) {
     final var destination = basePath + "notifications/zeebe-cluster";
     webSocket.convertAndSend(destination, notification);
+  }
+
+  public void sendClusterStatusUpdate(ClusterHealthyNotification clusterStatus) {
+    final var destination = basePath + "notifications/zeebe-status";
+    webSocket.convertAndSend(destination, clusterStatus);
   }
 }

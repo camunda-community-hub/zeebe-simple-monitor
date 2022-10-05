@@ -116,6 +116,9 @@ function connect() {
         stompClient.subscribe(buildPath('notifications/zeebe-cluster'), function (message) {
             handleZeebeClusterNotification(JSON.parse(message.body));
         });
+        stompClient.subscribe(buildPath('notifications/zeebe-status'), function (message) {
+            handleZeebeStatusNotification(JSON.parse(message.body));
+        });
     });
 }
 
@@ -149,6 +152,31 @@ function handleProcessInstanceNotification(notification) {
  */
 function handleZeebeClusterNotification(notification) {
     showError(notification.message)
+}
+
+/**
+ * @typedef ClusterHealthyNotification
+ * @type {object}
+ * @property {boolean} healthy
+ * @property {string} healthyString
+ */
+
+/**
+ * @param status {ClusterHealthyNotification}
+ */
+function handleZeebeStatusNotification(status) {
+    'use strict';
+    let $button = $("#button-show-status");
+    let oldHealthyString = $button.html().trim();
+    if (oldHealthyString !== status.healthyString) {
+        $button.html("Reload to update");
+        $button.removeClass("btn-outline-success");
+        $button.removeClass("btn-outline-danger");
+        $button.addClass("btn-outline-warning");
+        $button.click(function () {
+            location.reload();
+        });
+    }
 }
 
 function subscribeForProcessInstance(key) {
