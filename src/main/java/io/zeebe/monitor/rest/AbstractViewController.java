@@ -3,6 +3,7 @@ package io.zeebe.monitor.rest;
 import io.camunda.zeebe.client.api.response.BrokerInfo;
 import io.camunda.zeebe.client.api.response.PartitionInfo;
 import io.camunda.zeebe.client.api.response.Topology;
+import io.zeebe.monitor.ZeebeSimpleMonitorApp;
 import io.zeebe.monitor.rest.dto.BrokerDto;
 import io.zeebe.monitor.rest.dto.ClusterStatusDto;
 import io.zeebe.monitor.rest.dto.PartitionInfoDto;
@@ -85,7 +86,7 @@ abstract class AbstractViewController {
   protected void addDefaultAttributesToModel(Map<String, Object> model) {
     whitelabelPropertiesMapper.addPropertiesToModel(model, whitelabelProperties);
     final ClusterStatus status = zeebeStatusKeeper.getStatus();
-    final String version = applicationAttributes.getValue("Implementation-Version");
+    final String version = applicationAttributes.getValue(ZeebeSimpleMonitorApp.IMPLEMENTATION_VERSION);
     model.put("status", toStatusDto(status, version));
   }
 

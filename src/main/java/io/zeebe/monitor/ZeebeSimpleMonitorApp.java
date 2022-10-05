@@ -17,6 +17,8 @@ package io.zeebe.monitor;
 
 import com.samskivert.mustache.Mustache;
 import io.camunda.zeebe.spring.client.EnableZeebeClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -42,7 +44,9 @@ import java.util.jar.Manifest;
 @EnableSpringDataWebSupport
 public class ZeebeSimpleMonitorApp {
 
+  private static final Logger LOG = LoggerFactory.getLogger(ZeebeSimpleMonitorApp.class);
   public static final String REPLACEMENT_CHARACTER_QUESTIONMARK = "\u2370"; // == ⍰ character
+  public static final String IMPLEMENTATION_VERSION = "Implementation-Version";
 
   public static void main(final String... args) {
     SpringApplication.run(ZeebeSimpleMonitorApp.class, args);
@@ -73,14 +77,20 @@ public class ZeebeSimpleMonitorApp {
 
   @Bean
   public Attributes loadAttributesFromManifest() {
-    URLClassLoader cl = (URLClassLoader) ZeebeSimpleMonitorApp.class.getClassLoader();
-    URL url = cl.findResource("META-INF/MANIFEST.MF");
-    try (InputStream is = url.openStream()) {
-      Manifest manifest = new Manifest(is);
-      return manifest.getMainAttributes();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    final ClassLoader classLoader = ZeebeSimpleMonitorApp.class.getClassLoader();
+    if (classLoader instanceof URLClassLoader) {
+      URLClassLoader cl = (URLClassLoader) classLoader;
+      URL url = cl.findResource("META-INF/MANIFEST.MF");
+      try (InputStream is = url.openStream()) {
+        Manifest manifest = new Manifest(is);
+        return manifest.getMainAttributes();
+      } catch (IOException e) {
+        LOG.warn("can't determine version info from manifest, error: " + e.getMessage());
+      }
     }
+    final Attributes attributes = new Attributes();
+    attributes.putValue(IMPLEMENTATION_VERSION, "dev");
+    return attributes;
   }
 
 }
