@@ -2,9 +2,11 @@ Zeebe Simple Monitor
 =========================
 
 [![](https://img.shields.io/badge/Community%20Extension-An%20open%20source%20community%20maintained%20project-FF4700)](https://github.com/camunda-community-hub/community)
-
 [![](https://img.shields.io/badge/Lifecycle-Stable-brightgreen)](https://github.com/Camunda-Community-Hub/community/blob/main/extension-lifecycle.md#stable-)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+[![Compatible with: Camunda Platform 8](https://img.shields.io/badge/Compatible%20with-Camunda%20Platform%208-0072Ce)](https://github.com/camunda-community-hub/community/blob/main/extension-lifecycle.md#compatiblilty)
+[![](https://img.shields.io/badge/Maintainer%20Wanted-This%20extension%20is%20in%20search%20of%20a%20Maintainer-ff69b4)](https://github.com/camunda-community-hub/community/blob/main/extension-lifecycle.md)
 
 A monitoring application for [Zeebe](https://zeebe.io). It is designed for developers to
 
@@ -27,7 +29,7 @@ See the [upgrade instructions](./UPGRADE.md).
 The docker image for the worker is published to [GitHub Packages](https://github.com/orgs/camunda-community-hub/packages/container/package/zeebe-simple-monitor).
 
 ```
-docker pull ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.3.0
+docker pull ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.4.1
 ```
 
 * ensure that a Zeebe broker is running with a [Hazelcast exporter](https://github.com/camunda-community-hub/zeebe-hazelcast-exporter#install) (>= `1.0.0`)  
@@ -38,7 +40,7 @@ docker pull ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.3.0
 If the Zeebe broker runs on your local machine with the default configs then start the container with the following command:  
 
 ```
-docker run --network="host" ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.3.0
+docker run --network="host" ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.4.1
 ```
 
 For a local setup, the repository contains a [docker-compose file](docker/docker-compose.yml). It starts a Zeebe broker with the Hazelcast exporter and the application. 

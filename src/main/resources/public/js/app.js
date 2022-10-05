@@ -1,3 +1,7 @@
+const IMAGE_ARROW_DOWN = '<svg class="bi" width="12" height="12" fill="white"><use xlink:href="/img/bootstrap-icons.svg#caret-down-fill"/></svg>';
+const IMAGE_ARROW_UP = '<svg class="bi" width="12" height="12" fill="white"><use xlink:href="/img/bootstrap-icons.svg#caret-up-fill"/></svg>';
+const IMAGE_LIGHTNING = '<svg class="bi" width="12" height="12" fill="white"><use xlink:href="/img/bootstrap-icons.svg#lightning-fill"/></svg>';
+
 /**
  * @typedef ErrorMessage
  * @type {object}
@@ -593,7 +597,7 @@ function addIncidentMarker(overlays, elemenId) {
             right: 10
         },
         html: '<span class="bpmn-badge-incident" data-toggle="tooltip" data-placement="bottom" title="incident">'
-            + "⚡"
+            + IMAGE_LIGHTNING
             + '</span>'
     });
 }
@@ -652,18 +656,18 @@ function listSort(sortProperty, sortElement) {
     let search = window.location.search
     if(search.includes(sortAsc)) {
         let withReverseOrder = search.replace(sortAsc, sortDesc)
-        document.getElementById(sortElement).href = withReverseOrder
-        document.getElementById(sortElement).innerHTML = "▼"
+        document.getElementById(sortElement).href = withReverseOrder;
+        document.getElementById(sortElement).innerHTML = IMAGE_ARROW_DOWN;
     } else if(search.includes(sortDesc)) {
         let withReverseOrder = search.replace(sortDesc, sortAsc)
         document.getElementById(sortElement).href = withReverseOrder
-        document.getElementById(sortElement).innerHTML = "▲"
+        document.getElementById(sortElement).innerHTML = IMAGE_ARROW_UP;
     } else if(search) {
         document.getElementById(sortElement).href = search + "&" + sortDesc
-        document.getElementById(sortElement).innerHTML = "▼"
+        document.getElementById(sortElement).innerHTML = IMAGE_ARROW_DOWN;
     } else {
         document.getElementById(sortElement).href = "?" + sortDesc
-        document.getElementById(sortElement).innerHTML = "▼"
+        document.getElementById(sortElement).innerHTML = IMAGE_ARROW_UP;
     }
 }
 

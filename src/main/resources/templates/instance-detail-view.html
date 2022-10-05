@@ -93,31 +93,31 @@
         <nav>
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
                 <a class="nav-item nav-link {{#content-variable-list-view}}active{{/content-variable-list-view}}"
-                   id="nav-home-tab" href="/views/instances/{{instance.processInstanceKey}}/variable-list" role="tab"
+                   id="nav-home-tab" href="{{context-path}}views/instances/{{instance.processInstanceKey}}/variable-list" role="tab"
                    aria-controls="nav-home" aria-selected="true">Variables</a>
                 <a class="nav-item nav-link {{#content-audit-log-view}}active{{/content-audit-log-view}}"
-                   id="nav-audit-tab" href="/views/instances/{{instance.processInstanceKey}}/audit-log" role="tab"
+                   id="nav-audit-tab" href="{{context-path}}views/instances/{{instance.processInstanceKey}}/audit-log" role="tab"
                    aria-controls="nav-contact" aria-selected="false">Audit Log</a>
                 <a class="nav-item nav-link {{#content-incident-list-view}}active{{/content-incident-list-view}}"
-                   id="nav-incidents-tab" href="/views/instances/{{instance.processInstanceKey}}/incident-list" role="tab"
+                   id="nav-incidents-tab" href="{{context-path}}views/instances/{{instance.processInstanceKey}}/incident-list" role="tab"
                    aria-controls="nav-profile" aria-selected="false">Incidents</a>
                 <a class="nav-item nav-link {{#content-job-list-view}}active{{/content-job-list-view}}"
-                   id="nav-jobs-tab" href="/views/instances/{{instance.processInstanceKey}}/job-list" role="tab"
+                   id="nav-jobs-tab" href="{{context-path}}views/instances/{{instance.processInstanceKey}}/job-list" role="tab"
                    aria-controls="nav-contact" aria-selected="false">Jobs</a>
                 <a class="nav-item nav-link {{#content-message-subscription-list-view}}active{{/content-message-subscription-list-view}}"
                    id="nav-message-subscriptions-tab"
-                   href="/views/instances/{{instance.processInstanceKey}}/message-subscription-list" role="tab" aria-controls="nav-contact" aria-selected="false">Message
+                   href="{{context-path}}views/instances/{{instance.processInstanceKey}}/message-subscription-list" role="tab" aria-controls="nav-contact" aria-selected="false">Message
                     Subscriptions</a>
                 <a class="nav-item nav-link {{#content-timer-list-view}}active{{/content-timer-list-view}}"
-                   id="nav-timers-tab" href="/views/instances/{{instance.processInstanceKey}}/timer-list" role="tab"
+                   id="nav-timers-tab" href="{{context-path}}views/instances/{{instance.processInstanceKey}}/timer-list" role="tab"
                    aria-controls="nav-contact" aria-selected="false">Timers</a>
                 <a class="nav-item nav-link {{#content-called-processes-list-view}}active{{/content-called-processes-list-view}}"
                    id="nav-called-processes-tab"
-                   href="/views/instances/{{instance.processInstanceKey}}/called-processes-list" role="tab"
+                   href="{{context-path}}views/instances/{{instance.processInstanceKey}}/called-processes-list" role="tab"
                    aria-controls="nav-contact" aria-selected="false">Called Process Instances</a>
                 <a class="nav-item nav-link {{#content-error-list-view}}active{{/content-error-list-view}}"
                    id="nav-errors-tab"
-                   href="/views/instances/{{instance.processInstanceKey}}/error-list" role="tab"
+                   href="{{context-path}}views/instances/{{instance.processInstanceKey}}/error-list" role="tab"
                    aria-controls="nav-contact" aria-selected="false">Errors</a>
             </div>
         </nav>

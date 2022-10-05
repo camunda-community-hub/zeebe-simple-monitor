@@ -25,7 +25,7 @@ jobs:
       - name: Set up Java environment
         uses: actions/setup-java@e54a62b3df9364d4b4c1c29c7225e57fe605d7dd # pin@v1
         with:
-          java-version: 11
+          java-version: 17
           gpg-private-key: ${{ secrets.MAVEN_CENTRAL_GPG_SIGNING_KEY_SEC }}
           gpg-passphrase: MAVEN_CENTRAL_GPG_PASSPHRASE
       - name: Login to Docker
