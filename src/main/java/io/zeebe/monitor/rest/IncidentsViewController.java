@@ -1,6 +1,6 @@
 package io.zeebe.monitor.rest;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.Predicate;
 import io.zeebe.monitor.entity.IncidentEntity;
 import io.zeebe.monitor.querydsl.IncidentEntityPredicatesBuilder;
 import io.zeebe.monitor.repository.IncidentRepository;
@@ -28,15 +28,19 @@ public class IncidentsViewController extends AbstractViewController {
   public String incidentList(final Map<String, Object> model,
                              final Pageable pageable,
                              @RequestParam(required = false) String bpmnProcessId,
-                             @RequestParam(required = false) String errorType) {
+                             @RequestParam(required = false) String errorType,
+                             @RequestParam(required = false) String createdAfter,
+                             @RequestParam(required = false) String createdBefore) {
 
-    final IncidentEntityPredicatesBuilder predicatesBuilder = new IncidentEntityPredicatesBuilder();
-    predicatesBuilder.onlyUnresolved();
-    predicatesBuilder.withProcessId(bpmnProcessId);
-    predicatesBuilder.withErrorType(errorType);
-    final BooleanExpression predicates = predicatesBuilder.build();
+    final Predicate predicate = new IncidentEntityPredicatesBuilder()
+        .onlyUnresolved()
+        .withProcessId(bpmnProcessId)
+        .withErrorType(errorType)
+        .createdAfter(createdAfter)
+        .createdBefore(createdBefore)
+        .build();
 
-    final Page<IncidentEntity> dtos = incidentRepository.findAll(predicates, pageable);
+    final Page<IncidentEntity> dtos = incidentRepository.findAll(predicate, pageable);
     final List<IncidentListDto> incidents = new ArrayList<>();
     for (final IncidentEntity incidentEntity : dtos) {
       final IncidentListDto dto = toDto(incidentEntity);

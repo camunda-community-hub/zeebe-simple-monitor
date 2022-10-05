@@ -6,12 +6,22 @@
             <div class="form-row align-items-center">
                 <div class="col-auto">
                     <div class="input-group mb-2">
-                        <input type="text" class="form-control" id="filter-process-id" name="bpmnProcessId" placeholder="Process ID">
+                        <input type="text" class="form-control" id="filter-process-id" name="bpmnProcessId" placeholder="process id" style="width: 15em">
                     </div>
                 </div>
                 <div class="col-auto">
                     <div class="input-group mb-2">
-                        <input type="text" class="form-control" id="filter-error-type" name="errorType" placeholder="Error Type">
+                        <input type="text" class="form-control" id="filter-error-type" name="errorType" placeholder="error type" style="width: 15em">
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="input-group mb-2">
+                        <input type="text" class="form-control" id="filter-created-after" name="createdAfter" placeholder="created after" style="width: 15em">
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="input-group mb-2">
+                        <input type="text" class="form-control" id="filter-created-before" name="createdBefore" placeholder="created before" style="width: 15em">
                     </div>
                 </div>
                 <div class="col-auto">
@@ -80,12 +90,11 @@
             document.addEventListener('DOMContentLoaded', function(){
                 listSort('created','created-time')
             }, false);
-        </script>
-
-        <script type="application/javascript">
             document.addEventListener('DOMContentLoaded', function() {
                 bindQueryParamToElement("filter-process-id", "bpmnProcessId");
                 bindQueryParamToElement("filter-error-type", "errorType");
+                bindQueryParamToElement("filter-created-after", "createdAfter");
+                bindQueryParamToElement("filter-created-before", "createdBefore");
             }, false);
         </script>
     </div>
