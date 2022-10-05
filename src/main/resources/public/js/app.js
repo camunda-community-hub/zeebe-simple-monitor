@@ -672,7 +672,6 @@ function listSort(sortProperty, sortElement) {
 }
 
 // --------------------------------------------------------------------
-
 function openSaveFileDialog (data, filename, mimetype) {
     'use strict';
 
