@@ -22,7 +22,7 @@ public class ZeebeApplicationMysqlTest {
     private VariableRepository variableRepository;
 
     @Test
-    void setup_of_postgres_should_work() {
+    void setup_of_mysql_should_work() {
         assertThat(variableRepository).isNotNull();
     }
 }
