@@ -150,6 +150,21 @@ For example, using PostgreSQL:
 
 See the [docker-compose file](docker/docker-compose.yml) (profile: `postgres`) for a sample configuration with PostgreSQL. 
 
+The configuration for using MySql is similar but with an additional setting for the Hibernate naming strategy:
+
+```
+- spring.datasource.url=jdbc:mysql://db:3306/simple_monitor
+- spring.datasource.username=root
+- spring.datasource.password=zeebe
+- spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver
+- spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+- spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+```
+
+* the MySql database driver is already bundled
+
+See the [docker-compose file](docker/docker-compose.yml) (profile: `mysql`) for a sample configuration with MySql.
+
 ## Code of Conduct
 
 This project adheres to the Contributor Covenant [Code of
