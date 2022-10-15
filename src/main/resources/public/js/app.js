@@ -710,7 +710,7 @@ function onBpmnDownloadClicked(){
 
 (function checkIfBpmnExistsOrDisableDownloadButton() {
     'use strict';
-    if (RAW_BPMN_RESOURCE === 'WARNING-NO-XML-RESOURCE-FOUND') {
+    if (typeof RAW_BPMN_RESOURCE !== 'undefined' && RAW_BPMN_RESOURCE === 'WARNING-NO-XML-RESOURCE-FOUND') {
         var link = $('#bpmnDownloadLink');
         link.attr('title', 'BPMN definition not found or broken :-( ');
         link.removeAttr('href');
