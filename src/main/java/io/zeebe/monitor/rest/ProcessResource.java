@@ -59,7 +59,7 @@ public class ProcessResource {
 
     final var cmd =
         zeebeClient
-            .newDeployCommand()
+            .newDeployResourceCommand()
             .addResourceBytes(firstFile.getContent(), firstFile.getFilename());
 
     for (final FileDto file : files.subList(1, files.size())) {
