@@ -27,7 +27,6 @@ spring:
 
   data:
     web:
-      allowedOriginsUrls: ""
       pageable:
         default-page-size: 10
 
@@ -35,6 +34,7 @@ server:
   port: 8082
   servlet:
     context-path: /
+  allowedOriginsUrls: ""
 
 logging:
   level:

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-  @Value("${spring.data.web.allowedOriginsUrls}")
+  @Value("${spring.web.data.allowedOriginsUrls}")
   private String allowedOriginsUrls;
 
   @Override
