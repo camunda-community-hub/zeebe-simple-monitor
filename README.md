@@ -106,6 +106,7 @@ server:
   port: 8082
   servlet:
     context-path: /
+  allowedOriginsUrls: ""
 ```
 
 #### Change the Context-Path
@@ -116,6 +117,17 @@ The context-path or base-path of the application can be changed using the follow
 server:
   servlet:
     context-path: /monitor/
+```
+
+It is then available under http://localhost:8082/monitor.
+
+#### Cross Origin Requests
+
+To enable cors, add the allowed origins (`;` seperated) in the following property:
+
+``` 
+server:
+  allowedOriginsUrls: http://remote-hoste:8082;https://remote-hoste:8082
 ```
 
 It is then available under http://localhost:8082/monitor.
