@@ -22,8 +22,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
   @Override
   public void registerStompEndpoints(StompEndpointRegistry registry) {
-    String[] allowedOriginsUrlArr = this.allowedOriginsUrls.split(";");
-    if(allowedOriginsUrlArr.length>0){
+    if(this.allowedOriginsUrls != null && this.allowedOriginsUrls.length>0){
+        String[] allowedOriginsUrlArr = this.allowedOriginsUrls.split(";");
         registry.addEndpoint("/notifications").setAllowedOrigins(allowedOriginsUrlArr).withSockJS();
     }else{
         registry.addEndpoint("/notifications").withSockJS();
