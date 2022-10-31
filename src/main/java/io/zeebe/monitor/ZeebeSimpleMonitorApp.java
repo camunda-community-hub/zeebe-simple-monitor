@@ -17,6 +17,10 @@ package io.zeebe.monitor;
 
 import com.samskivert.mustache.Mustache;
 import io.camunda.zeebe.spring.client.EnableZeebeClient;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -24,14 +28,8 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @SpringBootApplication
@@ -70,15 +68,15 @@ public class ZeebeSimpleMonitorApp {
 
   @Bean
   public WebMvcConfigurer corsConfigurer() {
-      String urls = this.allowedOriginsUrls;
-      return new WebMvcConfigurerAdapter() {
-          @Override
-          public void addCorsMappings(CorsRegistry registry) {
-              if(urls != null && urls.length()>0){
-                String[] allowedOriginsUrlArr = urls.split(";");
-                registry.addMapping("/**").allowedOrigins(allowedOriginsUrlArr);
-              }
-          }
-      };
+    String urls = this.allowedOriginsUrls;
+    return new WebMvcConfigurerAdapter() {
+      @Override
+      public void addCorsMappings(CorsRegistry registry) {
+        if (urls != null && urls.length() > 0) {
+          String[] allowedOriginsUrlArr = urls.split(";");
+          registry.addMapping("/**").allowedOrigins(allowedOriginsUrlArr);
+        }
+      }
+    };
   }
 }
