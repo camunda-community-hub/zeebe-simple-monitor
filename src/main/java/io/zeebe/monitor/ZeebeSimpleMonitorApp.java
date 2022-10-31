@@ -29,12 +29,19 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
 @SpringBootApplication
 @EnableZeebeClient
 @EnableScheduling
 @EnableAsync
 @EnableSpringDataWebSupport
 public class ZeebeSimpleMonitorApp {
+  @Value("${server.allowedOriginsUrls}")
+  private String allowedOriginsUrls;
 
   public static void main(final String... args) {
     SpringApplication.run(ZeebeSimpleMonitorApp.class, args);
@@ -59,5 +66,19 @@ public class ZeebeSimpleMonitorApp {
   public Mustache.Compiler configureFallbackValueForMissingVariablesInMustacheTemplates(
       Mustache.TemplateLoader templateLoader) {
     return Mustache.compiler().defaultValue("⍰").withLoader(templateLoader);
+  }
+
+  @Bean
+  public WebMvcConfigurer corsConfigurer() {
+      String urls = this.allowedOriginsUrls;
+      return new WebMvcConfigurerAdapter() {
+          @Override
+          public void addCorsMappings(CorsRegistry registry) {
+              if(urls != null && urls.length()>0){
+                String[] allowedOriginsUrlArr = urls.split(";");
+                registry.addMapping("/**").allowedOrigins(allowedOriginsUrlArr);
+              }
+          }
+      };
   }
 }
