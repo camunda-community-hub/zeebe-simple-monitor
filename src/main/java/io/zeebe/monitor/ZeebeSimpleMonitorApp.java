@@ -68,11 +68,11 @@ public class ZeebeSimpleMonitorApp {
 
   @Bean
   public WebMvcConfigurer corsConfigurer() {
-    String urls = this.allowedOriginsUrls;
+    final String urls = this.allowedOriginsUrls;
     return new WebMvcConfigurerAdapter() {
       @Override
       public void addCorsMappings(CorsRegistry registry) {
-        if (urls != null && urls.length() > 0) {
+        if (hasText(urls)) {
           String[] allowedOriginsUrlArr = urls.split(";");
           registry.addMapping("/**").allowedOrigins(allowedOriginsUrlArr);
         }

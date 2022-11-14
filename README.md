@@ -123,14 +123,15 @@ It is then available under http://localhost:8082/monitor.
 
 #### Cross Origin Requests
 
-To enable cors, add the allowed origins (`;` seperated) in the following property:
+To enable Simple Monitor to send CORS header with every HTTP response,
+add the allowed origins (`;` separated) in the following property:
 
 ``` 
 server:
   allowedOriginsUrls: http://remote-hoste:8082;https://remote-hoste:8082
 ```
 
-It is then available under http://localhost:8082/monitor.
+This will then set ```Access-Control-Allow-Origin``` headers in every HTTP response.
 
 #### Customize the Look & Feel
 
