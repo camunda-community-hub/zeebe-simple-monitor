@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017 camunda services GmbH (info@camunda.com)
+ * Copyright ┬® 2017 camunda services GmbH (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -63,7 +64,7 @@ public class ZeebeSimpleMonitorApp {
   @Bean
   public Mustache.Compiler configureFallbackValueForMissingVariablesInMustacheTemplates(
       Mustache.TemplateLoader templateLoader) {
-    return Mustache.compiler().defaultValue("⍰").withLoader(templateLoader);
+    return Mustache.compiler().defaultValue("Ôì░").withLoader(templateLoader);
   }
 
   @Bean
@@ -72,7 +73,7 @@ public class ZeebeSimpleMonitorApp {
     return new WebMvcConfigurerAdapter() {
       @Override
       public void addCorsMappings(CorsRegistry registry) {
-        if (hasText(urls)) {
+        if (StringUtils.hasText(urls)) {
           String[] allowedOriginsUrlArr = urls.split(";");
           registry.addMapping("/**").allowedOrigins(allowedOriginsUrlArr);
         }
