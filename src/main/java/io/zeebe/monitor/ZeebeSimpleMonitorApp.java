@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017 camunda services GmbH (info@camunda.com)
+ * Copyright ┬® 2017 camunda services GmbH (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,10 @@ package io.zeebe.monitor;
 
 import com.samskivert.mustache.Mustache;
 import io.camunda.zeebe.spring.client.EnableZeebeClient;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -24,10 +28,10 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @SpringBootApplication
 @EnableZeebeClient
@@ -35,6 +39,8 @@ import java.util.concurrent.ScheduledExecutorService;
 @EnableAsync
 @EnableSpringDataWebSupport
 public class ZeebeSimpleMonitorApp {
+  @Value("${server.allowedOriginsUrls}")
+  private String allowedOriginsUrls;
 
   public static void main(final String... args) {
     SpringApplication.run(ZeebeSimpleMonitorApp.class, args);
@@ -58,6 +64,20 @@ public class ZeebeSimpleMonitorApp {
   @Bean
   public Mustache.Compiler configureFallbackValueForMissingVariablesInMustacheTemplates(
       Mustache.TemplateLoader templateLoader) {
-    return Mustache.compiler().defaultValue("⍰").withLoader(templateLoader);
+    return Mustache.compiler().defaultValue("Ôì░").withLoader(templateLoader);
+  }
+
+  @Bean
+  public WebMvcConfigurer corsConfigurer() {
+    final String urls = this.allowedOriginsUrls;
+    return new WebMvcConfigurerAdapter() {
+      @Override
+      public void addCorsMappings(CorsRegistry registry) {
+        if (StringUtils.hasText(urls)) {
+          String[] allowedOriginsUrlArr = urls.split(";");
+          registry.addMapping("/**").allowedOrigins(allowedOriginsUrlArr);
+        }
+      }
+    };
   }
 }
