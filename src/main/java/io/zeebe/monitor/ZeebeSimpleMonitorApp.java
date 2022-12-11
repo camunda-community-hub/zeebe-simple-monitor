@@ -85,13 +85,16 @@ public class ZeebeSimpleMonitorApp {
   public Attributes loadAttributesFromManifest() {
     final ClassLoader classLoader = ZeebeSimpleMonitorApp.class.getClassLoader();
     if (classLoader instanceof URLClassLoader) {
-      URLClassLoader cl = (URLClassLoader) classLoader;
-      URL url = cl.findResource("META-INF/MANIFEST.MF");
-      try (InputStream is = url.openStream()) {
-        Manifest manifest = new Manifest(is);
-        return manifest.getMainAttributes();
-      } catch (IOException e) {
-        LOG.warn("can't determine version info from manifest, error: " + e.getMessage());
+      URL url = ((URLClassLoader) classLoader).findResource("META-INF/MANIFEST.MF");
+      if (url != null) {
+        try (InputStream is = url.openStream()) {
+          Manifest manifest = new Manifest(is);
+          return manifest.getMainAttributes();
+        } catch (IOException e) {
+          LOG.warn("can't determine version info from manifest, error: " + e.getMessage());
+        }
+      } else {
+          LOG.warn("MANIFEST.MF file not present in classpath; will use 'dev' as version information");
       }
     }
     final Attributes attributes = new Attributes();
