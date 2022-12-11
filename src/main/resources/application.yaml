@@ -23,7 +23,8 @@ spring:
   mustache:
     prefix: classpath:/templates/
     suffix: .html
-    expose-request-attributes: true
+    servlet:
+      expose-request-attributes: true
 
   data:
     web:
@@ -34,6 +35,7 @@ server:
   port: 8082
   servlet:
     context-path: /
+  allowedOriginsUrls: ""
 
 logging:
   level:
