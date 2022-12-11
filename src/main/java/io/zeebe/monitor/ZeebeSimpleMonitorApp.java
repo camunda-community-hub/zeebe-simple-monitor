@@ -64,7 +64,8 @@ public class ZeebeSimpleMonitorApp {
   @Bean
   public Mustache.Compiler configureFallbackValueForMissingVariablesInMustacheTemplates(
       Mustache.TemplateLoader templateLoader) {
-    return Mustache.compiler().defaultValue("Ôì░").withLoader(templateLoader);
+    // FYI: \u2370 is equal to ⍰
+    return Mustache.compiler().defaultValue("\u2370").withLoader(templateLoader);
   }
 
   @Bean
