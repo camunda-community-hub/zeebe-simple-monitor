@@ -3,7 +3,11 @@
 <table class="table table-striped">
     <thead>
     <th>Process Instance Key</th>
-    <th>State</th>
+    <th>State
+        <a id="instance-state" href="#" class="badge badge-secondary" data-toggle="tooltip" data-placement="top"
+           title="Sort by Instance State">
+        </a>
+    </th>
     <th>Start Time
         <a id="instance-start-time" href="#" class="badge badge-secondary" data-toggle="tooltip" data-placement="top"
            title="Sort by Start Time">
@@ -26,6 +30,9 @@
 {{>components/table-pagination}}
 
 <script>
+    document.addEventListener('DOMContentLoaded', function(){
+        listSort('state','instance-state')
+    }, false);
     document.addEventListener('DOMContentLoaded', function(){
         listSort('start','instance-start-time')
     }, false);

@@ -677,25 +677,33 @@ function listPage(pageElement, page, size) {
     }
 }
 
-function listSort(sortProperty, sortElement) {
-    let sortAsc = "sort=" + sortProperty + ",asc"
-    let sortDesc = "sort=" + sortProperty + ",desc"
-
+function listSort(sortProperty, elementId) {
+    let sortAsc = "sort=" + sortProperty + ",asc";
+    let sortDesc = "sort=" + sortProperty + ",desc";
+    let elementNode = document.getElementById(elementId);
     let search = window.location.search
+    let sortParamRegEx = /sort=\w+,\w+/;
+
     if(search.includes(sortAsc)) {
-        let withReverseOrder = search.replace(sortAsc, sortDesc)
-        document.getElementById(sortElement).href = withReverseOrder;
-        document.getElementById(sortElement).innerHTML = IMAGE_ARROW_DOWN;
+        let withReverseOrder = search.replace(sortAsc, sortDesc);
+        elementNode.href = withReverseOrder;
+        elementNode.innerHTML = IMAGE_ARROW_DOWN;
     } else if(search.includes(sortDesc)) {
-        let withReverseOrder = search.replace(sortDesc, sortAsc)
-        document.getElementById(sortElement).href = withReverseOrder
-        document.getElementById(sortElement).innerHTML = IMAGE_ARROW_UP;
+        let withReverseOrder = search.replace(sortDesc, sortAsc);
+        elementNode.href = withReverseOrder;
+        elementNode.innerHTML = IMAGE_ARROW_UP;
     } else if(search) {
-        document.getElementById(sortElement).href = search + "&" + sortDesc
-        document.getElementById(sortElement).innerHTML = IMAGE_ARROW_DOWN;
+        if (sortParamRegEx.test(window.location.search)) {
+            // sort param exists already and will be replaced
+            elementNode.href = search.replace(sortParamRegEx, sortDesc)
+        } else {
+            // no sort param exists and will be appended
+            elementNode.href = search + "&" + sortDesc;
+        }
+        elementNode.innerHTML = IMAGE_ARROW_DOWN;
     } else {
-        document.getElementById(sortElement).href = "?" + sortDesc
-        document.getElementById(sortElement).innerHTML = IMAGE_ARROW_UP;
+        elementNode.href = "?" + sortDesc;
+        elementNode.innerHTML = IMAGE_ARROW_UP;
     }
 }
 
@@ -738,7 +746,7 @@ function onBpmnDownloadClicked(){
 
 (function checkIfBpmnExistsOrDisableDownloadButton() {
     'use strict';
-    if (RAW_BPMN_RESOURCE === 'WARNING-NO-XML-RESOURCE-FOUND') {
+    if (typeof RAW_BPMN_RESOURCE !== 'undefined' && RAW_BPMN_RESOURCE === 'WARNING-NO-XML-RESOURCE-FOUND') {
         var link = $('#bpmnDownloadLink');
         link.attr('title', 'BPMN definition not found or broken :-( ');
         link.removeAttr('href');

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017 camunda services GmbH (info@camunda.com)
+ * Copyright ┬® 2017 camunda services GmbH (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,6 @@ package io.zeebe.monitor;
 
 import com.samskivert.mustache.Mustache;
 import io.camunda.zeebe.spring.client.EnableZeebeClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.web.config.EnableSpringDataWebSupport;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -36,6 +26,20 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @SpringBootApplication
 @EnableZeebeClient
@@ -43,6 +47,8 @@ import java.util.jar.Manifest;
 @EnableAsync
 @EnableSpringDataWebSupport
 public class ZeebeSimpleMonitorApp {
+  @Value("${server.allowedOriginsUrls}")
+  private String allowedOriginsUrls;
 
   private static final Logger LOG = LoggerFactory.getLogger(ZeebeSimpleMonitorApp.class);
   public static final String REPLACEMENT_CHARACTER_QUESTIONMARK = "\u2370"; // == ⍰ character
@@ -91,6 +97,20 @@ public class ZeebeSimpleMonitorApp {
     final Attributes attributes = new Attributes();
     attributes.putValue(IMPLEMENTATION_VERSION, "dev");
     return attributes;
+  }
+
+  @Bean
+  public WebMvcConfigurer corsConfigurer() {
+    final String urls = this.allowedOriginsUrls;
+    return new WebMvcConfigurerAdapter() {
+      @Override
+      public void addCorsMappings(CorsRegistry registry) {
+        if (StringUtils.hasText(urls)) {
+          String[] allowedOriginsUrlArr = urls.split(";");
+          registry.addMapping("/**").allowedOrigins(allowedOriginsUrlArr);
+        }
+      }
+    };
   }
 
 }
