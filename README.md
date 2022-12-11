@@ -128,7 +128,7 @@ add the allowed origins (`;` separated) in the following property:
 
 ``` 
 server:
-  allowedOriginsUrls: http://remote-hoste:8082;https://remote-hoste:8082
+  allowedOriginsUrls: http://localhost:8082;https://monitor.cloud-provider.io:8082
 ```
 
 This will then set ```Access-Control-Allow-Origin``` headers in every HTTP response.
