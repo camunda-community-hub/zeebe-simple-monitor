@@ -106,6 +106,7 @@ server:
   port: 8082
   servlet:
     context-path: /
+  allowedOriginsUrls: ""
 ```
 
 #### Change the Context-Path
@@ -119,6 +120,18 @@ server:
 ```
 
 It is then available under http://localhost:8082/monitor.
+
+#### Cross Origin Requests
+
+To enable Simple Monitor to send CORS header with every HTTP response,
+add the allowed origins (`;` separated) in the following property:
+
+``` 
+server:
+  allowedOriginsUrls: http://localhost:8082;https://monitor.cloud-provider.io:8082
+```
+
+This will then set ```Access-Control-Allow-Origin``` headers in every HTTP response.
 
 #### Customize the Look & Feel
 
