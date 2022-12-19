@@ -32,6 +32,7 @@ public class ZeebeHazelcastService {
   public void start() {
     final ClientConfig clientConfig = new ClientConfig();
     clientConfig.getNetworkConfig().addAddress(hazelcastConnection);
+    clientConfig.getNetworkConfig().setSmartRouting(true);
 
     final var connectionRetryConfig =
         clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig();
