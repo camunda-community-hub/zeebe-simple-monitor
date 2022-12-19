@@ -54,8 +54,8 @@ public class ZeebeSimpleMonitorApp {
   @Bean
   public Executor asyncExecutor() {
     final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-    executor.setCorePoolSize(1);
-    executor.setMaxPoolSize(1);
+    executor.setCorePoolSize(24);
+    executor.setMaxPoolSize(24);
     executor.setQueueCapacity(32);
     executor.initialize();
     return executor;
