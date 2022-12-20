@@ -729,3 +729,16 @@ function onBpmnDownloadClicked(){
 })();
 
 // --------------------------------------------------------------------
+
+/**
+ * Takes a value from the search query parameters and sets the value attribute for the specified element.
+ * @param elementId mandatory, the element's ID
+ * @param paramName mandatory, the name of the query parameter
+ */
+function bindQueryParamToElement(elementId, paramName) {
+    'use strict';
+    let params = new URLSearchParams(window.location.search)
+    if (params.get(paramName) !== null) {
+        document.getElementById(elementId).setAttribute("value", params.get(paramName))
+    }
+}
