@@ -48,6 +48,12 @@
                 <a class="nav-link" href="{{context-path}}views/errors">Errors</a>
             </li>
         </ul>
+        <span class="navbar-text">
+            Cluster:
+            <!-- Button trigger modal -->
+            <button id="button-show-status" type="button" class="btn {{#status.isHealthy}}btn-outline-success{{/status.isHealthy}}{{^status.isHealthy}}btn-outline-danger{{/status.isHealthy}}" data-toggle="modal" data-target="#clusterStatusModal">{{ status.healthyString }}</button>
+        </span>
+        {{>modals/cluster-status-modal}}
     </div>
 </nav>
 

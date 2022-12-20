@@ -369,6 +369,31 @@
                 <version>3.0.0-M7</version>
             </plugin>
 
+            <plugin>
+                <!-- required to include MANIFEST.MF file for reading the application version -->
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>5.1.7</version>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <archive>
+                        <index>true</index>
+                        <manifest>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 

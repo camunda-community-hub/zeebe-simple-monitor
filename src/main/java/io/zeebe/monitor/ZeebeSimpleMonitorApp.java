@@ -17,9 +17,17 @@ package io.zeebe.monitor;
 
 import com.samskivert.mustache.Mustache;
 import io.camunda.zeebe.spring.client.EnableZeebeClient;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -41,6 +49,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 public class ZeebeSimpleMonitorApp {
   @Value("${server.allowedOriginsUrls}")
   private String allowedOriginsUrls;
+
+  private static final Logger LOG = LoggerFactory.getLogger(ZeebeSimpleMonitorApp.class);
+  public static final String REPLACEMENT_CHARACTER_QUESTIONMARK = "\u2370"; // == ⍰ character
+  public static final String IMPLEMENTATION_VERSION = "Implementation-Version";
 
   public static void main(final String... args) {
     SpringApplication.run(ZeebeSimpleMonitorApp.class, args);
@@ -64,8 +76,30 @@ public class ZeebeSimpleMonitorApp {
   @Bean
   public Mustache.Compiler configureFallbackValueForMissingVariablesInMustacheTemplates(
       Mustache.TemplateLoader templateLoader) {
-    // FYI: \u2370 is equal to ⍰
-    return Mustache.compiler().defaultValue("\u2370").withLoader(templateLoader);
+    return Mustache.compiler()
+        .defaultValue(REPLACEMENT_CHARACTER_QUESTIONMARK)
+        .withLoader(templateLoader);
+  }
+
+  @Bean
+  public Attributes loadAttributesFromManifest() {
+    final ClassLoader classLoader = ZeebeSimpleMonitorApp.class.getClassLoader();
+    if (classLoader instanceof URLClassLoader) {
+      URL url = ((URLClassLoader) classLoader).findResource("META-INF/MANIFEST.MF");
+      if (url != null) {
+        try (InputStream is = url.openStream()) {
+          Manifest manifest = new Manifest(is);
+          return manifest.getMainAttributes();
+        } catch (IOException e) {
+          LOG.warn("can't determine version info from manifest, error: " + e.getMessage());
+        }
+      } else {
+          LOG.warn("MANIFEST.MF file not present in classpath; will use 'dev' as version information");
+      }
+    }
+    final Attributes attributes = new Attributes();
+    attributes.putValue(IMPLEMENTATION_VERSION, "dev");
+    return attributes;
   }
 
   @Bean
@@ -81,4 +115,5 @@ public class ZeebeSimpleMonitorApp {
       }
     };
   }
+
 }
