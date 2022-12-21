@@ -1,0 +1,40 @@
+name: Main
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GHA_BOT_TOKEN }}
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set Tag Output
+        id: set-tag
+        run: |
+          last_tag=$(git describe --tags $(git rev-list --tags --max-count=1))
+          next_tag="${last_tag%.*}.$((${last_tag##*.}+1))"
+          echo "::set-output name=tag_name::$next_tag"
+
+      - name: Create Tag
+        uses: actions/github-script@v6
+        env:
+          TAG: ${{ steps.set-tag.outputs.tag_name }}
+        with:
+          github-token: "${{ secrets.GHA_BOT_TOKEN }}"
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "refs/tags/${{ steps.set-tag.outputs.tag_name }}",
+              sha: context.sha
+            })
