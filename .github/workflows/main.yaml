@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  GITHUB_TOKEN: ${{ secrets.GHA_BOT_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   create-release:
@@ -30,7 +30,7 @@ jobs:
         env:
           TAG: ${{ steps.set-tag.outputs.tag_name }}
         with:
-          github-token: "${{ secrets.GHA_BOT_TOKEN }}"
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
           script: |
             github.rest.git.createRef({
               owner: context.repo.owner,
