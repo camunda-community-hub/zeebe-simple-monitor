@@ -3,15 +3,20 @@ zeebe:
     broker.gatewayAddress: 127.0.0.1:26500
     security.plaintext: true
 
+    worker:
+      hazelcast:
+        connection: localhost:5701
+        connectionTimeout: PT30S
+
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: vnoc
-    password: top-secret
-    driverClassName: org.postgresql.Driver
+    url: jdbc:h2:mem:zeebe-monitor;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driverClassName: org.h2.Driver
 
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
 
