@@ -42,8 +42,6 @@ public abstract class AbstractViewOrResourceTest {
   @Autowired protected InstancesVariableListController instancesVariableListController;
 
   @MockBean protected ZeebeStatusUpdateService zeebeStatusUpdateService;
-  @MockBean protected HazelcastConfigRepository hazelcastConfigRepository;
-  @MockBean protected ZeebeHazelcastService zeebeHazelcastService;
   @MockBean protected ProcessRepository processRepository;
   @MockBean protected ProcessInstanceRepository processInstanceRepository;
   @MockBean protected ElementInstanceRepository elementInstanceRepository;

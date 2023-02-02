@@ -13,7 +13,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.time.Duration;
 
-@Component
+
 public class ZeebeHazelcastService {
 
   private static final Logger LOG = LoggerFactory.getLogger(ZeebeHazelcastService.class);
@@ -28,7 +28,6 @@ public class ZeebeHazelcastService {
 
   private AutoCloseable closeable;
 
-  @PostConstruct
   public void start() {
     final ClientConfig clientConfig = new ClientConfig();
     clientConfig.getNetworkConfig().addAddress(hazelcastConnection);
