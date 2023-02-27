@@ -5,7 +5,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.zeebe.monitor.repository.HazelcastConfigRepository;
-import io.zeebe.monitor.zeebe.ZeebeHazelcastService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -32,8 +31,7 @@ public class CorsSettingsControllerTest {
 
   @MockBean
   protected HazelcastConfigRepository hazelcastConfigRepository;
-  @MockBean
-  protected ZeebeHazelcastService zeebeHazelcastService;
+
 
   @Test
   public void access_control_origin_request_header_is_checked() throws Exception {

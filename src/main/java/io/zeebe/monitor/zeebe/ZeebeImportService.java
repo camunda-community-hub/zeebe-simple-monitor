@@ -7,11 +7,13 @@ import io.zeebe.monitor.entity.HazelcastConfig;
 import io.zeebe.monitor.repository.HazelcastConfigRepository;
 import io.zeebe.monitor.zeebe.importers.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+@Profile("hazelcast")
 @Component
 public class ZeebeImportService {
 
