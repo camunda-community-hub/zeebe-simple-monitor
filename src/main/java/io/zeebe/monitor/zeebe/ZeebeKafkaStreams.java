@@ -51,7 +51,7 @@ public class ZeebeKafkaStreams {
     }
 
     @Bean
-    public KStream<String, GenericKafkaRecord> kafkaZeebeMessagreStream() {
+    public KStream<String, GenericKafkaRecord> kafkaZeebeMessageStream() {
         KStream stream = this.streamsBuilder.stream("zeebe-message", Consumed.with(Serdes.String(), Serdes.String())).mapValues(value -> readValue(value)).filter((key, value) -> value != null);
         this.logger.debug("Initialize zeebe-message kafka stream");
         return stream;

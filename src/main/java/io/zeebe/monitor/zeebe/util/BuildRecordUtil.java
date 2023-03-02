@@ -19,11 +19,12 @@ public class BuildRecordUtil {
                 .setBpmnProcessId(getBpmnProcessId(values))
                 .setResource(getResource(values))
                 .setProcessDefinitionKey(getProcessDefinitionKey(values))
-                .setResourceName((String)values.get("resourceName"))
+                .setResourceName((String) values.get("resourceName"))
                 .setChecksum(getChecksum(values))
                 .setMetadata(getMetaData(genericKafkaRecord))
                 .build();
     }
+
     public static Schema.ProcessInstanceRecord buildProcessInstanceRecord(GenericKafkaRecord genericKafkaRecord) {
         Map values = genericKafkaRecord.getValue();
         return Schema.ProcessInstanceRecord.newBuilder()
@@ -31,9 +32,9 @@ public class BuildRecordUtil {
                 .setBpmnProcessId(getBpmnProcessId(values))
                 .setProcessInstanceKey(getProcessInstanceKey(values))
                 .setProcessDefinitionKey(getProcessDefinitionKey(values))
-                .setElementId((String)values.get("elementId"))
+                .setElementId((String) values.get("elementId"))
                 .setFlowScopeKey(getFlowScopeKey(values))
-                .setBpmnElementType((String)values.get("bpmnElementType"))
+                .setBpmnElementType((String) values.get("bpmnElementType"))
                 .setParentProcessInstanceKey(getParentProcessInstanceKey(values))
                 .setParentElementInstanceKey(getParentElementInstanceKey(values))
                 .setMetadata(getMetaData(genericKafkaRecord))
@@ -46,7 +47,7 @@ public class BuildRecordUtil {
                 .setProcessDefinitionKey(getProcessDefinitionKey(values))
                 .setProcessInstanceKey(getProcessInstanceKey(values))
                 .setElementInstanceKey(getElementInstanceKey(values))
-                .setTargetElementId((String)values.get("targetElementId"))
+                .setTargetElementId((String) values.get("targetElementId"))
                 .setDueDate(getDueDate(values))
                 .setRepetitions(getRepetitions(values))
                 .setMetadata(getMetaData(genericKafkaRecord))
@@ -56,8 +57,8 @@ public class BuildRecordUtil {
     public static Schema.VariableRecord buildVariableRecord(GenericKafkaRecord genericKafkaRecord) {
         Map values = genericKafkaRecord.getValue();
         return Schema.VariableRecord.newBuilder()
-                .setName((String)values.get("name"))
-                .setValue((String)values.get("value"))
+                .setName((String) values.get("name"))
+                .setValue((String) values.get("value"))
                 .setProcessDefinitionKey(getProcessDefinitionKey(values))
                 .setProcessInstanceKey(getProcessInstanceKey(values))
                 .setScopeKey(getScopeKey(values))
@@ -71,8 +72,8 @@ public class BuildRecordUtil {
         return Schema.ErrorRecord.newBuilder()
                 .setErrorEventPosition(getErrorEventPosition(values))
                 .setProcessInstanceKey(getProcessInstanceKey(values))
-                .setExceptionMessage((String)values.get("exceptionMessage"))
-                .setStacktrace((String)values.get("stacktrace"))
+                .setExceptionMessage((String) values.get("exceptionMessage"))
+                .setStacktrace((String) values.get("stacktrace"))
                 .setMetadata(getMetaData(genericKafkaRecord))
                 .build();
     }
@@ -80,9 +81,9 @@ public class BuildRecordUtil {
     public static Schema.MessageRecord buildMessageRecord(GenericKafkaRecord genericKafkaRecord) {
         Map values = genericKafkaRecord.getValue();
         return Schema.MessageRecord.newBuilder()
-                .setName((String)values.get("name"))
-                .setCorrelationKey((String)values.get("correlationKey"))
-                .setMessageId((String)values.get("messageId"))
+                .setName((String) values.get("name"))
+                .setCorrelationKey((String) values.get("correlationKey"))
+                .setMessageId((String) values.get("messageId"))
                 .setVariables(getVariables(values))
                 .setMetadata(getMetaData(genericKafkaRecord))
                 .build();
@@ -96,8 +97,8 @@ public class BuildRecordUtil {
                 .setProcessInstanceKey(getProcessInstanceKey(values))
                 .setElementInstanceKey(getElementInstanceKey(values))
                 .setJobKey(getJobKey(values))
-                .setErrorType((String)values.get("errorType"))
-                .setErrorMessage((String)values.get("errorMessage"))
+                .setErrorType((String) values.get("errorType"))
+                .setErrorMessage((String) values.get("errorMessage"))
                 .setMetadata(getMetaData(genericKafkaRecord))
                 .build();
     }
@@ -107,8 +108,8 @@ public class BuildRecordUtil {
         return Schema.MessageSubscriptionRecord.newBuilder()
                 .setBpmnProcessId(getBpmnProcessId(values))
                 .setElementInstanceKey(getElementInstanceKey(values))
-                .setMessageName((String)values.get("messageName"))
-                .setCorrelationKey((String)values.get("correlationKey"))
+                .setMessageName((String) values.get("messageName"))
+                .setCorrelationKey((String) values.get("correlationKey"))
                 .setProcessInstanceKey(getProcessInstanceKey(values))
                 .setMetadata(getMetaData(genericKafkaRecord))
                 .build();
@@ -118,9 +119,9 @@ public class BuildRecordUtil {
         Map values = genericKafkaRecord.getValue();
         return Schema.MessageStartEventSubscriptionRecord.newBuilder()
                 .setBpmnProcessId(getBpmnProcessId(values))
-                .setMessageName((String)values.get("messageName"))
+                .setMessageName((String) values.get("messageName"))
                 .setProcessDefinitionKey(getProcessDefinitionKey(values))
-                .setStartEventId((String)values.get("startEventId"))
+                .setStartEventId((String) values.get("startEventId"))
                 .setMetadata(getMetaData(genericKafkaRecord))
                 .build();
     }
@@ -133,8 +134,8 @@ public class BuildRecordUtil {
                 .setProcessInstanceKey(getProcessInstanceKey(values))
                 .setElementInstanceKey(getElementInstanceKey(values))
                 .setProcessDefinitionKey(getProcessDefinitionKey(values))
-                .setType((String)values.get("type"))
-                .setWorker((String)values.get("worker"))
+                .setType((String) values.get("type"))
+                .setWorker((String) values.get("worker"))
                 .setRetries(getRetries(values))
                 .build();
     }
@@ -155,7 +156,7 @@ public class BuildRecordUtil {
     }
 
     private static String getBpmnProcessId(Map values) {
-        return (String)values.get("bpmnProcessId");
+        return (String) values.get("bpmnProcessId");
     }
 
     private static long getProcessInstanceKey(Map values) {
@@ -191,11 +192,11 @@ public class BuildRecordUtil {
     }
 
     private static ByteString getResource(Map values) {
-        return  ByteString.copyFromUtf8(new String(Base64.getDecoder().decode((String)values.get("resource")), StandardCharsets.UTF_8));
+        return ByteString.copyFromUtf8(new String(Base64.getDecoder().decode((String) values.get("resource")), StandardCharsets.UTF_8));
     }
 
     private static ByteString getChecksum(Map values) {
-        return  ByteString.copyFromUtf8((String)values.get("resource"));
+        return ByteString.copyFromUtf8((String) values.get("resource"));
     }
 
     private static long getElementInstanceKey(Map values) {
@@ -219,6 +220,6 @@ public class BuildRecordUtil {
     }
 
     private static Struct getVariables(Map values) {
-        return Struct.newBuilder().putFields("variables", Value.newBuilder().setStringValue((String)values.get("variables")).build()).build();
+        return Struct.newBuilder().putFields("variables", Value.newBuilder().setStringValue(values.get("variables").toString()).build()).build();
     }
 }

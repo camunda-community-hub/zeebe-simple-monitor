@@ -60,7 +60,7 @@ public class KafkaStreamsService {
             errorImporter.importError(BuildRecordUtil.buildErrorRecord(event));
         });
 
-        zeebeKafkaStreams.kafkaZeebeMessagreStream().foreach((key, event) -> {
+        zeebeKafkaStreams.kafkaZeebeMessageStream().foreach((key, event) -> {
             messageImporter.importMessage(BuildRecordUtil.buildMessageRecord(event));
         });
 
