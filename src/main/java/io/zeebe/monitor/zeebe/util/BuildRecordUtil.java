@@ -128,6 +128,7 @@ public class BuildRecordUtil {
     public static Schema.JobRecord buildJobRecord(GenericKafkaRecord genericKafkaRecord) {
         Map values = genericKafkaRecord.getValue();
         return Schema.JobRecord.newBuilder()
+                .setMetadata(getMetaData(genericKafkaRecord))
                 .setBpmnProcessId(getBpmnProcessId(values))
                 .setProcessInstanceKey(getProcessInstanceKey(values))
                 .setElementInstanceKey(getElementInstanceKey(values))
