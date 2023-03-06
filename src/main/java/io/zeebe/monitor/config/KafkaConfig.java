@@ -1,6 +1,5 @@
 package io.zeebe.monitor.config;
 
-import com.sun.istack.NotNull;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsConfig;
 import org.springframework.beans.factory.annotation.Value;

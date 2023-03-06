@@ -71,3 +71,4 @@ kafkaSchemaRegistryUrl: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
 kafka:
   streams:
     maxMessageSizeBytes: ${KAFKA_MAX_MESSAGE_SIZE_BYTES:5242880}
+    numOfThreads: ${NUMBER_OF_STREAMS_THREAD:4}
