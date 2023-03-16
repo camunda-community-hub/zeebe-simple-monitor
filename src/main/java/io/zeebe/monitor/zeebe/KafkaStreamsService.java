@@ -1,7 +1,14 @@
 package io.zeebe.monitor.zeebe;
 
 import io.zeebe.exporter.proto.Schema;
-import io.zeebe.monitor.zeebe.importers.*;
+import io.zeebe.monitor.zeebe.importers.ErrorImporter;
+import io.zeebe.monitor.zeebe.importers.IncidentImporter;
+import io.zeebe.monitor.zeebe.importers.JobImporter;
+import io.zeebe.monitor.zeebe.importers.MessageImporter;
+import io.zeebe.monitor.zeebe.importers.MessageSubscriptionImporter;
+import io.zeebe.monitor.zeebe.importers.ProcessAndElementImporter;
+import io.zeebe.monitor.zeebe.importers.TimerImporter;
+import io.zeebe.monitor.zeebe.importers.VariableImporter;
 import io.zeebe.monitor.zeebe.util.BuildRecordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -10,7 +17,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 
 import static io.zeebe.monitor.zeebe.util.ImportUtil.ifEvent;
-import static io.zeebe.monitor.zeebe.util.ImportUtil.isEvent;
 
 @Profile("kafka")
 @Component
