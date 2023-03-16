@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static io.zeebe.monitor.zeebe.util.ImportUtil.ifEvent;
+
 @Profile("hazelcast")
 @Component
 public class ZeebeImportService {
@@ -87,20 +89,6 @@ public class ZeebeImportService {
     }
 
     return builder.build();
-  }
-
-  private <T> void ifEvent(
-      final T record,
-      final Function<T, Schema.RecordMetadata> extractor,
-      final Consumer<T> consumer) {
-    final var metadata = extractor.apply(record);
-    if (isEvent(metadata)) {
-      consumer.accept(record);
-    }
-  }
-
-  private boolean isEvent(final Schema.RecordMetadata metadata) {
-    return metadata.getRecordType() == Schema.RecordMetadata.RecordType.EVENT;
   }
 
 }
