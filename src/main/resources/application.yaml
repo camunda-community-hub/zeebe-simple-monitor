@@ -60,10 +60,7 @@ management:
     web:
       exposure:
         include: health, metrics, prometheus
-  metrics:
-    export.prometheus.enabled: true
-    tags:
-      application: zeebe-simple-monitor
+  metrics.export.prometheus.enabled: true
 
 white-label:
   logo.path: img/logo.png
