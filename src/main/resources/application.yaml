@@ -47,11 +47,21 @@ logging:
     com.hazelcast: WARN
 
 management:
+  endpoint:
+    metrics.enabled: true
+    prometheus.enabled: true
+    health:
+      enabled: true
+      probes:
+        enabled: true
+      group.liveness.include: livenessState,diskSpace,refreshScope
+      group.readiness.include: readinessState
   endpoints:
     web:
       exposure:
         include: health, metrics, prometheus
   metrics:
+    export.prometheus.enabled: true
     tags:
       application: zeebe-simple-monitor
 
