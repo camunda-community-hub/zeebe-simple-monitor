@@ -14,9 +14,13 @@ A monitoring application for [Zeebe](https://zeebe.io). It is designed for devel
 * test workflows manually
 * provide insides on how workflows are executed 
 
-The application imports the data from Zeebe using the [Hazelcast exporter](https://github.com/camunda-community-hub/zeebe-hazelcast-exporter). It aggregates the data and stores it into a (in-memory) database. The data is displayed on server-side rendered HTML pages.
+The application imports the data from Zeebe using the [Hazelcast exporter](https://github.com/camunda-community-hub/zeebe-hazelcast-exporter) or [Kafka exporter](https://github.com/camunda-community-hub/zeebe-kafka-exporter). It aggregates the data and stores it into a (postgres) database. The data is displayed on server-side rendered HTML pages.
 
+Hazelcast:
 ![how-it-works](docs/how-it-works.png)
+
+Zeebe-Kafka:
+![how-it-works](docs/kafka-exporter.png)
 
 ## Install
 
@@ -32,11 +36,11 @@ The docker image for the worker is published to [GitHub Packages](https://github
 docker pull ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.4.1
 ```
 
-* ensure that a Zeebe broker is running with a [Hazelcast exporter](https://github.com/camunda-community-hub/zeebe-hazelcast-exporter#install) (>= `1.0.0`)  
-* forward the Hazelcast port to the docker container (default: `5701`)
-* configure the connection to the Zeebe broker by setting `zeebe.client.broker.gateway-address` (default: `localhost:26500`) 
-* configure the connection to Hazelcast by setting `zeebe.client.worker.hazelcast.connection` (default: `localhost:5701`) 
-
+* for kafka exporter, ensure active profile is "kafka" and a Zeebe broker is running with [Kafka exporter](https://github.com/camunda-community-hub/zeebe-kafka-exporter)
+* for hazelcast exporter, ensure that a Zeebe broker is running with a [Hazelcast exporter](https://github.com/camunda-community-hub/zeebe-hazelcast-exporter#install) (>= `1.0.0`)  
+  * forward the Hazelcast port to the docker container (default: `5701`)
+  *  configure the connection to Hazelcast by setting `zeebe.client.worker.hazelcast.connection` (default: `localhost:5701`)
+* configure the connection to the Zeebe broker by setting `zeebe.client.broker.gateway-address` (default: `localhost:26500`)
 If the Zeebe broker runs on your local machine with the default configs then start the container with the following command:  
 
 ```
@@ -79,7 +83,6 @@ By default, the port is set to `8082` and the database is only in-memory (i.e. n
 
 ```
 zeebe:
-
   client:
     broker.gateway-address: 127.0.0.1:26500
     security.plaintext: true
@@ -90,7 +93,6 @@ zeebe:
         connectionTimeout: PT30S
 
 spring:
-
   datasource:
     url: jdbc:h2:mem:zeebe-monitor;DB_CLOSE_DELAY=-1
     username: sa
@@ -101,6 +103,9 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
+
+  profiles:
+    active: ${PROFILE:hazelcast}
 
 server:
   port: 8082
