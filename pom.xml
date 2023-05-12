@@ -458,9 +458,9 @@
     </repositories>
 
     <scm>
-        <url>https://github.com/camunda-community-hub/zeebe-simple-monitor</url>
-        <connection>scm:git:git@github.com:camunda-community-hub/zeebe-simple-monitor.git</connection>
-        <developerConnection>scm:git:git@github.com:camunda-community-hub/zeebe-simple-monitor.git</developerConnection>
+        <url>https://github.com/elisapolystar/zeebe-simple-monitor</url>
+        <connection>scm:git:git@github.com:elisapolystar/zeebe-simple-monitor.git</connection>
+        <developerConnection>scm:git:git@github.com:elisapolystar/zeebe-simple-monitor.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
