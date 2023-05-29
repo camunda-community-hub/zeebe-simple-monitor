@@ -21,10 +21,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
-public interface ProcessRepository extends PagingAndSortingRepository<ProcessEntity, Long> {
+public interface ProcessRepository extends
+        CrudRepository<ProcessEntity, Long>, PagingAndSortingRepository<ProcessEntity, Long> {
 
   Optional<ProcessEntity> findByKey(long key);
 

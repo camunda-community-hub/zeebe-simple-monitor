@@ -19,9 +19,11 @@ import io.zeebe.monitor.entity.TimerEntity;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface TimerRepository extends PagingAndSortingRepository<TimerEntity, Long> {
+public interface TimerRepository extends
+        CrudRepository<TimerEntity, Long>, PagingAndSortingRepository<TimerEntity, Long> {
 
   Page<TimerEntity> findByProcessInstanceKey(Long processInstanceKey, Pageable pageable);
 

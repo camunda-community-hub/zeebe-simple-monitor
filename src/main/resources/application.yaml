@@ -54,13 +54,12 @@ management:
       enabled: true
       probes:
         enabled: true
-      group.liveness.include: livenessState,diskSpace,refreshScope
-      group.readiness.include: readinessState
+      diskspace.enabled: true
   endpoints:
     web:
       exposure:
-        include: health, metrics, prometheus
-  metrics.export.prometheus.enabled: true
+        include: health, metrics, prometheus, refresh
+  prometheus.metrics.export.enabled: true
 
 white-label:
   logo.path: img/logo.png
