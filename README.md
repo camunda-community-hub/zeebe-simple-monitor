@@ -164,6 +164,7 @@ For example, using PostgreSQL:
 - spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 ```
 
+
 * the PostgreSQL database driver is already bundled 
 
 See the [docker-compose file](docker/docker-compose.yml) (profile: `postgres`) for a sample configuration with PostgreSQL. 

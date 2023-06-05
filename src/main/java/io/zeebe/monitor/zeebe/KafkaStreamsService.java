@@ -10,11 +10,10 @@ import io.zeebe.monitor.zeebe.importers.ProcessAndElementImporter;
 import io.zeebe.monitor.zeebe.importers.TimerImporter;
 import io.zeebe.monitor.zeebe.importers.VariableImporter;
 import io.zeebe.monitor.zeebe.util.BuildRecordUtil;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
 
 import static io.zeebe.monitor.zeebe.util.ImportUtil.ifEvent;
 

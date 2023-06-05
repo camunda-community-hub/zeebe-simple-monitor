@@ -17,9 +17,12 @@ package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.IncidentEntity;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface IncidentRepository extends PagingAndSortingRepository<IncidentEntity, Long>, QuerydslPredicateExecutor<IncidentEntity> {
+public interface IncidentRepository extends
+        CrudRepository<IncidentEntity, Long>,
+        PagingAndSortingRepository<IncidentEntity, Long>, QuerydslPredicateExecutor<IncidentEntity> {
 
   Iterable<IncidentEntity> findByProcessInstanceKey(long processInstanceKey);
 
