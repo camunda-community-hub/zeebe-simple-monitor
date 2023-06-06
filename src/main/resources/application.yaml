@@ -35,6 +35,9 @@ server:
   port: 8082
   servlet:
     context-path: /
+    encoding:
+      charset: UTF-8
+      force-response: true
   allowedOriginsUrls: ""
 
 logging:
