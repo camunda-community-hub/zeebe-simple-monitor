@@ -15,7 +15,7 @@
  */
 package io.zeebe.monitor.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity(name = "VARIABLE")
 @Table(indexes = {

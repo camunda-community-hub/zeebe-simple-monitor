@@ -22,13 +22,17 @@
         <version.zeebe.spring>8.2.2</version.zeebe.spring>
         <hazelcast.exporter.version>1.4.0</hazelcast.exporter.version>
 
-        <spring.boot.version>2.7.12</spring.boot.version>
+        <querydsl.version>5.0.0</querydsl.version>
+
+        <spring.boot.version>3.1.0</spring.boot.version>
         <!-- pin Hazelcast version because of spring-boot-dependencies -->
         <version.hazelcast>5.2.3</version.hazelcast>
 
         <!-- release parent settings -->
         <version.java>17</version.java>
         <java.version>${version.java}</java.version>
+	
+	    <jib-maven-plugin.image>eclipse-temurin:17-jre-forcal</jib-maven-plugin.image>
 
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -125,15 +129,16 @@
         <dependency>
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-apt</artifactId>
-            <version>5.0.0</version>
-            <classifier>jpa</classifier>
+            <classifier>jakarta</classifier>
+            <version>${querydsl.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-jpa</artifactId>
-            <version>5.0.0</version>
+            <version>${querydsl.version}</version>
+            <classifier>jakarta</classifier>
         </dependency>
 
         <dependency>
@@ -319,6 +324,9 @@
                     </execution>
                 </executions>
                 <configuration>
+                   <from>
+                      <image>${jib-maven-plugin.image}</image>
+                   </from>
                     <to>
                         <image>ghcr.io/camunda-community-hub/zeebe-simple-monitor</image>
                         <tags>${project.version}</tags>
@@ -366,7 +374,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.0</version>
             </plugin>
 
             <plugin>
@@ -405,7 +413,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.0.1</version>
+                        <version>3.1.0</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>

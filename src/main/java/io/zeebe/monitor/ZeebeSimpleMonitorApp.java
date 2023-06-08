@@ -16,7 +16,6 @@
 package io.zeebe.monitor;
 
 import com.samskivert.mustache.Mustache;
-import io.camunda.zeebe.spring.client.EnableZeebeClient;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -39,10 +38,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @SpringBootApplication
-@EnableZeebeClient
 @EnableScheduling
 @EnableAsync
 @EnableSpringDataWebSupport
@@ -105,7 +102,7 @@ public class ZeebeSimpleMonitorApp {
   @Bean
   public WebMvcConfigurer corsConfigurer() {
     final String urls = this.allowedOriginsUrls;
-    return new WebMvcConfigurerAdapter() {
+    return new WebMvcConfigurer() {
       @Override
       public void addCorsMappings(CorsRegistry registry) {
         if (StringUtils.hasText(urls)) {
