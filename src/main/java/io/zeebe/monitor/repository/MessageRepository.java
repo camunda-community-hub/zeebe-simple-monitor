@@ -16,6 +16,7 @@
 package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.MessageEntity;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface MessageRepository extends PagingAndSortingRepository<MessageEntity, Long> {}
+public interface MessageRepository extends PagingAndSortingRepository<MessageEntity, Long>, CrudRepository<MessageEntity, Long> {}
