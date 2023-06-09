@@ -9,10 +9,10 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
+import io.camunda.zeebe.model.bpmn.Bpmn;
+import io.camunda.zeebe.model.bpmn.BpmnModelInstance;
 import io.zeebe.monitor.entity.ProcessEntity;
 import io.zeebe.monitor.entity.ProcessInstanceEntity;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,13 +35,10 @@ class InstancesTimerListViewControllerTest extends AbstractViewOrResourceTest {
   @Test
   void timers_list_view_contains_pagination_elements() throws Exception {
     // GIVEN
-    String bpmn =
-        Files.readString(
-            Paths.get(this.getClass().getClassLoader().getResource("orderProcess.bpmn").getPath()));
-
+    BpmnModelInstance modelInstance = Bpmn.readModelFromStream(this.getClass().getClassLoader().getResourceAsStream("orderProcess.bpmn"));
     ProcessInstanceEntity processInstanceEntity = mock(ProcessInstanceEntity.class, RETURNS_MOCKS);
     ProcessEntity processEntity = mock(ProcessEntity.class, RETURNS_MOCKS);
-    when(processEntity.getResource()).thenReturn(bpmn);
+    when(processEntity.getResource()).thenReturn(modelInstance.toString());
 
     when(processInstanceRepository.findByKey(anyLong()))
         .thenReturn(Optional.of(processInstanceEntity));
