@@ -34,8 +34,10 @@ docker pull ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.4.1
 
 * ensure that a Zeebe broker is running with a [Hazelcast exporter](https://github.com/camunda-community-hub/zeebe-hazelcast-exporter#install) (>= `1.0.0`)  
 * forward the Hazelcast port to the docker container (default: `5701`)
+* if you want set the Hazelcast clusterName then config the environment of zeebe broker by setting `- ZEEBE_HAZELCAST_CLUSTER_NAME=dev` (default: `dev`)
 * configure the connection to the Zeebe broker by setting `zeebe.client.broker.gateway-address` (default: `localhost:26500`) 
-* configure the connection to Hazelcast by setting `zeebe.client.worker.hazelcast.connection` (default: `localhost:5701`) 
+* configure the connection to Hazelcast by setting `zeebe.client.worker.hazelcast.connection` (default: `localhost:5701`)
+* configure the clusterName to Hazelcast by setting `zeebe.client.worker.hazelcast.clusterName` (default: `dev`)
 
 If the Zeebe broker runs on your local machine with the default configs then start the container with the following command:  
 
@@ -87,6 +89,7 @@ zeebe:
     worker:
       hazelcast:
         connection: localhost:5701
+        clusterName: dev
         connectionTimeout: PT30S
 
 spring:

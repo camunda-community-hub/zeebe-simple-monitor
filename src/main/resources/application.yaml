@@ -6,6 +6,7 @@ zeebe:
     worker:
       hazelcast:
         connection: localhost:5701
+        clusterName: dev
         connectionTimeout: PT30S
 
 spring:
