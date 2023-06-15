@@ -19,6 +19,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
+import org.hibernate.Length;
 
 @Entity(name = "MESSAGE")
 public class MessageEntity {
@@ -36,7 +37,7 @@ public class MessageEntity {
   @Column(name = "MESSAGE_ID_")
   private String messageId;
 
-  @Column(name = "PAYLOAD_")
+  @Column(name = "PAYLOAD_",length= Length.LONG32)
   @Lob
   private String payload;
 

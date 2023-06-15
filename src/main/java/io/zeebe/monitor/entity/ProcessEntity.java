@@ -15,10 +15,8 @@
  */
 package io.zeebe.monitor.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
+import jakarta.persistence.*;
+import org.hibernate.Length;
 
 @Entity(name = "PROCESS")
 public class ProcessEntity {
@@ -33,7 +31,7 @@ public class ProcessEntity {
   private int version;
 
   @Lob
-  @Column(name = "RESOURCE_")
+  @Column(name = "RESOURCE_",length= Length.LONG32)
   private String resource;
 
   @Column(name = "TIMESTAMP_")
