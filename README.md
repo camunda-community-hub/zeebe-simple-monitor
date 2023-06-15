@@ -170,7 +170,7 @@ The configuration for using MySql is similar but with an additional setting for 
 - spring.datasource.username=root
 - spring.datasource.password=zeebe
 - spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver
-- spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+- spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
 - spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 ```
 
