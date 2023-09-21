@@ -43,8 +43,6 @@ logging:
   level:
     root: ERROR
     io.zeebe: INFO
-    io.zeebe.monitor: DEBUG
-    com.hazelcast: WARN
 
 management:
   endpoint:
