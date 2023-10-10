@@ -59,7 +59,7 @@ public class DatabaseRetentionService {
     private ArrayList<Long> findAllChildProcesses(long processInstanceId) {
         ArrayList<Long> processKeys = new ArrayList<Long>();
         processKeys.add(processInstanceId);
-        List<ProcessInstanceEntity> childProcesses = processInstanceRepository.findByParentProcessInstanceKey(processInstanceId, null).getContent();
+        List<ProcessInstanceEntity> childProcesses = processInstanceRepository.findByParentProcessInstanceKey(processInstanceId);
         for (ProcessInstanceEntity process : childProcesses) {
             processKeys.addAll(findAllChildProcesses(process.getKey()));
         }

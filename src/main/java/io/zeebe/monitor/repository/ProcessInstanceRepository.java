@@ -42,6 +42,8 @@ public interface ProcessInstanceRepository
     Page<ProcessInstanceEntity> findByParentProcessInstanceKey(
             long parentProcessInstanceKey, Pageable pageable);
 
+    ArrayList<ProcessInstanceEntity> findByParentProcessInstanceKey(long parentProcessInstanceKey);
+
     long countByParentProcessInstanceKey(long parentProcessInstanceKey);
 
     ArrayList<ProcessInstanceEntity> findProcessInstanceEntitiesByStartBeforeAndParentElementInstanceKeyIsAndEndIsNotNull(long before, long instanceKey);
