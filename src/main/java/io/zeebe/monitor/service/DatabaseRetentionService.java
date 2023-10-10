@@ -2,6 +2,8 @@ package io.zeebe.monitor.service;
 
 import io.zeebe.monitor.entity.ProcessInstanceEntity;
 import io.zeebe.monitor.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -30,6 +32,8 @@ public class DatabaseRetentionService {
 
     @Value("${retention.age}")
     Duration oldestProcess;
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     public DatabaseRetentionService(ProcessInstanceRepository processInstanceRepository,
@@ -65,6 +69,7 @@ public class DatabaseRetentionService {
     @Scheduled(fixedRateString = "${retention.interval}")
     @Transactional
     public void retention() {
+        logger.info("Retention cleanup beginning");
         long oldestProcessTime = Instant.now().minus(oldestProcess).toEpochMilli();
 
         // find all Completed and Terminated (i.e. those without an `end_` set) root processes older than X
@@ -91,5 +96,7 @@ public class DatabaseRetentionService {
         // messages have to be removed separately
         // this is annoying and it should be fixed
         messageRepository.deleteAllByTimestampLessThanAndState(oldestProcessTime, "expired");
+
+        logger.info("Retention cleanup complete with " + allRemovableProcessInstanceKeys.size() + " processes worth of data removed");
     }
 }
