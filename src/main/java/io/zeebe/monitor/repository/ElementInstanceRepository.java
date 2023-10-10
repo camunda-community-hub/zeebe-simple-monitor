@@ -21,4 +21,5 @@ import org.springframework.data.repository.CrudRepository;
 public interface ElementInstanceRepository extends CrudRepository<ElementInstanceEntity, String> {
 
   Iterable<ElementInstanceEntity> findByProcessInstanceKey(long processInstanceKey);
+  void deleteAllByProcessInstanceKey(long processInstanceKey);
 }

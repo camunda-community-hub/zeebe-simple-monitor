@@ -27,4 +27,6 @@ public interface VariableRepository extends
   Page<VariableEntity> findByProcessInstanceKey(long processInstanceKey, Pageable pageable);
 
   long countByProcessInstanceKey(long processInstanceKey);
+
+  void deleteAllByProcessInstanceKey(long processInstanceKey);
 }

@@ -27,4 +27,6 @@ public interface ErrorRepository extends
   Page<ErrorEntity> findByProcessInstanceKey(long processInstanceKey, Pageable pageable);
 
   long countByProcessInstanceKey(long processInstanceKey);
+
+  void deleteAllByProcessInstanceKey(long processInstanceKey);
 }

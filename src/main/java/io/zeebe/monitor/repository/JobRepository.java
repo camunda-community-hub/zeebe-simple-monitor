@@ -34,4 +34,6 @@ public interface JobRepository extends CrudRepository<JobEntity, Long>, PagingAn
   Page<JobEntity> findByStateNotIn(Collection<String> state, Pageable pageable);
 
   long countByStateNotIn(Collection<String> state);
+
+  void deleteAllByProcessInstanceKey(long processInstanceKey);
 }

@@ -20,4 +20,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface MessageRepository extends
-        CrudRepository<MessageEntity, Long>, PagingAndSortingRepository<MessageEntity, Long> {}
+        CrudRepository<MessageEntity, Long>, PagingAndSortingRepository<MessageEntity, Long> {
+    void deleteAllByTimestampLessThanAndState(long time, String state);
+}

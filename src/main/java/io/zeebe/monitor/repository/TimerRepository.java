@@ -30,4 +30,6 @@ public interface TimerRepository extends
   long countByProcessInstanceKey(Long processInstanceKey);
 
   List<TimerEntity> findByProcessDefinitionKeyAndProcessInstanceKeyIsNull(Long processInstanceKey);
+
+  void deleteAllByProcessInstanceKey(long processInstanceKey);
 }

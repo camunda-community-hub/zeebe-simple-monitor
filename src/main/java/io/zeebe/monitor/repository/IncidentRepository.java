@@ -26,4 +26,6 @@ public interface IncidentRepository extends
 
   Iterable<IncidentEntity> findByProcessInstanceKey(long processInstanceKey);
 
+  void deleteAllByProcessInstanceKey(long processInstanceKey);
+
 }

@@ -16,28 +16,36 @@
 package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.ProcessInstanceEntity;
+
+import java.util.ArrayList;
 import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface ProcessInstanceRepository
-    extends CrudRepository<ProcessInstanceEntity, Long>, PagingAndSortingRepository<ProcessInstanceEntity, Long> {
+        extends CrudRepository<ProcessInstanceEntity, Long>, PagingAndSortingRepository<ProcessInstanceEntity, Long> {
 
-  Page<ProcessInstanceEntity> findByProcessDefinitionKey(
-      long processDefinitionKey, Pageable pageable);
+    Page<ProcessInstanceEntity> findByProcessDefinitionKey(
+            long processDefinitionKey, Pageable pageable);
 
-  Optional<ProcessInstanceEntity> findByKey(long key);
+    Optional<ProcessInstanceEntity> findByKey(long key);
 
-  long countByProcessDefinitionKey(long processDefinitionKey);
+    long countByProcessDefinitionKey(long processDefinitionKey);
 
-  long countByProcessDefinitionKeyAndEndIsNotNull(long processDefinitionKey);
+    long countByProcessDefinitionKeyAndEndIsNotNull(long processDefinitionKey);
 
-  long countByProcessDefinitionKeyAndEndIsNull(long processDefinitionKey);
+    long countByProcessDefinitionKeyAndEndIsNull(long processDefinitionKey);
 
-  Page<ProcessInstanceEntity> findByParentProcessInstanceKey(
-      long parentProcessInstanceKey, Pageable pageable);
+    Page<ProcessInstanceEntity> findByParentProcessInstanceKey(
+            long parentProcessInstanceKey, Pageable pageable);
 
-  long countByParentProcessInstanceKey(long parentProcessInstanceKey);
+    long countByParentProcessInstanceKey(long parentProcessInstanceKey);
+
+    ArrayList<ProcessInstanceEntity> findProcessInstanceEntitiesByStartBeforeAndParentElementInstanceKeyIsAndEndIsNotNull(long before, long instanceKey);
+
+    void deleteAllByKey(long key);
+
 }

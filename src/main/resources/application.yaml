@@ -8,6 +8,11 @@ zeebe:
         connection: localhost:5701
         connectionTimeout: PT30S
 
+retention:
+  enabled: ${RETENTION_ENABLED:true}
+  interval: ${RETENTION_INTERVAL:PT24H}
+  age: ${RETENTION_AGE:PT168H}
+
 spring:
   datasource:
     url: jdbc:h2:mem:zeebe-monitor;DB_CLOSE_DELAY=-1
