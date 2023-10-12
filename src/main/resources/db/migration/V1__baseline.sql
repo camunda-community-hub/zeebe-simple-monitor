@@ -13,8 +13,8 @@ CREATE TABLE public.element_instance
     timestamp_              bigint
 );
 
-
 ALTER TABLE public.element_instance OWNER TO zeebe;
+
 CREATE TABLE public.error
 (
     position_             bigint NOT NULL,
@@ -25,16 +25,17 @@ CREATE TABLE public.error
     timestamp_            bigint
 );
 
-
 ALTER TABLE public.error OWNER TO zeebe;
+
 CREATE TABLE public.hazelcast_config
 (
     id       character varying(255) NOT NULL,
-    sequence bigint                 NOT NULL
+    SEQUENCE bigint
+                                    NOT NULL
 );
 
-
 ALTER TABLE public.hazelcast_config OWNER TO zeebe;
+
 CREATE TABLE public.incident
 (
     key_                    bigint NOT NULL,
@@ -49,8 +50,8 @@ CREATE TABLE public.incident
     resolved_               bigint
 );
 
-
 ALTER TABLE public.incident OWNER TO zeebe;
+
 CREATE TABLE public.job
 (
     key_                  bigint NOT NULL,
@@ -63,8 +64,8 @@ CREATE TABLE public.job
     worker_               character varying(255)
 );
 
-
 ALTER TABLE public.job OWNER TO zeebe;
+
 CREATE TABLE public.message
 (
     key_             bigint NOT NULL,
@@ -76,8 +77,8 @@ CREATE TABLE public.message
     timestamp_       bigint
 );
 
-
 ALTER TABLE public.message OWNER TO zeebe;
+
 CREATE TABLE public.message_subscription
 (
     id_                     character varying(255) NOT NULL,
@@ -91,8 +92,8 @@ CREATE TABLE public.message_subscription
     timestamp_              bigint
 );
 
-
 ALTER TABLE public.message_subscription OWNER TO zeebe;
+
 CREATE TABLE public.process
 (
     key_             bigint NOT NULL,
@@ -102,8 +103,8 @@ CREATE TABLE public.process
     version_         integer
 );
 
-
 ALTER TABLE public.process OWNER TO zeebe;
+
 CREATE TABLE public.process_instance
 (
     key_                         bigint NOT NULL,
@@ -118,8 +119,8 @@ CREATE TABLE public.process_instance
     version_                     integer
 );
 
-
 ALTER TABLE public.process_instance OWNER TO zeebe;
+
 CREATE TABLE public.timer
 (
     key_                    bigint NOT NULL,
@@ -133,8 +134,8 @@ CREATE TABLE public.timer
     timestamp_              bigint
 );
 
-
 ALTER TABLE public.timer OWNER TO zeebe;
+
 CREATE TABLE public.variable
 (
     id                    character varying(255) NOT NULL,
@@ -148,8 +149,8 @@ CREATE TABLE public.variable
     value_ oid
 );
 
-
 ALTER TABLE public.variable OWNER TO zeebe;
+
 ALTER TABLE ONLY public.element_instance
     ADD CONSTRAINT element_instance_pkey PRIMARY KEY (id);
 
