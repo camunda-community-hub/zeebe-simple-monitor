@@ -38,6 +38,11 @@ spring:
   profiles:
     active: ${PROFILE:hazelcast}
 
+  flyway:
+    baseline-version: 1
+    enabled: true
+
+
 server:
   port: 8082
   servlet:

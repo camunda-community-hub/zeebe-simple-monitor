@@ -9,3 +9,5 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: create
+  flyway:
+    enabled: false
