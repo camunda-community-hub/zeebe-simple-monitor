@@ -1,0 +1,11 @@
+package io.zeebe.monitor.model;
+
+public enum IntentTypes {
+    ELEMENT_ACTIVATING,
+    SEQUENCE_FLOW_TAKEN,
+    ELEMENT_COMPLETED,
+    ELEMENT_ACTIVATED,
+    ELEMENT_COMPLETING,
+    ELEMENT_TERMINATED,
+    ELEMENT_TERMINATING,
+}

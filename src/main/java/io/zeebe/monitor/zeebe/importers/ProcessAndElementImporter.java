@@ -17,15 +17,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProcessAndElementImporter {
 
-  @Autowired
-  private ProcessRepository processRepository;
-  @Autowired
-  private ProcessInstanceRepository processInstanceRepository;
-  @Autowired
-  private ElementInstanceRepository elementInstanceRepository;
+  private final ProcessRepository processRepository;
+  private final ProcessInstanceRepository processInstanceRepository;
+  private final ElementInstanceRepository elementInstanceRepository;
 
-  @Autowired
-  private ZeebeNotificationService notificationService;
+  private final ZeebeNotificationService notificationService;
+
+  public ProcessAndElementImporter(ProcessRepository processRepository, ProcessInstanceRepository processInstanceRepository, ElementInstanceRepository elementInstanceRepository, ZeebeNotificationService notificationService) {
+    this.processRepository = processRepository;
+    this.processInstanceRepository = processInstanceRepository;
+    this.elementInstanceRepository = elementInstanceRepository;
+    this.notificationService = notificationService;
+  }
 
   public void importProcess(final Schema.ProcessRecord record) {
     final int partitionId = record.getMetadata().getPartitionId();
