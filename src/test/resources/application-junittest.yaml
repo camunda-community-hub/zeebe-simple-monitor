@@ -2,3 +2,6 @@ logging:
   level:
     root: WARN
     io.zeebe: INFO
+spring:
+  flyway:
+    enabled: false
