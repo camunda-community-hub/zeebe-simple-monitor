@@ -45,6 +45,9 @@ public class ElementInstanceEntity {
     @Column(name = "KEY_")
     private long key;
 
+
+    // For some reason, they didn't map this to the ProcessInstanceIntent class
+    // (probably because it's for ProcessInstances)
     @Column(name = "INTENT_")
     private IntentTypes intent;
 
