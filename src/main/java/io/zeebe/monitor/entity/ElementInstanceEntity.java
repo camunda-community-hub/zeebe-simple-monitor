@@ -15,6 +15,8 @@
  */
 package io.zeebe.monitor.entity;
 
+import io.zeebe.monitor.model.BPMNElementTypes;
+import io.zeebe.monitor.model.IntentTypes;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -24,141 +26,151 @@ import jakarta.persistence.Table;
 
 @Entity(name = "ELEMENT_INSTANCE")
 @Table(indexes = {
-    // performance reason, because we use it in the
-    // {@link io.zeebe.monitor.repository.ElementInstanceRepository#findByProcessInstanceKey(long)}
-    @Index(name = "element_instance_processInstanceKeyIndex", columnList = "PROCESS_INSTANCE_KEY_"),
+        // performance reason, because we use it in the
+        // {@link io.zeebe.monitor.repository.ElementInstanceRepository#findByProcessInstanceKey(long)}
+        @Index(name = "element_instance_processInstanceKeyIndex", columnList = "PROCESS_INSTANCE_KEY_"),
 })
 public class ElementInstanceEntity {
 
-  @Id
-  @Column(name = "ID")
-  private String id;
+    @Id
+    @Column(name = "ID")
+    private String id;
 
-  @Column(name = "POSITION_")
-  private Long position;
+    @Column(name = "POSITION_")
+    private Long position;
 
-  @Column(name = "PARTITION_ID_")
-  private int partitionId;
+    @Column(name = "PARTITION_ID_")
+    private int partitionId;
 
-  @Column(name = "KEY_")
-  private long key;
+    @Column(name = "KEY_")
+    private long key;
 
-  @Column(name = "INTENT_")
-  private String intent;
 
-  @Column(name = "PROCESS_INSTANCE_KEY_")
-  private long processInstanceKey;
+    // For some reason, they didn't map this to the ProcessInstanceIntent class
+    // (probably because it's for ProcessInstances)
+    @Column(name = "INTENT_")
+    private IntentTypes intent;
 
-  @Column(name = "ELEMENT_ID_")
-  private String elementId;
+    @Column(name = "PROCESS_INSTANCE_KEY_")
+    private long processInstanceKey;
 
-  @Column(name = "BPMN_ELEMENT_TYPE_")
-  private String bpmnElementType;
+    @Column(name = "ELEMENT_ID_")
+    private String elementId;
 
-  @Column(name = "FLOW_SCOPE_KEY_")
-  private long flowScopeKey;
+    @Column(name = "BPMN_ELEMENT_TYPE_")
+    private BPMNElementTypes bpmnElementType;
 
-  @Column(name = "PROCESS_DEFINITION_KEY_")
-  private long processDefinitionKey;
+    @Column(name = "FLOW_SCOPE_KEY_")
+    private long flowScopeKey;
 
-  @Column(name = "TIMESTAMP_")
-  private long timestamp;
+    @Column(name = "PROCESS_DEFINITION_KEY_")
+    private long processDefinitionKey;
 
-  public String getId() {
-    return id;
-  }
+    @Column(name = "TIMESTAMP_")
+    private long timestamp;
 
-  private void setId(final String id) {
-    // made private, to avoid accidental changes
-    this.id = id;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public final String getGeneratedIdentifier() {
-    return this.partitionId + "-" + this.position;
-  }
+    private void setId(final String id) {
+        // made private, to avoid accidental changes
+        this.id = id;
+    }
 
-  @PrePersist
-  private void prePersistDeriveIdField() {
-    setId(getGeneratedIdentifier());
-  }
+    public final String getGeneratedIdentifier() {
+        return this.partitionId + "-" + this.position;
+    }
 
-  public long getKey() {
-    return key;
-  }
+    @PrePersist
+    private void prePersistDeriveIdField() {
+        setId(getGeneratedIdentifier());
+    }
 
-  public void setKey(final long key) {
-    this.key = key;
-  }
+    public long getKey() {
+        return key;
+    }
 
-  public String getIntent() {
-    return intent;
-  }
+    public void setKey(final long key) {
+        this.key = key;
+    }
 
-  public void setIntent(final String intent) {
-    this.intent = intent;
-  }
+    public IntentTypes getIntent() {
+        return intent;
+    }
 
-  public long getTimestamp() {
-    return timestamp;
-  }
+    public void setIntent(final String intent) {
+        this.intent = IntentTypes.valueOf(intent);
+    }
+    public void setIntent(final IntentTypes intent) {
+        this.intent = intent;
+    }
 
-  public void setTimestamp(final long timestamp) {
-    this.timestamp = timestamp;
-  }
+    public long getTimestamp() {
+        return timestamp;
+    }
 
-  public String getElementId() {
-    return elementId;
-  }
+    public void setTimestamp(final long timestamp) {
+        this.timestamp = timestamp;
+    }
 
-  public void setElementId(final String elementId) {
-    this.elementId = elementId;
-  }
+    public String getElementId() {
+        return elementId;
+    }
 
-  public long getFlowScopeKey() {
-    return flowScopeKey;
-  }
+    public void setElementId(final String elementId) {
+        this.elementId = elementId;
+    }
 
-  public void setFlowScopeKey(final long flowScopeKey) {
-    this.flowScopeKey = flowScopeKey;
-  }
+    public long getFlowScopeKey() {
+        return flowScopeKey;
+    }
 
-  public int getPartitionId() {
-    return partitionId;
-  }
+    public void setFlowScopeKey(final long flowScopeKey) {
+        this.flowScopeKey = flowScopeKey;
+    }
 
-  public void setPartitionId(final int partitionId) {
-    this.partitionId = partitionId;
-  }
+    public int getPartitionId() {
+        return partitionId;
+    }
 
-  public long getProcessInstanceKey() {
-    return processInstanceKey;
-  }
+    public void setPartitionId(final int partitionId) {
+        this.partitionId = partitionId;
+    }
 
-  public void setProcessInstanceKey(final long processInstanceKey) {
-    this.processInstanceKey = processInstanceKey;
-  }
+    public long getProcessInstanceKey() {
+        return processInstanceKey;
+    }
 
-  public long getProcessDefinitionKey() {
-    return processDefinitionKey;
-  }
+    public void setProcessInstanceKey(final long processInstanceKey) {
+        this.processInstanceKey = processInstanceKey;
+    }
 
-  public void setProcessDefinitionKey(final long processDefinitionKey) {
-    this.processDefinitionKey = processDefinitionKey;
-  }
+    public long getProcessDefinitionKey() {
+        return processDefinitionKey;
+    }
 
-  public Long getPosition() {
-    return position;
-  }
+    public void setProcessDefinitionKey(final long processDefinitionKey) {
+        this.processDefinitionKey = processDefinitionKey;
+    }
 
-  public void setPosition(final Long position) {
-    this.position = position;
-  }
+    public Long getPosition() {
+        return position;
+    }
 
-  public String getBpmnElementType() {
-    return bpmnElementType;
-  }
+    public void setPosition(final Long position) {
+        this.position = position;
+    }
 
-  public void setBpmnElementType(final String bpmnElementType) {
-    this.bpmnElementType = bpmnElementType;
-  }
+    public BPMNElementTypes getBpmnElementType() {
+        return bpmnElementType;
+    }
+
+    public void setBpmnElementType(final BPMNElementTypes bpmnElementType) {
+        this.bpmnElementType = bpmnElementType;
+    }
+
+    public void setBpmnElementType(final String bpmnElementType) {
+        this.bpmnElementType = BPMNElementTypes.valueOf(bpmnElementType);
+    }
 }

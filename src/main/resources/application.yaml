@@ -8,6 +8,11 @@ zeebe:
         connection: localhost:5701
         connectionTimeout: PT30S
 
+retention:
+  enabled: ${RETENTION_ENABLED:false}
+  interval: ${RETENTION_INTERVAL:PT24H}
+  age: ${RETENTION_AGE:PT168H}
+
 spring:
   datasource:
     url: jdbc:h2:mem:zeebe-monitor;DB_CLOSE_DELAY=-1
@@ -32,6 +37,11 @@ spring:
         default-page-size: 10
   profiles:
     active: ${PROFILE:hazelcast}
+
+  flyway:
+    baseline-version: 1
+    enabled: true
+
 
 server:
   port: 8082

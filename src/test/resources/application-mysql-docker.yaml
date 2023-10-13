@@ -11,3 +11,5 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     hibernate:
       ddl-auto: create
+  flyway:
+    enabled: false

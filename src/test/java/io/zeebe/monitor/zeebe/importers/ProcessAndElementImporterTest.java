@@ -3,6 +3,7 @@ package io.zeebe.monitor.zeebe.importers;
 import io.camunda.zeebe.protocol.record.intent.ProcessInstanceIntent;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.ElementInstanceEntity;
+import io.zeebe.monitor.model.BPMNElementTypes;
 import io.zeebe.monitor.repository.ElementInstanceRepository;
 import io.zeebe.monitor.repository.ZeebeRepositoryTest;
 import io.zeebe.monitor.zeebe.ZeebeNotificationService;
@@ -52,6 +53,7 @@ public class ProcessAndElementImporterTest extends ZeebeRepositoryTest {
             .setPosition(333L)
             .setPartitionId(55555)
             .setIntent(ProcessInstanceIntent.ELEMENT_ACTIVATED.name()))
+            .setBpmnElementType(BPMNElementTypes.PROCESS.name())
         .build();
   }
 

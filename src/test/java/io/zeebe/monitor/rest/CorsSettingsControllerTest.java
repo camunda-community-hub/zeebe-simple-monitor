@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
     properties = {
         "server.allowedOriginsUrls: http://www.someurl.com",
         "logging.level.io.zeebe.monitor: info",
+        "spring.flyway.enabled: false"
     })
 @AutoConfigureMockMvc
 @ActiveProfiles("junittest")
