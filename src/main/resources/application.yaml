@@ -9,7 +9,7 @@ zeebe:
         connectionTimeout: PT30S
 
 retention:
-  enabled: ${RETENTION_ENABLED:true}
+  enabled: ${RETENTION_ENABLED:false}
   interval: ${RETENTION_INTERVAL:PT24H}
   age: ${RETENTION_AGE:PT168H}
 
