@@ -92,13 +92,14 @@ public class ElementInstanceEntity {
         this.key = key;
     }
 
-    public IntentTypes getIntent() {
-        return intent;
+    public String getIntent() {
+        return intent.name();
     }
 
     public void setIntent(final String intent) {
         this.intent = IntentTypes.valueOf(intent);
     }
+
     public void setIntent(final IntentTypes intent) {
         this.intent = intent;
     }
@@ -159,8 +160,9 @@ public class ElementInstanceEntity {
         this.position = position;
     }
 
-    public BPMNElementTypes getBpmnElementType() {
-        return bpmnElementType;
+
+    public String getBpmnElementType() {
+        return bpmnElementType.name();
     }
 
     public void setBpmnElementType(final BPMNElementTypes bpmnElementType) {
