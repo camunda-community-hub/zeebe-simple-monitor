@@ -78,7 +78,7 @@ public class InstancesAuditLogViewController extends AbstractInstanceViewControl
                                     entry.setElementId(e.getElementId());
                                     entry.setElementName(flowElements.getOrDefault(e.getElementId(), ""));
                                     entry.setBpmnElementType(e.getBpmnElementType());
-                                    entry.setState(e.getIntent().name());
+                                    entry.setState(e.getIntent());
                                     entry.setTimestamp(Instant.ofEpochMilli(e.getTimestamp()).toString());
 
                                     return entry;
