@@ -17,12 +17,7 @@ package io.zeebe.monitor.entity;
 
 import io.zeebe.monitor.model.BPMNElementTypes;
 import io.zeebe.monitor.model.IntentTypes;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity(name = "ELEMENT_INSTANCE")
 @Table(indexes = {
@@ -49,6 +44,7 @@ public class ElementInstanceEntity {
     // For some reason, they didn't map this to the ProcessInstanceIntent class
     // (probably because it's for ProcessInstances)
     @Column(name = "INTENT_")
+    @Enumerated(EnumType.STRING)
     private IntentTypes intent;
 
     @Column(name = "PROCESS_INSTANCE_KEY_")
@@ -58,6 +54,7 @@ public class ElementInstanceEntity {
     private String elementId;
 
     @Column(name = "BPMN_ELEMENT_TYPE_")
+    @Enumerated(EnumType.STRING)
     private BPMNElementTypes bpmnElementType;
 
     @Column(name = "FLOW_SCOPE_KEY_")
