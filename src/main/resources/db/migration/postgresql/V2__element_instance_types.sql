@@ -16,8 +16,6 @@ TYPE public.ei_bpmn_element_type AS ENUM (
   'SEQUENCE_FLOW'
 );
 
-ALTER
-TYPE public.ei_bpmn_element_type OWNER TO postgres;
 
 CREATE
 TYPE public.ei_intent AS ENUM (
@@ -29,9 +27,6 @@ TYPE public.ei_intent AS ENUM (
   'ELEMENT_TERMINATED',
   'ELEMENT_TERMINATING'
 );
-
-ALTER
-TYPE public.ei_intent OWNER TO postgres;
 
 ALTER TABLE element_instance
     ALTER COLUMN intent_ TYPE ei_intent
