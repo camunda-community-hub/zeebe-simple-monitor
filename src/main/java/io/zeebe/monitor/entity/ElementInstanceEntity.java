@@ -19,9 +19,10 @@ import javax.persistence.*;
 
 @Entity(name = "ELEMENT_INSTANCE")
 @Table(indexes = {
-    // performance reason, because we use it in the
-    // {@link io.zeebe.monitor.repository.ElementInstanceRepository#findByProcessInstanceKey(long)}
     @Index(name = "element_instance_processInstanceKeyIndex", columnList = "PROCESS_INSTANCE_KEY_"),
+    @Index(name = "element_instance_processDefinitionKeyIndex", columnList = "PROCESS_DEFINITION_KEY_"),
+    @Index(name = "element_instance_intentIndex", columnList = "INTENT_"),
+    @Index(name = "element_instance_bpmnElementTypeIndex", columnList = "BPMN_ELEMENT_TYPE_"),
 })
 public class ElementInstanceEntity {
 
