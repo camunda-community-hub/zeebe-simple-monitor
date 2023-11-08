@@ -7,12 +7,14 @@ import io.zeebe.monitor.entity.HazelcastConfig;
 import io.zeebe.monitor.repository.HazelcastConfigRepository;
 import io.zeebe.monitor.zeebe.importers.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Component
+@ConditionalOnProperty(value="mode", havingValue = "hazelcast", matchIfMissing = true)
 public class ZeebeImportService {
 
   @Autowired private ProcessAndElementImporter processAndElementImporter;
