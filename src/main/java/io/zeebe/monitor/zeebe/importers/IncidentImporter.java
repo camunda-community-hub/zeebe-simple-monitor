@@ -14,7 +14,7 @@ public class IncidentImporter {
 
   public void importIncident(final Schema.IncidentRecord record) {
 
-    final IncidentIntent intent = IncidentIntent.valueOf(record.getMetadata().getIntent());
+    final String intent = record.getMetadata().getIntent();
     final long key = record.getMetadata().getKey();
     final long timestamp = record.getMetadata().getTimestamp();
 
@@ -35,11 +35,11 @@ public class IncidentImporter {
                   return newEntity;
                 });
 
-    if (intent == IncidentIntent.CREATED) {
+    if (intent.equalsIgnoreCase(IncidentIntent.CREATED.name())) {
       entity.setCreated(timestamp);
       incidentRepository.save(entity);
 
-    } else if (intent == IncidentIntent.RESOLVED) {
+    } else if (intent.equalsIgnoreCase(IncidentIntent.RESOLVED.name())) {
       entity.setResolved(timestamp);
       incidentRepository.save(entity);
     }

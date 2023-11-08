@@ -14,7 +14,7 @@ public class TimerImporter {
 
   public void importTimer(final Schema.TimerRecord record) {
 
-    final TimerIntent intent = TimerIntent.valueOf(record.getMetadata().getIntent());
+    final String intent = record.getMetadata().getIntent();
     final long key = record.getMetadata().getKey();
     final long timestamp = record.getMetadata().getTimestamp();
 
@@ -38,7 +38,7 @@ public class TimerImporter {
                   return newEntity;
                 });
 
-    entity.setState(intent.name().toLowerCase());
+    entity.setState(intent.toLowerCase());
     entity.setTimestamp(timestamp);
     timerRepository.save(entity);
   }

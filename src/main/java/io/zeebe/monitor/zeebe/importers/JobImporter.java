@@ -1,6 +1,5 @@
 package io.zeebe.monitor.zeebe.importers;
 
-import io.camunda.zeebe.protocol.record.intent.JobIntent;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.JobEntity;
 import io.zeebe.monitor.repository.JobRepository;
@@ -14,7 +13,7 @@ public class JobImporter {
 
   public void importJob(final Schema.JobRecord record) {
 
-    final JobIntent intent = JobIntent.valueOf(record.getMetadata().getIntent());
+    final String intent = record.getMetadata().getIntent();
     final long key = record.getMetadata().getKey();
     final long timestamp = record.getMetadata().getTimestamp();
 
@@ -31,7 +30,7 @@ public class JobImporter {
                   return newEntity;
                 });
 
-    entity.setState(intent.name().toLowerCase());
+    entity.setState(intent.toLowerCase());
     entity.setTimestamp(timestamp);
     entity.setWorker(record.getWorker());
     entity.setRetries(record.getRetries());

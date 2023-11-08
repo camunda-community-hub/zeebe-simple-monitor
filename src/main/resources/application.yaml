@@ -1,22 +1,29 @@
+mode: ${MODE:hazelcast}
+
 zeebe:
   client:
-    broker.gatewayAddress: 127.0.0.1:26500
+    broker.gatewayAddress: ${ZEEBE_URL:127.0.0.1:26500}
     security.plaintext: true
 
     worker:
       hazelcast:
-        connection: localhost:5701
+        connection: ${HAZELCAST_URL:localhost:5701}
         connectionTimeout: PT30S
+elastic:
+  url: ${ZEEBE_ELASTIC_URL}
+  user: ${ZEEBE_ELASTIC_USER}
+  password: ${ZEEBE_ELASTIC_PASSWORD}
+  index: ${ZEEBE_ELASTIC_INDEX}
 
 spring:
   datasource:
-    url: jdbc:h2:mem:zeebe-monitor;DB_CLOSE_DELAY=-1
-    username: sa
-    password:
-    driverClassName: org.h2.Driver
+    url: ${DB_URL:jdbc:h2:mem:zeebe-monitor;DB_CLOSE_DELAY=-1}
+    username: ${DB_USER:sa}
+    password: ${DB_PASSWORD:""}
+    driverClassName: ${DB_DRIVER:org.h2.Driver}
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: ${DB_DIALECT:org.hibernate.dialect.H2Dialect}
     hibernate:
       ddl-auto: update
 

@@ -1,7 +1,6 @@
 package io.zeebe.monitor.zeebe.importers;
 
 import io.camunda.zeebe.protocol.Protocol;
-import io.camunda.zeebe.protocol.record.intent.Intent;
 import io.camunda.zeebe.protocol.record.intent.ProcessInstanceIntent;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.ElementInstanceEntity;
@@ -53,7 +52,7 @@ public class ProcessAndElementImporter {
 
   private void addOrUpdateProcessInstance(final Schema.ProcessInstanceRecord record) {
 
-    final Intent intent = ProcessInstanceIntent.valueOf(record.getMetadata().getIntent());
+    final String intent = record.getMetadata().getIntent();
     final long timestamp = record.getMetadata().getTimestamp();
     final long processInstanceKey = record.getProcessInstanceKey();
 
@@ -73,7 +72,7 @@ public class ProcessAndElementImporter {
                   return newEntity;
                 });
 
-    if (intent == ProcessInstanceIntent.ELEMENT_ACTIVATED) {
+    if (intent.equalsIgnoreCase(ProcessInstanceIntent.ELEMENT_ACTIVATED.name())) {
       entity.setState("Active");
       entity.setStart(timestamp);
       processInstanceRepository.save(entity);
@@ -81,7 +80,7 @@ public class ProcessAndElementImporter {
       notificationService.sendCreatedProcessInstance(
           record.getProcessInstanceKey(), record.getProcessDefinitionKey());
 
-    } else if (intent == ProcessInstanceIntent.ELEMENT_COMPLETED) {
+    } else if (intent.equalsIgnoreCase(ProcessInstanceIntent.ELEMENT_COMPLETED.name())) {
       entity.setState("Completed");
       entity.setEnd(timestamp);
       processInstanceRepository.save(entity);
@@ -89,7 +88,7 @@ public class ProcessAndElementImporter {
       notificationService.sendEndedProcessInstance(
           record.getProcessInstanceKey(), record.getProcessDefinitionKey());
 
-    } else if (intent == ProcessInstanceIntent.ELEMENT_TERMINATED) {
+    } else if (intent.equalsIgnoreCase(ProcessInstanceIntent.ELEMENT_TERMINATED.name())) {
       entity.setState("Terminated");
       entity.setEnd(timestamp);
       processInstanceRepository.save(entity);

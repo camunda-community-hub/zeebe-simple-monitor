@@ -1,6 +1,5 @@
 package io.zeebe.monitor.zeebe.importers;
 
-import io.camunda.zeebe.protocol.record.intent.MessageIntent;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.MessageEntity;
 import io.zeebe.monitor.repository.MessageRepository;
@@ -14,7 +13,7 @@ public class MessageImporter {
 
   public void importMessage(final Schema.MessageRecord record) {
 
-    final MessageIntent intent = MessageIntent.valueOf(record.getMetadata().getIntent());
+    final String intent = record.getMetadata().getIntent();
     final long key = record.getMetadata().getKey();
     final long timestamp = record.getMetadata().getTimestamp();
 
@@ -32,7 +31,7 @@ public class MessageImporter {
                   return newEntity;
                 });
 
-    entity.setState(intent.name().toLowerCase());
+    entity.setState(intent.toLowerCase());
     entity.setTimestamp(timestamp);
     messageRepository.save(entity);
   }

@@ -41,7 +41,7 @@ public class ZeebeStatusUpdateService {
 
   private Topology getTopologyFromCluster() {
     return zeebeClient.newTopologyRequest()
-        .requestTimeout(Duration.ofSeconds(2))
+        .requestTimeout(Duration.ofSeconds(10))
         .send()
         .join();
   }
