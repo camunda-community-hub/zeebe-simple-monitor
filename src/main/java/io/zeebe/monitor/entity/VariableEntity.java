@@ -15,7 +15,8 @@
  */
 package io.zeebe.monitor.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+import org.hibernate.Length;
 
 @Entity(name = "VARIABLE")
 @Table(indexes = {
@@ -37,7 +38,7 @@ public class VariableEntity {
   @Column(name = "NAME_")
   private String name;
 
-  @Column(name = "VALUE_")
+  @Column(name = "VALUE_",length= Length.LONG32)
   @Lob
   private String value;
 

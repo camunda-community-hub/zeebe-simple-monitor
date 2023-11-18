@@ -33,9 +33,13 @@ docker pull ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.4.1
 ```
 
 * ensure that a Zeebe broker is running with a [Hazelcast exporter](https://github.com/camunda-community-hub/zeebe-hazelcast-exporter#install) (>= `1.0.0`)  
-* forward the Hazelcast port to the docker container (default: `5701`)
 * configure the connection to the Zeebe broker by setting `zeebe.client.broker.gateway-address` (default: `localhost:26500`) 
-* configure the connection to Hazelcast by setting `zeebe.client.worker.hazelcast.connection` (default: `localhost:5701`) 
+* configure the connection to Hazelcast by setting `zeebe.client.worker.hazelcast.connection` (default: `localhost:5701`)
+* forward the Hazelcast port to the docker container (default: `5701`)
+* if you want to set the Hazelcast clusterName then you need to adjust the Zeebe broker and the Zeebe Simple Monitor alike
+  * Hint: this is useful, e.g. when you want to adjust the ringbuffer's size in the Hazelcast cluster (the name is relevant) 
+  * a) in Zeebe broker, set the environment variable `ZEEBE_HAZELCAST_CLUSTER_NAME=dev` (default: `dev`)
+  * b) in Zeebe Simple Monitor, change the setting `zeebe.client.worker.hazelcast.clusterName` (default: `dev`)
 
 If the Zeebe broker runs on your local machine with the default configs then start the container with the following command:  
 
@@ -87,6 +91,7 @@ zeebe:
     worker:
       hazelcast:
         connection: localhost:5701
+        clusterName: dev
         connectionTimeout: PT30S
 
 spring:
@@ -170,7 +175,7 @@ The configuration for using MySql is similar but with an additional setting for 
 - spring.datasource.username=root
 - spring.datasource.password=zeebe
 - spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver
-- spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+- spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
 - spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 ```
 
