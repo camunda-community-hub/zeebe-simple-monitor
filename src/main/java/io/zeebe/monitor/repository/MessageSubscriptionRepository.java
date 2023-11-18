@@ -20,10 +20,11 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface MessageSubscriptionRepository
-    extends PagingAndSortingRepository<MessageSubscriptionEntity, Long> {
+    extends PagingAndSortingRepository<MessageSubscriptionEntity, Long>, CrudRepository<MessageSubscriptionEntity, Long> {
 
   Page<MessageSubscriptionEntity> findByProcessInstanceKey(
       long processInstanceKey, Pageable pageable);

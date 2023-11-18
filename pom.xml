@@ -22,13 +22,17 @@
         <version.zeebe.spring>8.3.1</version.zeebe.spring>
         <hazelcast.exporter.version>1.4.0</hazelcast.exporter.version>
 
-        <spring.boot.version>2.7.5</spring.boot.version>
+        <querydsl.version>5.0.0</querydsl.version>
+
+        <spring.boot.version>3.1.5</spring.boot.version>
         <!-- pin Hazelcast version because of spring-boot-dependencies -->
         <version.hazelcast>5.3.6</version.hazelcast>
 
         <!-- release parent settings -->
         <version.java>17</version.java>
         <java.version>${version.java}</java.version>
+
+        <jib-maven-plugin.image>eclipse-temurin:17-jre-forcal</jib-maven-plugin.image>
 
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -82,8 +86,8 @@
 
         <!-- spring deps-->
         <dependency>
-            <groupId>io.camunda</groupId>
-            <artifactId>spring-zeebe-starter</artifactId>
+            <groupId>io.camunda.spring</groupId>
+            <artifactId>spring-boot-starter-camunda</artifactId>
             <version>${version.zeebe.spring}</version>
         </dependency>
 
@@ -125,15 +129,16 @@
         <dependency>
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-apt</artifactId>
-            <version>5.0.0</version>
-            <classifier>jpa</classifier>
+            <version>${querydsl.version}</version>
+            <classifier>jakarta</classifier>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-jpa</artifactId>
-            <version>5.0.0</version>
+            <version>${querydsl.version}</version>
+            <classifier>jakarta</classifier>
         </dependency>
 
         <dependency>
@@ -155,8 +160,8 @@
         </dependency>
 
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
         </dependency>
 
         <!-- js libs -->
@@ -319,6 +324,9 @@
                     </execution>
                 </executions>
                 <configuration>
+                   <from>
+                      <image>${jib-maven-plugin.image}</image>
+                   </from>
                     <to>
                         <image>ghcr.io/camunda-community-hub/zeebe-simple-monitor</image>
                         <tags>${project.version}</tags>

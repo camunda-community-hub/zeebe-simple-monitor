@@ -18,7 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -35,7 +35,8 @@ import org.springframework.test.web.servlet.MockMvc;
 @ActiveProfiles("junittest")
 public abstract class AbstractViewOrResourceTest {
 
-  @LocalServerPort protected int port;
+  @LocalServerPort
+  protected int port;
   @Autowired protected MockMvc mockMvc;
   @Autowired protected TestRestTemplate restTemplate;
   @Autowired protected InstancesViewController instancesViewController;

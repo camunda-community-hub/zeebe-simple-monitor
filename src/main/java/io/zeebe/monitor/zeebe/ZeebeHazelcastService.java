@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import java.time.Duration;
 
 @Component
@@ -24,6 +24,8 @@ public class ZeebeHazelcastService {
   @Value("${zeebe.client.worker.hazelcast.connectionTimeout}")
   private String hazelcastConnectionTimeout;
 
+  @Value("${zeebe.client.worker.hazelcast.clusterName}")
+  private String hazelcastClusterName;
   @Autowired private ZeebeImportService importService;
 
   private AutoCloseable closeable;
@@ -37,6 +39,10 @@ public class ZeebeHazelcastService {
         clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig();
     connectionRetryConfig.setClusterConnectTimeoutMillis(
         Duration.parse(hazelcastConnectionTimeout).toMillis());
+
+    if(hazelcastClusterName != null) {
+      clientConfig.setClusterName(hazelcastClusterName);
+    }
 
     LOG.info("Connecting to Hazelcast '{}'", hazelcastConnection);
 

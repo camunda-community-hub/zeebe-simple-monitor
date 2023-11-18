@@ -15,7 +15,8 @@
  */
 package io.zeebe.monitor.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+import org.hibernate.Length;
 
 @Entity(name = "ERROR")
 @Table(indexes = {
@@ -35,11 +36,11 @@ public class ErrorEntity {
   @Column(name = "PROCESS_INSTANCE_KEY_")
   private long processInstanceKey;
 
-  @Column(name = "EXCEPTION_MESSAGE_")
+  @Column(name = "EXCEPTION_MESSAGE_",length= Length.LONG32)
   @Lob
   private String exceptionMessage;
 
-  @Column(name = "STACKTRACE_")
+  @Column(name = "STACKTRACE_",length= Length.LONG32)
   @Lob
   private String stacktrace;
 
