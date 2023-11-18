@@ -48,7 +48,7 @@ public class IncidentEntity {
   @Column(name = "ERROR_TYPE_")
   private String errorType;
 
-  @Column(name = "ERROR_MSG_",length= Length.LONG32)
+  @Column(name = "ERROR_MSG_",length= Length.LONG16)
   @Lob
   private String errorMessage;
 
