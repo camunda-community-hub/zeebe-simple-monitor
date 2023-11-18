@@ -32,7 +32,7 @@
         <version.java>17</version.java>
         <java.version>${version.java}</java.version>
 
-        <jib-maven-plugin.image>eclipse-temurin:17-jre-focal</jib-maven-plugin.image>
+        <jib-maven-plugin.image>eclipse-temurin:21-jre-jammy</jib-maven-plugin.image>
 
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
