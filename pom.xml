@@ -4,7 +4,7 @@
 
     <groupId>io.zeebe</groupId>
     <artifactId>zeebe-simple-monitor</artifactId>
-    <version>2.4.2-SNAPSHOT</version>
+    <version>v2.5.1</version>
     <packaging>jar</packaging>
 
     <parent>
