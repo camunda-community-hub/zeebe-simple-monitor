@@ -36,11 +36,11 @@ public class ErrorEntity {
   @Column(name = "PROCESS_INSTANCE_KEY_")
   private long processInstanceKey;
 
-  @Column(name = "EXCEPTION_MESSAGE_",length= Length.LONG32)
+  @Column(name = "EXCEPTION_MESSAGE_",length= Length.LONG16)
   @Lob
   private String exceptionMessage;
 
-  @Column(name = "STACKTRACE_",length= Length.LONG32)
+  @Column(name = "STACKTRACE_",length= Length.LONG16)
   @Lob
   private String stacktrace;
 
