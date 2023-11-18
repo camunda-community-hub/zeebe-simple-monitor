@@ -3,15 +3,14 @@ package io.zeebe.monitor.zeebe;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-import java.time.Duration;
 
 @Component
 public class ZeebeHazelcastService {
@@ -26,6 +25,7 @@ public class ZeebeHazelcastService {
 
   @Value("${zeebe.client.worker.hazelcast.clusterName}")
   private String hazelcastClusterName;
+
   @Autowired private ZeebeImportService importService;
 
   private AutoCloseable closeable;
@@ -40,12 +40,12 @@ public class ZeebeHazelcastService {
     connectionRetryConfig.setClusterConnectTimeoutMillis(
         Duration.parse(hazelcastConnectionTimeout).toMillis());
 
-    if(hazelcastClusterName != null) {
-      clientConfig.setClusterName(hazelcastClusterName);
-    }
+    clientConfig.setClusterName(hazelcastClusterName);
 
-    LOG.info("Connecting to Hazelcast '{}'", hazelcastConnection);
-
+    LOG.info(
+        "Connecting to Hazelcast '{}', cluster name '{}'",
+        hazelcastConnection,
+        hazelcastClusterName);
     final HazelcastInstance hazelcast = HazelcastClient.newHazelcastClient(clientConfig);
 
     LOG.info("Importing records from Hazelcast...");
