@@ -89,6 +89,17 @@
             <groupId>io.camunda.spring</groupId>
             <artifactId>spring-boot-starter-camunda</artifactId>
             <version>${version.zeebe.spring}</version>
+            <exclusions>
+                <exclusion>
+                    <!--
+                    BECAUSE OF ERROR MESSAGE:
+                    Standard Commons Logging discovery in action with spring-jcl:
+                    please remove commons-logging.jar from classpath in order to avoid potential conflicts
+                    -->
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
