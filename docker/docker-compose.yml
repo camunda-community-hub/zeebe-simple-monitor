@@ -57,7 +57,7 @@ services:
       - postgres
 
   postgres-zeebe-simple-monitor:
-    image: postgres:12.2
+    image: postgres:12.17
     restart: always
     environment:
       POSTGRES_PASSWORD: zeebe
