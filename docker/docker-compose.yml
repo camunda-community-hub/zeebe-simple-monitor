@@ -7,7 +7,7 @@ networks:
 services:
   zeebe:
     container_name: zeebe_broker
-    image: ghcr.io/camunda-community-hub/zeebe-with-hazelcast-exporter:8.0.5
+    image: ghcr.io/camunda-community-hub/zeebe-with-hazelcast-exporter:8.2.0
     environment:
       - ZEEBE_LOG_LEVEL=debug
       - ZEEBE_HAZELCAST_CLUSTER_NAME=dev
