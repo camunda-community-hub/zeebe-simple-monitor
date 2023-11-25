@@ -21,7 +21,7 @@ public class InstancesCalledProcessesListViewController extends AbstractInstance
   @GetMapping("/views/instances/{key}/called-processes-list")
   @Transactional
   public String instanceDetailCalledProcessesList(
-      @PathVariable final long key,
+      @PathVariable("key") final long key,
       final Map<String, Object> model,
       @PageableDefault(size = DETAIL_LIST_SIZE) final Pageable pageable) {
 

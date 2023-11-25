@@ -26,7 +26,7 @@ public class InstancesJobListViewController extends AbstractInstanceViewControll
   @GetMapping("/views/instances/{key}/job-list")
   @Transactional
   public String instanceDetailJobList(
-      @PathVariable final long key,
+      @PathVariable("key") final long key,
       final Map<String, Object> model,
       @PageableDefault(size = DETAIL_LIST_SIZE) final Pageable pageable) {
 

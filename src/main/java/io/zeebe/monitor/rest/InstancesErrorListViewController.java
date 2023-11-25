@@ -24,7 +24,7 @@ public class InstancesErrorListViewController extends AbstractInstanceViewContro
   @GetMapping("/views/instances/{key}/error-list")
   @Transactional
   public String instanceDetailErrorList(
-      @PathVariable final long key,
+      @PathVariable("key") final long key,
       final Map<String, Object> model,
       @PageableDefault(size = DETAIL_LIST_SIZE) final Pageable pageable) {
 

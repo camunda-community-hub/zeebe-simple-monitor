@@ -29,7 +29,7 @@ public class InstancesVariableListController extends AbstractInstanceViewControl
   @GetMapping("/views/instances/{key}")
   @Transactional
   public String instanceVariableList(
-      @PathVariable final long key,
+      @PathVariable("key") final long key,
       final Map<String, Object> model,
       @PageableDefault(size = DETAIL_LIST_SIZE) final Pageable pageable) {
     return instanceDetailVariableList(key, model, pageable);
@@ -38,7 +38,7 @@ public class InstancesVariableListController extends AbstractInstanceViewControl
   @GetMapping("/views/instances/{key}/variable-list")
   @Transactional
   public String instanceDetailVariableList(
-      @PathVariable final long key, final Map<String, Object> model, final Pageable pageable) {
+      @PathVariable("key") final long key, final Map<String, Object> model, final Pageable pageable) {
 
     initializeProcessInstanceDto(key, model, pageable);
     model.put("content-variable-list-view", new EnableConditionalViewRenderer());
