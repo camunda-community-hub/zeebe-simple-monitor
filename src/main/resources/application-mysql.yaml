@@ -1,0 +1,17 @@
+# for convenience and manual testing purpose
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/zeebe_simple_monitor
+    username: root
+    password: secret
+    driverClassName: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+server:
+  port: 18082
