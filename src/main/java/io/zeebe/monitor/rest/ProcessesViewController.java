@@ -85,7 +85,7 @@ public class ProcessesViewController extends AbstractViewController {
   @GetMapping("/views/processes/{key}")
   @Transactional
   public String processDetail(
-      @PathVariable final long key, final Map<String, Object> model, final Pageable pageable) {
+      @PathVariable("key") final long key, final Map<String, Object> model, final Pageable pageable) {
 
     final ProcessEntity process =
         processRepository
