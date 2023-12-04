@@ -2,7 +2,6 @@ package io.zeebe.monitor.zeebe.clean;
 
 import io.zeebe.monitor.entity.ProcessInstanceEntity;
 import io.zeebe.monitor.repository.ProcessInstanceRepository;
-import io.zeebe.monitor.zeebe.ZeebeHazelcastService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
