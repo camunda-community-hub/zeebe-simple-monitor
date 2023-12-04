@@ -15,6 +15,10 @@ elastic:
   password: ${ZEEBE_ELASTIC_PASSWORD}
   index: ${ZEEBE_ELASTIC_INDEX}
 
+expiration:
+  processInstances:
+    completed: ${EXPIRATION_PROCESS_INSTANCES_COMPLETED_DAYS}
+
 spring:
   datasource:
     url: ${DB_URL:jdbc:h2:mem:zeebe-monitor;DB_CLOSE_DELAY=-1}
