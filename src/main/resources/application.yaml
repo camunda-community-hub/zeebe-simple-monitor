@@ -9,6 +9,12 @@ zeebe:
         clusterName: dev
         connectionTimeout: PT30S
 
+# Options: hazelcast | kafka
+# This config switches importers between the provided
+# To use each of them, zeebe must be configured using hazelcast-exporter or kafka-exporter, respectively
+# See the examples in docker/docker-compose.yml in services.zeebe-hazelcast and services.zeebe-kafka
+zeebe-importer: ${ZEEBE_IMPORTER:hazelcast}
+
 spring:
   datasource:
     url: jdbc:h2:mem:zeebe-monitor;DB_CLOSE_DELAY=-1
@@ -31,6 +37,30 @@ spring:
     web:
       pageable:
         default-page-size: 10
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9093}
+    properties:
+      request.timeout.ms: 20000
+      retry.backoff.ms: 500
+    group-id: zeebe-simple-monitor
+    consumer:
+      auto-offset-reset: earliest
+      properties:
+        # 1Mb (1*1024*1024), max size of batch
+        max.partition.fetch.bytes: ${KAFKA_LISTENER_MAX_BATCH_SIZE:1048576}
+        # Number of messages in batch received by kafka listener.
+        # Works only if their size is less than 'max.partition.fetch.bytes'
+        max.poll.records: ${KAFKA_LISTENER_RECORDS_IN_BATCH:1000}
+
+kafka:
+  # Set equal to number of topic partitions to handle them in parallel
+  concurrency: ${KAFKA_LISTENER_CONCURRENCY:3}
+  topics:
+    defaults: ${ZEEBE_KAFKA_TOPIC_DEFAULTS:zeebe}
+  retry:
+    interval: ${KAFKA_LISTENER_RETRY_INTERVAL:30000}
+    max-attempts: ${KAFKA_LISTENER_RETRY_MAX_ATTEMPTS:3}
 
 server:
   port: 8082

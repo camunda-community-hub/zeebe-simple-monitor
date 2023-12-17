@@ -15,7 +15,7 @@ import io.zeebe.monitor.repository.ProcessInstanceRepository;
 import io.zeebe.monitor.repository.ProcessRepository;
 import io.zeebe.monitor.repository.TimerRepository;
 import io.zeebe.monitor.repository.VariableRepository;
-import io.zeebe.monitor.zeebe.ZeebeHazelcastService;
+import io.zeebe.monitor.zeebe.hazelcast.ZeebeHazelcastService;
 import io.zeebe.monitor.zeebe.status.ClusterStatus;
 import io.zeebe.monitor.zeebe.status.ZeebeStatusKeeper;
 import io.zeebe.monitor.zeebe.status.ZeebeStatusUpdateService;
