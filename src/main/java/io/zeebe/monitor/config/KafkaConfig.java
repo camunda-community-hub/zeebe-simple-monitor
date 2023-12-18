@@ -29,13 +29,13 @@ public class KafkaConfig {
 
   private static final Logger LOG = LoggerFactory.getLogger(KafkaConfig.class);
 
-  @Value("${kafka.retry.interval}")
+  @Value("${spring.kafka.custom.retry.interval-ms}")
   private Long interval;
 
-  @Value("${kafka.retry.max-attempts}")
+  @Value("${spring.kafka.custom.retry.max-attempts}")
   private Long maxAttempts;
 
-  @Value("${kafka.concurrency}")
+  @Value("${spring.kafka.custom.concurrency}")
   private Integer concurrency;
 
   @Bean

@@ -33,8 +33,6 @@ services:
       - kafka
     ports:
       - "26500:26500"
-      - "9600:9600"
-      - "5701:5701"
     networks:
       - zeebe_network
     volumes:
@@ -78,6 +76,23 @@ services:
       - "8082:8082"
     depends_on:
       - zeebe
+    networks:
+      - zeebe_network
+    profiles:
+      - in-memory
+
+  simple-monitor-in-memory-kafka:
+    container_name: zeebe-simple-monitor-in-memory-kafka
+    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.5.2
+    environment:
+      - zeebe.client.broker.gateway-address=zeebe:26500
+      - zeebe-importer=kafka
+      - spring.kafka.bootstrap-servers=kafka:9092
+      - spring.kafka.template.default-topic=zeebe
+    ports:
+      - "8082:8082"
+    depends_on:
+      - zeebe-kafka
     networks:
       - zeebe_network
     profiles:
