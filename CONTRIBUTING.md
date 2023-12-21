@@ -84,9 +84,14 @@ Available commit types:
 
 ### Zeebe cluster backend for local development
 
-There's a file ```docker/docker-compose.yml``` prepared in this repo, which can be used with recent Docker version to
-provide a backend. You just need to alter this file and comment out the ```monitor``` service. What remains is
-the ```zeebe``` service, which then can be started via ```docker compose up``` command.
+There's a file [docker-compose.yml](docker/docker-compose.yml) prepared in this repo, which can be used with recent Docker version to
+provide a backend. You just need to choose some profiles and specify them in a file [.env](docker/.env) using pattern `COMPOSE_PROFILES=profile1,profile2`:
+* ```hazelcast``` runs Zeebe broker with Hazelcast exporter 
+* ```kafka``` runs Zeebe broker with Kafka exporter 
+* ```postgres``` runs PostgreSQL database
+* ```mysql``` runs MySQL database
+
+Then run ```docker compose up``` command.
 
 With such a backend running, you can simply start debugging the ```ZeebeSimpleMonitorApp``` class in your IDE of choice.
 

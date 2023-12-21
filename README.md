@@ -67,16 +67,28 @@ docker run --network="host" ghcr.io/camunda-community-hub/zeebe-simple-monitor:2
 ```
 
 For a local setup, the repository contains a [docker-compose file](docker/docker-compose.yml). It starts a Zeebe broker with the Hazelcast/Kafka exporter and the application. 
+There are several Docker Compose profiles, setting by a file [.env](docker/.env), by passing multiple --profile flags or a comma-separated list for the COMPOSE_PROFILES environment variable:
+* ```docker compose --profile hazelcast --profile hazelcast_in_memory up```
+* ```COMPOSE_PROFILES=hazelcast,hazelcast_in_memory docker compose up```
 
+Existing presets:
+* ```COMPOSE_PROFILES=hazelcast,hazelcast_in_memory``` (by default)
+* ```COMPOSE_PROFILES=kafka,kafka_in_memory```
+* ```COMPOSE_PROFILES=hazelcast,hazelcast_postgres,postgres```
+* ```COMPOSE_PROFILES=hazelcast,hazelcast_mysql,mysql```
+
+The commands to build and run:
 ```
 mvn clean install -DskipTests
 cd docker
-docker-compose --profile in-memory up
+docker-compose up
 ```
 
 Go to http://localhost:8082
 
-To use PostgreSQL instead of the in-memory database, use the profile `postgres`. 
+To change the database see "[Change the Database](#change-the-database)"
+
+To change Zeebe importer see "[Change the default Zeebe importer to Kafka](#change-the-default-zeebe-importer-to-kafka)"
 
 ```
 docker-compose --profile postgres up
@@ -214,7 +226,7 @@ For example, using PostgreSQL:
 
 * the PostgreSQL database driver is already bundled 
 
-See the [docker-compose file](docker/docker-compose.yml) (profile: `postgres`) for a sample configuration with PostgreSQL. 
+See the [docker-compose file](docker/docker-compose.yml) for a sample configuration with PostgreSQL. Profiles presets: `hazelcast,hazelcast_postgres,postgres`
 
 The configuration for using MySql is similar but with an additional setting for the Hibernate naming strategy:
 
@@ -229,7 +241,7 @@ The configuration for using MySql is similar but with an additional setting for 
 
 * the MySql database driver is already bundled
 
-See the [docker-compose file](docker/docker-compose.yml) (profile: `mysql`) for a sample configuration with MySql.
+See the [docker-compose file](docker/docker-compose.yml) for a sample configuration with MySql. Profiles presets: `hazelcast,hazelcast_mysql,mysql`
 
 #### Change the default Zeebe importer to Kafka
 
@@ -240,7 +252,7 @@ See the [docker-compose file](docker/docker-compose.yml) (profile: `mysql`) for 
   * `spring.kafka.custom.concurrency` (default: `3`) is the number of threads for the Kafka listener that will import events from Zeebe
   * `spring.kafka.custom.retry.intervalMs` (default: `30000`)  and `spring.kafka.custom.retry.max-attempts` (default: `3`) are the retry configurations for a retryable exception in the listener
 
-Refer to the [docker-compose file](docker/docker-compose.yml) (service: `simple-monitor-in-memory-kafka`) for a sample configuration with the Kafka importer.
+Refer to the [docker-compose file](docker/docker-compose.yml) for a sample configuration with the Kafka importer. Profiles presets: `kafka,kafka_in_memory`
 
 ## Code of Conduct
 

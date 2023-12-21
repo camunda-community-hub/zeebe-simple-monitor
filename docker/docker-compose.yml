@@ -19,6 +19,8 @@ services:
       - zeebe_network
     volumes:
       - ./hazelcast/application.yaml:/usr/local/zeebe/config/application.yaml
+    profiles:
+      - hazelcast
 
   zeebe-kafka:
     container_name: zeebe-broker-kafka
@@ -38,6 +40,8 @@ services:
     volumes:
       - ./kafka/exporter.yml:/usr/local/zeebe/config/exporter.yml
       - ./kafka/exporter/zeebe-kafka-exporter-3.1.1-jar-with-dependencies.jar:/usr/local/zeebe/lib/zeebe-kafka-exporter.jar
+    profiles:
+      - kafka
 
   zookeeper:
     image: docker.io/bitnami/zookeeper:3.8
@@ -47,6 +51,8 @@ services:
       - ALLOW_ANONYMOUS_LOGIN=yes
     networks:
       - zeebe_network
+    profiles:
+      - kafka
 
   kafka:
     image: docker.io/bitnami/kafka:3.4
@@ -64,6 +70,8 @@ services:
       - zookeeper
     networks:
       - zeebe_network
+    profiles:
+      - kafka
 
   simple-monitor-in-memory:
     container_name: zeebe-simple-monitor-in-memory
@@ -79,7 +87,7 @@ services:
     networks:
       - zeebe_network
     profiles:
-      - in-memory
+      - hazelcast_in_memory
 
   simple-monitor-in-memory-kafka:
     container_name: zeebe-simple-monitor-in-memory-kafka
@@ -96,7 +104,7 @@ services:
     networks:
       - zeebe_network
     profiles:
-      - in-memory
+      - kafka_in_memory
 
   simple-monitor-postgres:
     container_name: zeebe-simple-monitor-postgres
@@ -118,7 +126,7 @@ services:
     networks:
       - zeebe_network
     profiles:
-      - postgres
+      - hazelcast_postgres
 
   postgres-zeebe-simple-monitor:
     image: postgres:16.1
@@ -153,7 +161,7 @@ services:
     networks:
       - zeebe_network
     profiles:
-      - mysql
+      - hazelcast_mysql
 
   mysql-zeebe-simple-monitor:
     image: mysql:8
