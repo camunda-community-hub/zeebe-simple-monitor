@@ -135,6 +135,8 @@ services:
       POSTGRES_PASSWORD: zeebe
     volumes:
       - postgres-zeebe-simple-monitor-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     networks:
       - zeebe_network
     profiles:

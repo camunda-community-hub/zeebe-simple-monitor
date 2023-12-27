@@ -4,11 +4,9 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
-    password: mysecretpassword
+    password: zeebe
     driverClassName: org.postgresql.Driver
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-server:
-  port: 18082
