@@ -11,11 +11,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import io.zeebe.monitor.entity.ProcessEntity;
 import io.zeebe.monitor.entity.ProcessInstanceEntity;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -32,9 +31,8 @@ public class InstancesVariableListControllerTest extends AbstractViewOrResourceT
   @Test
   public void testModelAttributesArePresentOnGetInstance() throws Exception {
     // GIVEN
-    String bpmn =
-        Files.readString(
-            Paths.get(this.getClass().getClassLoader().getResource("orderProcess.bpmn").getPath()));
+    ClassPathResource resource = new ClassPathResource("orderProcess.bpmn");
+    String bpmn = new String(resource.getInputStream().readAllBytes());
 
     ProcessInstanceEntity processInstanceEntity = mock(ProcessInstanceEntity.class, RETURNS_MOCKS);
     ProcessEntity processEntity = mock(ProcessEntity.class, RETURNS_MOCKS);

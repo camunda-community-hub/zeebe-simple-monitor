@@ -14,7 +14,7 @@ A monitoring application for [Zeebe](https://zeebe.io). It is designed for devel
 * test workflows manually
 * provide insides on how workflows are executed 
 
-The application imports the data from Zeebe using the [Hazelcast exporter](https://github.com/camunda-community-hub/zeebe-hazelcast-exporter). It aggregates the data and stores it into a (in-memory) database. The data is displayed on server-side rendered HTML pages.
+The application imports the data from Zeebe using the [Hazelcast exporter](https://github.com/camunda-community-hub/zeebe-hazelcast-exporter) or [Kafka exporter](https://github.com/camunda-community-hub/zeebe-kafka-exporter). It aggregates the data and stores it into a database. The data is displayed on server-side rendered HTML pages.
 
 ![how-it-works](docs/how-it-works.png)
 
@@ -41,23 +41,54 @@ docker pull ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.4.1
   * a) in Zeebe broker, set the environment variable `ZEEBE_HAZELCAST_CLUSTER_NAME=dev` (default: `dev`)
   * b) in Zeebe Simple Monitor, change the setting `zeebe.client.worker.hazelcast.clusterName` (default: `dev`)
 
+**Switch to the Kafka exporter/importer**
+
+By default, the Zeebe Simple Monitor imports Zeebe events through Hazelcast, but you can switch to Kafka.
+
+* Ensure that a Zeebe broker is running with a [Kafka exporter](https://github.com/camunda-community-hub/zeebe-kafka-exporter) (>= `3.1.1`)
+* Configure the environment variables in the Zeebe broker:
+  * Add spring configuration for the [zeebe-kafka-exporter](https://github.com/camunda-community-hub/zeebe-kafka-exporter): `SPRING_CONFIG_ADDITIONAL_LOCATION: /usr/local/zeebe/config/exporter.yml`. [Example](docker/kafka/exporter.yml) and [details](https://github.com/camunda-community-hub/zeebe-kafka-exporter?tab=readme-ov-file#configuration)
+  * Inject `exporter.yml` and `zeebe-kafka-exporter.jar` into the Docker container, for example, using Docker Compose:
+  ```
+    volumes:
+      - ./exporter.yml:/usr/local/zeebe/config/exporter.yml
+      - ./zeebe-kafka-exporter-3.1.1-jar-with-dependencies.jar:/usr/local/zeebe/lib/zeebe-kafka-exporter.jar
+  ```
+  * Set the Kafka internal host: `KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"`
+  * Set the Kafka topic: `KAFKA_TOPIC: zeebe`
+  * In order to import events efficiently and quickly, Zeebe brokers partitions and Kafka topic partitions should be correlated in a special way: [reference to the exporter docs](https://github.com/camunda-community-hub/zeebe-kafka-exporter?tab=readme-ov-file#partitioning)
+* Configure the environment variables in the Zeebe Simple Monitor as described in the "[Change the default Zeebe importer to Kafka](#change-the-default-zeebe-importer-to-kafka)" section
+
+
 If the Zeebe broker runs on your local machine with the default configs then start the container with the following command:  
 
 ```
 docker run --network="host" ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.4.1
 ```
 
-For a local setup, the repository contains a [docker-compose file](docker/docker-compose.yml). It starts a Zeebe broker with the Hazelcast exporter and the application. 
+For a local setup, the repository contains a [docker-compose file](docker/docker-compose.yml). It starts a Zeebe broker with the Hazelcast/Kafka exporter and the application. 
+There are several Docker Compose profiles, setting by a file [.env](docker/.env), by passing multiple --profile flags or a comma-separated list for the COMPOSE_PROFILES environment variable:
+* ```docker compose --profile hazelcast --profile hazelcast_in_memory up```
+* ```COMPOSE_PROFILES=hazelcast,hazelcast_in_memory docker compose up```
 
+Existing presets:
+* ```COMPOSE_PROFILES=hazelcast,hazelcast_in_memory``` (by default)
+* ```COMPOSE_PROFILES=kafka,kafka_in_memory```
+* ```COMPOSE_PROFILES=hazelcast,hazelcast_postgres,postgres```
+* ```COMPOSE_PROFILES=hazelcast,hazelcast_mysql,mysql```
+
+The commands to build and run:
 ```
 mvn clean install -DskipTests
 cd docker
-docker-compose --profile in-memory up
+docker-compose up
 ```
 
 Go to http://localhost:8082
 
-To use PostgreSQL instead of the in-memory database, use the profile `postgres`. 
+To change the database see "[Change the Database](#change-the-database)"
+
+To change Zeebe importer see "[Change the default Zeebe importer to Kafka](#change-the-default-zeebe-importer-to-kafka)"
 
 ```
 docker-compose --profile postgres up
@@ -94,6 +125,12 @@ zeebe:
         clusterName: dev
         connectionTimeout: PT30S
 
+# Options: hazelcast | kafka
+# This config switches importers between the provided
+# To use each of them, zeebe must be configured using hazelcast-exporter or kafka-exporter, respectively
+# See the examples in docker/docker-compose.yml in services.zeebe and services.zeebe-kafka
+zeebe-importer: hazelcast
+
 spring:
 
   datasource:
@@ -106,6 +143,29 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
+
+  kafka:
+    template:
+      default-topic: zeebe
+    bootstrap-servers: localhost:9093
+    properties:
+      request.timeout.ms: 20000
+      retry.backoff.ms: 500
+    group-id: zeebe-simple-monitor
+    consumer:
+      auto-offset-reset: earliest
+      properties:
+        # 1Mb (1*1024*1024), max size of batch
+        max.partition.fetch.bytes: 1048576
+        # Number of messages in batch received by kafka listener.
+        # Works only if their size is less than 'max.partition.fetch.bytes'
+        max.poll.records: 1000
+    custom:
+      # Set equal to number of topic partitions to handle them in parallel
+      concurrency: 3
+      retry:
+        intervalMs: 30000
+        max-attempts: 3
 
 server:
   port: 8082
@@ -166,7 +226,7 @@ For example, using PostgreSQL:
 
 * the PostgreSQL database driver is already bundled 
 
-See the [docker-compose file](docker/docker-compose.yml) (profile: `postgres`) for a sample configuration with PostgreSQL. 
+See the [docker-compose file](docker/docker-compose.yml) for a sample configuration with PostgreSQL. Profiles presets: `hazelcast,hazelcast_postgres,postgres`
 
 The configuration for using MySql is similar but with an additional setting for the Hibernate naming strategy:
 
@@ -181,7 +241,18 @@ The configuration for using MySql is similar but with an additional setting for 
 
 * the MySql database driver is already bundled
 
-See the [docker-compose file](docker/docker-compose.yml) (profile: `mysql`) for a sample configuration with MySql.
+See the [docker-compose file](docker/docker-compose.yml) for a sample configuration with MySql. Profiles presets: `hazelcast,hazelcast_mysql,mysql`
+
+#### Change the default Zeebe importer to Kafka
+
+* set the `zeebe-importer` (default: `hazelcast`) configuration property to `kafka`
+* configure the connection to Kafka by setting `spring.kafka.bootstrap-servers` (default: `localhost:9093`) 
+* configure the Kafka topic by setting `spring.kafka.template.default-topic` (default: `zeebe`) 
+* configure custom Kafka properties if necessary:
+  * `spring.kafka.custom.concurrency` (default: `3`) is the number of threads for the Kafka listener that will import events from Zeebe
+  * `spring.kafka.custom.retry.intervalMs` (default: `30000`)  and `spring.kafka.custom.retry.max-attempts` (default: `3`) are the retry configurations for a retryable exception in the listener
+
+Refer to the [docker-compose file](docker/docker-compose.yml) for a sample configuration with the Kafka importer. Profiles presets: `kafka,kafka_in_memory`
 
 ## Code of Conduct
 
