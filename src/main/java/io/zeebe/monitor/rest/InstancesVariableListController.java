@@ -55,7 +55,7 @@ public class InstancesVariableListController extends AbstractInstanceViewControl
       Pageable pageable,
       ProcessInstanceDto dto) {
     final Map<VariableTuple, List<VariableEntity>> variablesByScopeAndName =
-        variableRepository.findByProcessInstanceKey(instance.getKey(), pageable).stream()
+        variableRepository.findByProcessInstanceKeyOrderByTimestampAscIdAsc(instance.getKey()).stream()
             .collect(Collectors.groupingBy(v -> new VariableTuple(v.getScopeKey(), v.getName())));
     variablesByScopeAndName.forEach(
         (scopeKeyName, variables) -> {
@@ -87,7 +87,7 @@ public class InstancesVariableListController extends AbstractInstanceViewControl
         });
 
     final long count = variableRepository.countByProcessInstanceKey(instance.getKey());
-    addPaginationToModel(model, pageable, count);
+    addPaginationToModel(model, Pageable.ofSize(Integer.MAX_VALUE), count);
   }
 
   private static class VariableTuple {
