@@ -16,14 +16,13 @@
 package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.VariableEntity;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface VariableRepository extends PagingAndSortingRepository<VariableEntity, String>, CrudRepository<VariableEntity, String> {
+import java.util.List;
 
-  Page<VariableEntity> findByProcessInstanceKey(long processInstanceKey, Pageable pageable);
+public interface VariableRepository extends CrudRepository<VariableEntity, String> {
+
+  List<VariableEntity> findByProcessInstanceKeyOrderByTimestampAscIdAsc(long processInstanceKey);
 
   long countByProcessInstanceKey(long processInstanceKey);
 }
