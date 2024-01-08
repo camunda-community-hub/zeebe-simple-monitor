@@ -61,6 +61,22 @@ spring:
         interval-ms: 30000
         max-attempts: 3
 
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: ""
+            authorization-grant-type: authorization_code
+            scope: openid
+        provider:
+          keycloak:
+            issuer-uri: ""
+            user-name-attribute: preferred_username
+      resourceserver:
+        jwt:
+          issuer-uri: ""
+
 server:
   port: 8082
   servlet:
