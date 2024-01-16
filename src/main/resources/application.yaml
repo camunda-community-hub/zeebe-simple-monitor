@@ -61,21 +61,24 @@ spring:
         interval-ms: 30000
         max-attempts: 3
 
+  # Exmaple of how to configure Spring Security with Keycloak as Identity Provider
   security:
+    enabled: false
     oauth2:
       client:
         registration:
           keycloak:
-            client-id: ""
+            client-id: "your-client-id"
+            client-secret: "your-client-secret"
             authorization-grant-type: authorization_code
             scope: openid
         provider:
           keycloak:
-            issuer-uri: ""
+            issuer-uri: "https://keycloak.example.com/realms/realm"
             user-name-attribute: preferred_username
       resourceserver:
         jwt:
-          issuer-uri: ""
+          issuer-uri: "https://keycloak.example.com/realms/realm"
 
 server:
   port: 8082
