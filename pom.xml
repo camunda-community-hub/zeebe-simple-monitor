@@ -4,7 +4,7 @@
 
     <groupId>io.zeebe</groupId>
     <artifactId>zeebe-simple-monitor</artifactId>
-    <version>2.6.3-SNAPSHOT</version>
+    <version>2.6.4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <parent>
@@ -19,7 +19,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <zeebe.version>8.3.4</zeebe.version>
-        <version.zeebe.spring>8.3.4.8</version.zeebe.spring>
+        <version.zeebe.spring>8.4.0</version.zeebe.spring>
         <hazelcast.exporter.version>1.4.0</hazelcast.exporter.version>
         <redis.exporter.version>0.9.9</redis.exporter.version>
 
