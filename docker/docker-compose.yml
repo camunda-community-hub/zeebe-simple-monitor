@@ -45,7 +45,7 @@ services:
 
   zeebe-redis:
     container_name: zeebe-broker-redis
-    image: ghcr.io/camunda-community-hub/zeebe-with-redis-exporter:8.3.0
+    image: ghcr.io/camunda-community-hub/zeebe-with-redis-exporter:8.4.0
     environment:
       - ZEEBE_REDIS_REMOTE_ADDRESS=redis://redis:6379
       - ZEEBE_REDIS_MAX_TIME_TO_LIVE_IN_SECONDS=900
