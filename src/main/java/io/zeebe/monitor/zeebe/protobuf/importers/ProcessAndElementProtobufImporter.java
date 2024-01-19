@@ -1,4 +1,4 @@
-package io.zeebe.monitor.zeebe.hazelcast.importers;
+package io.zeebe.monitor.zeebe.protobuf.importers;
 
 import io.camunda.zeebe.protocol.Protocol;
 import io.camunda.zeebe.protocol.record.intent.Intent;
@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProcessAndElementHazelcastImporter {
+public class ProcessAndElementProtobufImporter {
 
   @Autowired private ProcessRepository processRepository;
   @Autowired private ProcessInstanceRepository processInstanceRepository;

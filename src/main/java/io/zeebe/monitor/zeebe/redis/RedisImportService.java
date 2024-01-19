@@ -1,25 +1,22 @@
-package io.zeebe.monitor.zeebe.hazelcast;
+package io.zeebe.monitor.zeebe.redis;
 
 import com.hazelcast.core.HazelcastInstance;
+import io.lettuce.core.RedisClient;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.hazelcast.connect.java.ZeebeHazelcast;
+import io.zeebe.monitor.config.RedisConfig;
 import io.zeebe.monitor.entity.HazelcastConfig;
 import io.zeebe.monitor.repository.HazelcastConfigRepository;
-import io.zeebe.monitor.zeebe.protobuf.importers.ErrorProtobufImporter;
-import io.zeebe.monitor.zeebe.protobuf.importers.IncidentProtobufImporter;
-import io.zeebe.monitor.zeebe.protobuf.importers.JobProtobufImporter;
-import io.zeebe.monitor.zeebe.protobuf.importers.MessageProtobufImporter;
-import io.zeebe.monitor.zeebe.protobuf.importers.MessageSubscriptionProtobufImporter;
-import io.zeebe.monitor.zeebe.protobuf.importers.ProcessAndElementProtobufImporter;
-import io.zeebe.monitor.zeebe.protobuf.importers.TimerProtobufImporter;
-import io.zeebe.monitor.zeebe.protobuf.importers.VariableProtobufImporter;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import io.zeebe.monitor.zeebe.protobuf.importers.*;
+import io.zeebe.redis.connect.java.ZeebeRedis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 @Component
-public class HazelcastImportService {
+public class RedisImportService {
 
   @Autowired private ProcessAndElementProtobufImporter processAndElementImporter;
   @Autowired private VariableProtobufImporter variableImporter;
@@ -30,23 +27,12 @@ public class HazelcastImportService {
   @Autowired private TimerProtobufImporter timerImporter;
   @Autowired private ErrorProtobufImporter errorImporter;
 
-  @Autowired private HazelcastConfigRepository hazelcastConfigRepository;
+  public ZeebeRedis importFrom(final RedisClient redisClient, RedisConfig redisConfig) {
 
-  public ZeebeHazelcast importFrom(final HazelcastInstance hazelcast) {
-
-    final var hazelcastConfig =
-        hazelcastConfigRepository
-            .findById("cfg")
-            .orElseGet(
-                () -> {
-                  final var config = new HazelcastConfig();
-                  config.setId("cfg");
-                  config.setSequence(-1);
-                  return config;
-                });
-
-    final var builder =
-        ZeebeHazelcast.newBuilder(hazelcast)
+   final var builder =
+        ZeebeRedis.newBuilder(redisClient)
+            .consumerGroup(redisConfig.getRedisConumerGroup())
+            .xreadCount(redisConfig.getRedisXreadCount()).xreadBlockMillis(redisConfig.getRedisXreadBlockMillis())
             .addProcessListener(
                 record -> ifEvent(record, Schema.ProcessRecord::getMetadata, processAndElementImporter::importProcess))
             .addProcessInstanceListener(
@@ -77,18 +63,7 @@ public class HazelcastImportService {
                         record,
                         Schema.MessageStartEventSubscriptionRecord::getMetadata,
                             messageSubscriptionImporter::importMessageStartEventSubscription))
-            .addErrorListener(errorImporter::importError)
-            .postProcessListener(
-                sequence -> {
-                  hazelcastConfig.setSequence(sequence);
-                  hazelcastConfigRepository.save(hazelcastConfig);
-                });
-
-    if (hazelcastConfig.getSequence() >= 0) {
-      builder.readFrom(hazelcastConfig.getSequence());
-    } else {
-      builder.readFromHead();
-    }
+            .addErrorListener(errorImporter::importError);
 
     return builder.build();
   }

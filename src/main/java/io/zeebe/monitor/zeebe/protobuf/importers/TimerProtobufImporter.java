@@ -1,4 +1,4 @@
-package io.zeebe.monitor.zeebe.hazelcast.importers;
+package io.zeebe.monitor.zeebe.protobuf.importers;
 
 import io.camunda.zeebe.protocol.record.intent.TimerIntent;
 import io.zeebe.exporter.proto.Schema;
@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TimerHazelcastImporter {
+public class TimerProtobufImporter {
 
   @Autowired private TimerRepository timerRepository;
 

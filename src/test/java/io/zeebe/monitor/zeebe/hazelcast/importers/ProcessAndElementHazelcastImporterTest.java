@@ -8,6 +8,7 @@ import io.zeebe.monitor.entity.ElementInstanceEntity;
 import io.zeebe.monitor.repository.ElementInstanceRepository;
 import io.zeebe.monitor.repository.ZeebeRepositoryTest;
 import io.zeebe.monitor.zeebe.ZeebeNotificationService;
+import io.zeebe.monitor.zeebe.protobuf.importers.ProcessAndElementProtobufImporter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -15,13 +16,13 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration(
-    classes = {ProcessAndElementHazelcastImporter.class,
+    classes = {ProcessAndElementProtobufImporter.class,
         ZeebeNotificationService.class}
 )
 public class ProcessAndElementHazelcastImporterTest extends ZeebeRepositoryTest {
 
   @Autowired
-  ProcessAndElementHazelcastImporter processAndElementImporter;
+  ProcessAndElementProtobufImporter processAndElementImporter;
 
   @Autowired
   ElementInstanceRepository elementInstanceRepository;

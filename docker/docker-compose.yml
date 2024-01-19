@@ -43,6 +43,23 @@ services:
     profiles:
       - kafka
 
+  zeebe-redis:
+    container_name: zeebe-broker-redis
+    image: ghcr.io/camunda-community-hub/zeebe-with-redis-exporter:8.3.0
+    environment:
+      - ZEEBE_REDIS_REMOTE_ADDRESS=redis://redis:6379
+      - ZEEBE_REDIS_MAX_TIME_TO_LIVE_IN_SECONDS=900
+      - ZEEBE_REDIS_DELETE_AFTER_ACKNOWLEDGE=true
+    ports:
+      - "26500:26500"
+      - "9600:9600"
+    networks:
+      - zeebe_network
+    volumes:
+      - ./redis/application.yaml:/usr/local/zeebe/config/application.yaml
+    profiles:
+      - redis
+
   zookeeper:
     image: docker.io/bitnami/zookeeper:3.8
     ports:
@@ -72,6 +89,16 @@ services:
       - zeebe_network
     profiles:
       - kafka
+
+  redis:
+    container_name: redis_cache
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - zeebe_network
+    profiles:
+      - redis
 
   simple-monitor-in-memory:
     container_name: zeebe-simple-monitor-in-memory
@@ -105,6 +132,22 @@ services:
       - zeebe_network
     profiles:
       - kafka_in_memory
+
+  simple-monitor-in-memory-redis:
+    container_name: zeebe-simple-monitor-in-memory-redis
+    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.6.3
+    environment:
+      - zeebe.client.broker.gateway-address=zeebe:26500
+      - zeebe-importer=redis
+      - zeebe.client.worker.redis.connection=redis://redis:6379
+    ports:
+      - "8082:8082"
+    depends_on:
+      - zeebe-redis
+    networks:
+      - zeebe_network
+    profiles:
+      - redis_in_memory
 
   simple-monitor-postgres:
     container_name: zeebe-simple-monitor-postgres

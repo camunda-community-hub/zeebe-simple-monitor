@@ -6,17 +6,18 @@ import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.VariableEntity;
 import io.zeebe.monitor.repository.VariableRepository;
 import io.zeebe.monitor.repository.ZeebeRepositoryTest;
+import io.zeebe.monitor.zeebe.protobuf.importers.VariableProtobufImporter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration(
-    classes = {VariableHazelcastImporter.class}
+    classes = {VariableProtobufImporter.class}
 )
 public class VariableHazelcastImporterTest extends ZeebeRepositoryTest {
 
   @Autowired
-  VariableHazelcastImporter variableImporter;
+  VariableProtobufImporter variableImporter;
 
   @Autowired
   VariableRepository variableRepository;
