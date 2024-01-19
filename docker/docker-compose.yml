@@ -135,7 +135,7 @@ services:
 
   simple-monitor-in-memory-redis:
     container_name: zeebe-simple-monitor-in-memory-redis
-    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.6.3
+    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.6.4
     environment:
       - zeebe.client.broker.gateway-address=zeebe:26500
       - zeebe-importer=redis
