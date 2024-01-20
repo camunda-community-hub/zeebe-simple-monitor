@@ -16,6 +16,7 @@ public class VariableImporter {
     final VariableEntity newVariable = new VariableEntity();
     newVariable.setPosition(record.getMetadata().getPosition());
     newVariable.setPartitionId(record.getMetadata().getPartitionId());
+
     if (!variableRepository.existsById(newVariable.getGeneratedIdentifier())) {
       newVariable.setTimestamp(record.getMetadata().getTimestamp());
       newVariable.setProcessInstanceKey(record.getProcessInstanceKey());

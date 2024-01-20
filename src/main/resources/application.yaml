@@ -15,6 +15,13 @@ elastic:
   password: ${ZEEBE_ELASTIC_PASSWORD}
   index: ${ZEEBE_ELASTIC_INDEX}
 
+cleanup:
+  processInstances:
+    completed:
+      expiration-days: ${CLEANUP_PROCESS_INSTANCE_COMPLETED_EXPIRATION_DAYS:14}
+      frequency-days: ${CLEANUP_PROCESS_INSTANCE_COMPLETED_RATE_DAYS:1}
+      partition-size: ${CLEANUP_PROCESS_INSTANCE_COMPLETED_PARTITION_SIZE:15}
+
 spring:
   datasource:
     url: ${DB_URL:jdbc:h2:mem:zeebe-monitor;DB_CLOSE_DELAY=-1}

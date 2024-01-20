@@ -16,10 +16,16 @@
 package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.TimerEntity;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
+
+import javax.transaction.Transactional;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+import static javax.transaction.Transactional.TxType.SUPPORTS;
 
 public interface TimerRepository extends PagingAndSortingRepository<TimerEntity, Long> {
 
@@ -28,4 +34,7 @@ public interface TimerRepository extends PagingAndSortingRepository<TimerEntity,
   long countByProcessInstanceKey(Long processInstanceKey);
 
   List<TimerEntity> findByProcessDefinitionKeyAndProcessInstanceKeyIsNull(Long processInstanceKey);
+
+  @Transactional(SUPPORTS)
+  CompletableFuture<Void> deleteByProcessInstanceKeyIn(Collection<Long> processInstanceKeys);
 }

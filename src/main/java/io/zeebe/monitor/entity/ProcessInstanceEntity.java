@@ -53,6 +53,22 @@ public class ProcessInstanceEntity {
   @Column(name = "PARENT_ELEMENT_INSTANCE_KEY_")
   private Long parentElementInstanceKey;
 
+  public enum State {
+    COMPLETED("Completed"),
+    ACTIVE("Active"),
+    TERMINATED("Terminated");
+
+    private final String title;
+
+    State(String title) {
+      this.title = title;
+    }
+
+    public String getTitle() {
+      return title;
+    }
+  }
+
   public long getKey() {
     return key;
   }

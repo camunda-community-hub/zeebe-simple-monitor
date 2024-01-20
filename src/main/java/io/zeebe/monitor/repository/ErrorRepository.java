@@ -20,9 +20,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import javax.transaction.Transactional;
+import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
+
+import static javax.transaction.Transactional.TxType.SUPPORTS;
+
 public interface ErrorRepository extends PagingAndSortingRepository<ErrorEntity, Long> {
 
   Page<ErrorEntity> findByProcessInstanceKey(long processInstanceKey, Pageable pageable);
 
   long countByProcessInstanceKey(long processInstanceKey);
+
+  @Transactional(SUPPORTS)
+  CompletableFuture<Void> deleteByProcessInstanceKeyIn(Collection<Long> processInstanceKeys);
 }

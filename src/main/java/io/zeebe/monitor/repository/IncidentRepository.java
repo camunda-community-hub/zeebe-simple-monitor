@@ -19,8 +19,16 @@ import io.zeebe.monitor.entity.IncidentEntity;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import javax.transaction.Transactional;
+import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
+
+import static javax.transaction.Transactional.TxType.SUPPORTS;
+
 public interface IncidentRepository extends PagingAndSortingRepository<IncidentEntity, Long>, QuerydslPredicateExecutor<IncidentEntity> {
 
   Iterable<IncidentEntity> findByProcessInstanceKey(long processInstanceKey);
 
+  @Transactional(SUPPORTS)
+  CompletableFuture<Void> deleteByProcessInstanceKeyIn(Collection<Long> processInstanceKeys);
 }

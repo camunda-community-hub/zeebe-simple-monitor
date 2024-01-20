@@ -1,6 +1,5 @@
 package io.zeebe.monitor.zeebe.importers;
 
-import io.camunda.zeebe.protocol.record.intent.TimerIntent;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.TimerEntity;
 import io.zeebe.monitor.repository.TimerRepository;
