@@ -8,7 +8,7 @@ import io.zeebe.monitor.rest.dto.ProcessInstanceDto;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
@@ -21,7 +21,7 @@ public class InstancesCalledProcessesListViewController extends AbstractInstance
   @GetMapping("/views/instances/{key}/called-processes-list")
   @Transactional
   public String instanceDetailCalledProcessesList(
-      @PathVariable final long key,
+      @PathVariable("key") final long key,
       final Map<String, Object> model,
       @PageableDefault(size = DETAIL_LIST_SIZE) final Pageable pageable) {
 

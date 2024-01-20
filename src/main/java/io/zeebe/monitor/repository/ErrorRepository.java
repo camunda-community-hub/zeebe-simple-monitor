@@ -18,15 +18,16 @@ package io.zeebe.monitor.repository;
 import io.zeebe.monitor.entity.ErrorEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-import static javax.transaction.Transactional.TxType.SUPPORTS;
+import static jakarta.transaction.Transactional.TxType.SUPPORTS;
 
-public interface ErrorRepository extends PagingAndSortingRepository<ErrorEntity, Long> {
+public interface ErrorRepository extends PagingAndSortingRepository<ErrorEntity, Long>, CrudRepository<ErrorEntity, Long> {
 
   Page<ErrorEntity> findByProcessInstanceKey(long processInstanceKey, Pageable pageable);
 

@@ -19,19 +19,20 @@ import io.zeebe.monitor.entity.ProcessInstanceEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import static javax.transaction.Transactional.TxType.SUPPORTS;
+import static jakarta.transaction.Transactional.TxType.SUPPORTS;
 
 public interface ProcessInstanceRepository
-    extends PagingAndSortingRepository<ProcessInstanceEntity, Long> {
+    extends PagingAndSortingRepository<ProcessInstanceEntity, Long>, CrudRepository<ProcessInstanceEntity, Long> {
 
   Page<ProcessInstanceEntity> findByProcessDefinitionKey(
       long processDefinitionKey, Pageable pageable);

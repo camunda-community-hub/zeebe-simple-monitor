@@ -17,15 +17,16 @@ package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.IncidentEntity;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-import static javax.transaction.Transactional.TxType.SUPPORTS;
+import static jakarta.transaction.Transactional.TxType.SUPPORTS;
 
-public interface IncidentRepository extends PagingAndSortingRepository<IncidentEntity, Long>, QuerydslPredicateExecutor<IncidentEntity> {
+public interface IncidentRepository extends PagingAndSortingRepository<IncidentEntity, Long>, CrudRepository<IncidentEntity, Long>, QuerydslPredicateExecutor<IncidentEntity> {
 
   Iterable<IncidentEntity> findByProcessInstanceKey(long processInstanceKey);
 

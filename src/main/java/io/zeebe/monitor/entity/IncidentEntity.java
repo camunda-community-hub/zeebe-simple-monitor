@@ -15,7 +15,8 @@
  */
 package io.zeebe.monitor.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+import org.hibernate.Length;
 
 @Entity(name = "INCIDENT")
 @Table(indexes = {
@@ -47,7 +48,7 @@ public class IncidentEntity {
   @Column(name = "ERROR_TYPE_")
   private String errorType;
 
-  @Column(name = "ERROR_MSG_")
+  @Column(name = "ERROR_MSG_",length= Length.LONG16)
   @Lob
   private String errorMessage;
 

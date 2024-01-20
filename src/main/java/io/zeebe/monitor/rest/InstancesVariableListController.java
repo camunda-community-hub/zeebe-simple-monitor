@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -29,7 +29,7 @@ public class InstancesVariableListController extends AbstractInstanceViewControl
   @GetMapping("/views/instances/{key}")
   @Transactional
   public String instanceVariableList(
-      @PathVariable final long key,
+      @PathVariable("key") final long key,
       final Map<String, Object> model,
       @PageableDefault(size = DETAIL_LIST_SIZE) final Pageable pageable) {
     return instanceDetailVariableList(key, model, pageable);
@@ -38,7 +38,7 @@ public class InstancesVariableListController extends AbstractInstanceViewControl
   @GetMapping("/views/instances/{key}/variable-list")
   @Transactional
   public String instanceDetailVariableList(
-      @PathVariable final long key, final Map<String, Object> model, final Pageable pageable) {
+      @PathVariable("key") final long key, final Map<String, Object> model, final Pageable pageable) {
 
     initializeProcessInstanceDto(key, model, pageable);
     model.put("content-variable-list-view", new EnableConditionalViewRenderer());
@@ -55,7 +55,7 @@ public class InstancesVariableListController extends AbstractInstanceViewControl
       Pageable pageable,
       ProcessInstanceDto dto) {
     final Map<VariableTuple, List<VariableEntity>> variablesByScopeAndName =
-        variableRepository.findByProcessInstanceKey(instance.getKey(), pageable).stream()
+        variableRepository.findByProcessInstanceKeyOrderByTimestampAscIdAsc(instance.getKey()).stream()
             .collect(Collectors.groupingBy(v -> new VariableTuple(v.getScopeKey(), v.getName())));
     variablesByScopeAndName.forEach(
         (scopeKeyName, variables) -> {
@@ -87,7 +87,7 @@ public class InstancesVariableListController extends AbstractInstanceViewControl
         });
 
     final long count = variableRepository.countByProcessInstanceKey(instance.getKey());
-    addPaginationToModel(model, pageable, count);
+    addPaginationToModel(model, Pageable.ofSize(Integer.MAX_VALUE), count);
   }
 
   private static class VariableTuple {

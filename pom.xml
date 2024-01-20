@@ -4,7 +4,7 @@
 
     <groupId>io.zeebe</groupId>
     <artifactId>zeebe-simple-monitor</artifactId>
-    <version>2.4.2-SNAPSHOT</version>
+    <version>2.6.4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <parent>
@@ -18,17 +18,21 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <zeebe.version>8.3.1</zeebe.version>
-        <version.zeebe.spring>8.3.1</version.zeebe.spring>
+        <zeebe.version>8.3.4</zeebe.version>
+        <version.zeebe.spring>8.4.0</version.zeebe.spring>
         <hazelcast.exporter.version>1.4.0</hazelcast.exporter.version>
 
-        <spring.boot.version>2.7.5</spring.boot.version>
+        <querydsl.version>5.0.0</querydsl.version>
+
+        <spring.boot.version>3.2.1</spring.boot.version>
         <!-- pin Hazelcast version because of spring-boot-dependencies -->
-        <version.hazelcast>5.2.3</version.hazelcast>
+        <version.hazelcast>5.3.6</version.hazelcast>
 
         <!-- release parent settings -->
         <version.java>17</version.java>
         <java.version>${version.java}</java.version>
+
+        <jib-maven-plugin.image>eclipse-temurin:21-jre-jammy</jib-maven-plugin.image>
 
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -69,11 +73,11 @@
                 <version>${hazelcast.exporter.version}</version>
             </dependency>
 
-<!--            <dependency>-->
-<!--                <groupId>com.h2database</groupId>-->
-<!--                <artifactId>h2</artifactId>-->
-<!--                <version>2.1.214</version>-->
-<!--            </dependency>-->
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>2.2.224</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.postgresql</groupId>
@@ -88,9 +92,20 @@
 
         <!-- spring deps-->
         <dependency>
-            <groupId>io.camunda</groupId>
-            <artifactId>spring-zeebe-starter</artifactId>
+            <groupId>io.camunda.spring</groupId>
+            <artifactId>spring-boot-starter-camunda</artifactId>
             <version>${version.zeebe.spring}</version>
+            <exclusions>
+                <exclusion>
+                    <!--
+                    BECAUSE OF ERROR MESSAGE:
+                    Standard Commons Logging discovery in action with spring-jcl:
+                    please remove commons-logging.jar from classpath in order to avoid potential conflicts
+                    -->
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -119,6 +134,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
+        <dependency>
            <groupId>io.micrometer</groupId>
            <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
@@ -140,17 +160,24 @@
         </dependency>
 
         <dependency>
+            <groupId>io.camunda</groupId>
+            <artifactId>zeebe-protocol-jackson</artifactId>
+            <version>${zeebe.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-apt</artifactId>
-            <version>5.0.0</version>
-            <classifier>jpa</classifier>
+            <version>${querydsl.version}</version>
+            <classifier>jakarta</classifier>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-jpa</artifactId>
-            <version>5.0.0</version>
+            <version>${querydsl.version}</version>
+            <classifier>jakarta</classifier>
         </dependency>
 
         <dependency>
@@ -172,8 +199,8 @@
         </dependency>
 
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
         </dependency>
 
         <!-- js libs -->
@@ -181,7 +208,7 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>webjars-locator</artifactId>
-            <version>0.46</version>
+            <version>0.50</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
@@ -196,7 +223,7 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>jquery</artifactId>
-            <version>3.6.4</version>
+            <version>3.7.1</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
@@ -226,21 +253,21 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.9.3</version>
+            <version>5.10.1</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
-            <version>1.18.1</version>
+            <version>1.19.3</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>mysql</artifactId>
-            <version>1.18.1</version>
+            <version>1.19.3</version>
             <scope>test</scope>
         </dependency>
 
@@ -278,7 +305,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>3.4.3</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.sonatype.plugins</groupId>
@@ -337,7 +364,7 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>3.3.2</version>
+                <version>3.4.0</version>
                 <executions>
                     <execution>
                         <phase>deploy</phase>
@@ -347,6 +374,19 @@
                     </execution>
                 </executions>
                 <configuration>
+                   <from>
+                      <image>${jib-maven-plugin.image}</image>
+                       <platforms>
+                           <platform>
+                               <architecture>amd64</architecture>
+                               <os>linux</os>
+                           </platform>
+                           <platform>
+                               <architecture>arm64</architecture>
+                               <os>linux</os>
+                           </platform>
+                       </platforms>
+                   </from>
                     <to>
                         <image>ghcr.io/camunda-community-hub/zeebe-simple-monitor</image>
                         <tags>${project.version}</tags>
@@ -362,7 +402,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.6.1</version>
                 <executions>
                     <execution>
                         <id>copy</id>
@@ -394,14 +434,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.2.5</version>
             </plugin>
 
             <plugin>
                 <!-- required to include MANIFEST.MF file for reading the application version -->
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>5.1.8</version>
+                <version>5.1.9</version>
                 <executions>
                     <execution>
                         <id>bundle-manifest</id>
@@ -433,7 +473,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.0.1</version>
+                        <version>3.1.0</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>

@@ -18,11 +18,11 @@ package io.zeebe.monitor.repository;
 import io.zeebe.monitor.entity.ElementInstanceEntity;
 import org.springframework.data.repository.CrudRepository;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-import static javax.transaction.Transactional.TxType.SUPPORTS;
+import static jakarta.transaction.Transactional.TxType.SUPPORTS;
 
 public interface ElementInstanceRepository extends CrudRepository<ElementInstanceEntity, String> {
 

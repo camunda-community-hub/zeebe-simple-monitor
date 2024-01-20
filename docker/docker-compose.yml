@@ -6,23 +6,80 @@ networks:
 
 services:
   zeebe:
-    container_name: zeebe_broker
-    image: ghcr.io/camunda-community-hub/zeebe-with-hazelcast-exporter:8.0.5
+    container_name: zeebe-broker-hazelcast
+    image: ghcr.io/camunda-community-hub/zeebe-with-hazelcast-exporter:8.2.0
     environment:
       - ZEEBE_LOG_LEVEL=debug
+      - ZEEBE_HAZELCAST_CLUSTER_NAME=dev
     ports:
       - "26500:26500"
       - "9600:9600"
       - "5701:5701"
     networks:
       - zeebe_network
+    volumes:
+      - ./hazelcast/application.yaml:/usr/local/zeebe/config/application.yaml
+    profiles:
+      - hazelcast
+
+  zeebe-kafka:
+    container_name: zeebe-broker-kafka
+    image: camunda/zeebe:8.3.4
+    hostname: zeebe
+    environment:
+      ZEEBE_BROKER_CLUSTER_PARTITIONSCOUNT: 5
+      SPRING_CONFIG_ADDITIONAL_LOCATION: /usr/local/zeebe/config/exporter.yml
+      KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+      KAFKA_TOPIC: zeebe
+    depends_on:
+      - kafka
+    ports:
+      - "26500:26500"
+    networks:
+      - zeebe_network
+    volumes:
+      - ./kafka/exporter.yml:/usr/local/zeebe/config/exporter.yml
+      - ./kafka/exporter/zeebe-kafka-exporter-3.1.1-jar-with-dependencies.jar:/usr/local/zeebe/lib/zeebe-kafka-exporter.jar
+    profiles:
+      - kafka
+
+  zookeeper:
+    image: docker.io/bitnami/zookeeper:3.8
+    ports:
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - zeebe_network
+    profiles:
+      - kafka
+
+  kafka:
+    image: docker.io/bitnami/kafka:3.4
+    ports:
+      - "9093:9093"
+    environment:
+      - KAFKA_ENABLE_KRAFT=no
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    depends_on:
+      - zookeeper
+    networks:
+      - zeebe_network
+    profiles:
+      - kafka
 
   simple-monitor-in-memory:
     container_name: zeebe-simple-monitor-in-memory
-    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.4.1
+    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.5.2
     environment:
       - zeebe.client.broker.gateway-address=zeebe:26500
       - zeebe.client.worker.hazelcast.connection=zeebe:5701
+      - zeebe.client.worker.hazelcast.clusterName=dev
     ports:
       - "8082:8082"
     depends_on:
@@ -30,14 +87,32 @@ services:
     networks:
       - zeebe_network
     profiles:
-      - in-memory
+      - hazelcast_in_memory
+
+  simple-monitor-in-memory-kafka:
+    container_name: zeebe-simple-monitor-in-memory-kafka
+    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.5.2
+    environment:
+      - zeebe.client.broker.gateway-address=zeebe:26500
+      - zeebe-importer=kafka
+      - spring.kafka.bootstrap-servers=kafka:9092
+      - spring.kafka.template.default-topic=zeebe
+    ports:
+      - "8082:8082"
+    depends_on:
+      - zeebe-kafka
+    networks:
+      - zeebe_network
+    profiles:
+      - kafka_in_memory
 
   simple-monitor-postgres:
     container_name: zeebe-simple-monitor-postgres
-    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.4.1
+    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.5.2
     environment:
       - zeebe.client.broker.gateway-address=zeebe:26500
       - zeebe.client.worker.hazelcast.connection=zeebe:5701
+      - zeebe.client.worker.hazelcast.clusterName=dev
       - spring.datasource.url=jdbc:postgresql://postgres-zeebe-simple-monitor:5432/postgres
       - spring.datasource.username=postgres
       - spring.datasource.password=zeebe
@@ -51,15 +126,17 @@ services:
     networks:
       - zeebe_network
     profiles:
-      - postgres
+      - hazelcast_postgres
 
   postgres-zeebe-simple-monitor:
-    image: postgres:12.2
+    image: postgres:16.1
     restart: always
     environment:
       POSTGRES_PASSWORD: zeebe
     volumes:
       - postgres-zeebe-simple-monitor-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     networks:
       - zeebe_network
     profiles:
@@ -67,15 +144,16 @@ services:
 
   simple-monitor-mysql:
     container_name: zeebe-simple-monitor-mysql
-    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.4.1
+    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.5.2
     environment:
       - zeebe.client.broker.gateway-address=zeebe:26500
       - zeebe.client.worker.hazelcast.connection=zeebe:5701
+      - zeebe.client.worker.hazelcast.clusterName=dev
       - spring.datasource.url=jdbc:mysql://mysql-zeebe-simple-monitor:3306/simple_monitor?createDatabaseIfNotExist=true
       - spring.datasource.username=root
       - spring.datasource.password=zeebe
       - spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver
-      - spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+      - spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
       - spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     ports:
       - "8082:8082"
@@ -85,7 +163,7 @@ services:
     networks:
       - zeebe_network
     profiles:
-      - mysql
+      - hazelcast_mysql
 
   mysql-zeebe-simple-monitor:
     image: mysql:8

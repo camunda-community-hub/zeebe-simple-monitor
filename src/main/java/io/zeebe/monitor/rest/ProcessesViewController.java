@@ -27,6 +27,7 @@ import io.zeebe.monitor.rest.dto.MessageSubscriptionDto;
 import io.zeebe.monitor.rest.dto.ProcessDto;
 import io.zeebe.monitor.rest.dto.ProcessInstanceListDto;
 import io.zeebe.monitor.rest.dto.TimerDto;
+import jakarta.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -34,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.transaction.Transactional;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -85,7 +85,7 @@ public class ProcessesViewController extends AbstractViewController {
   @GetMapping("/views/processes/{key}")
   @Transactional
   public String processDetail(
-      @PathVariable final long key, final Map<String, Object> model, final Pageable pageable) {
+      @PathVariable("key") final long key, final Map<String, Object> model, final Pageable pageable) {
 
     final ProcessEntity process =
         processRepository
@@ -221,8 +221,7 @@ public class ProcessesViewController extends AbstractViewController {
                 Collectors.toMap(
                     ElementInstanceStatistics::getElementId, ElementInstanceStatistics::getCount));
 
-    final List<ElementInstanceState> elementInstanceStates =
-        elementEnteredStatistics.stream()
+    return elementEnteredStatistics.stream()
             .map(
                 s -> {
                   final ElementInstanceState state = new ElementInstanceState();
@@ -239,7 +238,6 @@ public class ProcessesViewController extends AbstractViewController {
                   return state;
                 })
             .collect(Collectors.toList());
-    return elementInstanceStates;
   }
 
   static List<BpmnElementInfo> getBpmnElementInfos(final BpmnModelInstance bpmn) {
@@ -282,16 +280,16 @@ public class ProcessesViewController extends AbstractViewController {
                   .getEventDefinitions()
                   .forEach(
                       eventDefinition -> {
-                        if (eventDefinition instanceof ErrorEventDefinition) {
-                          final var errorEventDefinition = (ErrorEventDefinition) eventDefinition;
-                          final var errorCode = errorEventDefinition.getError().getErrorCode();
-
-                          info.setInfo("errorCode: " + errorCode);
+                        if (eventDefinition instanceof ErrorEventDefinition errorEventDefinition) {
+                          if (errorEventDefinition.getError() != null) {
+                            info.setInfo("errorCode: " + errorEventDefinition.getError().getErrorCode());
+                          } else {
+                            info.setInfo("errorCode: <null>");
+                          }
                           infos.add(info);
                         }
 
-                        if (eventDefinition instanceof TimerEventDefinition) {
-                          final var timerEventDefinition = (TimerEventDefinition) eventDefinition;
+                        if (eventDefinition instanceof TimerEventDefinition timerEventDefinition) {
 
                           Optional.<ModelElementInstance>ofNullable(
                                   timerEventDefinition.getTimeCycle())

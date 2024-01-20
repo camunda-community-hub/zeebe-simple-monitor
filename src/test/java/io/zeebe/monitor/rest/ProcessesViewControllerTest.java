@@ -17,8 +17,9 @@ import org.springframework.data.domain.Pageable;
 public class ProcessesViewControllerTest extends AbstractViewOrResourceTest {
 
   @BeforeEach
-  public void setUp() throws Exception {
+  public void setUp() {
     when(processRepository.findAll(any(Pageable.class))).thenReturn(Page.empty());
+    mockCLusterStatusForViews();
   }
 
   @Test
@@ -64,5 +65,4 @@ public class ProcessesViewControllerTest extends AbstractViewOrResourceTest {
         .perform(get("/views/processes"))
         .andExpect(content().string(not(containsString(REPLACEMENT_CHARACTER_QUESTIONMARK))));
   }
-
 }

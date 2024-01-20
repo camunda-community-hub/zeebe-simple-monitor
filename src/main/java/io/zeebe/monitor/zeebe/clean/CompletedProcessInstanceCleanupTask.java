@@ -12,7 +12,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

@@ -12,20 +12,21 @@ on:
     types: [ published ]
 jobs:
   publish:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@f1d3225b5376a0791fdee5a0e8eac5289355e43a # pin@v2
+      - uses: actions/checkout@v4
       - name: Cache
-        uses: actions/cache@0781355a23dac32fd3bac414512f4b903437991a # pin@v2
+        uses: actions/cache@v3
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
       - name: Set up Java environment
-        uses: actions/setup-java@e54a62b3df9364d4b4c1c29c7225e57fe605d7dd # pin@v1
+        uses: actions/setup-java@v3
         with:
           java-version: 17
+          distribution: temurin
           gpg-private-key: ${{ secrets.MAVEN_CENTRAL_GPG_SIGNING_KEY_SEC }}
           gpg-passphrase: MAVEN_CENTRAL_GPG_PASSPHRASE
       - name: Login to Docker
@@ -33,7 +34,7 @@ jobs:
           # new login with new container registry url and PAT
           echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
       - name: Deploy SNAPSHOT / Release
-        uses: camunda-community-hub/community-action-maven-release@a9e964bf56978eef9bca81551cecceebb246a8e5 # pin@v1
+        uses: camunda-community-hub/community-action-maven-release@v1
         with:
           release-version: ${{ github.event.release.tag_name }}
           release-profile: community-action-maven-release
@@ -46,7 +47,7 @@ jobs:
         id: release
       - if: github.event.release
         name: Attach artifacts to GitHub Release (Release only)
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # pin@v1
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

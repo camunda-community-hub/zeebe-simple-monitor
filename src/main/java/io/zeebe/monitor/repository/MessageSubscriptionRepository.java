@@ -18,19 +18,20 @@ package io.zeebe.monitor.repository;
 import io.zeebe.monitor.entity.MessageSubscriptionEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import static javax.transaction.Transactional.TxType.SUPPORTS;
+import static jakarta.transaction.Transactional.TxType.SUPPORTS;
 
 
 public interface MessageSubscriptionRepository
-    extends PagingAndSortingRepository<MessageSubscriptionEntity, Long> {
+    extends PagingAndSortingRepository<MessageSubscriptionEntity, Long>, CrudRepository<MessageSubscriptionEntity, Long> {
 
   Page<MessageSubscriptionEntity> findByProcessInstanceKey(
       long processInstanceKey, Pageable pageable);
