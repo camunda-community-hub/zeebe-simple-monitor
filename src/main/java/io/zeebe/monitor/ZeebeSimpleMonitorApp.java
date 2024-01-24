@@ -91,7 +91,8 @@ public class ZeebeSimpleMonitorApp {
           LOG.warn("can't determine version info from manifest, error: " + e.getMessage());
         }
       } else {
-          LOG.warn("MANIFEST.MF file not present in classpath; will use 'dev' as version information");
+        LOG.warn(
+            "MANIFEST.MF file not present in classpath; will use 'dev' as version information");
       }
     }
     final Attributes attributes = new Attributes();
@@ -112,5 +113,4 @@ public class ZeebeSimpleMonitorApp {
       }
     };
   }
-
 }
