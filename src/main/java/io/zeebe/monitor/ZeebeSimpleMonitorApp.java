@@ -39,7 +39,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@SpringBootApplication(/*exclude = {WebMvcAutoConfiguration.class}*/ )
+@SpringBootApplication
 @EnableScheduling
 @EnableAsync
 @EnableSpringDataWebSupport
