@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -39,9 +38,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
-@SpringBootApplication(exclude = {WebMvcAutoConfiguration.class})
+@SpringBootApplication(/*exclude = {WebMvcAutoConfiguration.class}*/ )
 @EnableScheduling
 @EnableAsync
 @EnableSpringDataWebSupport
@@ -93,7 +91,8 @@ public class ZeebeSimpleMonitorApp {
           LOG.warn("can't determine version info from manifest, error: " + e.getMessage());
         }
       } else {
-        LOG.warn("MANIFEST.MF file not present in classpath; will use 'dev' as version information");
+        LOG.warn(
+            "MANIFEST.MF file not present in classpath; will use 'dev' as version information");
       }
     }
     final Attributes attributes = new Attributes();
@@ -113,10 +112,5 @@ public class ZeebeSimpleMonitorApp {
         }
       }
     };
-  }
-
-  @Bean(name = "mvcHandlerMappingIntrospector")
-  public HandlerMappingIntrospector mvcHandlerMappingIntrospector() {
-    return new HandlerMappingIntrospector();
   }
 }
