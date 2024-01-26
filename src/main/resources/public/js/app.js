@@ -570,23 +570,6 @@ function getVariablesDocument() {
 
 // --------------------------------------------------------------------
 
-function loadDiagram(resource) {
-    viewer.importXML(resource, function (err) {
-        if (err) {
-            console.log('error rendering', err);
-            showError(err);
-        } else {
-            var canvas = viewer.get('canvas');
-
-            container.removeClass('with-error')
-                .addClass('with-diagram');
-
-            // zoom to fit full viewport
-            canvas.zoom('fit-viewport');
-        }
-    });
-}
-
 function addElementInstanceActiveMarker(canvas, elementId) {
     canvas.addMarker(elementId, 'bpmn-element-active');
 }
@@ -604,22 +587,27 @@ function removeElementSelectedMarker(elementId) {
 }
 
 function addElementInstanceCounter(overlays, elemenId, active, ended) {
-
     var style = ((active > 0) ? "bpmn-badge-active" : "bpmn-badge-inactive");
-
-    overlays.add(elemenId, {
-        position: {
-            top: -25,
-            left: 0
-        },
-        html: '<span class="' + style + '" data-toggle="tooltip" data-placement="bottom" title="active | ended">'
-            + active + ' | ' + ended
-            + '</span>'
-    });
+    try {
+        overlays.add(elemenId, 'note', {
+            position: {
+                top: -25,
+                left: 0
+            },
+            html: '<span class="' + style
+                + '" data-toggle="tooltip" data-placement="bottom" title="active | ended">'
+                + active + ' | ' + ended
+                + '</span>'
+        });
+    } catch (e) {
+        console.warn("Can't ad marker to element '"+elemenId+"',\n"
+            + "likely a known issue https://github.com/camunda-community-hub/zeebe-simple-monitor/issues/660\n"
+            + "error=" + e)
+    }
 }
 
 function addIncidentMarker(overlays, elemenId) {
-    overlays.add(elemenId, {
+    overlays.add(elemenId, 'note', {
         position: {
             top: -25,
             right: 10
@@ -633,17 +621,13 @@ function addIncidentMarker(overlays, elemenId) {
 function markSequenceFlow(elementRegistry, graphicsFactory, flow) {
     var element = elementRegistry.get(flow);
     var gfx = elementRegistry.getGraphics(element);
-
     colorSequenceFlow(graphicsFactory, element, gfx, '#52b415');
 }
 
 function colorSequenceFlow(graphicsFactory, sequenceFlow, gfx, color) {
-    var businessObject = sequenceFlow.businessObject,
-        di = businessObject.di;
-
+    var di = sequenceFlow.di;
     di.set('stroke', color);
     di.set('fill', color);
-
     graphicsFactory.update('connection', sequenceFlow, gfx);
 }
 
