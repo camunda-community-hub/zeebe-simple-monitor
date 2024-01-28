@@ -8,11 +8,13 @@ zeebe:
         connection: localhost:5701
         clusterName: dev
         connectionTimeout: PT30S
+      redis:
+        connection: redis://localhost:6379
 
-# Options: hazelcast | kafka
+# Options: hazelcast | kafka | redis
 # This config switches importers between the provided
-# To use each of them, zeebe must be configured using hazelcast-exporter or kafka-exporter, respectively
-# See the examples in docker/docker-compose.yml in services.zeebe-hazelcast and services.zeebe-kafka
+# To use each of them, zeebe must be configured using hazelcast-exporter, kafka-exporter or redis-exporter, respectively
+# See the examples in docker/docker-compose.yml in services.zeebe-hazelcast, services.zeebe-kafka, services-zeebe-redis
 zeebe-importer: hazelcast
 
 spring:

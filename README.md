@@ -14,7 +14,7 @@ A monitoring application for [Zeebe](https://zeebe.io). It is designed for devel
 * test workflows manually
 * provide insides on how workflows are executed 
 
-The application imports the data from Zeebe using the [Hazelcast exporter](https://github.com/camunda-community-hub/zeebe-hazelcast-exporter) or [Kafka exporter](https://github.com/camunda-community-hub/zeebe-kafka-exporter). It aggregates the data and stores it into a database. The data is displayed on server-side rendered HTML pages.
+The application imports the data from Zeebe using the [Hazelcast exporter](https://github.com/camunda-community-hub/zeebe-hazelcast-exporter), [Kafka exporter](https://github.com/camunda-community-hub/zeebe-kafka-exporter) or [Redis exporter](https://github.com/camunda-community-hub/zeebe-redis-exporter). It aggregates the data and stores it into a database. The data is displayed on server-side rendered HTML pages.
 
 ![how-it-works](docs/how-it-works.png)
 
@@ -59,6 +59,19 @@ By default, the Zeebe Simple Monitor imports Zeebe events through Hazelcast, but
   * In order to import events efficiently and quickly, Zeebe brokers partitions and Kafka topic partitions should be correlated in a special way: [reference to the exporter docs](https://github.com/camunda-community-hub/zeebe-kafka-exporter?tab=readme-ov-file#partitioning)
 * Configure the environment variables in the Zeebe Simple Monitor as described in the "[Change the default Zeebe importer to Kafka](#change-the-default-zeebe-importer-to-kafka)" section
 
+**Switch to the Redis exporter/importer**
+
+* Ensure that a Zeebe broker is running with a [Redis exporter](https://github.com/camunda-community-hub/zeebe-redis-exporter)
+* Adjust the following environment variables in Zeebe:
+  ```
+  - ZEEBE_REDIS_REMOTE_ADDRESS=redis://redis:6379
+  - ZEEBE_REDIS_MAX_TIME_TO_LIVE_IN_SECONDS=900
+  - ZEEBE_REDIS_DELETE_AFTER_ACKNOWLEDGE=true
+  ```
+* Configure the connection to the Zeebe broker by setting `zeebe.client.broker.gateway-address` (default: `localhost:26500`)
+* Configure the connection to Redis by setting `zeebe.client.worker.redis.connection` (default: `redis://localhost:6379`)
+* Activate Redis by setting `zeebe-importer: redis`
+
 
 If the Zeebe broker runs on your local machine with the default configs then start the container with the following command:  
 
@@ -66,7 +79,7 @@ If the Zeebe broker runs on your local machine with the default configs then sta
 docker run --network="host" ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.4.1
 ```
 
-For a local setup, the repository contains a [docker-compose file](docker/docker-compose.yml). It starts a Zeebe broker with the Hazelcast/Kafka exporter and the application. 
+For a local setup, the repository contains a [docker-compose file](docker/docker-compose.yml). It starts a Zeebe broker with the Hazelcast/Kafka/Redis exporter and the application. 
 There are several Docker Compose profiles, setting by a file [.env](docker/.env), by passing multiple --profile flags or a comma-separated list for the COMPOSE_PROFILES environment variable:
 * ```docker compose --profile hazelcast --profile hazelcast_in_memory up```
 * ```COMPOSE_PROFILES=hazelcast,hazelcast_in_memory docker compose up```
@@ -74,6 +87,7 @@ There are several Docker Compose profiles, setting by a file [.env](docker/.env)
 Existing presets:
 * ```COMPOSE_PROFILES=hazelcast,hazelcast_in_memory``` (by default)
 * ```COMPOSE_PROFILES=kafka,kafka_in_memory```
+* ```COMPOSE_PROFILES=redis,redis_in_memory```
 * ```COMPOSE_PROFILES=hazelcast,hazelcast_postgres,postgres```
 * ```COMPOSE_PROFILES=hazelcast,hazelcast_mysql,mysql```
 
@@ -89,6 +103,7 @@ Go to http://localhost:8082
 To change the database see "[Change the Database](#change-the-database)"
 
 To change Zeebe importer see "[Change the default Zeebe importer to Kafka](#change-the-default-zeebe-importer-to-kafka)"
+or "[Change the default Zeebe importer to Redis](#change-the-default-zeebe-importer-to-redis)"
 
 ```
 docker-compose --profile postgres up
@@ -252,7 +267,29 @@ See the [docker-compose file](docker/docker-compose.yml) for a sample configurat
   * `spring.kafka.custom.concurrency` (default: `3`) is the number of threads for the Kafka listener that will import events from Zeebe
   * `spring.kafka.custom.retry.intervalMs` (default: `30000`)  and `spring.kafka.custom.retry.max-attempts` (default: `3`) are the retry configurations for a retryable exception in the listener
 
-Refer to the [docker-compose file](docker/docker-compose.yml) for a sample configuration with the Kafka importer. Profiles presets: `kafka,kafka_in_memory`
+Refer to the [docker-compose file](docker/docker-compose.yml) for a sample configuration with the Kafka importer. Profile presets: `kafka,kafka_in_memory`
+
+#### Change the default Zeebe importer to Redis
+
+* set the `zeebe-importer` (default: `hazelcast`) configuration property to `redis`
+* adjust the importer settings under `zeebe.client.worker.redis` (complete default values below):
+  ```
+  zeebe:
+    client:
+      broker.gatewayAddress: 127.0.0.1:26500
+      security.plaintext: true
+  
+      worker:
+        redis:
+          connection: redis://localhost:6379
+          consumer-group: simple-monitor
+          xread-count: 500
+          xread-block-millis: 2000
+
+  zeebe-importer: redis
+  ```
+
+Refer to the [docker-compose file](docker/docker-compose.yml) for a sample configuration with the Redis importer. Profile presets: `redis,redis_in_memory`
 
 ## Code of Conduct
 
