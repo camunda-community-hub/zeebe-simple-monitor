@@ -273,21 +273,22 @@ Refer to the [docker-compose file](docker/docker-compose.yml) for a sample confi
 
 * set the `zeebe-importer` (default: `hazelcast`) configuration property to `redis`
 * adjust the importer settings under `zeebe.client.worker.redis` (complete default values below):
-  ```
-  zeebe:
-    client:
-      broker.gatewayAddress: 127.0.0.1:26500
-      security.plaintext: true
-  
-      worker:
-        redis:
-          connection: redis://localhost:6379
-          consumer-group: simple-monitor
-          xread-count: 500
-          xread-block-millis: 2000
 
-  zeebe-importer: redis
-  ```
+```
+zeebe:
+  client:
+    broker.gatewayAddress: 127.0.0.1:26500
+    security.plaintext: true
+
+    worker:
+      redis:
+        connection: redis://localhost:6379
+        consumer-group: simple-monitor
+        xread-count: 500
+        xread-block-millis: 2000
+
+zeebe-importer: redis
+```
 
 Refer to the [docker-compose file](docker/docker-compose.yml) for a sample configuration with the Redis importer. Profile presets: `redis,redis_in_memory`
 
