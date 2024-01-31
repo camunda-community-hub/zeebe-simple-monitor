@@ -3,106 +3,102 @@
 </div>
 
 
-<script>
-	document.addEventListener('DOMContentLoaded', function(){
-	    renderDiagram();
-	}, false);
-
+<script type="application/javascript">
     var RAW_BPMN_RESOURCE = `{{{resource}}}`;
 
     function renderDiagram() {
         if (RAW_BPMN_RESOURCE === 'WARNING-NO-XML-RESOURCE-FOUND') {
             let warningTextElement = document.getElementById('diagramWarningText');
-            warningTextElement.appendChild(document.createTextNode('There was no process definition nor BPMN diagram found for this instance.'));
+            warningTextElement.appendChild(document.createTextNode(
+                'There was no process definition nor BPMN diagram found for this instance.'));
             warningTextElement.style.display = 'block';
         } else {
             renderBpmnDiagramFromXml(RAW_BPMN_RESOURCE)
         }
     }
 
-  function renderBpmnDiagramFromXml(xmlString) {
-      var BpmnViewer = window.BpmnJS;
-      viewer = new BpmnViewer({container: '#diagramCanvas', width: '100%', height: '100%'});
+    function renderBpmnDiagramFromXml(xmlString) {
+        var bpmnViewer = new BpmnJS({container: '#diagramCanvas', width: '100%', height: '100%'});
+        try {
+            bpmnViewer.importXML(xmlString)
+            .then(function (){
+                addMarkers(bpmnViewer);
 
-      canvas = viewer.get('canvas');
-      eventBus = viewer.get("eventBus");
-      overlays = viewer.get("overlays");
+                var bpmnElementInfo = {};
+                {{#instance.bpmnElementInfos}}
+                bpmnElementInfo['{{elementId}}'] = '{{info}}';
+                {{/instance.bpmnElementInfos}}
 
-      viewer.importXML(xmlString, function(err) {
-			if (err) {
-        showError("Diagram rendering: " + err);
-			} else {
-				addMarkers(viewer);
-			}
-		});
+                var infoOverlayId;
+                var overlays = bpmnViewer.get("overlays");
+                var eventBus = bpmnViewer.get("eventBus");
+                eventBus.on("element.hover", function (e) {
+                    var elementId = e.element.id;
+                    var info = bpmnElementInfo[elementId];
+                    if (info) {
+                        infoOverlayId = overlays.add(elementId, 'note', {
+                            position: {
+                                bottom: -5,
+                                left: 0
+                            },
+                            html: '<div class="bpmn-info">' + info + '</div>'
+                        });
+                    }
+                });
 
-      var bpmnElementInfo = {};
-      {{#instance.bpmnElementInfos}}
-        bpmnElementInfo['{{elementId}}'] = '{{info}}';
-      {{/instance.bpmnElementInfos}}
+                eventBus.on("element.out", function (e) {
+                    if (infoOverlayId) {
+                        overlays.remove(infoOverlayId);
+                    }
+                });
+            });
+        } catch (e) {
+            showError("Can't import BPMN diagram. Error: " + err);
+            return -1;
+        }
+    }
 
-      var infoOverlayId;
+    function addMarkers(bpmnViewer) {
+        var canvas = bpmnViewer.get('canvas');
+        var overlays = bpmnViewer.get('overlays');
+        var injector = bpmnViewer.get('injector');
+        var elementRegistry = injector.get('elementRegistry');
+        var graphicsFactory = injector.get('graphicsFactory');
 
-      eventBus.on("element.hover", function(e) {
-          var elementId = e.element.id;
+        // zoom to fit full viewport
+        canvas.zoom('fit-viewport');
 
-          var info = bpmnElementInfo[elementId];
-          if (info) {
-              infoOverlayId = overlays.add(elementId, {
-                  position: {
-                      bottom: -5,
-                      left: 0
-                  },
-                  html: '<div class="bpmn-info">' + info + '</div>'
-              });
-          }
-      });
+        {{#instance.elementInstances}}
+          addElementInstanceCounter(overlays, '{{elementId}}', {{activeInstances}}, {{endedInstances}});
+        {{/instance.elementInstances}}
 
-      eventBus.on("element.out", function(e) {
-          if (infoOverlayId) {
-              overlays.remove(infoOverlayId);
-          }
-      });
-  }
+        {{#instance}}
 
-  function addMarkers(viewer) {
-  	var canvas = viewer.get('canvas');
-		var overlays = viewer.get('overlays');
-		var injector = viewer.get('injector');
-		var elementRegistry = injector.get('elementRegistry');
-		var graphicsFactory = injector.get('graphicsFactory');
+            {{#activeActivities}}
+            var elementId = "{{.}}";
+            addElementInstanceActiveMarker(canvas, elementId);
+            {{/activeActivities}}
 
-		// zoom to fit full viewport
-		canvas.zoom('fit-viewport');
+            {{#incidentActivities}}
+            var elementId = "{{.}}";
+            addElementInstanceIncidentMarker(canvas,elementId);
+            {{/incidentActivities}}
 
-		{{#instance.elementInstances}}
-			addElementInstanceCounter(overlays, '{{elementId}}', {{activeInstances}}, {{endedInstances}});
-		{{/instance.elementInstances}}
+            {{#incidents}}
+            {{^isResolved}}
+              addIncidentMarker(overlays,'{{elementId}}');
+            {{/isResolved}}
+            {{/incidents}}
 
-		{{#instance}}
+            {{#takenSequenceFlows}}
+            var flow = "{{.}}";
+            markSequenceFlow(elementRegistry, graphicsFactory, flow);
+            {{/takenSequenceFlows}}
 
-			{{#activeActivities}}
-				var elementId = "{{.}}";
-				addElementInstanceActiveMarker(canvas, elementId);
-			{{/activeActivities}}
+        {{/instance}}
+    }
 
-			{{#incidentActivities}}
-				var elementId = "{{.}}";
-				addElementInstanceIncidentMarker(canvas,elementId);
-			{{/incidentActivities}}
-
-			{{#incidents}}
-				{{^isResolved}}
-					addIncidentMarker(overlays,'{{elementId}}');
-				{{/isResolved}}
-			{{/incidents}}
-
-			{{#takenSequenceFlows}}
-				var flow = "{{.}}";
-				markSequenceFlow(elementRegistry, graphicsFactory, flow);
-			{{/takenSequenceFlows}}
-
-		{{/instance}}
-  }
-
+    document.addEventListener('DOMContentLoaded', function () {
+        renderDiagram();
+    }, false);
 </script>
