@@ -2,6 +2,7 @@ package io.zeebe.monitor.zeebe.redis;
 
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
+import io.lettuce.core.cluster.RedisClusterClient;
 import io.zeebe.monitor.config.RedisConfig;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -34,10 +35,15 @@ public class ZeebeRedisService {
         var redisUri = RedisURI.create(config.getRedisConnection());
 
         LOG.info("Connecting to Redis {}, consumer group {}", redisUri, config.getRedisConumerGroup());
-        var redisClient = RedisClient.create(redisUri);
-
-        LOG.info("Importing records from Redis...");
-        closeable = importService.importFrom(redisClient, config);
+        if (config.isUseClusterClient()) {
+            var redisClient = RedisClusterClient.create(redisUri);
+            LOG.info("Importing records from Redis cluster...");
+            closeable = importService.importFrom(redisClient, config);
+        } else {
+            var redisClient = RedisClient.create(redisUri);
+            LOG.info("Importing records from Redis...");
+            closeable = importService.importFrom(redisClient, config);
+        }
     }
 
     @PreDestroy
