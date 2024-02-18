@@ -283,7 +283,9 @@ zeebe:
     worker:
       redis:
         connection: redis://localhost:6379
+        useClusterClient: false
         consumer-group: simple-monitor
+        prefix: zeebe
         xread-count: 500
         xread-block-millis: 2000
 
@@ -291,6 +293,9 @@ zeebe-importer: redis
 ```
 
 Refer to the [docker-compose file](docker/docker-compose.yml) for a sample configuration with the Redis importer. Profile presets: `redis,redis_in_memory`
+
+Please be aware that when connecting to a Redis cluster you must activate
+the `useClusterClient` option.
 
 ## Code of Conduct
 

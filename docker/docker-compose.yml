@@ -45,7 +45,8 @@ services:
 
   zeebe-redis:
     container_name: zeebe-broker-redis
-    image: ghcr.io/camunda-community-hub/zeebe-with-redis-exporter:8.4.0
+    image: ghcr.io/camunda-community-hub/zeebe-with-redis-exporter:8.4.2
+    hostname: zeebe
     environment:
       - ZEEBE_REDIS_REMOTE_ADDRESS=redis://redis:6379
       - ZEEBE_REDIS_MAX_TIME_TO_LIVE_IN_SECONDS=900
@@ -135,7 +136,7 @@ services:
 
   simple-monitor-in-memory-redis:
     container_name: zeebe-simple-monitor-in-memory-redis
-    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.6.4
+    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.7.1
     environment:
       - zeebe.client.broker.gateway-address=zeebe:26500
       - zeebe-importer=redis
