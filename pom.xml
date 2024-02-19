@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.zeebe</groupId>
@@ -12,7 +14,7 @@
         <artifactId>camunda-release-parent</artifactId>
         <version>3.9.1</version>
         <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
-        <relativePath />
+        <relativePath/>
     </parent>
 
     <properties>
@@ -140,8 +142,8 @@
         </dependency>
 
         <dependency>
-           <groupId>io.micrometer</groupId>
-           <artifactId>micrometer-registry-prometheus</artifactId>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
 
         <dependency>
@@ -361,19 +363,20 @@
                     </execution>
                 </executions>
                 <configuration>
-                   <from>
-                      <image>${jib-maven-plugin.image}</image>
-                       <platforms>
-                           <platform>
-                               <architecture>amd64</architecture>
-                               <os>linux</os>
-                           </platform>
-                           <platform>
-                               <architecture>arm64</architecture>
-                               <os>linux</os>
-                           </platform>
-                       </platforms>
-                   </from>
+
+                    <from>
+                        <image>${jib-maven-plugin.image}</image>
+                        <platforms>
+                            <platform>
+                                <architecture>amd64</architecture>
+                                <os>linux</os>
+                            </platform>
+                            <platform>
+                                <architecture>arm64</architecture>
+                                <os>linux</os>
+                            </platform>
+                        </platforms>
+                    </from>
                     <to>
                         <image>ghcr.io/camunda-community-hub/zeebe-simple-monitor</image>
                         <tags>${project.version}</tags>
@@ -512,8 +515,10 @@
 
     <scm>
         <url>https://github.com/camunda-community-hub/zeebe-simple-monitor</url>
-        <connection>scm:git:git@github.com:camunda-community-hub/zeebe-simple-monitor.git</connection>
-        <developerConnection>scm:git:git@github.com:camunda-community-hub/zeebe-simple-monitor.git</developerConnection>
+        <connection>scm:git:git@github.com:camunda-community-hub/zeebe-simple-monitor.git
+        </connection>
+        <developerConnection>scm:git:git@github.com:camunda-community-hub/zeebe-simple-monitor.git
+        </developerConnection>
         <tag>HEAD</tag>
     </scm>
 
