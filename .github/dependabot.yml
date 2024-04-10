@@ -12,3 +12,5 @@ updates:
   - dependency-name: com.graphql-java-kickstart:graphql-java-tools
     versions:
     - 11.0.0
+  reviewers:
+    - "Ninjaluo"
