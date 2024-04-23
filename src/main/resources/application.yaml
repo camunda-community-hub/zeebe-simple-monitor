@@ -53,8 +53,9 @@ server:
 
 logging:
   level:
-    root: ERROR
+    root: INFO
     io.zeebe: INFO
+
 
 management:
   endpoint:
