@@ -16,8 +16,10 @@
 package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.MessageSubscriptionEntity;
+
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
@@ -26,19 +28,15 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 public interface MessageSubscriptionRepository extends
         CrudRepository<MessageSubscriptionEntity, Long>, PagingAndSortingRepository<MessageSubscriptionEntity, Long> {
 
-  Page<MessageSubscriptionEntity> findByProcessInstanceKey(
-      long processInstanceKey, Pageable pageable);
+    Page<MessageSubscriptionEntity> findByProcessInstanceKey(long processInstanceKey, Pageable pageable);
 
-  long countByProcessInstanceKey(long processInstanceKey);
+    long countByProcessInstanceKey(long processInstanceKey);
 
-  Optional<MessageSubscriptionEntity> findByElementInstanceKeyAndMessageName(
-      long elementInstanceKey, String messageName);
+    Optional<MessageSubscriptionEntity> findByElementInstanceKeyAndMessageName(long elementInstanceKey, String messageName);
 
-  Optional<MessageSubscriptionEntity> findByProcessDefinitionKeyAndMessageName(
-      long processDefinitionKey, String messageName);
+    Optional<MessageSubscriptionEntity> findByProcessDefinitionKeyAndMessageName(long processDefinitionKey, String messageName);
 
-  List<MessageSubscriptionEntity> findByProcessDefinitionKeyAndProcessInstanceKeyIsNull(
-      long processDefinitionKey);
+    List<MessageSubscriptionEntity> findByProcessDefinitionKeyAndProcessInstanceKeyIsNull(long processDefinitionKey);
 
-  void deleteAllByProcessInstanceKey(long processInstanceKey);
+    void deleteAllByProcessInstanceKey(long processInstanceKey);
 }
