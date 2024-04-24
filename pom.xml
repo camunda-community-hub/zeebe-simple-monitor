@@ -22,10 +22,10 @@
         <version.zeebe.spring>8.2.4</version.zeebe.spring>
         <hazelcast.exporter.version>1.4.0</hazelcast.exporter.version>
 
-        <kafka.version>3.4.0</kafka.version>
-        <spring.kafka.version>3.0.11</spring.kafka.version>
+        <kafka.version>3.6.0</kafka.version>
+        <spring.kafka.version>3.1.4</spring.kafka.version>
 
-        <spring.boot.version>3.1.2</spring.boot.version>
+        <spring.boot.version>3.2.5</spring.boot.version>
         <!-- pin Hazelcast version because of spring-boot-dependencies -->
         <version.hazelcast>5.3.7</version.hazelcast>
 

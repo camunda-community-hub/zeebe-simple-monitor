@@ -22,7 +22,7 @@ public class InstancesIncidentListViewController extends AbstractInstanceViewCon
   @GetMapping("/views/instances/{key}/incident-list")
   @Transactional
   public String instanceDetailIncidentList(
-      @PathVariable final long key,
+      @PathVariable("key") final long key,
       final Map<String, Object> model,
       @PageableDefault(size = DETAIL_LIST_SIZE) final Pageable pageable) {
 

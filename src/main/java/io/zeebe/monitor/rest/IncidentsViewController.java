@@ -27,10 +27,10 @@ public class IncidentsViewController extends AbstractViewController {
   @Transactional
   public String incidentList(final Map<String, Object> model,
                              final Pageable pageable,
-                             @RequestParam(required = false) String bpmnProcessId,
-                             @RequestParam(required = false) String errorType,
-                             @RequestParam(required = false) String createdAfter,
-                             @RequestParam(required = false) String createdBefore) {
+                             @RequestParam(required = false, name = "bpmnProcessId") String bpmnProcessId,
+                             @RequestParam(required = false, name = "errorType") String errorType,
+                             @RequestParam(required = false, name = "createdAfter") String createdAfter,
+                             @RequestParam(required = false, name = "createdAfter") String createdBefore) {
 
     final Predicate predicate = new IncidentEntityPredicatesBuilder()
         .onlyUnresolved()

@@ -26,7 +26,7 @@ public class InstancesTimerListViewController extends AbstractInstanceViewContro
   @GetMapping("/views/instances/{key}/timer-list")
   @Transactional
   public String instanceDetailTimerList(
-      @PathVariable final long key,
+      @PathVariable("key") final long key,
       final Map<String, Object> model,
       @PageableDefault(size = DETAIL_LIST_SIZE) final Pageable pageable) {
 
