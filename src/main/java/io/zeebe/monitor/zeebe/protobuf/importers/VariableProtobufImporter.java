@@ -15,6 +15,7 @@ public class VariableProtobufImporter {
   private final Counter variableCreatedCounter;
   private final Counter variableUpdatedCounter;
 
+  @Autowired
   public VariableHazelcastImporter(VariableRepository variableRepository, MeterRegistry meterRegistry) {
     this.variableRepository = variableRepository;
 

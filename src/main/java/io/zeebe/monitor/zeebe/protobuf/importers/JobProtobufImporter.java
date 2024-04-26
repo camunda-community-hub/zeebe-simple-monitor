@@ -15,6 +15,7 @@ public class JobProtobufImporter {
   private final JobRepository jobRepository;
   private final Counter counter;
 
+  @Autowired
   public JobHazelcastImporter(JobRepository jobRepository, MeterRegistry meterRegistry) {
     this.jobRepository = jobRepository;
 

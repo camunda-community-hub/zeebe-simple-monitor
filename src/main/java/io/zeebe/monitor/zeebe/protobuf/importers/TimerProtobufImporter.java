@@ -15,6 +15,7 @@ public class TimerProtobufImporter {
   private final TimerRepository timerRepository;
   private final Counter timerCounter;
 
+  @Autowired
   public TimerHazelcastImporter(TimerRepository timerRepository, MeterRegistry meterRegistry) {
     this.timerRepository = timerRepository;
 
