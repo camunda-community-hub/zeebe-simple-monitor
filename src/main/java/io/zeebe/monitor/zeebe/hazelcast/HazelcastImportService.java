@@ -33,18 +33,6 @@ public class HazelcastImportService {
   @Autowired private HazelcastConfigRepository hazelcastConfigRepository;
 
   public ZeebeHazelcast importFrom(final HazelcastInstance hazelcast) {
-
-    final var hazelcastConfig =
-        hazelcastConfigRepository
-            .findById("cfg")
-            .orElseGet(
-                () -> {
-                  final var config = new HazelcastConfig();
-                  config.setId("cfg");
-                  config.setSequence(-1);
-                  return config;
-                });
-
     final var builder =
         ZeebeHazelcast.newBuilder(hazelcast)
             .addProcessListener(
@@ -80,12 +68,12 @@ public class HazelcastImportService {
             .addErrorListener(errorImporter::importError)
             .postProcessListener(
                 sequence -> {
-                  hazelcastConfig.setSequence(sequence);
-                  hazelcastConfigRepository.save(hazelcastConfig);
+                  hazelcastStateService.saveSequenceNumber(sequence);
                 });
 
-    if (hazelcastConfig.getSequence() >= 0) {
-      builder.readFrom(hazelcastConfig.getSequence());
+    final var lastSequence = hazelcastStateService.getLastSequenceNumber();
+    if (lastSequence >= 0) {
+      builder.readFrom(lastSequence);
     } else {
       builder.readFromHead();
     }
