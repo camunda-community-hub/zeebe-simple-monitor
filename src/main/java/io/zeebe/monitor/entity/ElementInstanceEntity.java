@@ -18,6 +18,8 @@ package io.zeebe.monitor.entity;
 import io.zeebe.monitor.model.BPMNElementTypes;
 import io.zeebe.monitor.model.IntentTypes;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity(name = "ELEMENT_INSTANCE")
 @Table(indexes = {
@@ -43,8 +45,9 @@ public class ElementInstanceEntity {
 
     // For some reason, they didn't map this to the ProcessInstanceIntent class
     // (probably because it's for ProcessInstances)
-    @Column(name = "INTENT_")
+    @Column(name = "INTENT_", columnDefinition = "ei_intent")
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private IntentTypes intent;
 
     @Column(name = "PROCESS_INSTANCE_KEY_")
@@ -53,8 +56,9 @@ public class ElementInstanceEntity {
     @Column(name = "ELEMENT_ID_")
     private String elementId;
 
-    @Column(name = "BPMN_ELEMENT_TYPE_")
+    @Column(name = "BPMN_ELEMENT_TYPE_", columnDefinition = "ei_bpmn_element_type")
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private BPMNElementTypes bpmnElementType;
 
     @Column(name = "FLOW_SCOPE_KEY_")
