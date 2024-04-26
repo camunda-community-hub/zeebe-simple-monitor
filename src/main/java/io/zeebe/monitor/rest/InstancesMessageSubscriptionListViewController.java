@@ -25,7 +25,7 @@ public class InstancesMessageSubscriptionListViewController extends AbstractInst
   @GetMapping("/views/instances/{key}/message-subscription-list")
   @Transactional
   public String instanceDetailMessageSubscriptionList(
-      @PathVariable final long key,
+      @PathVariable("key") final long key,
       final Map<String, Object> model,
       @PageableDefault(size = DETAIL_LIST_SIZE) final Pageable pageable) {
     initializeProcessInstanceDto(key, model, pageable);
