@@ -16,7 +16,7 @@ public class TimerProtobufImporter {
   private final Counter timerCounter;
 
   @Autowired
-  public TimerHazelcastImporter(TimerRepository timerRepository, MeterRegistry meterRegistry) {
+  public TimerProtobufImporter(TimerRepository timerRepository, MeterRegistry meterRegistry) {
     this.timerRepository = timerRepository;
 
     this.timerCounter = Counter.builder("zeebemonitor_importer_timer").description("number of processed timers").register(meterRegistry);

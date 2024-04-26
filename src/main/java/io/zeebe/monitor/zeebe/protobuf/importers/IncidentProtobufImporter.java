@@ -17,7 +17,7 @@ public class IncidentProtobufImporter {
   private final Counter resolvedCounter;
 
   @Autowired
-  public IncidentHazelcastImporter(IncidentRepository incidentRepository, MeterRegistry meterRegistry) {
+  public IncidentProtobufImporter(IncidentRepository incidentRepository, MeterRegistry meterRegistry) {
     this.incidentRepository = incidentRepository;
 
     createdCounter = Counter.builder("zeebemonitor_importer_incident").tag("action", "created").description("number of processed incidents").register(meterRegistry);

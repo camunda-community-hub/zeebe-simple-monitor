@@ -11,12 +11,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class ErrorProtobufImporter {
 
+  private final ErrorRepository errorRepository;
   private final Counter counter;
 
-  private final ErrorRepository errorRepository;
-
   @Autowired
-  public ErrorHazelcastImporter(ErrorRepository errorRepository, MeterRegistry meterRegistry) {
+  public ErrorProtobufImporter(ErrorRepository errorRepository, MeterRegistry meterRegistry) {
     this.errorRepository = errorRepository;
 
     this.counter = Counter.builder("zeebemonitor_importer_error").description("number of processed errors").register(meterRegistry);

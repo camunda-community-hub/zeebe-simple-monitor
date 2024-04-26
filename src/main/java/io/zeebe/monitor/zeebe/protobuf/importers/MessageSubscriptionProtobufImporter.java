@@ -19,7 +19,7 @@ public class MessageSubscriptionProtobufImporter {
   private final Counter eventCounter;
 
   @Autowired
-  public MessageSubscriptionHazelcastImporter(MessageSubscriptionRepository messageSubscriptionRepository, MeterRegistry meterRegistry) {
+  public MessageSubscriptionProtobufImporter(MessageSubscriptionRepository messageSubscriptionRepository, MeterRegistry meterRegistry) {
     this.messageSubscriptionRepository = messageSubscriptionRepository;
 
     this.subsCounter =

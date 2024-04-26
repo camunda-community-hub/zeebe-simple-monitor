@@ -16,7 +16,7 @@ public class JobProtobufImporter {
   private final Counter counter;
 
   @Autowired
-  public JobHazelcastImporter(JobRepository jobRepository, MeterRegistry meterRegistry) {
+  public JobProtobufImporter(JobRepository jobRepository, MeterRegistry meterRegistry) {
     this.jobRepository = jobRepository;
 
     counter = Counter.builder("zeebemonitor_importer_job").description("number of processed jobs").register(meterRegistry);

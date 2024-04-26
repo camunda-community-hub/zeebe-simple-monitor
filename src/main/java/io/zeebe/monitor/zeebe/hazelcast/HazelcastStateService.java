@@ -1,4 +1,4 @@
-package io.zeebe.monitor.zeebe.hazelcast.importers;
+package io.zeebe.monitor.zeebe.hazelcast;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;

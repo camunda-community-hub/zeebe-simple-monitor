@@ -16,7 +16,7 @@ public class MessageProtobufImporter {
   private final Counter counter;
 
   @Autowired
-  public MessageHazelcastImporter(MessageRepository messageRepository, MeterRegistry meterRegistry) {
+  public MessageProtobufImporter(MessageRepository messageRepository, MeterRegistry meterRegistry) {
     this.messageRepository = messageRepository;
 
     this.counter = Counter.builder("zeebemonitor_importer_message").description("number of processed messages").register(meterRegistry);

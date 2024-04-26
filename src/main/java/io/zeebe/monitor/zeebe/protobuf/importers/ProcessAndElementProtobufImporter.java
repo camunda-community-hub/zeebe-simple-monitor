@@ -30,7 +30,7 @@ public class ProcessAndElementProtobufImporter {
   private final Counter elementInstanceCounter;
 
   @Autowired
-  public ProcessAndElementHazelcastImporter(ProcessRepository processRepository, ProcessInstanceRepository processInstanceRepository, ElementInstanceRepository elementInstanceRepository, MeterRegistry meterRegistry, ZeebeNotificationService notificationService) {
+  public ProcessAndElementProtobufImporter(ProcessRepository processRepository, ProcessInstanceRepository processInstanceRepository, ElementInstanceRepository elementInstanceRepository, MeterRegistry meterRegistry, ZeebeNotificationService notificationService) {
     this.processRepository = processRepository;
     this.processInstanceRepository = processInstanceRepository;
     this.elementInstanceRepository = elementInstanceRepository;

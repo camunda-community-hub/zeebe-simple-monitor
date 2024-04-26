@@ -16,7 +16,7 @@ public class VariableProtobufImporter {
   private final Counter variableUpdatedCounter;
 
   @Autowired
-  public VariableHazelcastImporter(VariableRepository variableRepository, MeterRegistry meterRegistry) {
+  public VariableProtobufImporter(VariableRepository variableRepository, MeterRegistry meterRegistry) {
     this.variableRepository = variableRepository;
 
     this.variableCreatedCounter = Counter.builder("zeebemonitor_importer_variable").tag("action", "imported").description("number of processed variables").register(meterRegistry);
