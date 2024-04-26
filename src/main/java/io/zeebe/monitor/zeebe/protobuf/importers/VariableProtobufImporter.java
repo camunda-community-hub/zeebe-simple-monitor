@@ -11,8 +11,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class VariableProtobufImporter {
 
-  @Autowired private VariableRepository variableRepository;
-  @Autowired private MeterRegistry meterRegistry;
+  private final VariableRepository variableRepository;
+  private final Counter variableCreatedCounter;
+  private final Counter variableUpdatedCounter;
+
+  public VariableHazelcastImporter(VariableRepository variableRepository, MeterRegistry meterRegistry) {
+    this.variableRepository = variableRepository;
+
+    this.variableCreatedCounter = Counter.builder("zeebemonitor_importer_variable").tag("action", "imported").description("number of processed variables").register(meterRegistry);
+    this.variableUpdatedCounter = Counter.builder("zeebemonitor_importer_variable").tag("action", "updated").description("number of processed variables").register(meterRegistry);
+  }
 
   public void importVariable(final Schema.VariableRecord record) {
     final VariableEntity newVariable = new VariableEntity();
@@ -27,7 +35,11 @@ public class VariableProtobufImporter {
       newVariable.setState(record.getMetadata().getIntent().toLowerCase());
       variableRepository.save(newVariable);
 
-      Counter.builder("zeebemonitor_importer_variable").tag("action", "imported").tag("state", newVariable.getState()).description("number of processed variables").register(meterRegistry).increment();
+      if (newVariable.getState().equals("updated")) {
+        variableUpdatedCounter.increment();
+      } else {
+        variableCreatedCounter.increment();
+      }
     }
   }
 }

@@ -14,8 +14,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class MessageSubscriptionProtobufImporter {
 
-  @Autowired private MessageSubscriptionRepository messageSubscriptionRepository;
-  @Autowired private MeterRegistry meterRegistry;
+  private final MessageSubscriptionRepository messageSubscriptionRepository;
+  private final Counter subsCounter;
+  private final Counter eventCounter;
+
+  public MessageSubscriptionHazelcastImporter(MessageSubscriptionRepository messageSubscriptionRepository, MeterRegistry meterRegistry) {
+    this.messageSubscriptionRepository = messageSubscriptionRepository;
+
+    this.subsCounter =
+            Counter.builder("zeebemonitor_importer_message_subscription").description("number of processed message subscriptions").register(meterRegistry);
+    this.eventCounter = Counter.builder("zeebemonitor_importer_message_start_event_subscription").description("number of processed message start events").register(meterRegistry);
+  }
 
   public void importMessageSubscription(final Schema.MessageSubscriptionRecord record) {
 
@@ -43,7 +52,8 @@ public class MessageSubscriptionProtobufImporter {
     entity.setTimestamp(timestamp);
     messageSubscriptionRepository.save(entity);
 
-    Counter.builder("zeebemonitor_importer_message_subscription").tag("action", "imported").tag("state", entity.getState()).description("number of processed message subscriptions").register(meterRegistry).increment();
+
+    subsCounter.increment();
   }
 
   public void importMessageStartEventSubscription(
@@ -72,7 +82,7 @@ public class MessageSubscriptionProtobufImporter {
     entity.setTimestamp(timestamp);
     messageSubscriptionRepository.save(entity);
 
-    Counter.builder("zeebemonitor_importer_message_subscription").tag("action", "imported").tag("state", entity.getState()).description("number of processed message start events").register(meterRegistry).increment();
+    eventCounter.increment();
   }
 
   private String generateId() {

@@ -12,8 +12,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class MessageProtobufImporter {
 
-  @Autowired private MessageRepository messageRepository;
-  @Autowired private MeterRegistry meterRegistry;
+  private final MessageRepository messageRepository;
+  private final Counter counter;
+
+  @Autowired
+  public MessageHazelcastImporter(MessageRepository messageRepository, MeterRegistry meterRegistry) {
+    this.messageRepository = messageRepository;
+
+    this.counter = Counter.builder("zeebemonitor_importer_message").description("number of processed messages").register(meterRegistry);
+  }
 
   public void importMessage(final Schema.MessageRecord record) {
 
@@ -39,6 +46,6 @@ public class MessageProtobufImporter {
     entity.setTimestamp(timestamp);
     messageRepository.save(entity);
 
-    Counter.builder("zeebemonitor_importer_message").tag("action", "imported").tag("state", intent.name().toLowerCase()).description("number of processed messages").register(meterRegistry).increment();
+    counter.increment();
   }
 }

@@ -12,8 +12,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class JobProtobufImporter {
 
-  @Autowired private JobRepository jobRepository;
-  @Autowired private MeterRegistry meterRegistry;
+  private final JobRepository jobRepository;
+  private final Counter counter;
+
+  public JobHazelcastImporter(JobRepository jobRepository, MeterRegistry meterRegistry) {
+    this.jobRepository = jobRepository;
+
+    counter = Counter.builder("zeebemonitor_importer_job").description("number of processed jobs").register(meterRegistry);
+  }
 
   public void importJob(final Schema.JobRecord record) {
 
@@ -40,6 +46,6 @@ public class JobProtobufImporter {
     entity.setRetries(record.getRetries());
     jobRepository.save(entity);
 
-    Counter.builder("zeebemonitor_importer_job").tag("action", "imported").tag("state", entity.getState()).description("number of processed jobs").register(meterRegistry).increment();
+    counter.increment();
   }
 }

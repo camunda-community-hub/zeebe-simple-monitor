@@ -19,12 +19,29 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProcessAndElementProtobufImporter {
 
-  @Autowired private ProcessRepository processRepository;
-  @Autowired private ProcessInstanceRepository processInstanceRepository;
-  @Autowired private ElementInstanceRepository elementInstanceRepository;
-  @Autowired private MeterRegistry meterRegistry;
+  private final ProcessRepository processRepository;
+  private final ProcessInstanceRepository processInstanceRepository;
+  private final ElementInstanceRepository elementInstanceRepository;
+  private final ZeebeNotificationService notificationService;
+  private final Counter processCounter;
+  private final Counter instanceActivatedCounter;
+  private final Counter instanceCompletedCounter;
+  private final Counter instanceTerminatedCounter;
+  private final Counter elementInstanceCounter;
 
-  @Autowired private ZeebeNotificationService notificationService;
+  @Autowired
+  public ProcessAndElementHazelcastImporter(ProcessRepository processRepository, ProcessInstanceRepository processInstanceRepository, ElementInstanceRepository elementInstanceRepository, MeterRegistry meterRegistry, ZeebeNotificationService notificationService) {
+    this.processRepository = processRepository;
+    this.processInstanceRepository = processInstanceRepository;
+    this.elementInstanceRepository = elementInstanceRepository;
+    this.notificationService = notificationService;
+
+    this.processCounter = Counter.builder("zeebemonitor_importer_process").description("number of processed processes").register(meterRegistry);
+    this.instanceActivatedCounter = Counter.builder("zeebemonitor_importer_process_instance").tag("action", "activated").description("number of activated process instances").register(meterRegistry);
+    this.instanceCompletedCounter = Counter.builder("zeebemonitor_importer_process_instance").tag("action", "activated").description("number of activated process instances").register(meterRegistry);
+    this.instanceTerminatedCounter = Counter.builder("zeebemonitor_importer_process_instance").tag("action", "activated").description("number of activated process instances").register(meterRegistry);
+    this.elementInstanceCounter = Counter.builder("zeebemonitor_importer_element_instance").description("number of processed element_instances").register(meterRegistry);
+  }
 
   public void importProcess(final Schema.ProcessRecord record) {
     final int partitionId = record.getMetadata().getPartitionId();
@@ -42,7 +59,7 @@ public class ProcessAndElementProtobufImporter {
     entity.setTimestamp(record.getMetadata().getTimestamp());
     processRepository.save(entity);
 
-    Counter.builder("zeebemonitor_importer_process").tag("action", "imported").description("number of processed processes").register(meterRegistry).increment();
+    processCounter.increment();
   }
 
   public void importProcessInstance(final Schema.ProcessInstanceRecord record) {
@@ -58,51 +75,44 @@ public class ProcessAndElementProtobufImporter {
     final long timestamp = record.getMetadata().getTimestamp();
     final long processInstanceKey = record.getProcessInstanceKey();
 
-    final ProcessInstanceEntity entity =
-        processInstanceRepository
-            .findById(processInstanceKey)
-            .orElseGet(
-                () -> {
-                  final ProcessInstanceEntity newEntity = new ProcessInstanceEntity();
-                  newEntity.setPartitionId(record.getMetadata().getPartitionId());
-                  newEntity.setKey(processInstanceKey);
-                  newEntity.setBpmnProcessId(record.getBpmnProcessId());
-                  newEntity.setVersion(record.getVersion());
-                  newEntity.setProcessDefinitionKey(record.getProcessDefinitionKey());
-                  newEntity.setParentProcessInstanceKey(record.getParentProcessInstanceKey());
-                  newEntity.setParentElementInstanceKey(record.getParentElementInstanceKey());
-                  return newEntity;
-                });
+    final ProcessInstanceEntity entity = processInstanceRepository.findById(processInstanceKey).orElseGet(() -> {
+      final ProcessInstanceEntity newEntity = new ProcessInstanceEntity();
+      newEntity.setPartitionId(record.getMetadata().getPartitionId());
+      newEntity.setKey(processInstanceKey);
+      newEntity.setBpmnProcessId(record.getBpmnProcessId());
+      newEntity.setVersion(record.getVersion());
+      newEntity.setProcessDefinitionKey(record.getProcessDefinitionKey());
+      newEntity.setParentProcessInstanceKey(record.getParentProcessInstanceKey());
+      newEntity.setParentElementInstanceKey(record.getParentElementInstanceKey());
+      return newEntity;
+    });
 
     if (intent == ProcessInstanceIntent.ELEMENT_ACTIVATED) {
       entity.setState("Active");
       entity.setStart(timestamp);
       processInstanceRepository.save(entity);
 
-      notificationService.sendCreatedProcessInstance(
-          record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+      notificationService.sendCreatedProcessInstance(record.getProcessInstanceKey(), record.getProcessDefinitionKey());
 
-      Counter.builder("zeebemonitor_importer_process_instance").tag("action", "activated").description("number of activated process instances").register(meterRegistry).increment();
+      instanceActivatedCounter.increment();
 
     } else if (intent == ProcessInstanceIntent.ELEMENT_COMPLETED) {
       entity.setState("Completed");
       entity.setEnd(timestamp);
       processInstanceRepository.save(entity);
 
-      notificationService.sendEndedProcessInstance(
-          record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+      notificationService.sendEndedProcessInstance(record.getProcessInstanceKey(), record.getProcessDefinitionKey());
 
-      Counter.builder("zeebemonitor_importer_process_instance").tag("action", "completed").description("number of processed process instances").register(meterRegistry).increment();
+      instanceCompletedCounter.increment();
 
     } else if (intent == ProcessInstanceIntent.ELEMENT_TERMINATED) {
       entity.setState("Terminated");
       entity.setEnd(timestamp);
       processInstanceRepository.save(entity);
 
-      notificationService.sendEndedProcessInstance(
-          record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+      notificationService.sendEndedProcessInstance(record.getProcessInstanceKey(), record.getProcessDefinitionKey());
 
-      Counter.builder("zeebemonitor_importer_process_instance").tag("action", "terminated").description("number of processed process instances").register(meterRegistry).increment();
+      instanceTerminatedCounter.increment();
     }
   }
 
@@ -120,10 +130,9 @@ public class ProcessAndElementProtobufImporter {
       entity.setProcessDefinitionKey(record.getProcessDefinitionKey());
       entity.setBpmnElementType(record.getBpmnElementType());
       elementInstanceRepository.save(entity);
-      notificationService.sendUpdatedProcessInstance(
-          record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+      notificationService.sendUpdatedProcessInstance(record.getProcessInstanceKey(), record.getProcessDefinitionKey());
 
-      Counter.builder("zeebemonitor_importer_element_instance").tag("action", "imported").tag("type", entity.getBpmnElementType()).description("number of processed element_instances").register(meterRegistry).increment();
+      elementInstanceCounter.increment();
     }
   }
 }

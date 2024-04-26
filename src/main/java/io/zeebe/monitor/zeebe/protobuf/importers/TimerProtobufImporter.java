@@ -12,8 +12,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class TimerProtobufImporter {
 
-  @Autowired private TimerRepository timerRepository;
-  @Autowired private MeterRegistry meterRegistry;
+  private final TimerRepository timerRepository;
+  private final Counter timerCounter;
+
+  public TimerHazelcastImporter(TimerRepository timerRepository, MeterRegistry meterRegistry) {
+    this.timerRepository = timerRepository;
+
+    this.timerCounter = Counter.builder("zeebemonitor_importer_timer").description("number of processed timers").register(meterRegistry);
+  }
 
   public void importTimer(final Schema.TimerRecord record) {
 
@@ -45,6 +51,6 @@ public class TimerProtobufImporter {
     entity.setTimestamp(timestamp);
     timerRepository.save(entity);
 
-    Counter.builder("zeebemonitor_importer_timer").tag("action", "imported").tag("state", entity.getState()).description("number of processed timers").register(meterRegistry).increment();
+    timerCounter.increment();
   }
 }
