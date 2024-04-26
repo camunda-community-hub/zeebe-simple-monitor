@@ -10,9 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The HazelcastStateService manages the current pointer of the Hazelcast import process.
- *
+ * <p>
  * That pointer is required to read the next-relevant message from the RingBuffer
- *
+ * <p>
  * Usually, that RingBuffer is read 1 by 1, but sometimes, the RingBuffer may overrun by the export process,
  * and in that case, the Import process will set the sequence to the current position of the RingBuffer.
  */

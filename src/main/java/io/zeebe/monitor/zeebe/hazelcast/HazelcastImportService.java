@@ -67,9 +67,7 @@ public class HazelcastImportService {
                             messageSubscriptionImporter::importMessageStartEventSubscription))
             .addErrorListener(errorImporter::importError)
             .postProcessListener(
-                sequence -> {
-                  hazelcastStateService.saveSequenceNumber(sequence);
-                });
+                sequence -> hazelcastStateService.saveSequenceNumber(sequence));
 
     final var lastSequence = hazelcastStateService.getLastSequenceNumber();
     if (lastSequence >= 0) {
