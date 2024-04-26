@@ -1,6 +1,8 @@
 package io.zeebe.monitor.zeebe.protobuf.importers;
 
 import io.camunda.zeebe.protocol.record.intent.TimerIntent;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.TimerEntity;
 import io.zeebe.monitor.repository.TimerRepository;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Component;
 public class TimerProtobufImporter {
 
   @Autowired private TimerRepository timerRepository;
+  @Autowired private MeterRegistry meterRegistry;
 
   public void importTimer(final Schema.TimerRecord record) {
 
@@ -41,5 +44,7 @@ public class TimerProtobufImporter {
     entity.setState(intent.name().toLowerCase());
     entity.setTimestamp(timestamp);
     timerRepository.save(entity);
+
+    Counter.builder("zeebemonitor_importer_timer").tag("action", "imported").tag("state", entity.getState()).description("number of processed timers").register(meterRegistry).increment();
   }
 }

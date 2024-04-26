@@ -1,5 +1,7 @@
 package io.zeebe.monitor.zeebe.protobuf.importers;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.VariableEntity;
 import io.zeebe.monitor.repository.VariableRepository;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Component;
 public class VariableProtobufImporter {
 
   @Autowired private VariableRepository variableRepository;
+  @Autowired private MeterRegistry meterRegistry;
 
   public void importVariable(final Schema.VariableRecord record) {
     final VariableEntity newVariable = new VariableEntity();
@@ -23,6 +26,8 @@ public class VariableProtobufImporter {
       newVariable.setScopeKey(record.getScopeKey());
       newVariable.setState(record.getMetadata().getIntent().toLowerCase());
       variableRepository.save(newVariable);
+
+      Counter.builder("zeebemonitor_importer_variable").tag("action", "imported").tag("state", newVariable.getState()).description("number of processed variables").register(meterRegistry).increment();
     }
   }
 }

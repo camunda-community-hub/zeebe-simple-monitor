@@ -1,6 +1,8 @@
 package io.zeebe.monitor.zeebe.protobuf.importers;
 
 import io.camunda.zeebe.protocol.record.intent.IncidentIntent;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.IncidentEntity;
 import io.zeebe.monitor.repository.IncidentRepository;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Component;
 public class IncidentProtobufImporter {
 
   @Autowired private IncidentRepository incidentRepository;
+  @Autowired private MeterRegistry meterRegistry;
 
   public void importIncident(final Schema.IncidentRecord record) {
 
@@ -39,9 +42,13 @@ public class IncidentProtobufImporter {
       entity.setCreated(timestamp);
       incidentRepository.save(entity);
 
+      Counter.builder("zeebemonitor_importer_incident").tag("action", "created").description("number of processed incidents").register(meterRegistry).increment();
+
     } else if (intent == IncidentIntent.RESOLVED) {
       entity.setResolved(timestamp);
       incidentRepository.save(entity);
+
+      Counter.builder("zeebemonitor_importer_incident").tag("action", "resolved").description("number of processed incidents").register(meterRegistry).increment();
     }
   }
 }

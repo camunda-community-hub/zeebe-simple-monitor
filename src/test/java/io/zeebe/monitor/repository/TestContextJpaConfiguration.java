@@ -1,5 +1,7 @@
 package io.zeebe.monitor.repository;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,6 +50,11 @@ public class TestContextJpaConfiguration {
     JpaTransactionManager transactionManager = new JpaTransactionManager();
     transactionManager.setEntityManagerFactory(entityManagerFactory.getObject());
     return transactionManager;
+  }
+
+  @Bean
+  public MeterRegistry meterRegistry() {
+    return new SimpleMeterRegistry();
   }
 
   private Properties getAdditionalJpaProperties() {

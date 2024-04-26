@@ -2,6 +2,8 @@ package io.zeebe.monitor.zeebe.protobuf.importers;
 
 import io.camunda.zeebe.protocol.record.intent.MessageStartEventSubscriptionIntent;
 import io.camunda.zeebe.protocol.record.intent.MessageSubscriptionIntent;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.MessageSubscriptionEntity;
 import io.zeebe.monitor.repository.MessageSubscriptionRepository;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Component;
 public class MessageSubscriptionProtobufImporter {
 
   @Autowired private MessageSubscriptionRepository messageSubscriptionRepository;
+  @Autowired private MeterRegistry meterRegistry;
 
   public void importMessageSubscription(final Schema.MessageSubscriptionRecord record) {
 
@@ -39,6 +42,8 @@ public class MessageSubscriptionProtobufImporter {
     entity.setState(intent.name().toLowerCase());
     entity.setTimestamp(timestamp);
     messageSubscriptionRepository.save(entity);
+
+    Counter.builder("zeebemonitor_importer_message_subscription").tag("action", "imported").tag("state", entity.getState()).description("number of processed message subscriptions").register(meterRegistry).increment();
   }
 
   public void importMessageStartEventSubscription(
@@ -66,6 +71,8 @@ public class MessageSubscriptionProtobufImporter {
     entity.setState(intent.name().toLowerCase());
     entity.setTimestamp(timestamp);
     messageSubscriptionRepository.save(entity);
+
+    Counter.builder("zeebemonitor_importer_message_subscription").tag("action", "imported").tag("state", entity.getState()).description("number of processed message start events").register(meterRegistry).increment();
   }
 
   private String generateId() {
