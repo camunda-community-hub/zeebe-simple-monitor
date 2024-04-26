@@ -22,7 +22,7 @@ The application imports the data from Zeebe using the [Hazelcast exporter](https
 
 ### Upgrading from a prior version
 
-See the [upgrade instructions](./UPGRADE.md).
+See the [upgrade instructions](UPGRADE.md).
 
 ### Docker
 
