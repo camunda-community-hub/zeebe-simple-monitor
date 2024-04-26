@@ -92,7 +92,8 @@ public class ProcessAndElementProtobufImporter {
       entity.setStart(timestamp);
       processInstanceRepository.save(entity);
 
-      notificationService.sendCreatedProcessInstance(record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+      notificationService.sendCreatedProcessInstance(
+          record.getProcessInstanceKey(), record.getProcessDefinitionKey());
 
       instanceActivatedCounter.increment();
 
@@ -101,7 +102,8 @@ public class ProcessAndElementProtobufImporter {
       entity.setEnd(timestamp);
       processInstanceRepository.save(entity);
 
-      notificationService.sendEndedProcessInstance(record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+      notificationService.sendEndedProcessInstance(
+          record.getProcessInstanceKey(), record.getProcessDefinitionKey());
 
       instanceCompletedCounter.increment();
 
@@ -110,7 +112,8 @@ public class ProcessAndElementProtobufImporter {
       entity.setEnd(timestamp);
       processInstanceRepository.save(entity);
 
-      notificationService.sendEndedProcessInstance(record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+      notificationService.sendEndedProcessInstance(
+          record.getProcessInstanceKey(), record.getProcessDefinitionKey());
 
       instanceTerminatedCounter.increment();
     }
@@ -130,7 +133,8 @@ public class ProcessAndElementProtobufImporter {
       entity.setProcessDefinitionKey(record.getProcessDefinitionKey());
       entity.setBpmnElementType(record.getBpmnElementType());
       elementInstanceRepository.save(entity);
-      notificationService.sendUpdatedProcessInstance(record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+      notificationService.sendUpdatedProcessInstance(
+          record.getProcessInstanceKey(), record.getProcessDefinitionKey());
 
       elementInstanceCounter.increment();
     }

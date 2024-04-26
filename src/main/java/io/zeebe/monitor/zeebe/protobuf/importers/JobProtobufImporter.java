@@ -19,7 +19,7 @@ public class JobProtobufImporter {
   public JobProtobufImporter(JobRepository jobRepository, MeterRegistry meterRegistry) {
     this.jobRepository = jobRepository;
 
-    counter = Counter.builder("zeebemonitor_importer_job").description("number of processed jobs").register(meterRegistry);
+    this.counter = Counter.builder("zeebemonitor_importer_job").description("number of processed jobs").register(meterRegistry);
   }
 
   public void importJob(final Schema.JobRecord record) {
