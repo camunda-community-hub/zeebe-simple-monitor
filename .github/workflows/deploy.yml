@@ -42,7 +42,7 @@ jobs:
       - name: Tar files
         run: tar -czvf zeebe-simple-monitor.tgz target/zeebe-simple-monitor-2.4.2.jar src/main/resources/application.yaml
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: zeebe-simple-monitor.tgz
           path: zeebe-simple-monitor.tgz
