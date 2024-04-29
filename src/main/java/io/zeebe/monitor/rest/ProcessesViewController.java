@@ -1,5 +1,7 @@
 package io.zeebe.monitor.rest;
 
+import static io.zeebe.monitor.model.BpmnElementType.MULTI_INSTANCE_BODY;
+import static io.zeebe.monitor.model.IntentTypes.*;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import io.camunda.zeebe.model.bpmn.Bpmn;
@@ -17,6 +19,7 @@ import io.zeebe.monitor.entity.MessageSubscriptionEntity;
 import io.zeebe.monitor.entity.ProcessEntity;
 import io.zeebe.monitor.entity.ProcessInstanceEntity;
 import io.zeebe.monitor.entity.TimerEntity;
+import io.zeebe.monitor.model.IntentTypes;
 import io.zeebe.monitor.repository.MessageSubscriptionRepository;
 import io.zeebe.monitor.repository.ProcessInstanceRepository;
 import io.zeebe.monitor.repository.ProcessRepository;
@@ -46,11 +49,11 @@ import org.springframework.web.server.ResponseStatusException;
 @Controller
 public class ProcessesViewController extends AbstractViewController {
 
-  static final List<String> PROCESS_INSTANCE_ENTERED_INTENTS = List.of("ELEMENT_ACTIVATED");
+  static final List<String> PROCESS_INSTANCE_ENTERED_INTENTS = List.of(ELEMENT_ACTIVATED.name());
   static final List<String> PROCESS_INSTANCE_COMPLETED_INTENTS =
-      List.of("ELEMENT_COMPLETED", "ELEMENT_TERMINATED");
+      List.of(ELEMENT_COMPLETED.name(), ELEMENT_TERMINATED.name());
   static final List<String> EXCLUDE_ELEMENT_TYPES =
-      List.of(BpmnElementType.MULTI_INSTANCE_BODY.name());
+      List.of(MULTI_INSTANCE_BODY.name());
 
   @Autowired private ProcessRepository processRepository;
   @Autowired private ProcessInstanceRepository processInstanceRepository;

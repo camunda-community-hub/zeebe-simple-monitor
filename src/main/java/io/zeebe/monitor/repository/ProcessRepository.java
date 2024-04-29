@@ -20,6 +20,9 @@ import io.zeebe.monitor.entity.ProcessEntity;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+
+import io.zeebe.monitor.model.BpmnElementType;
+import io.zeebe.monitor.model.IntentTypes;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -35,7 +38,7 @@ public interface ProcessRepository extends
       value =
           "SELECT ELEMENT_ID_ AS elementId, COUNT(*) AS count "
               + "FROM ELEMENT_INSTANCE "
-              + "WHERE PROCESS_DEFINITION_KEY_ = :key and INTENT_ in (:intents) and BPMN_ELEMENT_TYPE_ not in (:excludeElementTypes)"
+              + "WHERE PROCESS_DEFINITION_KEY_ = :key and INTENT_::text in (:intents) and BPMN_ELEMENT_TYPE_::text not in (:excludeElementTypes)"
               + "GROUP BY ELEMENT_ID_")
   List<ElementInstanceStatistics> getElementInstanceStatisticsByKeyAndIntentIn(
       @Param("key") long key,

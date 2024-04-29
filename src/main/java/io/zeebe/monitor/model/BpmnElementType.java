@@ -1,6 +1,6 @@
 package io.zeebe.monitor.model;
 
-public enum BPMN_ELEMENT_TYPE {
+public enum BpmnElementType {
     END_EVENT,
     START_EVENT,
     RECEIVE_TASK,
