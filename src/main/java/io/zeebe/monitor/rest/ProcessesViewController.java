@@ -1,7 +1,7 @@
 package io.zeebe.monitor.rest;
 
 import static io.zeebe.monitor.model.BpmnElementType.MULTI_INSTANCE_BODY;
-import static io.zeebe.monitor.model.IntentTypes.*;
+import static io.zeebe.monitor.model.IntentType.*;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import io.camunda.zeebe.model.bpmn.Bpmn;
@@ -13,13 +13,11 @@ import io.camunda.zeebe.model.bpmn.instance.ServiceTask;
 import io.camunda.zeebe.model.bpmn.instance.TimerEventDefinition;
 import io.camunda.zeebe.model.bpmn.instance.zeebe.ZeebeTaskDefinition;
 import io.camunda.zeebe.protocol.record.intent.MessageSubscriptionIntent;
-import io.camunda.zeebe.protocol.record.value.BpmnElementType;
 import io.zeebe.monitor.entity.ElementInstanceStatistics;
 import io.zeebe.monitor.entity.MessageSubscriptionEntity;
 import io.zeebe.monitor.entity.ProcessEntity;
 import io.zeebe.monitor.entity.ProcessInstanceEntity;
 import io.zeebe.monitor.entity.TimerEntity;
-import io.zeebe.monitor.model.IntentTypes;
 import io.zeebe.monitor.repository.MessageSubscriptionRepository;
 import io.zeebe.monitor.repository.ProcessInstanceRepository;
 import io.zeebe.monitor.repository.ProcessRepository;

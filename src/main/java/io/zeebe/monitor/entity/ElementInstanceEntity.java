@@ -16,7 +16,7 @@
 package io.zeebe.monitor.entity;
 
 import io.zeebe.monitor.model.BpmnElementType;
-import io.zeebe.monitor.model.IntentTypes;
+import io.zeebe.monitor.model.IntentType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -47,7 +47,7 @@ public class ElementInstanceEntity {
     @Column(name = "INTENT_", columnDefinition = "ei_intent")
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    private IntentTypes intent;
+    private IntentType intent;
 
     @Column(name = "PROCESS_INSTANCE_KEY_")
     private long processInstanceKey;
@@ -100,10 +100,10 @@ public class ElementInstanceEntity {
     }
 
     public void setIntent(final String intent) {
-        this.intent = IntentTypes.valueOf(intent);
+        this.intent = IntentType.valueOf(intent);
     }
 
-    public void setIntent(final IntentTypes intent) {
+    public void setIntent(final IntentType intent) {
         this.intent = intent;
     }
 
