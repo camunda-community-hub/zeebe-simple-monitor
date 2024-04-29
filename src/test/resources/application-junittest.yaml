@@ -4,4 +4,7 @@ logging:
     io.zeebe: INFO
 spring:
   flyway:
-    enabled: false
+    enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
