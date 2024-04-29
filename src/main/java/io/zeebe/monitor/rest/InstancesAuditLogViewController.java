@@ -31,7 +31,7 @@ public class InstancesAuditLogViewController extends AbstractInstanceViewControl
     @GetMapping("/views/instances/{key}/audit-log")
     @Transactional
     public String instanceDetailAuditLog(
-            @PathVariable final long key,
+            @PathVariable("key") final long key,
             final Map<String, Object> model,
             @PageableDefault(size = DETAIL_LIST_SIZE) final Pageable pageable) {
         initializeProcessInstanceDto(key, model, pageable);
