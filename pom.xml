@@ -227,14 +227,14 @@
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>6.3.2.Final</version>
+            <version>6.5.0.Final</version>
         </dependency>
 
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <version>8.2.0</version>
-        </dependency>˚
+        </dependency>
 
         <dependency>
             <groupId>jakarta.persistence</groupId>

@@ -15,10 +15,9 @@
  */
 package io.zeebe.monitor.entity;
 
-import io.zeebe.monitor.model.BPMNElementTypes;
+import io.zeebe.monitor.model.BPMN_ELEMENT_TYPE;
 import io.zeebe.monitor.model.IntentTypes;
 import jakarta.persistence.*;
-import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -43,7 +42,6 @@ public class ElementInstanceEntity {
     @Column(name = "KEY_")
     private long key;
 
-
     // For some reason, they didn't map this to the ProcessInstanceIntent class
     // (probably because it's for ProcessInstances)
     @Column(name = "INTENT_", columnDefinition = "ei_intent")
@@ -57,11 +55,10 @@ public class ElementInstanceEntity {
     @Column(name = "ELEMENT_ID_")
     private String elementId;
 
-
     @Column(name = "BPMN_ELEMENT_TYPE_", columnDefinition = "ei_bpmn_element_type")
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    private BPMNElementTypes bpmnElementType;
+    private BPMN_ELEMENT_TYPE bpmnElementType;
 
     @Column(name = "FLOW_SCOPE_KEY_")
     private long flowScopeKey;
@@ -171,11 +168,11 @@ public class ElementInstanceEntity {
         return bpmnElementType.name();
     }
 
-    public void setBpmnElementType(final BPMNElementTypes bpmnElementType) {
+    public void setBpmnElementType(final BPMN_ELEMENT_TYPE bpmnElementType) {
         this.bpmnElementType = bpmnElementType;
     }
 
     public void setBpmnElementType(final String bpmnElementType) {
-        this.bpmnElementType = BPMNElementTypes.valueOf(bpmnElementType);
+        this.bpmnElementType = BPMN_ELEMENT_TYPE.valueOf(bpmnElementType);
     }
 }
