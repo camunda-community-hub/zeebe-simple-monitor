@@ -1,4 +1,4 @@
-FROM azul/zulu-openjdk-alpine:17-jre
+FROM azul/zulu-openjdk-alpine:21-jre
 
 RUN apk update && \
     apk upgrade && \
