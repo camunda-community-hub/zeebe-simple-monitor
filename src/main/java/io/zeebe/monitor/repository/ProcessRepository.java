@@ -20,10 +20,12 @@ import io.zeebe.monitor.entity.ProcessEntity;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface ProcessRepository extends PagingAndSortingRepository<ProcessEntity, Long>, CrudRepository<ProcessEntity, Long> {
 
@@ -41,5 +43,6 @@ public interface ProcessRepository extends PagingAndSortingRepository<ProcessEnt
       @Param("intents") Collection<String> intents,
       @Param("excludeElementTypes") Collection<String> excludeElementTypes);
 
+  @Transactional(readOnly = true)
   List<ProcessEntity> findByBpmnProcessIdStartsWith(String bpmnProcessId);
 }
