@@ -39,8 +39,7 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 @Controller
@@ -59,25 +58,38 @@ public class ProcessesViewController extends AbstractViewController {
 
   @GetMapping("/")
   public String index(final Map<String, Object> model, final Pageable pageable) {
-    return processList(model, pageable);
+    return processList(model, pageable, Optional.empty());
   }
 
   @GetMapping("/views/processes")
-  public String processList(final Map<String, Object> model, final Pageable pageable) {
+  public String processList(final Map<String, Object> model, final Pageable pageable, @RequestParam("bpmnProcessId") Optional<String> bpmnProcessId) {
 
-    final long count = processRepository.count();
+    if (bpmnProcessId.isPresent()) {
+      final List<ProcessDto> processes = new ArrayList<>();
+      for (final ProcessEntity processEntity : processRepository.findByBpmnProcessIdStartsWith(bpmnProcessId.get())) {
+        final ProcessDto dto = toDto(processEntity);
+        processes.add(dto);
+      }
 
-    final List<ProcessDto> processes = new ArrayList<>();
-    for (final ProcessEntity processEntity : processRepository.findAll(pageable)) {
-      final ProcessDto dto = toDto(processEntity);
-      processes.add(dto);
+      model.put("processes", processes);
+
+      addPaginationToModel(model, Pageable.ofSize(Integer.MAX_VALUE), processes.size());
+      addDefaultAttributesToModel(model);
+    } else {
+      final long count = processRepository.count();
+
+      final List<ProcessDto> processes = new ArrayList<>();
+      for (final ProcessEntity processEntity : processRepository.findAll(pageable)) {
+        final ProcessDto dto = toDto(processEntity);
+        processes.add(dto);
+      }
+
+      model.put("processes", processes);
+      model.put("count", count);
+
+      addPaginationToModel(model, pageable, count);
+      addDefaultAttributesToModel(model);
     }
-
-    model.put("processes", processes);
-    model.put("count", count);
-
-    addPaginationToModel(model, pageable, count);
-    addDefaultAttributesToModel(model);
 
     return "process-list-view";
   }

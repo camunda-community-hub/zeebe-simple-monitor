@@ -40,4 +40,6 @@ public interface ProcessRepository extends PagingAndSortingRepository<ProcessEnt
       @Param("key") long key,
       @Param("intents") Collection<String> intents,
       @Param("excludeElementTypes") Collection<String> excludeElementTypes);
+
+  List<ProcessEntity> findByBpmnProcessIdStartsWith(String bpmnProcessId);
 }
