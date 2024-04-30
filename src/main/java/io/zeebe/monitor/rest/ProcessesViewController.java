@@ -72,6 +72,8 @@ public class ProcessesViewController extends AbstractViewController {
       }
 
       model.put("processes", processes);
+      model.put("bpmnProcessId", bpmnProcessId.get());
+      model.put("count", processes.size());
 
       addPaginationToModel(model, Pageable.ofSize(Integer.MAX_VALUE), processes.size());
       addDefaultAttributesToModel(model);
@@ -85,6 +87,7 @@ public class ProcessesViewController extends AbstractViewController {
       }
 
       model.put("processes", processes);
+      model.remove("bpmnProcessId");
       model.put("count", count);
 
       addPaginationToModel(model, pageable, count);
