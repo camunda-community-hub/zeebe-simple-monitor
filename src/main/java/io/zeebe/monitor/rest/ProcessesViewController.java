@@ -1,7 +1,5 @@
 package io.zeebe.monitor.rest;
 
-import static io.zeebe.monitor.model.BpmnElementType.MULTI_INSTANCE_BODY;
-import static io.zeebe.monitor.model.IntentType.*;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import io.camunda.zeebe.model.bpmn.Bpmn;
@@ -13,6 +11,7 @@ import io.camunda.zeebe.model.bpmn.instance.ServiceTask;
 import io.camunda.zeebe.model.bpmn.instance.TimerEventDefinition;
 import io.camunda.zeebe.model.bpmn.instance.zeebe.ZeebeTaskDefinition;
 import io.camunda.zeebe.protocol.record.intent.MessageSubscriptionIntent;
+import io.camunda.zeebe.protocol.record.value.BpmnElementType;
 import io.zeebe.monitor.entity.ElementInstanceStatistics;
 import io.zeebe.monitor.entity.MessageSubscriptionEntity;
 import io.zeebe.monitor.entity.ProcessEntity;
@@ -47,11 +46,11 @@ import org.springframework.web.server.ResponseStatusException;
 @Controller
 public class ProcessesViewController extends AbstractViewController {
 
-  static final List<String> PROCESS_INSTANCE_ENTERED_INTENTS = List.of(ELEMENT_ACTIVATED.name());
+  static final List<String> PROCESS_INSTANCE_ENTERED_INTENTS = List.of("ELEMENT_ACTIVATED");
   static final List<String> PROCESS_INSTANCE_COMPLETED_INTENTS =
-      List.of(ELEMENT_COMPLETED.name(), ELEMENT_TERMINATED.name());
+      List.of("ELEMENT_COMPLETED", "ELEMENT_TERMINATED");
   static final List<String> EXCLUDE_ELEMENT_TYPES =
-      List.of(MULTI_INSTANCE_BODY.name());
+      List.of(BpmnElementType.MULTI_INSTANCE_BODY.name());
 
   @Autowired private ProcessRepository processRepository;
   @Autowired private ProcessInstanceRepository processInstanceRepository;
