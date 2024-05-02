@@ -3,11 +3,10 @@ package io.zeebe.monitor.zeebe.importers;
 import io.camunda.zeebe.protocol.record.intent.ProcessInstanceIntent;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.ElementInstanceEntity;
-import io.zeebe.monitor.model.BpmnElementType;
+import io.zeebe.monitor.model.BPMNElementTypes;
 import io.zeebe.monitor.repository.ElementInstanceRepository;
 import io.zeebe.monitor.repository.ZeebeRepositoryTest;
 import io.zeebe.monitor.zeebe.ZeebeNotificationService;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -20,7 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
     classes = {ProcessAndElementImporter.class,
         ZeebeNotificationService.class}
 )
-@Disabled("Broken with custom Postgres data types")
 public class ProcessAndElementImporterTest extends ZeebeRepositoryTest {
 
   @Autowired
@@ -55,7 +53,7 @@ public class ProcessAndElementImporterTest extends ZeebeRepositoryTest {
             .setPosition(333L)
             .setPartitionId(55555)
             .setIntent(ProcessInstanceIntent.ELEMENT_ACTIVATED.name()))
-            .setBpmnElementType(BpmnElementType.PROCESS.name())
+            .setBpmnElementType(BPMNElementTypes.PROCESS.name())
         .build();
   }
 

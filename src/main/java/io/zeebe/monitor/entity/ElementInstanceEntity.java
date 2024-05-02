@@ -15,11 +15,9 @@
  */
 package io.zeebe.monitor.entity;
 
-import io.zeebe.monitor.model.BpmnElementType;
-import io.zeebe.monitor.model.IntentType;
+import io.zeebe.monitor.model.BPMNElementTypes;
+import io.zeebe.monitor.model.IntentTypes;
 import jakarta.persistence.*;
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 @Entity(name = "ELEMENT_INSTANCE")
 @Table(indexes = {
@@ -42,12 +40,12 @@ public class ElementInstanceEntity {
     @Column(name = "KEY_")
     private long key;
 
+
     // For some reason, they didn't map this to the ProcessInstanceIntent class
     // (probably because it's for ProcessInstances)
-    @Column(name = "INTENT_", columnDefinition = "ei_intent")
+    @Column(name = "INTENT_")
     @Enumerated(EnumType.STRING)
-    @JdbcType(PostgreSQLEnumJdbcType.class)
-    private IntentType intent;
+    private IntentTypes intent;
 
     @Column(name = "PROCESS_INSTANCE_KEY_")
     private long processInstanceKey;
@@ -55,10 +53,9 @@ public class ElementInstanceEntity {
     @Column(name = "ELEMENT_ID_")
     private String elementId;
 
-    @Column(name = "BPMN_ELEMENT_TYPE_", columnDefinition = "ei_bpmn_element_type")
+    @Column(name = "BPMN_ELEMENT_TYPE_")
     @Enumerated(EnumType.STRING)
-    @JdbcType(PostgreSQLEnumJdbcType.class)
-    private BpmnElementType bpmnElementType;
+    private BPMNElementTypes bpmnElementType;
 
     @Column(name = "FLOW_SCOPE_KEY_")
     private long flowScopeKey;
@@ -100,10 +97,10 @@ public class ElementInstanceEntity {
     }
 
     public void setIntent(final String intent) {
-        this.intent = IntentType.valueOf(intent);
+        this.intent = IntentTypes.valueOf(intent);
     }
 
-    public void setIntent(final IntentType intent) {
+    public void setIntent(final IntentTypes intent) {
         this.intent = intent;
     }
 
@@ -168,11 +165,11 @@ public class ElementInstanceEntity {
         return bpmnElementType.name();
     }
 
-    public void setBpmnElementType(final BpmnElementType bpmnElementType) {
+    public void setBpmnElementType(final BPMNElementTypes bpmnElementType) {
         this.bpmnElementType = bpmnElementType;
     }
 
     public void setBpmnElementType(final String bpmnElementType) {
-        this.bpmnElementType = BpmnElementType.valueOf(bpmnElementType);
+        this.bpmnElementType = BPMNElementTypes.valueOf(bpmnElementType);
     }
 }

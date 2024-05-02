@@ -5,6 +5,3 @@ logging:
 spring:
   flyway:
     enabled: false
-  jpa:
-    hibernate:
-      ddl-auto: update
