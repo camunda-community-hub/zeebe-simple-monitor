@@ -29,6 +29,8 @@
         <!-- pin Hazelcast version because of spring-boot-dependencies -->
         <version.hazelcast>5.3.6</version.hazelcast>
 
+        <version.hibernate.validator>8.0.1.Final</version.hibernate.validator>
+
         <!-- release parent settings -->
         <version.java>17</version.java>
         <java.version>${version.java}</java.version>
@@ -196,6 +198,12 @@
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${version.hibernate.validator}</version>
         </dependency>
 
         <!-- js libs -->
