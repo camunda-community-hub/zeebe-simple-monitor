@@ -194,7 +194,7 @@
         <dependency>
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-apt</artifactId>
-            <version>5.0.0</version>
+            <version>5.1.0</version>
             <classifier>jakarta</classifier>
             <scope>provided</scope>
         </dependency>
@@ -202,7 +202,7 @@
         <dependency>
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-jpa</artifactId>
-            <version>5.0.0</version>
+            <version>5.1.0</version>
             <classifier>jakarta</classifier>
         </dependency>
 
@@ -229,6 +229,12 @@
             <!-- to be bundled into the docker file, for convenience, see issue #254 -->
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>6.5.0.Final</version>
         </dependency>
 
         <dependency>
@@ -531,6 +537,11 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
+        </repository>
+        <repository>
+            <id>maven_central</id>
+            <name>Maven Central</name>
+            <url>https://repo.maven.apache.org/maven2/</url>
         </repository>
     </repositories>
 
