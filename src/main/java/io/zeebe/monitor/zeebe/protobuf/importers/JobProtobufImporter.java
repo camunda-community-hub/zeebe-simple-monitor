@@ -1,6 +1,8 @@
 package io.zeebe.monitor.zeebe.protobuf.importers;
 
 import io.camunda.zeebe.protocol.record.intent.JobIntent;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.JobEntity;
 import io.zeebe.monitor.repository.JobRepository;
@@ -10,7 +12,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class JobProtobufImporter {
 
-  @Autowired private JobRepository jobRepository;
+  private final JobRepository jobRepository;
+  private final Counter counter;
+
+  @Autowired
+  public JobProtobufImporter(JobRepository jobRepository, MeterRegistry meterRegistry) {
+    this.jobRepository = jobRepository;
+
+    this.counter = Counter.builder("zeebemonitor_importer_job").description("number of processed jobs").register(meterRegistry);
+  }
 
   public void importJob(final Schema.JobRecord record) {
 
@@ -36,5 +46,7 @@ public class JobProtobufImporter {
     entity.setWorker(record.getWorker());
     entity.setRetries(record.getRetries());
     jobRepository.save(entity);
+
+    counter.increment();
   }
 }

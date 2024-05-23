@@ -3,8 +3,6 @@ package io.zeebe.monitor.zeebe.hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.hazelcast.connect.java.ZeebeHazelcast;
-import io.zeebe.monitor.entity.HazelcastConfig;
-import io.zeebe.monitor.repository.HazelcastConfigRepository;
 import io.zeebe.monitor.zeebe.protobuf.importers.ErrorProtobufImporter;
 import io.zeebe.monitor.zeebe.protobuf.importers.IncidentProtobufImporter;
 import io.zeebe.monitor.zeebe.protobuf.importers.JobProtobufImporter;
@@ -30,21 +28,9 @@ public class HazelcastImportService {
   @Autowired private TimerProtobufImporter timerImporter;
   @Autowired private ErrorProtobufImporter errorImporter;
 
-  @Autowired private HazelcastConfigRepository hazelcastConfigRepository;
+  @Autowired private HazelcastStateService hazelcastStateService;
 
   public ZeebeHazelcast importFrom(final HazelcastInstance hazelcast) {
-
-    final var hazelcastConfig =
-        hazelcastConfigRepository
-            .findById("cfg")
-            .orElseGet(
-                () -> {
-                  final var config = new HazelcastConfig();
-                  config.setId("cfg");
-                  config.setSequence(-1);
-                  return config;
-                });
-
     final var builder =
         ZeebeHazelcast.newBuilder(hazelcast)
             .addProcessListener(
@@ -79,13 +65,11 @@ public class HazelcastImportService {
                             messageSubscriptionImporter::importMessageStartEventSubscription))
             .addErrorListener(errorImporter::importError)
             .postProcessListener(
-                sequence -> {
-                  hazelcastConfig.setSequence(sequence);
-                  hazelcastConfigRepository.save(hazelcastConfig);
-                });
+                    hazelcastStateService::saveSequenceNumber);
 
-    if (hazelcastConfig.getSequence() >= 0) {
-      builder.readFrom(hazelcastConfig.getSequence());
+    final var lastSequence = hazelcastStateService.getLastSequenceNumber();
+    if (lastSequence >= 0) {
+      builder.readFrom(lastSequence);
     } else {
       builder.readFromHead();
     }
