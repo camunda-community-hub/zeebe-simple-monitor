@@ -3,11 +3,16 @@ package io.zeebe.monitor.zeebe.importers;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.VariableEntity;
 import io.zeebe.monitor.repository.VariableRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 @Component
 public class VariableImporter {
+
+  private static final Logger LOG = LoggerFactory.getLogger(ProcessAndElementImporter.class);
 
   @Autowired
   private VariableRepository variableRepository;
@@ -23,7 +28,11 @@ public class VariableImporter {
       newVariable.setValue(record.getValue());
       newVariable.setScopeKey(record.getScopeKey());
       newVariable.setState(record.getMetadata().getIntent().toLowerCase());
-      variableRepository.save(newVariable);
+      try {
+        variableRepository.save(newVariable);
+      } catch (DataIntegrityViolationException e){
+        LOG.warn("Attempted to save duplicate Element Instance with id {}", newVariable.getGeneratedIdentifier());
+      }
     }
   }
 
