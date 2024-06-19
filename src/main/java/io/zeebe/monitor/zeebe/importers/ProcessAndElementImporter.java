@@ -10,11 +10,17 @@ import io.zeebe.monitor.entity.ProcessInstanceEntity;
 import io.zeebe.monitor.repository.ElementInstanceRepository;
 import io.zeebe.monitor.repository.ProcessInstanceRepository;
 import io.zeebe.monitor.repository.ProcessRepository;
+import io.zeebe.monitor.zeebe.ZeebeHazelcastService;
 import io.zeebe.monitor.zeebe.ZeebeNotificationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ProcessAndElementImporter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ProcessAndElementImporter.class);
 
     private final ProcessRepository processRepository;
     private final ProcessInstanceRepository processInstanceRepository;
@@ -114,7 +120,11 @@ public class ProcessAndElementImporter {
             entity.setFlowScopeKey(record.getFlowScopeKey());
             entity.setProcessDefinitionKey(record.getProcessDefinitionKey());
             entity.setBpmnElementType(record.getBpmnElementType());
-            elementInstanceRepository.save(entity);
+            try {
+                elementInstanceRepository.save(entity);
+            } catch (DataIntegrityViolationException e){
+                LOG.warn("Attempted to save duplicate Element Instance with id {}", entity.getGeneratedIdentifier());
+            }
             notificationService.sendUpdatedProcessInstance(record.getProcessInstanceKey(), record.getProcessDefinitionKey());
         }
     }
