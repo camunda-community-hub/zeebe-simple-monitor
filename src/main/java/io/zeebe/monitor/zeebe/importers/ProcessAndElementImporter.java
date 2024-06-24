@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
+import static io.camunda.zeebe.protocol.record.intent.ProcessInstanceIntent.*;
+
 @Component
 public class ProcessAndElementImporter {
 
@@ -64,7 +66,7 @@ public class ProcessAndElementImporter {
 
     private void addOrUpdateProcessInstance(final Schema.ProcessInstanceRecord record) {
 
-        final Intent intent = ProcessInstanceIntent.valueOf(record.getMetadata().getIntent());
+        final Intent intent = valueOf(record.getMetadata().getIntent());
         final long timestamp = record.getMetadata().getTimestamp();
         final long processInstanceKey = record.getProcessInstanceKey();
 
@@ -84,29 +86,40 @@ public class ProcessAndElementImporter {
                                     return newEntity;
                                 });
 
-        if (intent == ProcessInstanceIntent.ELEMENT_ACTIVATED) {
-            entity.setState("Active");
-            entity.setStart(timestamp);
-            processInstanceRepository.save(entity);
+        switch (intent) {
+            case ELEMENT_ACTIVATED -> {
+                entity.setState("Active");
+                entity.setStart(timestamp);
+                saveProcessInstanceRecord(entity);
 
-            notificationService.sendCreatedProcessInstance(
-                    record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+                notificationService.sendCreatedProcessInstance(
+                        record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+            }
+            case ELEMENT_COMPLETED -> {
+                entity.setState("Completed");
+                entity.setEnd(timestamp);
+                saveProcessInstanceRecord(entity);
 
-        } else if (intent == ProcessInstanceIntent.ELEMENT_COMPLETED) {
-            entity.setState("Completed");
-            entity.setEnd(timestamp);
-            processInstanceRepository.save(entity);
+                notificationService.sendEndedProcessInstance(
+                        record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+            }
+            case ELEMENT_TERMINATED -> {
+                entity.setState("Terminated");
+                entity.setEnd(timestamp);
+                saveProcessInstanceRecord(entity);
 
-            notificationService.sendEndedProcessInstance(
-                    record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+                notificationService.sendEndedProcessInstance(
+                        record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + intent);
+        }
+    }
 
-        } else if (intent == ProcessInstanceIntent.ELEMENT_TERMINATED) {
-            entity.setState("Terminated");
-            entity.setEnd(timestamp);
-            processInstanceRepository.save(entity);
-
-            notificationService.sendEndedProcessInstance(
-                    record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+    private void saveProcessInstanceRecord(ProcessInstanceEntity pei){
+        try {
+            processInstanceRepository.save(pei);
+        } catch (DataIntegrityViolationException e) {
+            LOG.warn("Attempted to save duplicate ProcessInstance with key {}", pei.getKey());
         }
     }
 
