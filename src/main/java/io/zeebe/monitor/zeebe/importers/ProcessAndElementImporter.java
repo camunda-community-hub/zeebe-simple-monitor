@@ -111,7 +111,7 @@ public class ProcessAndElementImporter {
                 notificationService.sendEndedProcessInstance(
                         record.getProcessInstanceKey(), record.getProcessDefinitionKey());
             }
-            default -> throw new IllegalStateException("Unexpected value: " + intent);
+            default -> {}
         }
     }
 
