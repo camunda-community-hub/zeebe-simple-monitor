@@ -1,6 +1,5 @@
 package io.zeebe.monitor.zeebe.importers;
 
-import io.camunda.zeebe.protocol.Protocol;
 import io.camunda.zeebe.protocol.record.intent.Intent;
 import io.camunda.zeebe.protocol.record.intent.ProcessInstanceIntent;
 import io.zeebe.exporter.proto.Schema;
@@ -10,12 +9,13 @@ import io.zeebe.monitor.entity.ProcessInstanceEntity;
 import io.zeebe.monitor.repository.ElementInstanceRepository;
 import io.zeebe.monitor.repository.ProcessInstanceRepository;
 import io.zeebe.monitor.repository.ProcessRepository;
-import io.zeebe.monitor.zeebe.ZeebeHazelcastService;
 import io.zeebe.monitor.zeebe.ZeebeNotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
+
+import static io.camunda.zeebe.protocol.record.intent.ProcessInstanceIntent.*;
 
 @Component
 public class ProcessAndElementImporter {
@@ -27,6 +27,7 @@ public class ProcessAndElementImporter {
     private final ElementInstanceRepository elementInstanceRepository;
 
     private final ZeebeNotificationService notificationService;
+    private ProcessEntity newEntity;
 
     public ProcessAndElementImporter(ProcessRepository processRepository, ProcessInstanceRepository processInstanceRepository, ElementInstanceRepository elementInstanceRepository, ZeebeNotificationService notificationService) {
         this.processRepository = processRepository;
@@ -38,18 +39,22 @@ public class ProcessAndElementImporter {
     public void importProcess(final Schema.ProcessRecord record) {
         final int partitionId = record.getMetadata().getPartitionId();
 
-        if (partitionId != Protocol.DEPLOYMENT_PARTITION) {
-            // ignore process event on other partitions to avoid duplicates
-            return;
+        final ProcessEntity entity =
+                processRepository.findById(record.getProcessDefinitionKey()).orElseGet(
+                        () -> {
+                            final ProcessEntity newEntity = new ProcessEntity();
+                            newEntity.setKey(record.getProcessDefinitionKey());
+                            newEntity.setBpmnProcessId(record.getBpmnProcessId());
+                            newEntity.setVersion(record.getVersion());
+                            newEntity.setResource(record.getResource().toStringUtf8());
+                            newEntity.setTimestamp(record.getMetadata().getTimestamp());
+                            return newEntity;
+                        });
+        try {
+            processRepository.save(entity);
+        } catch (DataIntegrityViolationException e) {
+            LOG.warn("Attempted to save duplicate Process with key {}", entity.getKey());
         }
-
-        final ProcessEntity entity = new ProcessEntity();
-        entity.setKey(record.getProcessDefinitionKey());
-        entity.setBpmnProcessId(record.getBpmnProcessId());
-        entity.setVersion(record.getVersion());
-        entity.setResource(record.getResource().toStringUtf8());
-        entity.setTimestamp(record.getMetadata().getTimestamp());
-        processRepository.save(entity);
     }
 
     public void importProcessInstance(final Schema.ProcessInstanceRecord record) {
@@ -61,7 +66,7 @@ public class ProcessAndElementImporter {
 
     private void addOrUpdateProcessInstance(final Schema.ProcessInstanceRecord record) {
 
-        final Intent intent = ProcessInstanceIntent.valueOf(record.getMetadata().getIntent());
+        final Intent intent = valueOf(record.getMetadata().getIntent());
         final long timestamp = record.getMetadata().getTimestamp();
         final long processInstanceKey = record.getProcessInstanceKey();
 
@@ -81,29 +86,40 @@ public class ProcessAndElementImporter {
                                     return newEntity;
                                 });
 
-        if (intent == ProcessInstanceIntent.ELEMENT_ACTIVATED) {
-            entity.setState("Active");
-            entity.setStart(timestamp);
-            processInstanceRepository.save(entity);
+        switch (intent) {
+            case ELEMENT_ACTIVATED -> {
+                entity.setState("Active");
+                entity.setStart(timestamp);
+                saveProcessInstanceRecord(entity);
 
-            notificationService.sendCreatedProcessInstance(
-                    record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+                notificationService.sendCreatedProcessInstance(
+                        record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+            }
+            case ELEMENT_COMPLETED -> {
+                entity.setState("Completed");
+                entity.setEnd(timestamp);
+                saveProcessInstanceRecord(entity);
 
-        } else if (intent == ProcessInstanceIntent.ELEMENT_COMPLETED) {
-            entity.setState("Completed");
-            entity.setEnd(timestamp);
-            processInstanceRepository.save(entity);
+                notificationService.sendEndedProcessInstance(
+                        record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+            }
+            case ELEMENT_TERMINATED -> {
+                entity.setState("Terminated");
+                entity.setEnd(timestamp);
+                saveProcessInstanceRecord(entity);
 
-            notificationService.sendEndedProcessInstance(
-                    record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+                notificationService.sendEndedProcessInstance(
+                        record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + intent);
+        }
+    }
 
-        } else if (intent == ProcessInstanceIntent.ELEMENT_TERMINATED) {
-            entity.setState("Terminated");
-            entity.setEnd(timestamp);
-            processInstanceRepository.save(entity);
-
-            notificationService.sendEndedProcessInstance(
-                    record.getProcessInstanceKey(), record.getProcessDefinitionKey());
+    private void saveProcessInstanceRecord(ProcessInstanceEntity pei){
+        try {
+            processInstanceRepository.save(pei);
+        } catch (DataIntegrityViolationException e) {
+            LOG.warn("Attempted to save duplicate ProcessInstance with key {}", pei.getKey());
         }
     }
 
@@ -122,7 +138,7 @@ public class ProcessAndElementImporter {
             entity.setBpmnElementType(record.getBpmnElementType());
             try {
                 elementInstanceRepository.save(entity);
-            } catch (DataIntegrityViolationException e){
+            } catch (DataIntegrityViolationException e) {
                 LOG.warn("Attempted to save duplicate Element Instance with id {}", entity.getGeneratedIdentifier());
             }
             notificationService.sendUpdatedProcessInstance(record.getProcessInstanceKey(), record.getProcessDefinitionKey());

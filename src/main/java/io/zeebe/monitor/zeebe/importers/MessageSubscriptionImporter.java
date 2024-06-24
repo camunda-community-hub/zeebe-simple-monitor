@@ -5,13 +5,16 @@ import io.camunda.zeebe.protocol.record.intent.MessageSubscriptionIntent;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.MessageSubscriptionEntity;
 import io.zeebe.monitor.repository.MessageSubscriptionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
-
-import java.util.UUID;
 
 @Component
 public class MessageSubscriptionImporter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MessageImporter.class);
 
     @Autowired
     private MessageSubscriptionRepository messageSubscriptionRepository;
@@ -39,7 +42,11 @@ public class MessageSubscriptionImporter {
 
         entity.setState(intent.name().toLowerCase());
         entity.setTimestamp(timestamp);
-        messageSubscriptionRepository.save(entity);
+        try {
+            messageSubscriptionRepository.save(entity);
+        } catch (DataIntegrityViolationException e) {
+            LOG.warn("Attempted to save duplicate MessageSubscription with id {}", entity.getId());
+        }
     }
 
     public void importMessageStartEventSubscription(

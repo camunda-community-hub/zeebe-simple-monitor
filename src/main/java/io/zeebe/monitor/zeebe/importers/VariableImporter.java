@@ -12,28 +12,28 @@ import org.springframework.stereotype.Component;
 @Component
 public class VariableImporter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ProcessAndElementImporter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProcessAndElementImporter.class);
 
-  @Autowired
-  private VariableRepository variableRepository;
+    @Autowired
+    private VariableRepository variableRepository;
 
-  public void importVariable(final Schema.VariableRecord record) {
-    final VariableEntity newVariable = new VariableEntity();
-    newVariable.setPosition(record.getMetadata().getPosition());
-    newVariable.setPartitionId(record.getMetadata().getPartitionId());
-    if (!variableRepository.existsById(newVariable.getGeneratedIdentifier())) {
-      newVariable.setTimestamp(record.getMetadata().getTimestamp());
-      newVariable.setProcessInstanceKey(record.getProcessInstanceKey());
-      newVariable.setName(record.getName());
-      newVariable.setValue(record.getValue());
-      newVariable.setScopeKey(record.getScopeKey());
-      newVariable.setState(record.getMetadata().getIntent().toLowerCase());
-      try {
-        variableRepository.save(newVariable);
-      } catch (DataIntegrityViolationException e){
-        LOG.warn("Attempted to save duplicate Element Instance with id {}", newVariable.getGeneratedIdentifier());
-      }
+    public void importVariable(final Schema.VariableRecord record) {
+        final VariableEntity newVariable = new VariableEntity();
+        newVariable.setPosition(record.getMetadata().getPosition());
+        newVariable.setPartitionId(record.getMetadata().getPartitionId());
+        if (!variableRepository.existsById(newVariable.getGeneratedIdentifier())) {
+            newVariable.setTimestamp(record.getMetadata().getTimestamp());
+            newVariable.setProcessInstanceKey(record.getProcessInstanceKey());
+            newVariable.setName(record.getName());
+            newVariable.setValue(record.getValue());
+            newVariable.setScopeKey(record.getScopeKey());
+            newVariable.setState(record.getMetadata().getIntent().toLowerCase());
+            try {
+                variableRepository.save(newVariable);
+            } catch (DataIntegrityViolationException e) {
+                LOG.warn("Attempted to save duplicate Element Instance with id {}", newVariable.getGeneratedIdentifier());
+            }
+        }
     }
-  }
 
 }
