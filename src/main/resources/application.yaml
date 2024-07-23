@@ -84,6 +84,7 @@ spring:
       on-profile: kafka
 kafkaBootstrapServers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 kafkaSchemaRegistryUrl: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
+numOfImportThreads: ${NUMBER_OF_IMPORT_THREADS:5}
 kafka:
   streams:
     maxMessageSizeBytes: ${KAFKA_MAX_MESSAGE_SIZE_BYTES:5242880}

@@ -1,6 +1,7 @@
 package io.zeebe.monitor.zeebe;
 
 import io.zeebe.exporter.proto.Schema;
+import io.zeebe.monitor.rest.dto.GenericKafkaRecord;
 import io.zeebe.monitor.zeebe.importers.ErrorImporter;
 import io.zeebe.monitor.zeebe.importers.IncidentImporter;
 import io.zeebe.monitor.zeebe.importers.JobImporter;
@@ -12,14 +13,27 @@ import io.zeebe.monitor.zeebe.importers.VariableImporter;
 import io.zeebe.monitor.zeebe.util.BuildRecordUtil;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.ExecutorService;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import static io.zeebe.monitor.zeebe.util.ImportUtil.ifEvent;
+
+import org.apache.kafka.streams.kstream.KStream;
 
 @Profile("kafka")
 @Component
 public class KafkaStreamsService {
+    @Value("${numOfImportThreads:5}")
+    public int numOfThreads;
+
     @Autowired
     private ProcessAndElementImporter processAndElementImporter;
 
@@ -47,58 +61,78 @@ public class KafkaStreamsService {
     @Autowired
     private ZeebeKafkaStreams zeebeKafkaStreams;
 
+    private ExecutorService executorService;
+
     @PostConstruct
     public void start() {
+        executorService = Executors.newFixedThreadPool(numOfThreads);
 
-        zeebeKafkaStreams
-            .kafkaProcessStream()
-            .mapValues((key, event) -> BuildRecordUtil.buildProcessRecord(event))
-            .filter((key, record) -> ifEvent(record, Schema.ProcessRecord::getMetadata))
-            .foreach((key, record) -> processAndElementImporter.importProcess(record));
+        processStream(zeebeKafkaStreams.kafkaProcessInstanceStream(),
+                processAndElementImporter::importProcessInstance,
+                BuildRecordUtil::buildProcessInstanceRecord,
+                record -> record.getMetadata());
 
-        zeebeKafkaStreams.kafkaProcessInstanceStream()
-            .mapValues((key, event) -> BuildRecordUtil.buildProcessInstanceRecord(event))
-            .filter((key, record) -> ifEvent(record, Schema.ProcessInstanceRecord::getMetadata))
-            .foreach((key, record) -> processAndElementImporter.importProcessInstance(record));
+        processStream(zeebeKafkaStreams.kafkaZeebeTimerStream(),
+                timerImporter::importTimer,
+                BuildRecordUtil::buildTimerRecord,
+                record -> record.getMetadata());
 
-        zeebeKafkaStreams.kafkaZeebeTimerStream()
-            .mapValues((key, event) -> BuildRecordUtil.buildTimerRecord(event))
-            .filter((key, record) -> ifEvent(record, Schema.TimerRecord::getMetadata))
-            .foreach((key, record) -> timerImporter.importTimer(record));
+        processStream(zeebeKafkaStreams.kafkaZeebeVariableStream(),
+                variableImporter::importVariable,
+                BuildRecordUtil::buildVariableRecord,
+                record -> record.getMetadata());
 
-        zeebeKafkaStreams.kafkaZeebeVariableStream()
-            .mapValues((key, event) -> BuildRecordUtil.buildVariableRecord(event))
-            .filter((key, record) -> ifEvent(record, Schema.VariableRecord::getMetadata))
-            .foreach((key, record) -> variableImporter.importVariable(record));
+        processStream(zeebeKafkaStreams.kafkaZeebeErrorStream(),
+                errorImporter::importError,
+                BuildRecordUtil::buildErrorRecord,
+                record -> record.getMetadata());
 
-        zeebeKafkaStreams.kafkaZeebeErrorStream()
-            .mapValues((key, event) -> BuildRecordUtil.buildErrorRecord(event))
-            .filter((key, record) -> ifEvent(record, Schema.ErrorRecord::getMetadata))
-            .foreach((key, record) -> errorImporter.importError(record));
+        processStream(zeebeKafkaStreams.kafkaZeebeMessageStream(),
+                messageImporter::importMessage,
+                BuildRecordUtil::buildMessageRecord,
+                record -> record.getMetadata());
 
-        zeebeKafkaStreams.kafkaZeebeMessageStream()
-            .mapValues((key, event) -> BuildRecordUtil.buildMessageRecord(event))
-            .filter((key, record) -> ifEvent(record, Schema.MessageRecord::getMetadata))
-            .foreach((key, record) -> messageImporter.importMessage(record));
+        processStream(zeebeKafkaStreams.kafkaZeebeIncidentStream(),
+                incidentImporter::importIncident,
+                BuildRecordUtil::buildIncidentRecord,
+                record -> record.getMetadata());
 
-        zeebeKafkaStreams.kafkaZeebeIncidentStream()
-            .mapValues((key, event) -> BuildRecordUtil.buildIncidentRecord(event))
-            .filter((key, record) -> ifEvent(record, Schema.IncidentRecord::getMetadata))
-            .foreach((key, record) -> incidentImporter.importIncident(record));
+        processStream(zeebeKafkaStreams.kafkaZeebeMessageSubscriptionStream(),
+                messageSubscriptionImporter::importMessageSubscription,
+                BuildRecordUtil::buildMessageSubscriptionRecord,
+                record -> record.getMetadata());
 
-        zeebeKafkaStreams.kafkaZeebeMessageSubscriptionStream()
-            .mapValues((key, event) -> BuildRecordUtil.buildMessageSubscriptionRecord(event))
-            .filter((key, record) -> ifEvent(record, Schema.MessageSubscriptionRecord::getMetadata))
-            .foreach((key, record) -> messageSubscriptionImporter.importMessageSubscription(record));
+        processStream(zeebeKafkaStreams.kafkaZeebeMessageSubscriptionStartEventStream(),
+                messageSubscriptionImporter::importMessageStartEventSubscription,
+                BuildRecordUtil::buildMessageStartEventSubscriptionRecord,
+                record -> record.getMetadata());
 
-        zeebeKafkaStreams.kafkaZeebeMessageSubscriptionStartEventStream()
-            .mapValues((key, event) -> BuildRecordUtil.buildMessageStartEventSubscriptionRecord(event))
-            .filter((key, record) -> ifEvent(record, Schema.MessageStartEventSubscriptionRecord::getMetadata))
-            .foreach((key, record) -> messageSubscriptionImporter.importMessageStartEventSubscription(record));
+        processStream(zeebeKafkaStreams.kafkaZeebeJobStream(),
+                jobImporter::importJob,
+                BuildRecordUtil::buildJobRecord,
+                record -> record.getMetadata());
+    }
 
-        zeebeKafkaStreams.kafkaZeebeJobStream()
-            .mapValues((key, event) -> BuildRecordUtil.buildJobRecord(event))
-            .filter((key, record) -> ifEvent(record, Schema.JobRecord::getMetadata))
-            .foreach((key, record) -> jobImporter.importJob(record));
+    private <T> void processStream(
+            KStream<String, GenericKafkaRecord> stream,
+            Consumer<T> importer,
+            Function<GenericKafkaRecord, T> recordBuilder,
+            Function<T, Schema.RecordMetadata> metadataExtractor
+    ) {
+        stream
+                .mapValues(recordBuilder::apply)
+                .filter((key, record) -> ifEvent(record, metadataExtractor))
+                .foreach((key, record) -> {
+                    Future<?> future = executorService.submit(() -> importer.accept(record));
+                    handleFuture(future);
+                });
+    }
+
+    private void handleFuture(Future<?> future) {
+        try {
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
