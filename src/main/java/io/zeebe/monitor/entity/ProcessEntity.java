@@ -19,6 +19,9 @@ import jakarta.persistence.*;
 import org.hibernate.Length;
 
 @Entity(name = "PROCESS")
+@Table(indexes = {
+        @Index(name = "process_bpmnProcessId", columnList = "BPMN_PROCESS_ID_"),
+})
 public class ProcessEntity {
   @Id
   @Column(name = "KEY_")
