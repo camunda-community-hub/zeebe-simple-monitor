@@ -67,6 +67,11 @@ public class KafkaStreamsService {
     public void start() {
         executorService = Executors.newFixedThreadPool(numOfThreads);
 
+        processStream(zeebeKafkaStreams.kafkaProcessStream(),
+                processAndElementImporter::importProcess,
+                BuildRecordUtil::buildProcessRecord,
+                record -> record.getMetadata());
+
         processStream(zeebeKafkaStreams.kafkaProcessInstanceStream(),
                 processAndElementImporter::importProcessInstance,
                 BuildRecordUtil::buildProcessInstanceRecord,
