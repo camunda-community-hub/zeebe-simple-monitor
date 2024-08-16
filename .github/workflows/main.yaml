@@ -38,3 +38,17 @@ jobs:
               ref: "refs/tags/${{ steps.set-tag.outputs.tag_name }}",
               sha: context.sha
             })
+
+      - name: Trigger Release
+        uses: actions/github-script@v6
+        env:
+          TAG: ${{ steps.set-tag.outputs.tag_name }}
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          script: |
+            github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: "${{ steps.set-tag.outputs.tag_name }}",
+              generate_release_notes: true
+            });
