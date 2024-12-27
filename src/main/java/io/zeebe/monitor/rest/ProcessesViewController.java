@@ -62,11 +62,15 @@ public class ProcessesViewController extends AbstractViewController {
   }
 
   @GetMapping("/views/processes")
-  public String processList(final Map<String, Object> model, final Pageable pageable, @RequestParam(value = "bpmnProcessId", required = false) Optional<String> bpmnProcessId) {
+  public String processList(
+      final Map<String, Object> model,
+      final Pageable pageable,
+      @RequestParam(value = "bpmnProcessId", required = false) Optional<String> bpmnProcessId) {
 
     if (bpmnProcessId.isPresent() && bpmnProcessId.get().length() >= 3) {
       final List<ProcessDto> processes = new ArrayList<>();
-      for (final ProcessEntity processEntity : processRepository.findByBpmnProcessIdStartsWith(bpmnProcessId.get())) {
+      for (final ProcessEntity processEntity :
+          processRepository.findByBpmnProcessIdStartsWith(bpmnProcessId.get())) {
         final ProcessDto dto = toDto(processEntity);
         processes.add(dto);
       }
@@ -100,7 +104,9 @@ public class ProcessesViewController extends AbstractViewController {
   @GetMapping("/views/processes/{key}")
   @Transactional
   public String processDetail(
-      @PathVariable("key") final long key, final Map<String, Object> model, final Pageable pageable) {
+      @PathVariable("key") final long key,
+      final Map<String, Object> model,
+      final Pageable pageable) {
 
     final ProcessEntity process =
         processRepository
@@ -237,22 +243,22 @@ public class ProcessesViewController extends AbstractViewController {
                     ElementInstanceStatistics::getElementId, ElementInstanceStatistics::getCount));
 
     return elementEnteredStatistics.stream()
-            .map(
-                s -> {
-                  final ElementInstanceState state = new ElementInstanceState();
+        .map(
+            s -> {
+              final ElementInstanceState state = new ElementInstanceState();
 
-                  final String elementId = s.getElementId();
-                  state.setElementId(elementId);
+              final String elementId = s.getElementId();
+              state.setElementId(elementId);
 
-                  final long completedInstances = elementCompletedCount.getOrDefault(elementId, 0L);
-                  final long enteredInstances = s.getCount();
+              final long completedInstances = elementCompletedCount.getOrDefault(elementId, 0L);
+              final long enteredInstances = s.getCount();
 
-                  state.setActiveInstances(enteredInstances - completedInstances);
-                  state.setEndedInstances(completedInstances);
+              state.setActiveInstances(enteredInstances - completedInstances);
+              state.setEndedInstances(completedInstances);
 
-                  return state;
-                })
-            .collect(Collectors.toList());
+              return state;
+            })
+        .collect(Collectors.toList());
   }
 
   static List<BpmnElementInfo> getBpmnElementInfos(final BpmnModelInstance bpmn) {
@@ -297,7 +303,8 @@ public class ProcessesViewController extends AbstractViewController {
                       eventDefinition -> {
                         if (eventDefinition instanceof ErrorEventDefinition errorEventDefinition) {
                           if (errorEventDefinition.getError() != null) {
-                            info.setInfo("errorCode: " + errorEventDefinition.getError().getErrorCode());
+                            info.setInfo(
+                                "errorCode: " + errorEventDefinition.getError().getErrorCode());
                           } else {
                             info.setInfo("errorCode: <null>");
                           }

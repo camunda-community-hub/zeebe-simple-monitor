@@ -5,18 +5,17 @@ import io.zeebe.monitor.entity.IncidentEntity;
 import io.zeebe.monitor.querydsl.IncidentEntityPredicatesBuilder;
 import io.zeebe.monitor.repository.IncidentRepository;
 import io.zeebe.monitor.rest.dto.IncidentListDto;
+import jakarta.transaction.Transactional;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import jakarta.transaction.Transactional;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @Controller
 public class IncidentsViewController extends AbstractViewController {
@@ -25,20 +24,22 @@ public class IncidentsViewController extends AbstractViewController {
 
   @GetMapping("/views/incidents")
   @Transactional
-  public String incidentList(final Map<String, Object> model,
-                             final Pageable pageable,
-                             @RequestParam(required = false,name = "bpmnProcessId") String bpmnProcessId,
-                             @RequestParam(required = false, name = "errorType") String errorType,
-                             @RequestParam(required = false, name = "createdAfter") String createdAfter,
-                             @RequestParam(required = false, name = "createdAfter") String createdBefore) {
+  public String incidentList(
+      final Map<String, Object> model,
+      final Pageable pageable,
+      @RequestParam(required = false, name = "bpmnProcessId") String bpmnProcessId,
+      @RequestParam(required = false, name = "errorType") String errorType,
+      @RequestParam(required = false, name = "createdAfter") String createdAfter,
+      @RequestParam(required = false, name = "createdAfter") String createdBefore) {
 
-    final Predicate predicate = new IncidentEntityPredicatesBuilder()
-        .onlyUnresolved()
-        .withProcessId(bpmnProcessId)
-        .withErrorType(errorType)
-        .createdAfter(createdAfter)
-        .createdBefore(createdBefore)
-        .build();
+    final Predicate predicate =
+        new IncidentEntityPredicatesBuilder()
+            .onlyUnresolved()
+            .withProcessId(bpmnProcessId)
+            .withErrorType(errorType)
+            .createdAfter(createdAfter)
+            .createdBefore(createdBefore)
+            .build();
 
     final Page<IncidentEntity> dtos = incidentRepository.findAll(predicate, pageable);
     final List<IncidentListDto> incidents = new ArrayList<>();

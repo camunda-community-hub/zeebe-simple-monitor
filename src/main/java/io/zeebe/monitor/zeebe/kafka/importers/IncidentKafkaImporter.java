@@ -33,7 +33,8 @@ public class IncidentKafkaImporter extends KafkaImporter {
                   newEntity.setProcessInstanceKey(value.getProcessInstanceKey());
                   newEntity.setElementInstanceKey(value.getElementInstanceKey());
                   newEntity.setJobKey(value.getJobKey());
-                  newEntity.setErrorType(value.getErrorType() == null ? null : value.getErrorType().name());
+                  newEntity.setErrorType(
+                      value.getErrorType() == null ? null : value.getErrorType().name());
                   newEntity.setErrorMessage(value.getErrorMessage());
                   return newEntity;
                 });

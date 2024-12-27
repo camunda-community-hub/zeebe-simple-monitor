@@ -1,9 +1,8 @@
 package io.zeebe.monitor.zeebe.status;
 
-import org.springframework.stereotype.Component;
-
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ZeebeStatusKeeper {

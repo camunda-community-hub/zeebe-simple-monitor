@@ -17,11 +17,20 @@ public class IncidentProtobufImporter {
   private final Counter resolvedCounter;
 
   @Autowired
-  public IncidentProtobufImporter(IncidentRepository incidentRepository, MeterRegistry meterRegistry) {
+  public IncidentProtobufImporter(
+      IncidentRepository incidentRepository, MeterRegistry meterRegistry) {
     this.incidentRepository = incidentRepository;
 
-    createdCounter = Counter.builder("zeebemonitor_importer_incident").tag("action", "created").description("number of processed incidents").register(meterRegistry);
-    resolvedCounter = Counter.builder("zeebemonitor_importer_incident").tag("action", "resolved").description("number of processed incidents").register(meterRegistry);
+    createdCounter =
+        Counter.builder("zeebemonitor_importer_incident")
+            .tag("action", "created")
+            .description("number of processed incidents")
+            .register(meterRegistry);
+    resolvedCounter =
+        Counter.builder("zeebemonitor_importer_incident")
+            .tag("action", "resolved")
+            .description("number of processed incidents")
+            .register(meterRegistry);
   }
 
   public void importIncident(final Schema.IncidentRecord record) {

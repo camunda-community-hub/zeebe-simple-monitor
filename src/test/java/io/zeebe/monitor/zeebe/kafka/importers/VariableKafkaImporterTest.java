@@ -19,8 +19,7 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration(classes = {VariableKafkaImporter.class})
 public class VariableKafkaImporterTest extends ZeebeRepositoryTest {
 
-  @Autowired
-  VariableKafkaImporter variableImporter;
+  @Autowired VariableKafkaImporter variableImporter;
 
   @Autowired VariableRepository variableRepository;
 

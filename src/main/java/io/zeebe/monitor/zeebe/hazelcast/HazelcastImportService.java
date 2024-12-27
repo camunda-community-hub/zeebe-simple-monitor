@@ -34,7 +34,11 @@ public class HazelcastImportService {
     final var builder =
         ZeebeHazelcast.newBuilder(hazelcast)
             .addProcessListener(
-                record -> ifEvent(record, Schema.ProcessRecord::getMetadata, processAndElementImporter::importProcess))
+                record ->
+                    ifEvent(
+                        record,
+                        Schema.ProcessRecord::getMetadata,
+                        processAndElementImporter::importProcess))
             .addProcessInstanceListener(
                 record ->
                     ifEvent(
@@ -42,30 +46,40 @@ public class HazelcastImportService {
                         Schema.ProcessInstanceRecord::getMetadata,
                         processAndElementImporter::importProcessInstance))
             .addIncidentListener(
-                record -> ifEvent(record, Schema.IncidentRecord::getMetadata, incidentImporter::importIncident))
+                record ->
+                    ifEvent(
+                        record,
+                        Schema.IncidentRecord::getMetadata,
+                        incidentImporter::importIncident))
             .addJobListener(
                 record -> ifEvent(record, Schema.JobRecord::getMetadata, jobImporter::importJob))
             .addVariableListener(
-                record -> ifEvent(record, Schema.VariableRecord::getMetadata, variableImporter::importVariable))
+                record ->
+                    ifEvent(
+                        record,
+                        Schema.VariableRecord::getMetadata,
+                        variableImporter::importVariable))
             .addTimerListener(
-                record -> ifEvent(record, Schema.TimerRecord::getMetadata, timerImporter::importTimer))
+                record ->
+                    ifEvent(record, Schema.TimerRecord::getMetadata, timerImporter::importTimer))
             .addMessageListener(
-                record -> ifEvent(record, Schema.MessageRecord::getMetadata, messageImporter::importMessage))
+                record ->
+                    ifEvent(
+                        record, Schema.MessageRecord::getMetadata, messageImporter::importMessage))
             .addMessageSubscriptionListener(
                 record ->
                     ifEvent(
                         record,
                         Schema.MessageSubscriptionRecord::getMetadata,
-                            messageSubscriptionImporter::importMessageSubscription))
+                        messageSubscriptionImporter::importMessageSubscription))
             .addMessageStartEventSubscriptionListener(
                 record ->
                     ifEvent(
                         record,
                         Schema.MessageStartEventSubscriptionRecord::getMetadata,
-                            messageSubscriptionImporter::importMessageStartEventSubscription))
+                        messageSubscriptionImporter::importMessageStartEventSubscription))
             .addErrorListener(errorImporter::importError)
-            .postProcessListener(
-                    hazelcastStateService::saveSequenceNumber);
+            .postProcessListener(hazelcastStateService::saveSequenceNumber);
 
     final var lastSequence = hazelcastStateService.getLastSequenceNumber();
     if (lastSequence >= 0) {
@@ -90,5 +104,4 @@ public class HazelcastImportService {
   private boolean isEvent(final Schema.RecordMetadata metadata) {
     return metadata.getRecordType() == Schema.RecordMetadata.RecordType.EVENT;
   }
-
 }

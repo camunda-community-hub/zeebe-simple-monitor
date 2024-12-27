@@ -1,17 +1,15 @@
 package io.zeebe.monitor.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.zeebe.monitor.entity.ElementInstanceEntity;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class ElementInstanceRepositoryTest extends ZeebeRepositoryTest {
 
-  @Autowired
-  private ElementInstanceRepository elementInstanceRepository;
+  @Autowired private ElementInstanceRepository elementInstanceRepository;
 
   @Test
   public void JPA_will_automatically_update_the_ID_attribute() {
@@ -44,5 +42,4 @@ public class ElementInstanceRepositoryTest extends ZeebeRepositoryTest {
     elementInstance.setPosition(456L);
     return elementInstance;
   }
-
 }

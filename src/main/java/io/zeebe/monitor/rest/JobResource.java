@@ -36,12 +36,7 @@ public class JobResource {
   @RequestMapping(path = "/{key}/fail", method = RequestMethod.PUT)
   public void failJob(@PathVariable("key") final long key) {
 
-    zeebeClient
-        .newFailCommand(key)
-        .retries(0)
-        .errorMessage("Failed by user.")
-        .send()
-        .join();
+    zeebeClient.newFailCommand(key).retries(0).errorMessage("Failed by user.").send().join();
   }
 
   @RequestMapping(path = "/{key}/throw-error", method = RequestMethod.PUT)
@@ -50,5 +45,4 @@ public class JobResource {
 
     zeebeClient.newThrowErrorCommand(key).errorCode(dto.getErrorCode()).send().join();
   }
-
 }

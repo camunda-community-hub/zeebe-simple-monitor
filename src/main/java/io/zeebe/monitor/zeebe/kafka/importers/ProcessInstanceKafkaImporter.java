@@ -90,7 +90,8 @@ public class ProcessInstanceKafkaImporter extends KafkaImporter {
       entity.setElementId(value.getElementId());
       entity.setFlowScopeKey(value.getFlowScopeKey());
       entity.setProcessDefinitionKey(value.getProcessDefinitionKey());
-      entity.setBpmnElementType(value.getBpmnElementType() == null ? null : value.getBpmnElementType().name());
+      entity.setBpmnElementType(
+          value.getBpmnElementType() == null ? null : value.getBpmnElementType().name());
       elementInstanceRepository.save(entity);
       notificationService.sendUpdatedProcessInstance(
           value.getProcessInstanceKey(), value.getProcessDefinitionKey());

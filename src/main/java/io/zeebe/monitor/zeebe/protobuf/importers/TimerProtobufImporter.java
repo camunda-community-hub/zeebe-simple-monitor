@@ -19,7 +19,10 @@ public class TimerProtobufImporter {
   public TimerProtobufImporter(TimerRepository timerRepository, MeterRegistry meterRegistry) {
     this.timerRepository = timerRepository;
 
-    this.timerCounter = Counter.builder("zeebemonitor_importer_timer").description("number of processed timers").register(meterRegistry);
+    this.timerCounter =
+        Counter.builder("zeebemonitor_importer_timer")
+            .description("number of processed timers")
+            .register(meterRegistry);
   }
 
   public void importTimer(final Schema.TimerRecord record) {

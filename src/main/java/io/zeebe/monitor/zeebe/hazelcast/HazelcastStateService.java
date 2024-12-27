@@ -10,11 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The HazelcastStateService manages the current pointer of the Hazelcast import process.
- * <p>
- * That pointer is required to read the next-relevant message from the RingBuffer
- * <p>
- * Usually, that RingBuffer is read 1 by 1, but sometimes, the RingBuffer may overrun by the export process,
- * and in that case, the Import process will set the sequence to the current position of the RingBuffer.
+ *
+ * <p>That pointer is required to read the next-relevant message from the RingBuffer
+ *
+ * <p>Usually, that RingBuffer is read 1 by 1, but sometimes, the RingBuffer may overrun by the
+ * export process, and in that case, the Import process will set the sequence to the current
+ * position of the RingBuffer.
  */
 @Component
 public class HazelcastStateService {
@@ -23,12 +24,14 @@ public class HazelcastStateService {
   private final Counter sequenceCounter;
 
   @Autowired
-  public HazelcastStateService(HazelcastConfigRepository hazelcastConfigRepository, MeterRegistry meterRegistry) {
+  public HazelcastStateService(
+      HazelcastConfigRepository hazelcastConfigRepository, MeterRegistry meterRegistry) {
     this.hazelcastConfigRepository = hazelcastConfigRepository;
 
-    sequenceCounter = Counter.builder("zeebemonitor_importer_ringbuffer_sequences_read").
-            description("number of items read from Hazelcast's ringbuffer (sequence counter)").
-            register(meterRegistry);
+    sequenceCounter =
+        Counter.builder("zeebemonitor_importer_ringbuffer_sequences_read")
+            .description("number of items read from Hazelcast's ringbuffer (sequence counter)")
+            .register(meterRegistry);
   }
 
   public long getLastSequenceNumber() {
@@ -50,13 +53,13 @@ public class HazelcastStateService {
 
   private HazelcastConfig getHazelcastConfig() {
     return hazelcastConfigRepository
-            .findById("cfg")
-            .orElseGet(
-                    () -> {
-                      final var config = new HazelcastConfig();
-                      config.setId("cfg");
-                      config.setSequence(-1);
-                      return config;
-                    });
+        .findById("cfg")
+        .orElseGet(
+            () -> {
+              final var config = new HazelcastConfig();
+              config.setId("cfg");
+              config.setSequence(-1);
+              return config;
+            });
   }
 }

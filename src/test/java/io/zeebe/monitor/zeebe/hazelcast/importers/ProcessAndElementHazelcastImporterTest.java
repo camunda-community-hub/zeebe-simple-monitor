@@ -16,19 +16,14 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration(
-    classes = {ProcessAndElementProtobufImporter.class,
-        ZeebeNotificationService.class}
-)
+    classes = {ProcessAndElementProtobufImporter.class, ZeebeNotificationService.class})
 public class ProcessAndElementHazelcastImporterTest extends ZeebeRepositoryTest {
 
-  @Autowired
-  ProcessAndElementProtobufImporter processAndElementImporter;
+  @Autowired ProcessAndElementProtobufImporter processAndElementImporter;
 
-  @Autowired
-  ElementInstanceRepository elementInstanceRepository;
+  @Autowired ElementInstanceRepository elementInstanceRepository;
 
-  @MockBean
-  SimpMessagingTemplate simpMessagingTemplate;
+  @MockBean SimpMessagingTemplate simpMessagingTemplate;
 
   @Test
   public void only_storing_first_variable_event_prevents_duplicate_PartitionID_and_Position() {
@@ -49,11 +44,11 @@ public class ProcessAndElementHazelcastImporterTest extends ZeebeRepositoryTest 
   private Schema.ProcessInstanceRecord createElementInstanceWithId(String elementId) {
     return Schema.ProcessInstanceRecord.newBuilder()
         .setElementId(elementId)
-        .setMetadata(Schema.RecordMetadata.newBuilder()
-            .setPosition(333L)
-            .setPartitionId(55555)
-            .setIntent(ProcessInstanceIntent.ELEMENT_ACTIVATED.name()))
+        .setMetadata(
+            Schema.RecordMetadata.newBuilder()
+                .setPosition(333L)
+                .setPartitionId(55555)
+                .setIntent(ProcessInstanceIntent.ELEMENT_ACTIVATED.name()))
         .build();
   }
-
 }

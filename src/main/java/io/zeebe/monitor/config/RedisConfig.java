@@ -8,45 +8,45 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RedisConfig {
 
-    @Value("${zeebe.client.worker.redis.connection}")
-    private String redisConnection;
+  @Value("${zeebe.client.worker.redis.connection}")
+  private String redisConnection;
 
-    @Value("${zeebe.client.worker.redis.useClusterClient:false}")
-    private boolean useClusterClient;
+  @Value("${zeebe.client.worker.redis.useClusterClient:false}")
+  private boolean useClusterClient;
 
-    @Value("${zeebe.client.worker.redis.consumer-group:simple-monitor}")
-    private String redisConumerGroup;
+  @Value("${zeebe.client.worker.redis.consumer-group:simple-monitor}")
+  private String redisConumerGroup;
 
-    @Value("${zeebe.client.worker.redis.xread-count:500}")
-    private int redisXreadCount;
+  @Value("${zeebe.client.worker.redis.xread-count:500}")
+  private int redisXreadCount;
 
-    @Value("${zeebe.client.worker.redis.xread-block-millis:2000}")
-    private int redisXreadBlockMillis;
+  @Value("${zeebe.client.worker.redis.xread-block-millis:2000}")
+  private int redisXreadBlockMillis;
 
-    @Value("${zeebe.client.worker.redis.prefix:zeebe}")
-    private String redisPrefix;
+  @Value("${zeebe.client.worker.redis.prefix:zeebe}")
+  private String redisPrefix;
 
-    public String getRedisConnection() {
-        return redisConnection;
-    }
+  public String getRedisConnection() {
+    return redisConnection;
+  }
 
-    public boolean isUseClusterClient() {
-        return useClusterClient;
-    }
+  public boolean isUseClusterClient() {
+    return useClusterClient;
+  }
 
-    public String getRedisConumerGroup() {
-        return redisConumerGroup;
-    }
+  public String getRedisConumerGroup() {
+    return redisConumerGroup;
+  }
 
-    public int getRedisXreadCount() {
-        return redisXreadCount;
-    }
+  public int getRedisXreadCount() {
+    return redisXreadCount;
+  }
 
-    public int getRedisXreadBlockMillis() {
-        return redisXreadBlockMillis;
-    }
+  public int getRedisXreadBlockMillis() {
+    return redisXreadBlockMillis;
+  }
 
-    public String getRedisPrefix() {
-        return redisPrefix;
-    }
+  public String getRedisPrefix() {
+    return redisPrefix;
+  }
 }

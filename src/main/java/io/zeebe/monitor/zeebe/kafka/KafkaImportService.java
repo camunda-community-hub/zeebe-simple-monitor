@@ -35,7 +35,10 @@ public class KafkaImportService {
   @Autowired private JobKafkaImporter jobImporter;
   @Autowired private MessageKafkaImporter messageImporter;
   @Autowired private MessageSubscriptionKafkaImporter messageSubscriptionImporter;
-  @Autowired private MessageStartEventSubscriptionKafkaImporter messageStartEventSubscriptionImporter;
+
+  @Autowired
+  private MessageStartEventSubscriptionKafkaImporter messageStartEventSubscriptionImporter;
+
   @Autowired private ProcessKafkaImporter processImporter;
   @Autowired private ProcessInstanceKafkaImporter processInstanceImporter;
   @Autowired private TimerKafkaImporter timerImporter;
@@ -55,12 +58,10 @@ public class KafkaImportService {
           VARIABLE);
 
   /**
-   * Saves in separate transactions on each value type {@link #runAsync(KafkaImporter, ValueType, List)}
-   * to do it asynchronously.
-   * If some transactions rollbacks by an exception, previous executed will
-   * not.
-   * After the exception, invoker can save the entire batch again. It's ok, all operations is
-   * idempotent
+   * Saves in separate transactions on each value type {@link #runAsync(KafkaImporter, ValueType,
+   * List)} to do it asynchronously. If some transactions rollbacks by an exception, previous
+   * executed will not. After the exception, invoker can save the entire batch again. It's ok, all
+   * operations is idempotent
    *
    * @param records records to save
    */
@@ -76,13 +77,13 @@ public class KafkaImportService {
                     case INCIDENT -> runAsync(incidentImporter, valueType, recordList);
                     case JOB -> runAsync(jobImporter, valueType, recordList);
                     case MESSAGE -> runAsync(messageImporter, valueType, recordList);
-                    case MESSAGE_SUBSCRIPTION -> runAsync(
-                        messageSubscriptionImporter, valueType, recordList);
-                    case MESSAGE_START_EVENT_SUBSCRIPTION -> runAsync(
-                        messageStartEventSubscriptionImporter, valueType, recordList);
+                    case MESSAGE_SUBSCRIPTION ->
+                        runAsync(messageSubscriptionImporter, valueType, recordList);
+                    case MESSAGE_START_EVENT_SUBSCRIPTION ->
+                        runAsync(messageStartEventSubscriptionImporter, valueType, recordList);
                     case PROCESS -> runAsync(processImporter, valueType, recordList);
-                    case PROCESS_INSTANCE -> runAsync(
-                        processInstanceImporter, valueType, recordList);
+                    case PROCESS_INSTANCE ->
+                        runAsync(processInstanceImporter, valueType, recordList);
                     case TIMER -> runAsync(timerImporter, valueType, recordList);
                     case VARIABLE -> runAsync(variableImporter, valueType, recordList);
                     default -> CompletableFuture.completedFuture(Void.TYPE);
@@ -97,7 +98,7 @@ public class KafkaImportService {
   }
 
   private CompletableFuture<Void> runAsync(
-          KafkaImporter kafkaImporter, ValueType valueType, List<Record<RecordValue>> recordList) {
+      KafkaImporter kafkaImporter, ValueType valueType, List<Record<RecordValue>> recordList) {
     return CompletableFuture.runAsync(
         () -> {
           kafkaImporter.importRecords(recordList);

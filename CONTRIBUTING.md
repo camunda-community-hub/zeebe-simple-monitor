@@ -50,11 +50,17 @@ Build the JAR files with
 mvn clean install
 ```
 
-## Styleguides
+## Styleguide
 
 ### Source Code
 
 The Java code should be formatted using [Google's Java Format](https://github.com/google/google-java-format).
+
+For re-formatting, you can use plugins in your code editor, or just run
+
+```shell
+mvn com.spotify.fmt:fmt-maven-plugin:2.25:format
+```
 
 ### Git Commit Messages
 
@@ -86,8 +92,8 @@ Available commit types:
 
 There's a file [docker-compose.yml](docker/docker-compose.yml) prepared in this repo, which can be used with recent Docker version to
 provide a backend. You just need to choose some profiles and specify them in a file [.env](docker/.env) using pattern `COMPOSE_PROFILES=profile1,profile2`:
-* ```hazelcast``` runs Zeebe broker with Hazelcast exporter 
-* ```kafka``` runs Zeebe broker with Kafka exporter 
+* ```hazelcast``` runs Zeebe broker with Hazelcast exporter
+* ```kafka``` runs Zeebe broker with Kafka exporter
 * ```postgres``` runs PostgreSQL database
 * ```mysql``` runs MySQL database
 

@@ -8,12 +8,12 @@ import io.zeebe.monitor.repository.VariableRepository;
 import io.zeebe.monitor.rest.dto.ProcessInstanceDto;
 import io.zeebe.monitor.rest.dto.VariableEntry;
 import io.zeebe.monitor.rest.dto.VariableUpdateEntry;
+import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -38,7 +38,9 @@ public class InstancesVariableListController extends AbstractInstanceViewControl
   @GetMapping("/views/instances/{key}/variable-list")
   @Transactional
   public String instanceDetailVariableList(
-      @PathVariable("key") final long key, final Map<String, Object> model, final Pageable pageable) {
+      @PathVariable("key") final long key,
+      final Map<String, Object> model,
+      final Pageable pageable) {
 
     initializeProcessInstanceDto(key, model, pageable);
     model.put("content-variable-list-view", new EnableConditionalViewRenderer());
@@ -55,7 +57,9 @@ public class InstancesVariableListController extends AbstractInstanceViewControl
       Pageable pageable,
       ProcessInstanceDto dto) {
     final Map<VariableTuple, List<VariableEntity>> variablesByScopeAndName =
-        variableRepository.findByProcessInstanceKeyOrderByTimestampAscIdAsc(instance.getKey()).stream()
+        variableRepository
+            .findByProcessInstanceKeyOrderByTimestampAscIdAsc(instance.getKey())
+            .stream()
             .collect(Collectors.groupingBy(v -> new VariableTuple(v.getScopeKey(), v.getName())));
     variablesByScopeAndName.forEach(
         (scopeKeyName, variables) -> {

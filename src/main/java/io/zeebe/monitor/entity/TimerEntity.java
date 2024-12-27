@@ -18,11 +18,12 @@ package io.zeebe.monitor.entity;
 import jakarta.persistence.*;
 
 @Entity(name = "TIMER")
-@Table(indexes = {
-    // performance reason, because we use it in the
-    // {@link io.zeebe.monitor.repository.TimerRepository#findByProcessInstanceKey(long)}
-    @Index(name = "timer_processInstanceKeyIndex", columnList = "PROCESS_INSTANCE_KEY_"),
-})
+@Table(
+    indexes = {
+      // performance reason, because we use it in the
+      // {@link io.zeebe.monitor.repository.TimerRepository#findByProcessInstanceKey(long)}
+      @Index(name = "timer_processInstanceKeyIndex", columnList = "PROCESS_INSTANCE_KEY_"),
+    })
 public class TimerEntity {
 
   @Id

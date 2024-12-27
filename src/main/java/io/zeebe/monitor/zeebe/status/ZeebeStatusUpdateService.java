@@ -4,13 +4,12 @@ import io.camunda.zeebe.client.ZeebeClient;
 import io.camunda.zeebe.client.api.response.Topology;
 import io.zeebe.monitor.rest.ui.ClusterHealthyNotification;
 import io.zeebe.monitor.zeebe.ZeebeNotificationService;
+import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.time.Duration;
 
 @Component
 public class ZeebeStatusUpdateService {
@@ -28,7 +27,9 @@ public class ZeebeStatusUpdateService {
       status.setTopology(getTopologyFromCluster());
     } catch (Exception e) {
       // Stacking the exceptions, to make them better readable, like this:
-      // Can't get status from cluster, errors (stacked): io exception; io.grpc.StatusRuntimeException: UNAVAILABLE: io exception; UNAVAILABLE: io exception; Connection refused: /127.0.0.1:26500; Connection refused;
+      // Can't get status from cluster, errors (stacked): io exception;
+      // io.grpc.StatusRuntimeException: UNAVAILABLE: io exception; UNAVAILABLE: io exception;
+      // Connection refused: /127.0.0.1:26500; Connection refused;
       StringBuilder sb = new StringBuilder();
       for (Throwable t = e; t != null; t = t.getCause()) {
         sb.append(t.getMessage()).append("; ");
@@ -36,14 +37,11 @@ public class ZeebeStatusUpdateService {
       LOG.warn("Can't get status from cluster, errors (stacked): " + sb);
     }
     zeebeStatusKeeper.setStatus(status);
-    zeebeNotificationService.sendClusterStatusUpdate(new ClusterHealthyNotification(status.getHealthyString(), status.isHealthy()));
+    zeebeNotificationService.sendClusterStatusUpdate(
+        new ClusterHealthyNotification(status.getHealthyString(), status.isHealthy()));
   }
 
   private Topology getTopologyFromCluster() {
-    return zeebeClient.newTopologyRequest()
-        .requestTimeout(Duration.ofSeconds(2))
-        .send()
-        .join();
+    return zeebeClient.newTopologyRequest().requestTimeout(Duration.ofSeconds(2)).send().join();
   }
-
 }

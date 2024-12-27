@@ -19,10 +19,11 @@ import jakarta.persistence.*;
 import org.hibernate.Length;
 
 @Entity(name = "VARIABLE")
-@Table(indexes = {
-    // performance reason, because we use it in the VariableRepository.findByProcessInstanceKey()
-    @Index(name = "variable_processInstanceKeyIndex", columnList = "PROCESS_INSTANCE_KEY_"),
-})
+@Table(
+    indexes = {
+      // performance reason, because we use it in the VariableRepository.findByProcessInstanceKey()
+      @Index(name = "variable_processInstanceKeyIndex", columnList = "PROCESS_INSTANCE_KEY_"),
+    })
 public class VariableEntity {
 
   @Id
@@ -38,7 +39,7 @@ public class VariableEntity {
   @Column(name = "NAME_")
   private String name;
 
-  @Column(name = "VALUE_",length= Length.LONG32)
+  @Column(name = "VALUE_", length = Length.LONG32)
   @Lob
   private String value;
 
@@ -68,7 +69,7 @@ public class VariableEntity {
   }
 
   @PrePersist
-  private void prePersistDeriveIdField(){
+  private void prePersistDeriveIdField() {
     setId(getGeneratedIdentifier());
   }
 

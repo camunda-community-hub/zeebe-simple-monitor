@@ -11,16 +11,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
-@ContextConfiguration(
-    classes = {VariableProtobufImporter.class}
-)
+@ContextConfiguration(classes = {VariableProtobufImporter.class})
 public class VariableHazelcastImporterTest extends ZeebeRepositoryTest {
 
-  @Autowired
-  VariableProtobufImporter variableImporter;
+  @Autowired VariableProtobufImporter variableImporter;
 
-  @Autowired
-  VariableRepository variableRepository;
+  @Autowired VariableRepository variableRepository;
 
   @Test
   public void only_storing_first_variable_event_prevents_duplicate_PartitionID_and_Position() {
@@ -40,9 +36,7 @@ public class VariableHazelcastImporterTest extends ZeebeRepositoryTest {
 
   private Schema.VariableRecord createVariableRecordWithName(String name) {
     return Schema.VariableRecord.newBuilder()
-        .setMetadata(Schema.RecordMetadata.newBuilder()
-            .setPartitionId(123)
-            .setPosition(456L))
+        .setMetadata(Schema.RecordMetadata.newBuilder().setPartitionId(123).setPosition(456L))
         .setName(name)
         .build();
   }

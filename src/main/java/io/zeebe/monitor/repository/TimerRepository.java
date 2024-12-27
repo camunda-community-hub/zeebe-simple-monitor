@@ -22,7 +22,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface TimerRepository extends PagingAndSortingRepository<TimerEntity, Long>, CrudRepository<TimerEntity, Long> {
+public interface TimerRepository
+    extends PagingAndSortingRepository<TimerEntity, Long>, CrudRepository<TimerEntity, Long> {
 
   Page<TimerEntity> findByProcessInstanceKey(Long processInstanceKey, Pageable pageable);
 

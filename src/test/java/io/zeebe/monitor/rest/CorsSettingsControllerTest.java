@@ -18,26 +18,23 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = {
-        "server.allowedOriginsUrls: http://www.someurl.com",
-        "logging.level.io.zeebe.monitor: info",
+      "server.allowedOriginsUrls: http://www.someurl.com",
+      "logging.level.io.zeebe.monitor: info",
     })
 @AutoConfigureMockMvc
 @ActiveProfiles("junittest")
 public class CorsSettingsControllerTest {
 
-  @LocalServerPort
-  protected int port;
-  @Autowired
-  protected MockMvc mockMvc;
+  @LocalServerPort protected int port;
+  @Autowired protected MockMvc mockMvc;
 
-  @MockBean
-  protected HazelcastConfigRepository hazelcastConfigRepository;
-  @MockBean
-  protected ZeebeHazelcastService zeebeHazelcastService;
+  @MockBean protected HazelcastConfigRepository hazelcastConfigRepository;
+  @MockBean protected ZeebeHazelcastService zeebeHazelcastService;
 
   @Test
   public void access_control_origin_request_header_is_checked() throws Exception {
-    mockMvc.perform(
+    mockMvc
+        .perform(
             options("/")
                 .header("Access-Control-Request-Method", "GET")
                 .header("Host", "localhost")
@@ -47,7 +44,8 @@ public class CorsSettingsControllerTest {
 
   @Test
   public void access_control_allow_origin_response_header_is_send() throws Exception {
-    mockMvc.perform(
+    mockMvc
+        .perform(
             options("/")
                 .header("Access-Control-Request-Method", "GET")
                 .header("Host", "localhost")
@@ -55,5 +53,4 @@ public class CorsSettingsControllerTest {
         .andExpect(status().isOk())
         .andExpect(header().string("Access-Control-Allow-Origin", "http://www.someurl.com"));
   }
-
 }

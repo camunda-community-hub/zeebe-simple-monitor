@@ -23,7 +23,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface ProcessInstanceRepository
-    extends PagingAndSortingRepository<ProcessInstanceEntity, Long>, CrudRepository<ProcessInstanceEntity, Long> {
+    extends PagingAndSortingRepository<ProcessInstanceEntity, Long>,
+        CrudRepository<ProcessInstanceEntity, Long> {
 
   Page<ProcessInstanceEntity> findByProcessDefinitionKey(
       long processDefinitionKey, Pageable pageable);
