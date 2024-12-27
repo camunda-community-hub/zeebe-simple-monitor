@@ -16,11 +16,20 @@ public class VariableProtobufImporter {
   private final Counter variableUpdatedCounter;
 
   @Autowired
-  public VariableProtobufImporter(VariableRepository variableRepository, MeterRegistry meterRegistry) {
+  public VariableProtobufImporter(
+      VariableRepository variableRepository, MeterRegistry meterRegistry) {
     this.variableRepository = variableRepository;
 
-    this.variableCreatedCounter = Counter.builder("zeebemonitor_importer_variable").tag("action", "imported").description("number of processed variables").register(meterRegistry);
-    this.variableUpdatedCounter = Counter.builder("zeebemonitor_importer_variable").tag("action", "updated").description("number of processed variables").register(meterRegistry);
+    this.variableCreatedCounter =
+        Counter.builder("zeebemonitor_importer_variable")
+            .tag("action", "imported")
+            .description("number of processed variables")
+            .register(meterRegistry);
+    this.variableUpdatedCounter =
+        Counter.builder("zeebemonitor_importer_variable")
+            .tag("action", "updated")
+            .description("number of processed variables")
+            .register(meterRegistry);
   }
 
   public void importVariable(final Schema.VariableRecord record) {

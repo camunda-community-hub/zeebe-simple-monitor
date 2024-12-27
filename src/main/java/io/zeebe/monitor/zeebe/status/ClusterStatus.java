@@ -1,12 +1,11 @@
 package io.zeebe.monitor.zeebe.status;
 
+import static java.lang.String.valueOf;
+
 import io.camunda.zeebe.client.api.response.PartitionBrokerHealth;
 import io.camunda.zeebe.client.api.response.PartitionInfo;
 import io.camunda.zeebe.client.api.response.Topology;
-
 import java.util.Collection;
-
-import static java.lang.String.valueOf;
 
 public class ClusterStatus {
 
@@ -18,15 +17,18 @@ public class ClusterStatus {
     this.topology = topology;
     boolean unHealthy = true;
     if (topology != null) {
-      unHealthy = topology.getBrokers().stream()
-          .map(brokerInfo -> brokerInfo.getPartitions().stream()
-              .map(PartitionInfo::getHealth)
-              .toList())
-          .flatMap(Collection::stream)
-          .anyMatch(health -> health != PartitionBrokerHealth.HEALTHY);
+      unHealthy =
+          topology.getBrokers().stream()
+              .map(
+                  brokerInfo ->
+                      brokerInfo.getPartitions().stream().map(PartitionInfo::getHealth).toList())
+              .flatMap(Collection::stream)
+              .anyMatch(health -> health != PartitionBrokerHealth.HEALTHY);
     }
     healthy = topology != null && !unHealthy;
-    healthyString = valueOf(healthy ? PartitionBrokerHealth.HEALTHY : PartitionBrokerHealth.UNHEALTHY).toLowerCase();
+    healthyString =
+        valueOf(healthy ? PartitionBrokerHealth.HEALTHY : PartitionBrokerHealth.UNHEALTHY)
+            .toLowerCase();
   }
 
   public String getHealthyString() {
@@ -40,5 +42,4 @@ public class ClusterStatus {
   public Topology getTopology() {
     return topology;
   }
-
 }

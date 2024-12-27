@@ -30,17 +30,40 @@ public class ProcessAndElementProtobufImporter {
   private final Counter elementInstanceCounter;
 
   @Autowired
-  public ProcessAndElementProtobufImporter(ProcessRepository processRepository, ProcessInstanceRepository processInstanceRepository, ElementInstanceRepository elementInstanceRepository, MeterRegistry meterRegistry, ZeebeNotificationService notificationService) {
+  public ProcessAndElementProtobufImporter(
+      ProcessRepository processRepository,
+      ProcessInstanceRepository processInstanceRepository,
+      ElementInstanceRepository elementInstanceRepository,
+      MeterRegistry meterRegistry,
+      ZeebeNotificationService notificationService) {
     this.processRepository = processRepository;
     this.processInstanceRepository = processInstanceRepository;
     this.elementInstanceRepository = elementInstanceRepository;
     this.notificationService = notificationService;
 
-    this.processCounter = Counter.builder("zeebemonitor_importer_process").description("number of processed processes").register(meterRegistry);
-    this.instanceActivatedCounter = Counter.builder("zeebemonitor_importer_process_instance").tag("action", "activated").description("number of activated process instances").register(meterRegistry);
-    this.instanceCompletedCounter = Counter.builder("zeebemonitor_importer_process_instance").tag("action", "activated").description("number of activated process instances").register(meterRegistry);
-    this.instanceTerminatedCounter = Counter.builder("zeebemonitor_importer_process_instance").tag("action", "activated").description("number of activated process instances").register(meterRegistry);
-    this.elementInstanceCounter = Counter.builder("zeebemonitor_importer_element_instance").description("number of processed element_instances").register(meterRegistry);
+    this.processCounter =
+        Counter.builder("zeebemonitor_importer_process")
+            .description("number of processed processes")
+            .register(meterRegistry);
+    this.instanceActivatedCounter =
+        Counter.builder("zeebemonitor_importer_process_instance")
+            .tag("action", "activated")
+            .description("number of activated process instances")
+            .register(meterRegistry);
+    this.instanceCompletedCounter =
+        Counter.builder("zeebemonitor_importer_process_instance")
+            .tag("action", "activated")
+            .description("number of activated process instances")
+            .register(meterRegistry);
+    this.instanceTerminatedCounter =
+        Counter.builder("zeebemonitor_importer_process_instance")
+            .tag("action", "activated")
+            .description("number of activated process instances")
+            .register(meterRegistry);
+    this.elementInstanceCounter =
+        Counter.builder("zeebemonitor_importer_element_instance")
+            .description("number of processed element_instances")
+            .register(meterRegistry);
   }
 
   public void importProcess(final Schema.ProcessRecord record) {
@@ -75,17 +98,21 @@ public class ProcessAndElementProtobufImporter {
     final long timestamp = record.getMetadata().getTimestamp();
     final long processInstanceKey = record.getProcessInstanceKey();
 
-    final ProcessInstanceEntity entity = processInstanceRepository.findById(processInstanceKey).orElseGet(() -> {
-      final ProcessInstanceEntity newEntity = new ProcessInstanceEntity();
-      newEntity.setPartitionId(record.getMetadata().getPartitionId());
-      newEntity.setKey(processInstanceKey);
-      newEntity.setBpmnProcessId(record.getBpmnProcessId());
-      newEntity.setVersion(record.getVersion());
-      newEntity.setProcessDefinitionKey(record.getProcessDefinitionKey());
-      newEntity.setParentProcessInstanceKey(record.getParentProcessInstanceKey());
-      newEntity.setParentElementInstanceKey(record.getParentElementInstanceKey());
-      return newEntity;
-    });
+    final ProcessInstanceEntity entity =
+        processInstanceRepository
+            .findById(processInstanceKey)
+            .orElseGet(
+                () -> {
+                  final ProcessInstanceEntity newEntity = new ProcessInstanceEntity();
+                  newEntity.setPartitionId(record.getMetadata().getPartitionId());
+                  newEntity.setKey(processInstanceKey);
+                  newEntity.setBpmnProcessId(record.getBpmnProcessId());
+                  newEntity.setVersion(record.getVersion());
+                  newEntity.setProcessDefinitionKey(record.getProcessDefinitionKey());
+                  newEntity.setParentProcessInstanceKey(record.getParentProcessInstanceKey());
+                  newEntity.setParentElementInstanceKey(record.getParentElementInstanceKey());
+                  return newEntity;
+                });
 
     if (intent == ProcessInstanceIntent.ELEMENT_ACTIVATED) {
       entity.setState("Active");

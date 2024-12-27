@@ -18,7 +18,10 @@ public class ErrorProtobufImporter {
   public ErrorProtobufImporter(ErrorRepository errorRepository, MeterRegistry meterRegistry) {
     this.errorRepository = errorRepository;
 
-    this.counter = Counter.builder("zeebemonitor_importer_error").description("number of processed errors").register(meterRegistry);
+    this.counter =
+        Counter.builder("zeebemonitor_importer_error")
+            .description("number of processed errors")
+            .register(meterRegistry);
   }
 
   public void importError(final Schema.ErrorRecord record) {

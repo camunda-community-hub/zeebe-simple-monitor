@@ -20,8 +20,10 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface IncidentRepository extends PagingAndSortingRepository<IncidentEntity, Long>, QuerydslPredicateExecutor<IncidentEntity>, CrudRepository<IncidentEntity, Long> {
+public interface IncidentRepository
+    extends PagingAndSortingRepository<IncidentEntity, Long>,
+        QuerydslPredicateExecutor<IncidentEntity>,
+        CrudRepository<IncidentEntity, Long> {
 
   Iterable<IncidentEntity> findByProcessInstanceKey(long processInstanceKey);
-
 }

@@ -22,20 +22,24 @@ public class ZeebeNotificationService {
 
   public void sendUpdatedProcessInstance(
       final long processInstanceKey, final long processDefinitionKey) {
-    sendNotification(createProcessInstanceNotification(processInstanceKey, processDefinitionKey, Type.UPDATED));
+    sendNotification(
+        createProcessInstanceNotification(processInstanceKey, processDefinitionKey, Type.UPDATED));
   }
 
   public void sendCreatedProcessInstance(
       final long processInstanceKey, final long processDefinitionKey) {
-    sendNotification(createProcessInstanceNotification(processInstanceKey, processDefinitionKey, Type.CREATED));
+    sendNotification(
+        createProcessInstanceNotification(processInstanceKey, processDefinitionKey, Type.CREATED));
   }
 
   public void sendEndedProcessInstance(
       final long processInstanceKey, final long processDefinitionKey) {
-    sendNotification(createProcessInstanceNotification(processInstanceKey, processDefinitionKey, Type.REMOVED));
+    sendNotification(
+        createProcessInstanceNotification(processInstanceKey, processDefinitionKey, Type.REMOVED));
   }
 
-  private ProcessInstanceNotification createProcessInstanceNotification(long processInstanceKey, long processDefinitionKey, Type type) {
+  private ProcessInstanceNotification createProcessInstanceNotification(
+      long processInstanceKey, long processDefinitionKey, Type type) {
     final ProcessInstanceNotification notification = new ProcessInstanceNotification();
     notification.setProcessInstanceKey(processInstanceKey);
     notification.setProcessDefinitionKey(processDefinitionKey);

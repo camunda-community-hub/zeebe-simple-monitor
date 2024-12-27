@@ -35,7 +35,9 @@ class InstancesTimerListViewControllerTest extends AbstractViewOrResourceTest {
   @Test
   void timers_list_view_contains_pagination_elements() throws Exception {
     // GIVEN
-    BpmnModelInstance modelInstance = Bpmn.readModelFromStream(this.getClass().getClassLoader().getResourceAsStream("orderProcess.bpmn"));
+    BpmnModelInstance modelInstance =
+        Bpmn.readModelFromStream(
+            this.getClass().getClassLoader().getResourceAsStream("orderProcess.bpmn"));
     ProcessInstanceEntity processInstanceEntity = mock(ProcessInstanceEntity.class, RETURNS_MOCKS);
     ProcessEntity processEntity = mock(ProcessEntity.class, RETURNS_MOCKS);
     when(processEntity.getResource()).thenReturn(modelInstance.toString());

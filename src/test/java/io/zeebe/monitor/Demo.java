@@ -1,7 +1,6 @@
 package io.zeebe.monitor;
 
 import io.camunda.zeebe.client.ZeebeClient;
-
 import java.util.Collections;
 
 public class Demo {

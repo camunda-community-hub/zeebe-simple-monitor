@@ -24,7 +24,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface MessageSubscriptionRepository
-    extends PagingAndSortingRepository<MessageSubscriptionEntity, Long>, CrudRepository<MessageSubscriptionEntity, Long> {
+    extends PagingAndSortingRepository<MessageSubscriptionEntity, Long>,
+        CrudRepository<MessageSubscriptionEntity, Long> {
 
   Page<MessageSubscriptionEntity> findByProcessInstanceKey(
       long processInstanceKey, Pageable pageable);

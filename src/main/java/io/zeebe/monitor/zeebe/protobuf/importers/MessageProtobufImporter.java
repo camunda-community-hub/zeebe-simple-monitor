@@ -19,7 +19,10 @@ public class MessageProtobufImporter {
   public MessageProtobufImporter(MessageRepository messageRepository, MeterRegistry meterRegistry) {
     this.messageRepository = messageRepository;
 
-    this.counter = Counter.builder("zeebemonitor_importer_message").description("number of processed messages").register(meterRegistry);
+    this.counter =
+        Counter.builder("zeebemonitor_importer_message")
+            .description("number of processed messages")
+            .register(meterRegistry);
   }
 
   public void importMessage(final Schema.MessageRecord record) {

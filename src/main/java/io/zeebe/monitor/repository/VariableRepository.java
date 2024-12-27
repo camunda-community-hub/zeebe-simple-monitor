@@ -16,9 +16,8 @@
 package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.VariableEntity;
-import org.springframework.data.repository.CrudRepository;
-
 import java.util.List;
+import org.springframework.data.repository.CrudRepository;
 
 public interface VariableRepository extends CrudRepository<VariableEntity, String> {
 

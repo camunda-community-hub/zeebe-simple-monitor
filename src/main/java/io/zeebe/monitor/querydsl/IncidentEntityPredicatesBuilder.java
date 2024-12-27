@@ -1,11 +1,12 @@
 package io.zeebe.monitor.querydsl;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.PathBuilder;
 import io.zeebe.monitor.entity.QIncidentEntity;
-
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,10 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-
 public class IncidentEntityPredicatesBuilder {
-  final PathBuilder<QIncidentEntity> pathBuilder = new PathBuilder<>(QIncidentEntity.class, QIncidentEntity.incidentEntity.getMetadata());
+  final PathBuilder<QIncidentEntity> pathBuilder =
+      new PathBuilder<>(QIncidentEntity.class, QIncidentEntity.incidentEntity.getMetadata());
   private final List<Predicate> predicates = new ArrayList<>();
 
   public IncidentEntityPredicatesBuilder onlyUnresolved() {
@@ -42,7 +42,8 @@ public class IncidentEntityPredicatesBuilder {
   public IncidentEntityPredicatesBuilder createdAfter(String timestamp) {
     if (!isEmpty(timestamp)) {
       final Optional<Long> created = parseIsoToUtcMillis(timestamp);
-      created.ifPresent(utcMillis -> predicates.add(pathBuilder.getNumber("created", Long.class).goe(utcMillis)));
+      created.ifPresent(
+          utcMillis -> predicates.add(pathBuilder.getNumber("created", Long.class).goe(utcMillis)));
     }
     return this;
   }
@@ -50,7 +51,8 @@ public class IncidentEntityPredicatesBuilder {
   public IncidentEntityPredicatesBuilder createdBefore(String timestamp) {
     if (!isEmpty(timestamp)) {
       final Optional<Long> created = parseIsoToUtcMillis(timestamp);
-      created.ifPresent(utcMillis -> predicates.add(pathBuilder.getNumber("created", Long.class).loe(utcMillis)));
+      created.ifPresent(
+          utcMillis -> predicates.add(pathBuilder.getNumber("created", Long.class).loe(utcMillis)));
     }
     return this;
   }
@@ -65,8 +67,10 @@ public class IncidentEntityPredicatesBuilder {
 
   private Optional<Long> parseIsoToUtcMillis(String timestamp) {
     try {
-      final ZonedDateTime zonedDateTime = ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(timestamp));
-      final long utcMillis = zonedDateTime.withZoneSameInstant(ZoneId.of("UTC")).toInstant().toEpochMilli();
+      final ZonedDateTime zonedDateTime =
+          ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(timestamp));
+      final long utcMillis =
+          zonedDateTime.withZoneSameInstant(ZoneId.of("UTC")).toInstant().toEpochMilli();
       return Optional.of(utcMillis);
     } catch (DateTimeParseException ignore) {
       // ignore

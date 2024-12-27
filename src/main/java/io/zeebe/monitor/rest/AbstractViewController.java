@@ -9,13 +9,12 @@ import io.zeebe.monitor.rest.dto.ClusterStatusDto;
 import io.zeebe.monitor.rest.dto.PartitionInfoDto;
 import io.zeebe.monitor.zeebe.status.ClusterStatus;
 import io.zeebe.monitor.zeebe.status.ZeebeStatusKeeper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
-
 import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 
 abstract class AbstractViewController {
 
@@ -86,7 +85,8 @@ abstract class AbstractViewController {
   protected void addDefaultAttributesToModel(Map<String, Object> model) {
     whitelabelPropertiesMapper.addPropertiesToModel(model, whitelabelProperties);
     final ClusterStatus status = zeebeStatusKeeper.getStatus();
-    final String version = applicationAttributes.getValue(ZeebeSimpleMonitorApp.IMPLEMENTATION_VERSION);
+    final String version =
+        applicationAttributes.getValue(ZeebeSimpleMonitorApp.IMPLEMENTATION_VERSION);
     model.put("status", toStatusDto(status, version));
   }
 
@@ -122,7 +122,6 @@ abstract class AbstractViewController {
     }
     return clusterStatusDto;
   }
-
 
   private static class Page {
     private final int pageNumber;

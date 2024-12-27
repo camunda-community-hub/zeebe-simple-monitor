@@ -48,7 +48,8 @@ public class KafkaConfig {
     factory.setBatchListener(true);
     factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.BATCH);
 
-    // Any exception thrown from record of the batch will skip(NotRetryableExceptions) or retry the entire batch
+    // Any exception thrown from record of the batch will skip(NotRetryableExceptions) or retry the
+    // entire batch
     var errorHandler =
         new DefaultErrorHandler(
             (record, e) ->

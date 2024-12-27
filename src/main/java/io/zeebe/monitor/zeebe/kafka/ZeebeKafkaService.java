@@ -26,7 +26,9 @@ public class ZeebeKafkaService {
   @Autowired private RecordDeserializer deserializer;
   @Autowired private KafkaImportService kafkaImportService;
 
-  @KafkaListener(topics = "${spring.kafka.template.default-topic}", groupId = "${spring.kafka.group-id}")
+  @KafkaListener(
+      topics = "${spring.kafka.template.default-topic}",
+      groupId = "${spring.kafka.group-id}")
   public void listener(List<ConsumerRecord<String, byte[]>> messages) {
     try {
       final var records =

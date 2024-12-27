@@ -37,7 +37,7 @@ public class MessageEntity {
   @Column(name = "MESSAGE_ID_")
   private String messageId;
 
-  @Column(name = "PAYLOAD_",length= Length.LONG32)
+  @Column(name = "PAYLOAD_", length = Length.LONG32)
   @Lob
   private String payload;
 

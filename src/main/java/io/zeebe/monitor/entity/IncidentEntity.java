@@ -19,11 +19,12 @@ import jakarta.persistence.*;
 import org.hibernate.Length;
 
 @Entity(name = "INCIDENT")
-@Table(indexes = {
-    // performance reason, because we use it in the
-    // {@link io.zeebe.monitor.repository.IncidentRepository#findByProcessInstanceKey(long)}
-    @Index(name = "incident_processInstanceKeyIndex", columnList = "PROCESS_INSTANCE_KEY_"),
-})
+@Table(
+    indexes = {
+      // performance reason, because we use it in the
+      // {@link io.zeebe.monitor.repository.IncidentRepository#findByProcessInstanceKey(long)}
+      @Index(name = "incident_processInstanceKeyIndex", columnList = "PROCESS_INSTANCE_KEY_"),
+    })
 public class IncidentEntity {
 
   @Id
@@ -48,7 +49,7 @@ public class IncidentEntity {
   @Column(name = "ERROR_TYPE_")
   private String errorType;
 
-  @Column(name = "ERROR_MSG_",length= Length.LONG16)
+  @Column(name = "ERROR_MSG_", length = Length.LONG16)
   @Lob
   private String errorMessage;
 

@@ -19,12 +19,18 @@ public class MessageSubscriptionProtobufImporter {
   private final Counter eventCounter;
 
   @Autowired
-  public MessageSubscriptionProtobufImporter(MessageSubscriptionRepository messageSubscriptionRepository, MeterRegistry meterRegistry) {
+  public MessageSubscriptionProtobufImporter(
+      MessageSubscriptionRepository messageSubscriptionRepository, MeterRegistry meterRegistry) {
     this.messageSubscriptionRepository = messageSubscriptionRepository;
 
     this.subsCounter =
-            Counter.builder("zeebemonitor_importer_message_subscription").description("number of processed message subscriptions").register(meterRegistry);
-    this.eventCounter = Counter.builder("zeebemonitor_importer_message_start_event_subscription").description("number of processed message start events").register(meterRegistry);
+        Counter.builder("zeebemonitor_importer_message_subscription")
+            .description("number of processed message subscriptions")
+            .register(meterRegistry);
+    this.eventCounter =
+        Counter.builder("zeebemonitor_importer_message_start_event_subscription")
+            .description("number of processed message start events")
+            .register(meterRegistry);
   }
 
   public void importMessageSubscription(final Schema.MessageSubscriptionRecord record) {
@@ -52,7 +58,6 @@ public class MessageSubscriptionProtobufImporter {
     entity.setState(intent.name().toLowerCase());
     entity.setTimestamp(timestamp);
     messageSubscriptionRepository.save(entity);
-
 
     subsCounter.increment();
   }

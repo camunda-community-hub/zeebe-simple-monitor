@@ -19,9 +19,10 @@ import jakarta.persistence.*;
 import org.hibernate.Length;
 
 @Entity(name = "PROCESS")
-@Table(indexes = {
-        @Index(name = "process_bpmnProcessId", columnList = "BPMN_PROCESS_ID_"),
-})
+@Table(
+    indexes = {
+      @Index(name = "process_bpmnProcessId", columnList = "BPMN_PROCESS_ID_"),
+    })
 public class ProcessEntity {
   @Id
   @Column(name = "KEY_")
@@ -34,7 +35,7 @@ public class ProcessEntity {
   private int version;
 
   @Lob
-  @Column(name = "RESOURCE_",length= Length.LONG32)
+  @Column(name = "RESOURCE_", length = Length.LONG32)
   private String resource;
 
   @Column(name = "TIMESTAMP_")

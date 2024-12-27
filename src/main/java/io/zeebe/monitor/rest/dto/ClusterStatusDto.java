@@ -77,5 +77,4 @@ public class ClusterStatusDto {
   public String getSimpleMonitorVersion() {
     return simpleMonitorVersion;
   }
-
 }
