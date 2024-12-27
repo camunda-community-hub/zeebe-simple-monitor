@@ -9,6 +9,14 @@
             New Deployment
         </button>
 
+        <form method="get" action="{{context-path}}views/processes">
+            <label for="bpmn-search-input">
+                    Search by BPMN Process ID
+            </label>
+            <input id="bpmn-search-input" placeholder="BPMN process id" name="bpmnProcessId" type="text" title="Type in a bpmnId" minlength="3" />
+            <button type="submit">Search</button>
+        </form>
+
     </div>
 
     <div class="col-md-12">
@@ -17,6 +25,7 @@
 
         <table class="table table-striped">
             <thead>
+            <tr>
             <th>Process Definition Key</th>
             <th>BPMN process id</th>
             <th>Version</th>
@@ -28,6 +37,7 @@
                     <svg class="bi" width="12" height="12" fill="white"><use xlink:href="/img/bootstrap-icons.svg#caret-up-fill"/></svg>
                 </a>
             </th>
+            </tr>
             </thead>
 
             {{#processes}}
