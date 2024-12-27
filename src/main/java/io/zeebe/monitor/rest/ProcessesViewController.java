@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import jakarta.validation.constraints.Size;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -63,9 +62,9 @@ public class ProcessesViewController extends AbstractViewController {
   }
 
   @GetMapping("/views/processes")
-  public String processList(final Map<String, Object> model, final Pageable pageable, @RequestParam("bpmnProcessId") Optional<@Size(min = 3) String> bpmnProcessId) {
+  public String processList(final Map<String, Object> model, final Pageable pageable, @RequestParam(value = "bpmnProcessId", required = false) Optional<String> bpmnProcessId) {
 
-    if (bpmnProcessId.isPresent()) {
+    if (bpmnProcessId.isPresent() && bpmnProcessId.get().length() >= 3) {
       final List<ProcessDto> processes = new ArrayList<>();
       for (final ProcessEntity processEntity : processRepository.findByBpmnProcessIdStartsWith(bpmnProcessId.get())) {
         final ProcessDto dto = toDto(processEntity);
@@ -88,7 +87,7 @@ public class ProcessesViewController extends AbstractViewController {
       }
 
       model.put("processes", processes);
-      model.remove("bpmnProcessId");
+      model.put("bpmnProcessId", "");
       model.put("count", count);
 
       addPaginationToModel(model, pageable, count);

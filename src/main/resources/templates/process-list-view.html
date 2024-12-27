@@ -9,17 +9,16 @@
             New Deployment
         </button>
 
-        <form method="get" action="{{context-path}}views/processes">
-            <label for="bpmn-search-input">
-                    Search by BPMN Process ID
-            </label>
-            <input id="bpmn-search-input" placeholder="BPMN process id" name="bpmnProcessId" type="text" title="Type in a bpmnId" minlength="3" />
-            <button type="submit">Search</button>
+        <form class="form-inline" method="get" action="{{context-path}}views/processes">
+            <div class="form-group mb-2 col-sm-3">
+                <label class="mx-sm-2" for="bpmn-search-input" >Search by</label>
+                <input class="col-sm-9 form-control" id="bpmn-search-input" placeholder="BPMN process id (min 3 characters)" name="bpmnProcessId" type="text" title="BPMN process id (min 3 characters)" value="{{bpmnProcessId}}" />
+            </div>
+            <button class="btn btn-secondary mb-2" type="submit">Search</button>
         </form>
-
     </div>
 
-    <div class="col-md-12">
+    <div class="col-md-12 border-top">
 
         <span>{{count}} process definitions</span>
 
