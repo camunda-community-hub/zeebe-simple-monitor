@@ -22,7 +22,7 @@ The application imports the data from Zeebe using the [Hazelcast exporter](https
 
 ### Upgrading from a prior version
 
-See the [upgrade instructions](./UPGRADE.md).
+See the [upgrade instructions](UPGRADE.md).
 
 ### Docker
 
@@ -296,6 +296,15 @@ Refer to the [docker-compose file](docker/docker-compose.yml) for a sample confi
 
 Please be aware that when connecting to a Redis cluster you must activate
 the `useClusterClient` option.
+
+## Metrics
+The monitor exports a couple of metrics via the usual `/actuator/prometheus` endpoint.
+
+In addition to the default metrics that are available via Spring Boot, there are some metrics exported specific
+- for the import process (e.g. number of imported process instances)
+- Hazelcast's ringbuffer.
+
+All metrics are prefixed with `zeebemonitor_importer`.
 
 ## Code of Conduct
 

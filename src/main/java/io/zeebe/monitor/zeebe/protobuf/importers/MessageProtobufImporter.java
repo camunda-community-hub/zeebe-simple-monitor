@@ -1,6 +1,8 @@
 package io.zeebe.monitor.zeebe.protobuf.importers;
 
 import io.camunda.zeebe.protocol.record.intent.MessageIntent;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.MessageEntity;
 import io.zeebe.monitor.repository.MessageRepository;
@@ -10,7 +12,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class MessageProtobufImporter {
 
-  @Autowired private MessageRepository messageRepository;
+  private final MessageRepository messageRepository;
+  private final Counter counter;
+
+  @Autowired
+  public MessageProtobufImporter(MessageRepository messageRepository, MeterRegistry meterRegistry) {
+    this.messageRepository = messageRepository;
+
+    this.counter = Counter.builder("zeebemonitor_importer_message").description("number of processed messages").register(meterRegistry);
+  }
 
   public void importMessage(final Schema.MessageRecord record) {
 
@@ -35,5 +45,7 @@ public class MessageProtobufImporter {
     entity.setState(intent.name().toLowerCase());
     entity.setTimestamp(timestamp);
     messageRepository.save(entity);
+
+    counter.increment();
   }
 }

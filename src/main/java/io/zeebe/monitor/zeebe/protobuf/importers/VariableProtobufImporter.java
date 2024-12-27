@@ -1,5 +1,7 @@
 package io.zeebe.monitor.zeebe.protobuf.importers;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.VariableEntity;
 import io.zeebe.monitor.repository.VariableRepository;
@@ -9,7 +11,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class VariableProtobufImporter {
 
-  @Autowired private VariableRepository variableRepository;
+  private final VariableRepository variableRepository;
+  private final Counter variableCreatedCounter;
+  private final Counter variableUpdatedCounter;
+
+  @Autowired
+  public VariableProtobufImporter(VariableRepository variableRepository, MeterRegistry meterRegistry) {
+    this.variableRepository = variableRepository;
+
+    this.variableCreatedCounter = Counter.builder("zeebemonitor_importer_variable").tag("action", "imported").description("number of processed variables").register(meterRegistry);
+    this.variableUpdatedCounter = Counter.builder("zeebemonitor_importer_variable").tag("action", "updated").description("number of processed variables").register(meterRegistry);
+  }
 
   public void importVariable(final Schema.VariableRecord record) {
     final VariableEntity newVariable = new VariableEntity();
@@ -23,6 +35,12 @@ public class VariableProtobufImporter {
       newVariable.setScopeKey(record.getScopeKey());
       newVariable.setState(record.getMetadata().getIntent().toLowerCase());
       variableRepository.save(newVariable);
+
+      if (newVariable.getState().equals("updated")) {
+        variableUpdatedCounter.increment();
+      } else {
+        variableCreatedCounter.increment();
+      }
     }
   }
 }

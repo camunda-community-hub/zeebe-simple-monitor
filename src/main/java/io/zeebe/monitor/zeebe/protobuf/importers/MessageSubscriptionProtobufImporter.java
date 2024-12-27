@@ -2,6 +2,8 @@ package io.zeebe.monitor.zeebe.protobuf.importers;
 
 import io.camunda.zeebe.protocol.record.intent.MessageStartEventSubscriptionIntent;
 import io.camunda.zeebe.protocol.record.intent.MessageSubscriptionIntent;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.MessageSubscriptionEntity;
 import io.zeebe.monitor.repository.MessageSubscriptionRepository;
@@ -12,7 +14,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class MessageSubscriptionProtobufImporter {
 
-  @Autowired private MessageSubscriptionRepository messageSubscriptionRepository;
+  private final MessageSubscriptionRepository messageSubscriptionRepository;
+  private final Counter subsCounter;
+  private final Counter eventCounter;
+
+  @Autowired
+  public MessageSubscriptionProtobufImporter(MessageSubscriptionRepository messageSubscriptionRepository, MeterRegistry meterRegistry) {
+    this.messageSubscriptionRepository = messageSubscriptionRepository;
+
+    this.subsCounter =
+            Counter.builder("zeebemonitor_importer_message_subscription").description("number of processed message subscriptions").register(meterRegistry);
+    this.eventCounter = Counter.builder("zeebemonitor_importer_message_start_event_subscription").description("number of processed message start events").register(meterRegistry);
+  }
 
   public void importMessageSubscription(final Schema.MessageSubscriptionRecord record) {
 
@@ -39,6 +52,9 @@ public class MessageSubscriptionProtobufImporter {
     entity.setState(intent.name().toLowerCase());
     entity.setTimestamp(timestamp);
     messageSubscriptionRepository.save(entity);
+
+
+    subsCounter.increment();
   }
 
   public void importMessageStartEventSubscription(
@@ -66,6 +82,8 @@ public class MessageSubscriptionProtobufImporter {
     entity.setState(intent.name().toLowerCase());
     entity.setTimestamp(timestamp);
     messageSubscriptionRepository.save(entity);
+
+    eventCounter.increment();
   }
 
   private String generateId() {
