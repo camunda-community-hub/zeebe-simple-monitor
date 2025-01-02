@@ -21,7 +21,7 @@
         <zeebe.version>8.3.4</zeebe.version>
         <version.zeebe.spring>8.4.2</version.zeebe.spring>
         <hazelcast.exporter.version>1.4.0</hazelcast.exporter.version>
-        <redis.exporter.version>0.9.11</redis.exporter.version>
+        <redis.exporter.version>1.0.1</redis.exporter.version>
 
         <querydsl.version>5.1.0</querydsl.version>
 
