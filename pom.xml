@@ -29,7 +29,7 @@
         <!-- pin Hazelcast version because of spring-boot-dependencies -->
         <version.hazelcast>5.5.0</version.hazelcast>
 
-        <version.hibernate.validator>8.0.1.Final</version.hibernate.validator>
+        <version.hibernate.validator>8.0.2.Final</version.hibernate.validator>
 
         <!-- release parent settings -->
         <version.java>17</version.java>
