@@ -9,12 +9,20 @@
             New Deployment
         </button>
 
-        <form class="form-inline" method="get" action="{{context-path}}views/processes">
-            <div class="form-group mb-2 col-sm-3">
-                <label class="mx-sm-2" for="bpmn-search-input" >Search by</label>
-                <input class="col-sm-9 form-control" id="bpmn-search-input" placeholder="BPMN process id (min 3 characters)" name="bpmnProcessId" type="text" title="BPMN process id (min 3 characters)" value="{{bpmnProcessId}}" />
+        <form method="get" action="{{context-path}}views/processes">
+            <div class="form-inline">
+                <div class="form-group mb-2 col-sm-3">
+                    <label class="mx-sm-2" for="bpmn-search-input" >Search by</label>
+                    <input class="col-sm-9 form-control" id="bpmn-search-input" placeholder="BPMN process id (min 3 characters)" name="bpmnProcessId" type="text" title="BPMN process id (min 3 characters)" value="{{bpmnProcessId}}" />
+                </div>
+
+                <button class="btn btn-secondary mb-2" type="submit">Search</button>
             </div>
-            <button class="btn btn-secondary mb-2" type="submit">Search</button>
+
+            <div class="form-group mb-2 col-sm-3">
+                <label class="form-check-label mx-sm-2" for="latestDefinition" >Latest version</label>
+                <input class="mx-sm-2"  id="latestDefinition" name="latestDefinition" type="checkbox" {{#latestDefinition}}checked{{/latestDefinition}}/>
+            </div>
         </form>
     </div>
 

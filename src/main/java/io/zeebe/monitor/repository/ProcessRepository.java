@@ -21,13 +21,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface ProcessRepository
-    extends PagingAndSortingRepository<ProcessEntity, Long>, CrudRepository<ProcessEntity, Long> {
+    extends PagingAndSortingRepository<ProcessEntity, Long>,
+        QuerydslPredicateExecutor<ProcessEntity>,
+        CrudRepository<ProcessEntity, Long> {
 
   Optional<ProcessEntity> findByKey(long key);
 
@@ -43,6 +45,13 @@ public interface ProcessRepository
       @Param("intents") Collection<String> intents,
       @Param("excludeElementTypes") Collection<String> excludeElementTypes);
 
-  @Transactional(readOnly = true)
-  List<ProcessEntity> findByBpmnProcessIdStartsWith(String bpmnProcessId);
+  @Query(
+      nativeQuery = true,
+      value =
+          """
+                  SELECT p.key_
+                      FROM process p WHERE (bpmn_process_id_,version_) IN
+                         (SELECT bpmn_process_id_, MAX(version_)  FROM process p  GROUP BY p.bpmn_process_id_)
+                  """)
+  List<Long> findLatestVersions();
 }

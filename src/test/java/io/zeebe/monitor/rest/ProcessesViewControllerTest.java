@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.querydsl.core.types.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,8 @@ public class ProcessesViewControllerTest extends AbstractViewOrResourceTest {
   @BeforeEach
   public void setUp() {
     when(processRepository.findAll(any(Pageable.class))).thenReturn(Page.empty());
+    when(processRepository.findAll(any(Predicate.class), any(Pageable.class)))
+        .thenReturn(Page.empty());
     mockCLusterStatusForViews();
   }
 
