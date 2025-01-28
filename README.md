@@ -29,7 +29,7 @@ See the [upgrade instructions](UPGRADE.md).
 The docker image for the worker is published to [GitHub Packages](https://github.com/orgs/camunda-community-hub/packages/container/package/zeebe-simple-monitor).
 
 ```
-docker pull ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.4.1
+docker pull ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.8.1
 ```
 
 * ensure that a Zeebe broker is running with a [Hazelcast exporter](https://github.com/camunda-community-hub/zeebe-hazelcast-exporter#install) (>= `1.0.0`)  
@@ -76,7 +76,7 @@ By default, the Zeebe Simple Monitor imports Zeebe events through Hazelcast, but
 If the Zeebe broker runs on your local machine with the default configs then start the container with the following command:  
 
 ```
-docker run --network="host" ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.4.1
+docker run --network="host" ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.8.1
 ```
 
 For a local setup, the repository contains a [docker-compose file](docker/docker-compose.yml). It starts a Zeebe broker with the Hazelcast/Kafka/Redis exporter and the application. 

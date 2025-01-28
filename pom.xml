@@ -4,7 +4,7 @@
 
     <groupId>io.zeebe</groupId>
     <artifactId>zeebe-simple-monitor</artifactId>
-    <version>v2.8.1</version>
+    <version>2.8.1</version>
     <packaging>jar</packaging>
 
     <parent>
@@ -12,14 +12,14 @@
         <artifactId>camunda-release-parent</artifactId>
         <version>3.9.1</version>
         <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
-        <relativePath />
+        <relativePath/>
     </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <zeebe.version>8.3.4</zeebe.version>
-        <version.zeebe.spring>8.4.2</version.zeebe.spring>
+        <zeebe.version>8.5.12</zeebe.version>
+        <version.zeebe.spring>8.5.12</version.zeebe.spring>
         <hazelcast.exporter.version>1.4.0</hazelcast.exporter.version>
         <redis.exporter.version>1.0.1</redis.exporter.version>
 
@@ -39,6 +39,7 @@
 
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
 
         <nexus.snapshot.repository>https://artifacts.camunda.com/artifactory/zeebe-io-snapshots/
         </nexus.snapshot.repository>
@@ -95,8 +96,8 @@
 
         <!-- spring deps-->
         <dependency>
-            <groupId>io.camunda.spring</groupId>
-            <artifactId>spring-boot-starter-camunda</artifactId>
+            <groupId>io.camunda</groupId>
+            <artifactId>spring-boot-starter-camunda-sdk</artifactId>
             <version>${version.zeebe.spring}</version>
             <exclusions>
                 <exclusion>
@@ -306,26 +307,25 @@
                 </plugin>
                 <!--Plugin for query-dsl-->
                 <plugin>
-                    <groupId>com.mysema.maven</groupId>
-                    <artifactId>apt-maven-plugin</artifactId>
-                    <version>1.1.3</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>process</goal>
-                            </goals>
-                            <configuration>
-                                <includes>
-                                    <include>io.zeebe.monitor.entity.**</include>
-                                </includes>
-                            </configuration>
-                        </execution>
-                    </executions>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
                     <configuration>
-                        <outputDirectory>target/generated-sources/annotations</outputDirectory>
-                        <processors>
-                            <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
-                        </processors>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>com.querydsl</groupId>
+                                <artifactId>querydsl-apt</artifactId>
+                                <version>${querydsl.version}</version>
+                                <classifier>jakarta</classifier>
+                            </path>
+                            <path>
+                                <groupId>jakarta.persistence</groupId>
+                                <artifactId>jakarta.persistence-api</artifactId>
+                                <version>3.1.0</version>
+                            </path>
+                        </annotationProcessorPaths>
                     </configuration>
                 </plugin>
             </plugins>
