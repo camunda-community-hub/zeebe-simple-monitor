@@ -120,8 +120,12 @@ public class ProcessesViewController extends AbstractViewController {
             .findByKey(key)
             .orElseThrow(
                 () -> new ResponseStatusException(NOT_FOUND, "No process found with key: " + key));
-
     model.put("process", toDto(process));
+
+    final Optional<ProcessEntity> latest =
+        processRepository.findByBpmnProcessIdStartsWith(process.getBpmnProcessId()).stream()
+            .max(Comparator.comparingInt(ProcessEntity::getVersion));
+    model.put("latestProcessDefinition", toDto(latest.orElse(process)));
     model.put("resource", getProcessResource(process));
 
     final List<ElementInstanceState> elementInstanceStates = getElementInstanceStates(key);
