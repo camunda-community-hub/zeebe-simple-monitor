@@ -71,7 +71,7 @@ public class ProcessesViewController extends AbstractViewController {
       final Map<String, Object> model,
       Pageable pageable,
       @RequestParam(value = "bpmnProcessId", required = false) Optional<String> bpmnProcessId,
-      @RequestParam(value = "latestDefinition", defaultValue = "false") boolean latestDefinition) {
+      @RequestParam(value = "showOldProcessVersions", defaultValue = "false") boolean showOldProcessVersions) {
     if (!pageable.getSort().isSorted()) {
       pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), DEFAULT_SORT);
     }
@@ -81,7 +81,7 @@ public class ProcessesViewController extends AbstractViewController {
         .filter(it -> it.length() >= 3)
         .ifPresent(predicatesBuilder::withBpmnProcessId);
 
-    if (latestDefinition) {
+    if (!showOldProcessVersions) {
       var latestProcessKeys = processRepository.findLatestVersions();
       predicatesBuilder.withKeys(latestProcessKeys);
     }
@@ -99,7 +99,7 @@ public class ProcessesViewController extends AbstractViewController {
 
     model.put("processes", processes);
     model.put("bpmnProcessId", bpmnProcessId.orElse(""));
-    model.put("latestDefinition", latestDefinition);
+    model.put("showOldProcessVersions", showOldProcessVersions);
     model.put("count", totalProcesses);
 
     addPaginationToModel(model, pageable, totalProcesses);
