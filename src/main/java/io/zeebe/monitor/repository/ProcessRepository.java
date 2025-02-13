@@ -17,7 +17,6 @@ package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.ElementInstanceStatistics;
 import io.zeebe.monitor.entity.ProcessEntity;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
