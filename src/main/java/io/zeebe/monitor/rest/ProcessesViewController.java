@@ -71,15 +71,14 @@ public class ProcessesViewController extends AbstractViewController {
       final Map<String, Object> model,
       Pageable pageable,
       @RequestParam(value = "bpmnProcessId", required = false) Optional<String> bpmnProcessId,
-      @RequestParam(value = "showOldProcessVersions", defaultValue = "false") boolean showOldProcessVersions) {
+      @RequestParam(value = "showOldProcessVersions", defaultValue = "false")
+          boolean showOldProcessVersions) {
     if (!pageable.getSort().isSorted()) {
       pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), DEFAULT_SORT);
     }
 
     var predicatesBuilder = new ProcessEntityPredicatesBuilder();
-    bpmnProcessId
-        .filter(it -> it.length() >= 3)
-        .ifPresent(predicatesBuilder::withBpmnProcessId);
+    bpmnProcessId.filter(it -> it.length() >= 3).ifPresent(predicatesBuilder::withBpmnProcessId);
 
     if (!showOldProcessVersions) {
       var latestProcessKeys = processRepository.findLatestVersions();
@@ -123,7 +122,9 @@ public class ProcessesViewController extends AbstractViewController {
     model.put("process", toDto(process));
 
     final Optional<ProcessEntity> latest =
-        processRepository.findByBpmnProcessIdStartsWith(process.getBpmnProcessId()).stream()
+        processRepository
+            .findByBpmnProcessIdContaining(process.getBpmnProcessId(), pageable)
+            .stream()
             .max(Comparator.comparingInt(ProcessEntity::getVersion));
     model.put("latestProcessDefinition", toDto(latest.orElse(process)));
     model.put("resource", getProcessResource(process));

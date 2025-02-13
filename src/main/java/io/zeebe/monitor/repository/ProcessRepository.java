@@ -17,9 +17,11 @@ package io.zeebe.monitor.repository;
 
 import io.zeebe.monitor.entity.ElementInstanceStatistics;
 import io.zeebe.monitor.entity.ProcessEntity;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.CrudRepository;
@@ -54,4 +56,6 @@ public interface ProcessRepository
                          (SELECT bpmn_process_id_, MAX(version_)  FROM process p  GROUP BY p.bpmn_process_id_)
                   """)
   List<Long> findLatestVersions();
+
+  List<ProcessEntity> findByBpmnProcessIdContaining(String bpmnProcessId, Pageable pageable);
 }
