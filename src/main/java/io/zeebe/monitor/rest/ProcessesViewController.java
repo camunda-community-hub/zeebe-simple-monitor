@@ -79,7 +79,7 @@ public class ProcessesViewController extends AbstractViewController {
     var predicatesBuilder = new ProcessEntityPredicatesBuilder();
     bpmnProcessId
         .filter(it -> it.length() >= 3)
-        .ifPresent(predicatesBuilder::withBpmnProcessIdPrefix);
+        .ifPresent(predicatesBuilder::withBpmnProcessId);
 
     if (latestDefinition) {
       var latestProcessKeys = processRepository.findLatestVersions();

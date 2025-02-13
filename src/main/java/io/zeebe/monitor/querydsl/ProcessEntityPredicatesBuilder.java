@@ -19,9 +19,9 @@ public class ProcessEntityPredicatesBuilder {
 
   private final List<Predicate> predicates = new ArrayList<>();
 
-  public ProcessEntityPredicatesBuilder withBpmnProcessIdPrefix(String processId) {
+  public ProcessEntityPredicatesBuilder withBpmnProcessId(String processId) {
     if (!isEmpty(processId)) {
-      predicates.add(pathBuilder.getString("bpmnProcessId").startsWithIgnoreCase(processId));
+      predicates.add(pathBuilder.getString("bpmnProcessId").containsIgnoreCase(processId));
     }
     return this;
   }
