@@ -103,7 +103,7 @@ services:
 
   simple-monitor-in-memory:
     container_name: zeebe-simple-monitor-in-memory
-    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.5.2
+    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.9.0
     environment:
       - zeebe.client.broker.gateway-address=zeebe:26500
       - zeebe.client.worker.hazelcast.connection=zeebe:5701
@@ -119,7 +119,7 @@ services:
 
   simple-monitor-in-memory-kafka:
     container_name: zeebe-simple-monitor-in-memory-kafka
-    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.5.2
+    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.9.0
     environment:
       - zeebe.client.broker.gateway-address=zeebe:26500
       - zeebe-importer=kafka
@@ -136,7 +136,7 @@ services:
 
   simple-monitor-in-memory-redis:
     container_name: zeebe-simple-monitor-in-memory-redis
-    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.7.2
+    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.9.0
     environment:
       - zeebe.client.broker.gateway-address=zeebe:26500
       - zeebe-importer=redis
@@ -152,7 +152,7 @@ services:
 
   simple-monitor-postgres:
     container_name: zeebe-simple-monitor-postgres
-    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.5.2
+    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.9.0
     environment:
       - zeebe.client.broker.gateway-address=zeebe:26500
       - zeebe.client.worker.hazelcast.connection=zeebe:5701
@@ -188,7 +188,7 @@ services:
 
   simple-monitor-mysql:
     container_name: zeebe-simple-monitor-mysql
-    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.5.2
+    image: ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.9.0
     environment:
       - zeebe.client.broker.gateway-address=zeebe:26500
       - zeebe.client.worker.hazelcast.connection=zeebe:5701
