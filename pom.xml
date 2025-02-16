@@ -4,7 +4,7 @@
 
     <groupId>io.zeebe</groupId>
     <artifactId>zeebe-simple-monitor</artifactId>
-    <version>2.9.0</version>
+    <version>2.9.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <parent>
@@ -12,7 +12,7 @@
         <artifactId>camunda-release-parent</artifactId>
         <version>3.9.1</version>
         <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
-        <relativePath/>
+        <relativePath />
     </parent>
 
     <properties>
