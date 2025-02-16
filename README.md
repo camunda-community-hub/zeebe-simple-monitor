@@ -12,7 +12,7 @@ A monitoring application for [Zeebe](https://zeebe.io). It is designed for devel
 
 * get in touch with Zeebe and workflow execution (BPMN)
 * test workflows manually
-* provide insides on how workflows are executed 
+* provide insides on how workflows are executed
 
 The application imports the data from Zeebe using the [Hazelcast exporter](https://github.com/camunda-community-hub/zeebe-hazelcast-exporter), [Kafka exporter](https://github.com/camunda-community-hub/zeebe-kafka-exporter) or [Redis exporter](https://github.com/camunda-community-hub/zeebe-redis-exporter). It aggregates the data and stores it into a database. The data is displayed on server-side rendered HTML pages.
 
@@ -29,15 +29,15 @@ See the [upgrade instructions](UPGRADE.md).
 The docker image for the worker is published to [GitHub Packages](https://github.com/orgs/camunda-community-hub/packages/container/package/zeebe-simple-monitor).
 
 ```
-docker pull ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.8.1
+docker pull ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.9.0
 ```
 
-* ensure that a Zeebe broker is running with a [Hazelcast exporter](https://github.com/camunda-community-hub/zeebe-hazelcast-exporter#install) (>= `1.0.0`)  
-* configure the connection to the Zeebe broker by setting `zeebe.client.broker.gateway-address` (default: `localhost:26500`) 
+* ensure that a Zeebe broker is running with a [Hazelcast exporter](https://github.com/camunda-community-hub/zeebe-hazelcast-exporter#install) (>= `1.0.0`)
+* configure the connection to the Zeebe broker by setting `zeebe.client.broker.gateway-address` (default: `localhost:26500`)
 * configure the connection to Hazelcast by setting `zeebe.client.worker.hazelcast.connection` (default: `localhost:5701`)
 * forward the Hazelcast port to the docker container (default: `5701`)
 * if you want to set the Hazelcast clusterName then you need to adjust the Zeebe broker and the Zeebe Simple Monitor alike
-  * Hint: this is useful, e.g. when you want to adjust the ringbuffer's size in the Hazelcast cluster (the name is relevant) 
+  * Hint: this is useful, e.g. when you want to adjust the ringbuffer's size in the Hazelcast cluster (the name is relevant)
   * a) in Zeebe broker, set the environment variable `ZEEBE_HAZELCAST_CLUSTER_NAME=dev` (default: `dev`)
   * b) in Zeebe Simple Monitor, change the setting `zeebe.client.worker.hazelcast.clusterName` (default: `dev`)
 
@@ -73,13 +73,13 @@ By default, the Zeebe Simple Monitor imports Zeebe events through Hazelcast, but
 * Activate Redis by setting `zeebe-importer: redis`
 
 
-If the Zeebe broker runs on your local machine with the default configs then start the container with the following command:  
+If the Zeebe broker runs on your local machine with the default configs then start the container with the following command:
 
 ```
-docker run --network="host" ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.8.1
+docker run --network="host" ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.9.0
 ```
 
-For a local setup, the repository contains a [docker-compose file](docker/docker-compose.yml). It starts a Zeebe broker with the Hazelcast/Kafka/Redis exporter and the application. 
+For a local setup, the repository contains a [docker-compose file](docker/docker-compose.yml). It starts a Zeebe broker with the Hazelcast/Kafka/Redis exporter and the application.
 There are several Docker Compose profiles, setting by a file [.env](docker/.env), by passing multiple --profile flags or a comma-separated list for the COMPOSE_PROFILES environment variable:
 * ```docker compose --profile hazelcast --profile hazelcast_in_memory up```
 * ```COMPOSE_PROFILES=hazelcast,hazelcast_in_memory docker compose up```
@@ -112,10 +112,10 @@ docker-compose --profile postgres up
 ### Manual
 
 1. Download the latest [application JAR](https://github.com/zeebe-io/zeebe-simple-monitor/releases) _(zeebe-simple-monitor-%{VERSION}.jar
-)_
+   )_
 
 1. Start the application
-	`java -jar zeebe-simple-monitor-{VERSION}.jar`
+   `java -jar zeebe-simple-monitor-{VERSION}.jar`
 
 1. Go to http://localhost:8082
 
@@ -239,7 +239,7 @@ For example, using PostgreSQL:
 - spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 ```
 
-* the PostgreSQL database driver is already bundled 
+* the PostgreSQL database driver is already bundled
 
 See the [docker-compose file](docker/docker-compose.yml) for a sample configuration with PostgreSQL. Profiles presets: `hazelcast,hazelcast_postgres,postgres`
 
@@ -261,8 +261,8 @@ See the [docker-compose file](docker/docker-compose.yml) for a sample configurat
 #### Change the default Zeebe importer to Kafka
 
 * set the `zeebe-importer` (default: `hazelcast`) configuration property to `kafka`
-* configure the connection to Kafka by setting `spring.kafka.bootstrap-servers` (default: `localhost:9093`) 
-* configure the Kafka topic by setting `spring.kafka.template.default-topic` (default: `zeebe`) 
+* configure the connection to Kafka by setting `spring.kafka.bootstrap-servers` (default: `localhost:9093`)
+* configure the Kafka topic by setting `spring.kafka.template.default-topic` (default: `zeebe`)
 * configure custom Kafka properties if necessary:
   * `spring.kafka.custom.concurrency` (default: `3`) is the number of threads for the Kafka listener that will import events from Zeebe
   * `spring.kafka.custom.retry.intervalMs` (default: `30000`)  and `spring.kafka.custom.retry.max-attempts` (default: `3`) are the retry configurations for a retryable exception in the listener
