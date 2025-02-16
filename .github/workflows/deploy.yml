@@ -34,7 +34,7 @@ jobs:
           # new login with new container registry url and PAT
           echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
       - name: Deploy SNAPSHOT / Release
-        uses: camunda-community-hub/community-action-maven-release@v1.2.2
+        uses: camunda-community-hub/community-action-maven-release@v1.2.3
         with:
           release-version: ${{ github.event.release.tag_name }}
           release-profile: community-action-maven-release

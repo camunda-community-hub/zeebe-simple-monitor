@@ -17,6 +17,7 @@ import io.zeebe.monitor.entity.MessageSubscriptionEntity;
 import io.zeebe.monitor.entity.ProcessEntity;
 import io.zeebe.monitor.entity.ProcessInstanceEntity;
 import io.zeebe.monitor.entity.TimerEntity;
+import io.zeebe.monitor.querydsl.ProcessEntityPredicatesBuilder;
 import io.zeebe.monitor.repository.MessageSubscriptionRepository;
 import io.zeebe.monitor.repository.ProcessInstanceRepository;
 import io.zeebe.monitor.repository.ProcessRepository;
@@ -30,14 +31,13 @@ import io.zeebe.monitor.rest.dto.TimerDto;
 import jakarta.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -51,52 +51,58 @@ public class ProcessesViewController extends AbstractViewController {
   static final List<String> EXCLUDE_ELEMENT_TYPES =
       List.of(BpmnElementType.MULTI_INSTANCE_BODY.name());
 
+  static final Sort DEFAULT_SORT =
+      Sort.by(Sort.Order.desc("bpmnProcessId"), Sort.Order.desc("timestamp"));
+
   @Autowired private ProcessRepository processRepository;
   @Autowired private ProcessInstanceRepository processInstanceRepository;
   @Autowired private MessageSubscriptionRepository messageSubscriptionRepository;
   @Autowired private TimerRepository timerRepository;
 
   @GetMapping("/")
+  @Transactional
   public String index(final Map<String, Object> model, final Pageable pageable) {
-    return processList(model, pageable, Optional.empty());
+    return processList(model, pageable, Optional.empty(), true);
   }
 
   @GetMapping("/views/processes")
+  @Transactional
   public String processList(
       final Map<String, Object> model,
-      final Pageable pageable,
-      @RequestParam(value = "bpmnProcessId", required = false) Optional<String> bpmnProcessId) {
-
-    if (bpmnProcessId.isPresent() && bpmnProcessId.get().length() >= 3) {
-      final List<ProcessDto> processes = new ArrayList<>();
-      for (final ProcessEntity processEntity :
-          processRepository.findByBpmnProcessIdStartsWith(bpmnProcessId.get())) {
-        final ProcessDto dto = toDto(processEntity);
-        processes.add(dto);
-      }
-
-      model.put("processes", processes);
-      model.put("bpmnProcessId", bpmnProcessId.get());
-      model.put("count", processes.size());
-
-      addPaginationToModel(model, Pageable.ofSize(Integer.MAX_VALUE), processes.size());
-      addDefaultAttributesToModel(model);
-    } else {
-      final long count = processRepository.count();
-
-      final List<ProcessDto> processes = new ArrayList<>();
-      for (final ProcessEntity processEntity : processRepository.findAll(pageable)) {
-        final ProcessDto dto = toDto(processEntity);
-        processes.add(dto);
-      }
-
-      model.put("processes", processes);
-      model.put("bpmnProcessId", "");
-      model.put("count", count);
-
-      addPaginationToModel(model, pageable, count);
-      addDefaultAttributesToModel(model);
+      Pageable pageable,
+      @RequestParam(value = "bpmnProcessId", required = false) Optional<String> bpmnProcessId,
+      @RequestParam(value = "showOldProcessVersions", defaultValue = "false")
+          boolean showOldProcessVersions) {
+    if (!pageable.getSort().isSorted()) {
+      pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), DEFAULT_SORT);
     }
+
+    var predicatesBuilder = new ProcessEntityPredicatesBuilder();
+    bpmnProcessId.filter(it -> it.length() >= 3).ifPresent(predicatesBuilder::withBpmnProcessId);
+
+    if (!showOldProcessVersions) {
+      var latestProcessKeys = processRepository.findLatestVersions();
+      predicatesBuilder.withKeys(latestProcessKeys);
+    }
+    var processesEntities = processRepository.findAll(predicatesBuilder.build(), pageable);
+
+    final List<ProcessDto> processes = new ArrayList<>();
+
+    processesEntities.forEach(
+        process -> {
+          final ProcessDto dto = toDto(process);
+          processes.add(dto);
+        });
+
+    var totalProcesses = processesEntities.getTotalElements();
+
+    model.put("processes", processes);
+    model.put("bpmnProcessId", bpmnProcessId.orElse(""));
+    model.put("showOldProcessVersions", showOldProcessVersions);
+    model.put("count", totalProcesses);
+
+    addPaginationToModel(model, pageable, totalProcesses);
+    addDefaultAttributesToModel(model);
 
     return "process-list-view";
   }
@@ -113,8 +119,14 @@ public class ProcessesViewController extends AbstractViewController {
             .findByKey(key)
             .orElseThrow(
                 () -> new ResponseStatusException(NOT_FOUND, "No process found with key: " + key));
-
     model.put("process", toDto(process));
+
+    final Optional<ProcessEntity> latest =
+        processRepository
+            .findByBpmnProcessIdContaining(process.getBpmnProcessId(), pageable)
+            .stream()
+            .max(Comparator.comparingInt(ProcessEntity::getVersion));
+    model.put("latestProcessDefinition", toDto(latest.orElse(process)));
     model.put("resource", getProcessResource(process));
 
     final List<ElementInstanceState> elementInstanceStates = getElementInstanceStates(key);
