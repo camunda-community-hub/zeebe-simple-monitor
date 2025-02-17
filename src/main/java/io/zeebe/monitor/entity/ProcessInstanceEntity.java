@@ -15,11 +15,14 @@
  */
 package io.zeebe.monitor.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity(name = "PROCESS_INSTANCE")
+@Table(
+    indexes = {
+      @Index(name = "process_instance__start", columnList = "START_"),
+      @Index(name = "process_instance__state", columnList = "STATE_"),
+    })
 public class ProcessInstanceEntity {
 
   @Id
@@ -119,6 +122,10 @@ public class ProcessInstanceEntity {
 
   public String getState() {
     return state;
+  }
+
+  public void setState(final ProcessInstanceState state) {
+    setState(state.name());
   }
 
   public void setState(final String state) {

@@ -9,6 +9,7 @@ import io.camunda.zeebe.protocol.record.RecordValue;
 import io.camunda.zeebe.protocol.record.ValueType;
 import io.camunda.zeebe.protocol.record.intent.DeploymentIntent;
 import io.camunda.zeebe.protocol.record.value.ImmutableVariableRecordValue;
+import io.zeebe.monitor.config.BusinessKeyProperties;
 import io.zeebe.monitor.entity.VariableEntity;
 import io.zeebe.monitor.repository.VariableRepository;
 import io.zeebe.monitor.repository.ZeebeRepositoryTest;
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
-@ContextConfiguration(classes = {VariableKafkaImporter.class})
+@ContextConfiguration(classes = {VariableKafkaImporter.class, BusinessKeyProperties.class})
 public class VariableKafkaImporterTest extends ZeebeRepositoryTest {
 
   @Autowired VariableKafkaImporter variableImporter;

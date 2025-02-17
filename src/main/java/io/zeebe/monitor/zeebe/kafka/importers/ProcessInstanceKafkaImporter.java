@@ -6,6 +6,7 @@ import io.camunda.zeebe.protocol.record.intent.ProcessInstanceIntent;
 import io.camunda.zeebe.protocol.record.value.ProcessInstanceRecordValue;
 import io.zeebe.monitor.entity.ElementInstanceEntity;
 import io.zeebe.monitor.entity.ProcessInstanceEntity;
+import io.zeebe.monitor.entity.ProcessInstanceState;
 import io.zeebe.monitor.repository.ElementInstanceRepository;
 import io.zeebe.monitor.repository.ProcessInstanceRepository;
 import io.zeebe.monitor.zeebe.ZeebeNotificationService;
@@ -51,7 +52,7 @@ public class ProcessInstanceKafkaImporter extends KafkaImporter {
                 });
 
     if (intent == ProcessInstanceIntent.ELEMENT_ACTIVATED) {
-      entity.setState("Active");
+      entity.setState(ProcessInstanceState.Active);
       entity.setStart(timestamp);
       processInstanceRepository.save(entity);
 
@@ -59,7 +60,7 @@ public class ProcessInstanceKafkaImporter extends KafkaImporter {
           value.getProcessInstanceKey(), value.getProcessDefinitionKey());
 
     } else if (intent == ProcessInstanceIntent.ELEMENT_COMPLETED) {
-      entity.setState("Completed");
+      entity.setState(ProcessInstanceState.Completed);
       entity.setEnd(timestamp);
       processInstanceRepository.save(entity);
 
@@ -67,7 +68,7 @@ public class ProcessInstanceKafkaImporter extends KafkaImporter {
           value.getProcessInstanceKey(), value.getProcessDefinitionKey());
 
     } else if (intent == ProcessInstanceIntent.ELEMENT_TERMINATED) {
-      entity.setState("Terminated");
+      entity.setState(ProcessInstanceState.Terminated);
       entity.setEnd(timestamp);
       processInstanceRepository.save(entity);
 

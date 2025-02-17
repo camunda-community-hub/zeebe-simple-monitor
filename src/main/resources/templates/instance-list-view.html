@@ -1,6 +1,30 @@
 {{>layout/header}}
 
 <div class="row">
+    <div class="col-md-12 mb-2">
+        <form method="get" action="{{context-path}}views/instances">
+            <div class="form-row">
+                <div class="form-group mb-1 col-sm-2">
+                    <label class="mx-sm-2" for="business-key-search-input" >Business key</label>
+                    <input class="form-control" id="business-key-search-input" name="businessKey" type="text" value="{{businessKey}}" />
+                </div>
+
+                <div class="form-group mb-3 col-sm-1">
+                    <label class="mx-sm-2" for="state">State</label>
+                    <select class="form-control" id="state" name="state" multiple>
+                        {{#state}}
+                        <option value="{{value}}" {{#selected}}selected{{/selected}}>{{value}}</option>
+                        {{/state}}
+                    </select>
+                </div>
+
+                <div class="form-group mb-2 col-sm-3">
+                    <button class="btn btn-primary mb-1 col-sm-2" type="submit">Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
     <div class="col-md-12">
 
         <span>{{count}} instances</span>
