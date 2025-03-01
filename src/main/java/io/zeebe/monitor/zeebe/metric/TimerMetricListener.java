@@ -1,0 +1,27 @@
+package io.zeebe.monitor.zeebe.metric;
+
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.zeebe.monitor.zeebe.event.TimerEvent;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+
+@Component
+public class TimerMetricListener {
+
+  private final Counter counter;
+
+  @Autowired
+  public TimerMetricListener(MeterRegistry meterRegistry) {
+    this.counter =
+        Counter.builder("zeebemonitor_importer_timer")
+            .description("number of processed timers")
+            .register(meterRegistry);
+  }
+
+  @EventListener
+  public void onTimerEvent(TimerEvent event) {
+    counter.increment();
+  }
+}

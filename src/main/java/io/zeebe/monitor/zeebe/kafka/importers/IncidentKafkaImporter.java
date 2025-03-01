@@ -6,13 +6,16 @@ import io.camunda.zeebe.protocol.record.intent.IncidentIntent;
 import io.camunda.zeebe.protocol.record.value.IncidentRecordValue;
 import io.zeebe.monitor.entity.IncidentEntity;
 import io.zeebe.monitor.repository.IncidentRepository;
+import io.zeebe.monitor.zeebe.event.IncidentEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Component
 public class IncidentKafkaImporter extends KafkaImporter {
 
   @Autowired private IncidentRepository incidentRepository;
+  @Autowired private ApplicationEventPublisher applicationEventPublisher;
 
   @Override
   public void importRecord(final Record<RecordValue> record) {
@@ -43,9 +46,16 @@ public class IncidentKafkaImporter extends KafkaImporter {
       entity.setCreated(timestamp);
       incidentRepository.save(entity);
 
+      applicationEventPublisher.publishEvent(
+          new IncidentEvent(
+              entity.getBpmnProcessId(), value.getElementId(), IncidentIntent.CREATED));
     } else if (intent == IncidentIntent.RESOLVED) {
       entity.setResolved(timestamp);
       incidentRepository.save(entity);
+
+      applicationEventPublisher.publishEvent(
+          new IncidentEvent(
+              entity.getBpmnProcessId(), value.getElementId(), IncidentIntent.RESOLVED));
     }
   }
 }

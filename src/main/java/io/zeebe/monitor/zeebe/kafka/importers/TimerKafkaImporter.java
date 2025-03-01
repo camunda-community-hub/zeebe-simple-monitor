@@ -5,13 +5,16 @@ import io.camunda.zeebe.protocol.record.RecordValue;
 import io.camunda.zeebe.protocol.record.value.TimerRecordValue;
 import io.zeebe.monitor.entity.TimerEntity;
 import io.zeebe.monitor.repository.TimerRepository;
+import io.zeebe.monitor.zeebe.event.TimerEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TimerKafkaImporter extends KafkaImporter {
 
   @Autowired private TimerRepository timerRepository;
+  @Autowired private ApplicationEventPublisher applicationEventPublisher;
 
   @Override
   public void importRecord(final Record<RecordValue> record) {
@@ -43,5 +46,7 @@ public class TimerKafkaImporter extends KafkaImporter {
     entity.setState(intent.name().toLowerCase());
     entity.setTimestamp(timestamp);
     timerRepository.save(entity);
+
+    applicationEventPublisher.publishEvent(new TimerEvent());
   }
 }
