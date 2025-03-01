@@ -5,13 +5,16 @@ import io.camunda.zeebe.protocol.record.RecordValue;
 import io.camunda.zeebe.protocol.record.value.ErrorRecordValue;
 import io.zeebe.monitor.entity.ErrorEntity;
 import io.zeebe.monitor.repository.ErrorRepository;
+import io.zeebe.monitor.zeebe.event.ErrorEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ErrorKafkaImporter extends KafkaImporter {
 
   @Autowired private ErrorRepository errorRepository;
+  @Autowired private ApplicationEventPublisher applicationEventPublisher;
 
   @Override
   public void importRecord(final Record<RecordValue> record) {
@@ -34,5 +37,7 @@ public class ErrorKafkaImporter extends KafkaImporter {
                 });
 
     errorRepository.save(entity);
+
+    applicationEventPublisher.publishEvent(new ErrorEvent());
   }
 }

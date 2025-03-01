@@ -9,7 +9,10 @@ import io.zeebe.monitor.entity.ProcessInstanceEntity;
 import io.zeebe.monitor.repository.ElementInstanceRepository;
 import io.zeebe.monitor.repository.ProcessInstanceRepository;
 import io.zeebe.monitor.zeebe.ZeebeNotificationService;
+import io.zeebe.monitor.zeebe.event.ProcessElementEvent;
+import io.zeebe.monitor.zeebe.event.ProcessInstanceEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,6 +21,7 @@ public class ProcessInstanceKafkaImporter extends KafkaImporter {
   @Autowired private ProcessInstanceRepository processInstanceRepository;
   @Autowired private ElementInstanceRepository elementInstanceRepository;
   @Autowired private ZeebeNotificationService notificationService;
+  @Autowired private ApplicationEventPublisher applicationEventPublisher;
 
   @Override
   public void importRecord(final Record<RecordValue> record) {
@@ -55,6 +59,9 @@ public class ProcessInstanceKafkaImporter extends KafkaImporter {
       entity.setStart(timestamp);
       processInstanceRepository.save(entity);
 
+      applicationEventPublisher.publishEvent(
+          new ProcessInstanceEvent(ProcessInstanceIntent.ELEMENT_ACTIVATED));
+
       notificationService.sendCreatedProcessInstance(
           value.getProcessInstanceKey(), value.getProcessDefinitionKey());
 
@@ -63,6 +70,9 @@ public class ProcessInstanceKafkaImporter extends KafkaImporter {
       entity.setEnd(timestamp);
       processInstanceRepository.save(entity);
 
+      applicationEventPublisher.publishEvent(
+          new ProcessInstanceEvent(ProcessInstanceIntent.ELEMENT_COMPLETED));
+
       notificationService.sendEndedProcessInstance(
           value.getProcessInstanceKey(), value.getProcessDefinitionKey());
 
@@ -70,6 +80,9 @@ public class ProcessInstanceKafkaImporter extends KafkaImporter {
       entity.setState("Terminated");
       entity.setEnd(timestamp);
       processInstanceRepository.save(entity);
+
+      applicationEventPublisher.publishEvent(
+          new ProcessInstanceEvent(ProcessInstanceIntent.ELEMENT_TERMINATED));
 
       notificationService.sendEndedProcessInstance(
           value.getProcessInstanceKey(), value.getProcessDefinitionKey());
@@ -93,6 +106,13 @@ public class ProcessInstanceKafkaImporter extends KafkaImporter {
       entity.setBpmnElementType(
           value.getBpmnElementType() == null ? null : value.getBpmnElementType().name());
       elementInstanceRepository.save(entity);
+
+      applicationEventPublisher.publishEvent(
+          new ProcessElementEvent(
+              value.getBpmnProcessId(),
+              entity.getBpmnElementType(),
+              entity.getElementId(),
+              entity.getIntent()));
       notificationService.sendUpdatedProcessInstance(
           value.getProcessInstanceKey(), value.getProcessDefinitionKey());
     }

@@ -5,13 +5,16 @@ import io.camunda.zeebe.protocol.record.RecordValue;
 import io.camunda.zeebe.protocol.record.value.MessageRecordValue;
 import io.zeebe.monitor.entity.MessageEntity;
 import io.zeebe.monitor.repository.MessageRepository;
+import io.zeebe.monitor.zeebe.event.MessageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MessageKafkaImporter extends KafkaImporter {
 
   @Autowired private MessageRepository messageRepository;
+  @Autowired private ApplicationEventPublisher applicationEventPublisher;
 
   @Override
   public void importRecord(final Record<RecordValue> record) {
@@ -37,5 +40,7 @@ public class MessageKafkaImporter extends KafkaImporter {
     entity.setState(intent.name().toLowerCase());
     entity.setTimestamp(timestamp);
     messageRepository.save(entity);
+
+    applicationEventPublisher.publishEvent(new MessageEvent());
   }
 }

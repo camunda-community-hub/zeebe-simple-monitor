@@ -5,13 +5,16 @@ import io.camunda.zeebe.protocol.record.RecordValue;
 import io.camunda.zeebe.protocol.record.value.MessageStartEventSubscriptionRecordValue;
 import io.zeebe.monitor.entity.MessageSubscriptionEntity;
 import io.zeebe.monitor.repository.MessageSubscriptionRepository;
+import io.zeebe.monitor.zeebe.event.MessageSubscriptionEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MessageStartEventSubscriptionKafkaImporter extends KafkaImporter {
 
   @Autowired private MessageSubscriptionRepository messageSubscriptionRepository;
+  @Autowired private ApplicationEventPublisher applicationEventPublisher;
 
   @Override
   public void importRecord(final Record<RecordValue> record) {
@@ -37,5 +40,7 @@ public class MessageStartEventSubscriptionKafkaImporter extends KafkaImporter {
     entity.setState(intent.name().toLowerCase());
     entity.setTimestamp(timestamp);
     messageSubscriptionRepository.save(entity);
+
+    applicationEventPublisher.publishEvent(new MessageSubscriptionEvent(true));
   }
 }
