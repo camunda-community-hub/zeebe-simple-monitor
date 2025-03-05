@@ -15,6 +15,9 @@ public class IncidentProtobufImporter {
   public void importIncident(final Schema.IncidentRecord record) {
 
     final IncidentIntent intent = IncidentIntent.valueOf(record.getMetadata().getIntent());
+    if (intent!= IncidentIntent.CREATED && intent != IncidentIntent.RESOLVED) {
+      return;
+    }
     final long key = record.getMetadata().getKey();
     final long timestamp = record.getMetadata().getTimestamp();
 

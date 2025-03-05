@@ -50,6 +50,11 @@ public class ProcessAndElementProtobufImporter {
   private void addOrUpdateProcessInstance(final Schema.ProcessInstanceRecord record) {
 
     final Intent intent = ProcessInstanceIntent.valueOf(record.getMetadata().getIntent());
+
+    if (intent != ProcessInstanceIntent.ELEMENT_ACTIVATED && intent != ProcessInstanceIntent.ELEMENT_COMPLETED && intent != ProcessInstanceIntent.ELEMENT_TERMINATED
+        && intent != ProcessInstanceIntent.SEQUENCE_FLOW_TAKEN) {
+      return;
+    }
     final long timestamp = record.getMetadata().getTimestamp();
     final long processInstanceKey = record.getProcessInstanceKey();
 
@@ -96,6 +101,13 @@ public class ProcessAndElementProtobufImporter {
   }
 
   private void addElementInstance(final Schema.ProcessInstanceRecord record) {
+
+    final ProcessInstanceIntent intent = ProcessInstanceIntent.valueOf(record.getMetadata().getIntent());
+    if (intent != ProcessInstanceIntent.ELEMENT_ACTIVATED && intent != ProcessInstanceIntent.ELEMENT_COMPLETED && intent != ProcessInstanceIntent.ELEMENT_TERMINATED
+        && intent != ProcessInstanceIntent.SEQUENCE_FLOW_TAKEN) {
+      return;
+    }
+
     final ElementInstanceEntity entity = new ElementInstanceEntity();
     entity.setPartitionId(record.getMetadata().getPartitionId());
     entity.setPosition(record.getMetadata().getPosition());

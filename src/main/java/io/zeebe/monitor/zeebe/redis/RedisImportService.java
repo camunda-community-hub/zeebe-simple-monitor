@@ -10,6 +10,7 @@ import io.zeebe.redis.connect.java.ZeebeRedis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -28,6 +29,7 @@ public class RedisImportService {
   public ZeebeRedis importFrom(final RedisClient redisClient, RedisConfig redisConfig) {
     final var builder = ZeebeRedis.newBuilder(redisClient)
                     .consumerGroup(redisConfig.getRedisConumerGroup())
+                    .consumerId(redisConfig.getRedisConumerGroup() + UUID.randomUUID().toString().substring(0, 8))
                     .xreadCount(redisConfig.getRedisXreadCount()).xreadBlockMillis(redisConfig.getRedisXreadBlockMillis())
                     .prefix(redisConfig.getRedisPrefix());
     addListener(builder);
@@ -38,6 +40,7 @@ public class RedisImportService {
     final var builder = ZeebeRedis.newBuilder(redisClient)
                     .withStandardClusterOptions()
                     .consumerGroup(redisConfig.getRedisConumerGroup())
+                    .consumerId(redisConfig.getRedisConumerGroup() + UUID.randomUUID().toString().substring(0, 8))
                     .xreadCount(redisConfig.getRedisXreadCount()).xreadBlockMillis(redisConfig.getRedisXreadBlockMillis())
                     .prefix(redisConfig.getRedisPrefix());
     addListener(builder);

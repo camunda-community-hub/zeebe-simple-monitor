@@ -10,31 +10,28 @@ import org.springframework.stereotype.Component;
 @Component
 public class JobProtobufImporter {
 
-  @Autowired private JobRepository jobRepository;
+  @Autowired
+  private JobRepository jobRepository;
 
   public void importJob(final Schema.JobRecord record) {
 
     final JobIntent intent = JobIntent.valueOf(record.getMetadata().getIntent());
+    if (intent != JobIntent.COMPLETED) {
+      return;
+    }
     final long key = record.getMetadata().getKey();
     final long timestamp = record.getMetadata().getTimestamp();
 
-    final JobEntity entity =
-        jobRepository
-            .findById(key)
-            .orElseGet(
-                () -> {
-                  final JobEntity newEntity = new JobEntity();
-                  newEntity.setKey(key);
-                  newEntity.setProcessInstanceKey(record.getProcessInstanceKey());
-                  newEntity.setElementInstanceKey(record.getElementInstanceKey());
-                  newEntity.setJobType(record.getType());
-                  return newEntity;
-                });
+    final JobEntity newEntity = new JobEntity();
+    newEntity.setKey(key);
+    newEntity.setProcessInstanceKey(record.getProcessInstanceKey());
+    newEntity.setElementInstanceKey(record.getElementInstanceKey());
+    newEntity.setJobType(record.getType());
 
-    entity.setState(intent.name().toLowerCase());
-    entity.setTimestamp(timestamp);
-    entity.setWorker(record.getWorker());
-    entity.setRetries(record.getRetries());
-    jobRepository.save(entity);
+    newEntity.setState(intent.name().toLowerCase());
+    newEntity.setTimestamp(timestamp);
+    newEntity.setWorker(record.getWorker());
+    newEntity.setRetries(record.getRetries());
+    jobRepository.save(newEntity);
   }
 }

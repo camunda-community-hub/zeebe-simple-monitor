@@ -30,7 +30,7 @@
         <version.hazelcast>5.3.6</version.hazelcast>
 
         <!-- release parent settings -->
-        <version.java>17</version.java>
+        <version.java>21</version.java>
         <java.version>${version.java}</java.version>
 
         <jib-maven-plugin.image>eclipse-temurin:21-jre-jammy</jib-maven-plugin.image>
