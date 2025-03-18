@@ -90,11 +90,11 @@ public class RedisImportService {
                     Schema.MessageStartEventSubscriptionRecord::getMetadata,
                     messageSubscriptionImporter::importMessageStartEventSubscription))
         .addUserTaskListener(
-        		record ->
-        				ifEvent(
-        						record,
-        						Schema.UserTaskRecord::getMetadata,
-        						userTaskProtobufImporter::importUserTask))
+            record ->
+                ifEvent(
+                    record,
+                    Schema.UserTaskRecord::getMetadata,
+                    userTaskProtobufImporter::importUserTask))
         .addErrorListener(errorImporter::importError);
   }
 

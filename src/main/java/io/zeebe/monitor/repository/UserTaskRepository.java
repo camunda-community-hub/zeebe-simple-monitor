@@ -12,17 +12,15 @@
  */
 package io.zeebe.monitor.repository;
 
+import io.zeebe.monitor.entity.UserTaskEntity;
 import java.util.List;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 
-import io.zeebe.monitor.entity.UserTaskEntity;
-
 public interface UserTaskRepository extends CrudRepository<UserTaskEntity, Long> {
 
-	List<UserTaskEntity> findByProcessInstanceKeyOrderByStartAscKeyAsc(long processInstanceKey, Pageable pageable);
+  List<UserTaskEntity> findByProcessInstanceKeyOrderByStartAscKeyAsc(
+      long processInstanceKey, Pageable pageable);
 
-	long countByProcessInstanceKey(long processInstanceKey);
-
+  long countByProcessInstanceKey(long processInstanceKey);
 }

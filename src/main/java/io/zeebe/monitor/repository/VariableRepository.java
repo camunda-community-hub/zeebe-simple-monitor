@@ -12,16 +12,13 @@
  */
 package io.zeebe.monitor.repository;
 
-import java.util.List;
-
-import org.springframework.data.repository.CrudRepository;
-
 import io.zeebe.monitor.entity.VariableEntity;
+import java.util.List;
+import org.springframework.data.repository.CrudRepository;
 
 public interface VariableRepository extends CrudRepository<VariableEntity, String> {
 
-	List<VariableEntity> findByProcessInstanceKeyOrderByTimestampAscIdAsc(long processInstanceKey);
+  List<VariableEntity> findByProcessInstanceKeyOrderByTimestampAscIdAsc(long processInstanceKey);
 
-	long countByProcessInstanceKey(long processInstanceKey);
-
+  long countByProcessInstanceKey(long processInstanceKey);
 }
