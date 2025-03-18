@@ -4,28 +4,29 @@ zeebe:
     security.plaintext: true
 
     worker:
-      hazelcast:
-        connection: localhost:5701
-        clusterName: dev
-        connectionTimeout: PT30S
       redis:
-        connection: redis://localhost:6379
+        connection: redis://Mngfnfw6Khwg2bYiMd7y6FAWKYy67xZ7@localhost:6379
+        useClusterClient: false
+        consumer-group: simple-monitor
+        prefix: zeebe
+        xread-count: 500
+        xread-block-millis: 2000
 
 # Options: hazelcast | kafka | redis
 # This config switches importers between the provided
 # To use each of them, zeebe must be configured using hazelcast-exporter, kafka-exporter or redis-exporter, respectively
 # See the examples in docker/docker-compose.yml in services.zeebe-hazelcast, services.zeebe-kafka, services-zeebe-redis
-zeebe-importer: hazelcast
+zeebe-importer: redis
 
 spring:
   datasource:
-    url: jdbc:h2:mem:zeebe-monitor;DB_CLOSE_DELAY=-1
-    username: sa
-    password:
-    driverClassName: org.h2.Driver
+      url: jdbc:postgresql://localhost:5432/zeebe
+      username: zeebeuser
+      password: sportstech@123
+      driverClassName: org.postgresql.Driver
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
 

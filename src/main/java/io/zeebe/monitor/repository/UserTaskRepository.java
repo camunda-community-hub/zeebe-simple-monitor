@@ -14,13 +14,14 @@ package io.zeebe.monitor.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 
-import io.zeebe.monitor.entity.VariableEntity;
+import io.zeebe.monitor.entity.UserTaskEntity;
 
-public interface VariableRepository extends CrudRepository<VariableEntity, String> {
+public interface UserTaskRepository extends CrudRepository<UserTaskEntity, Long> {
 
-	List<VariableEntity> findByProcessInstanceKeyOrderByTimestampAscIdAsc(long processInstanceKey);
+	List<UserTaskEntity> findByProcessInstanceKeyOrderByStartAscKeyAsc(long processInstanceKey, Pageable pageable);
 
 	long countByProcessInstanceKey(long processInstanceKey);
 

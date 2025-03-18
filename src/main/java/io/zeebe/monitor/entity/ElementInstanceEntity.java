@@ -65,6 +65,9 @@ public class ElementInstanceEntity {
   @Column(name = "TIMESTAMP_")
   private long timestamp;
 
+  @Column(name = "USER_KEY_")
+  private Long userKey;
+
   public String getId() {
     return id;
   }
@@ -162,4 +165,12 @@ public class ElementInstanceEntity {
   public void setBpmnElementType(final String bpmnElementType) {
     this.bpmnElementType = bpmnElementType;
   }
+  
+	public Long getUserKey() {
+		return userKey;
+	}
+
+	public void setUserKey(final Long userKey) {
+		this.userKey = userKey;
+	}
 }
