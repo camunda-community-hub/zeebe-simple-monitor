@@ -150,6 +150,12 @@
         <dependency>
             <groupId>io.zeebe.hazelcast</groupId>
             <artifactId>zeebe-hazelcast-connector</artifactId>
+            <exclusions>
+            	<exclusion>
+            		<groupId>io.zeebe</groupId>
+            		<artifactId>zeebe-exporter-protobuf</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
