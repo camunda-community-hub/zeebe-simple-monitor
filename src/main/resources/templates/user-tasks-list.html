@@ -8,6 +8,7 @@
     <th>Status</th>
     <th>Start</th>
     <th>End</th>
+    <th></th>
     </thead>
 
     {{#instance.userTasks}}
@@ -20,6 +21,15 @@
         <td>{{status}}</td>
         <td>{{start}}</td>
         <td>{{end}}</td>
+        <td>
+            {{>modals/complete-user-task-modal}}
+
+            <button type="button" class="btn btn-primary" data-toggle="modal"
+                    data-target="#completeUserTaskModal-{{processInstanceKey}}-{{key}}"
+                    {{^instance.isRunning}}disabled{{/instance.isRunning}} {{^notActive}}hidden{{/notActive}} >
+            Complete
+            </button>
+        </td>
     </tr>
     {{/instance.userTasks}}
 

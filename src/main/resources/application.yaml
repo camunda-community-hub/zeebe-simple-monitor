@@ -1,6 +1,9 @@
 zeebe:
   client:
     broker.gatewayAddress: 127.0.0.1:26500
+    broker:
+      gateway-address: 127.0.0.1:26500
+      rest-address: http://127.0.0.1:8086
     security.plaintext: true
 
     worker:

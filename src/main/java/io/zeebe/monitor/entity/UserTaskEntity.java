@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity(name = "USER_TASK")
 @Table(
@@ -40,6 +41,8 @@ public class UserTaskEntity {
 
   @Column(name = "END_")
   private Long end;
+
+  @Transient private boolean notActive;
 
   public long getKey() {
     return key;
@@ -103,5 +106,9 @@ public class UserTaskEntity {
 
   public void setEnd(Long end) {
     this.end = end;
+  }
+
+  public boolean isNotActive() {
+    return notActive = this.status != "Active";
   }
 }

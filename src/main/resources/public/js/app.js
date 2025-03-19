@@ -293,6 +293,61 @@ function updateVariable(scopeKey, name) {
     });
 }
 
+function completeUserTask(processInstanceKey, userTaskKey) {
+	var errorDisplayElementId = "complete-task-variable-" + userTaskKey + "-error";
+	var elementId = "complete-task-variable-" + userTaskKey;
+	var textArea = document.getElementById(elementId);
+	var errorDisplayElement = document.getElementById(errorDisplayElementId);
+	try{
+		errorDisplayElement.innerHTML = "";
+	    var value = textArea.value;
+	    
+	    var data = "{}";
+	    
+		if(value) {
+		    textArea.style.border = "1px solid #ced4da";
+			data = JSON.stringify(JSON.parse(value));			
+		}
+		
+	    $.ajax({
+	        type: 'POST',
+	        url: buildPath('api/user-task/' + userTaskKey),
+	        data: data,
+	        contentType: 'application/json; charset=utf-8',
+	        success: function (result) {
+	            showSuccess("Task Completed.");
+	        },
+	        error: function (xhr, ajaxOptions, thrownError) {
+	            showErrorResonse(xhr, ajaxOptions, thrownError);
+	        },
+	        timeout: 5000,
+	        crossDomain: true,
+	    });
+	    $("#completeUserTaskModal-" + processInstanceKey + "-" + userTaskKey).modal('hide');
+    } catch(e) {
+		errorDisplayElement.innerHTML = e.message;
+		textArea.style.border = "1px solid tomato";
+	}
+}
+
+function prettyPrint(userTaskKey) {
+	var errorDisplayElementId = "complete-task-variable-" + userTaskKey + "-error";
+	var elementId = "complete-task-variable-" + userTaskKey;
+	var textArea = document.getElementById(elementId);
+	var errorDisplayElement = document.getElementById(errorDisplayElementId);
+	try{
+		errorDisplayElement.innerHTML = "";
+	    var ugly = textArea.value;
+	    textArea.style.border = "1px solid #ced4da";
+	    var obj = JSON.parse(ugly);
+	    var pretty = JSON.stringify(obj, undefined, 4);
+	    textArea.value = pretty;
+    } catch(e) {
+		errorDisplayElement.innerHTML = e.message;
+		textArea.style.border = "1px solid tomato";
+	}
+}
+
 function setVariable() {
 
     var scopeKeyElement = document.getElementById("variable-scopeKey");
