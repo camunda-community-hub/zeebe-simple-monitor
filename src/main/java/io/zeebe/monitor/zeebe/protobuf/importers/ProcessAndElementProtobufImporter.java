@@ -65,7 +65,7 @@ public class ProcessAndElementProtobufImporter {
                 () -> {
                   final ProcessInstanceEntity newEntity = new ProcessInstanceEntity();
                   newEntity.setPartitionId(record.getMetadata().getPartitionId());
-                  newEntity.setKey(processInstanceKey);
+                  //newEntity.setKey(processInstanceKey);
                   newEntity.setBpmnProcessId(record.getBpmnProcessId());
                   newEntity.setVersion(record.getVersion());
                   newEntity.setProcessDefinitionKey(record.getProcessDefinitionKey());
@@ -73,6 +73,13 @@ public class ProcessAndElementProtobufImporter {
                   newEntity.setParentElementInstanceKey(record.getParentElementInstanceKey());
                   return newEntity;
                 });
+
+    if (entity.getKey() == 0 && intent != ProcessInstanceIntent.ELEMENT_ACTIVATED) {
+      return;   
+    }
+    else if (entity.getKey() == 0) {
+      entity.setKey(processInstanceKey);
+    }
 
     if (intent == ProcessInstanceIntent.ELEMENT_ACTIVATED) {
       entity.setState("Active");
