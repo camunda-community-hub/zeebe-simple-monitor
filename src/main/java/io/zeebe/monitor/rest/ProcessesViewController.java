@@ -69,7 +69,7 @@ public class ProcessesViewController extends AbstractViewController {
 
     final List<ProcessDto> processes = new ArrayList<>();
     for (final ProcessEntity processEntity : processRepository.findAll(pageable)) {
-      final ProcessDto dto = toDto(processEntity);
+      final ProcessDto dto =ProcessDto.from(processEntity, 0, 0);
       processes.add(dto);
     }
 

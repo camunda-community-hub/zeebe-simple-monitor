@@ -20,8 +20,6 @@
             <th>Process Definition Key</th>
             <th>BPMN process id</th>
             <th>Version</th>
-            <th># active</th>
-            <th># ended</th>
             <th>Deployment Time
                 <a id="process-deployment-time" href="#" class="badge badge-secondary" data-toggle="tooltip" data-placement="top"
                    title="Sort by Deployment Time">
@@ -35,8 +33,6 @@
                 <td><a href="{{context-path}}views/processes/{{processDefinitionKey}}">{{processDefinitionKey}}</a></td>
                 <td>{{bpmnProcessId}}</td>
                 <td>{{version}}</td>
-                <td>{{countRunning}}</td>
-                <td>{{countEnded}}</td>
                 <td>{{deploymentTime}}</td>
             </tr>
             {{/processes}}

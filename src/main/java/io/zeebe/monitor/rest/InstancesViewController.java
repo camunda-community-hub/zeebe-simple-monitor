@@ -19,7 +19,7 @@ public class InstancesViewController extends AbstractViewController {
   @GetMapping("/views/instances")
   public String instanceList(final Map<String, Object> model, final Pageable pageable) {
 
-    final long count = processInstanceRepository.count();
+    final long count = 10000000l;//processInstanceRepository.count();
 
     final List<ProcessInstanceListDto> instances = new ArrayList<>();
     for (final ProcessInstanceEntity instanceEntity : processInstanceRepository.findAll(pageable)) {
