@@ -18,7 +18,7 @@ public class MessageSubscriptionProtobufImporter {
   public void importMessageSubscription(final Schema.MessageSubscriptionRecord record) {
 
     final MessageSubscriptionIntent intent = MessageSubscriptionIntent.valueOf(record.getMetadata().getIntent());
-    if (intent != MessageSubscriptionIntent.CREATED && intent != MessageSubscriptionIntent.CORRELATED) {
+    if (intent != MessageSubscriptionIntent.CORRELATED) {
       return;
 
     }
