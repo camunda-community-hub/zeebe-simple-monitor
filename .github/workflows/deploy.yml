@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -34,12 +34,16 @@ jobs:
           # new login with new container registry url and PAT
           echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
       - name: Deploy SNAPSHOT / Release
-        uses: camunda-community-hub/community-action-maven-release@v1.2.3
+        uses: camunda-community-hub/community-action-maven-release@v2
         with:
           release-version: ${{ github.event.release.tag_name }}
           release-profile: community-action-maven-release
           nexus-usr: ${{ secrets.NEXUS_USR }}
           nexus-psw: ${{ secrets.NEXUS_PSW }}
+          sonatype-central-portal-usr: ${{ secrets.COMMUNITY_HUB_MAVEN_CENTRAL_CP_USR }}
+          sonatype-central-portal-psw: ${{ secrets.COMMUNITY_HUB_MAVEN_CENTRAL_CP_PSW }}
+          # maven-usr, maven-psw and maven-url are deprecated; they are required only for publishing to the legacy OSS Sonatype repository.
+          # Once the io.zeebe namespace is migrated to the Sonatype Central Portal, these can be safely removed.
           maven-usr: ${{ secrets.MAVEN_CENTRAL_DEPLOYMENT_USR }}
           maven-psw: ${{ secrets.MAVEN_CENTRAL_DEPLOYMENT_PSW }}
           maven-gpg-passphrase: ${{ secrets.MAVEN_CENTRAL_GPG_SIGNING_KEY_PASSPHRASE }}
