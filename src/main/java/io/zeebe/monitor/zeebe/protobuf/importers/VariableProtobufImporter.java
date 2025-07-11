@@ -1,35 +1,24 @@
 package io.zeebe.monitor.zeebe.protobuf.importers;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.VariableEntity;
 import io.zeebe.monitor.repository.VariableRepository;
+import io.zeebe.monitor.zeebe.event.VariableEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Component
 public class VariableProtobufImporter {
 
   private final VariableRepository variableRepository;
-  private final Counter variableCreatedCounter;
-  private final Counter variableUpdatedCounter;
+  private final ApplicationEventPublisher applicationEventPublisher;
 
   @Autowired
   public VariableProtobufImporter(
-      VariableRepository variableRepository, MeterRegistry meterRegistry) {
+      VariableRepository variableRepository, ApplicationEventPublisher applicationEventPublisher) {
     this.variableRepository = variableRepository;
-
-    this.variableCreatedCounter =
-        Counter.builder("zeebemonitor_importer_variable")
-            .tag("action", "imported")
-            .description("number of processed variables")
-            .register(meterRegistry);
-    this.variableUpdatedCounter =
-        Counter.builder("zeebemonitor_importer_variable")
-            .tag("action", "updated")
-            .description("number of processed variables")
-            .register(meterRegistry);
+    this.applicationEventPublisher = applicationEventPublisher;
   }
 
   public void importVariable(final Schema.VariableRecord record) {
@@ -46,9 +35,9 @@ public class VariableProtobufImporter {
       variableRepository.save(newVariable);
 
       if (newVariable.getState().equals("updated")) {
-        variableUpdatedCounter.increment();
+        applicationEventPublisher.publishEvent(new VariableEvent(true));
       } else {
-        variableCreatedCounter.increment();
+        applicationEventPublisher.publishEvent(new VariableEvent(false));
       }
     }
   }
