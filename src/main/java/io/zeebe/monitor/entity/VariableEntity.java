@@ -42,6 +42,9 @@ public class VariableEntity {
   @Lob
   private String value;
 
+  @Column(name = "VALUETEXT_")
+  private String valueText;
+
   @Column(name = "PROCESS_INSTANCE_KEY_")
   private long processInstanceKey;
 
@@ -134,5 +137,13 @@ public class VariableEntity {
 
   public void setPartitionId(final int partitionId) {
     this.partitionId = partitionId;
+  }
+
+  public String getValueText() {
+    return valueText;
+  }
+
+  public void setValueText(final String valueText) {
+    this.valueText = valueText;
   }
 }

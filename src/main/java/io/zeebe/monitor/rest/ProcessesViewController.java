@@ -47,15 +47,17 @@ import org.springframework.web.server.ResponseStatusException;
 public class ProcessesViewController extends AbstractViewController {
 
   static final List<String> PROCESS_INSTANCE_ENTERED_INTENTS = List.of("ELEMENT_ACTIVATED");
-  static final List<String> PROCESS_INSTANCE_COMPLETED_INTENTS =
-      List.of("ELEMENT_COMPLETED", "ELEMENT_TERMINATED");
-  static final List<String> EXCLUDE_ELEMENT_TYPES =
-      List.of(BpmnElementType.MULTI_INSTANCE_BODY.name());
+  static final List<String> PROCESS_INSTANCE_COMPLETED_INTENTS = List.of("ELEMENT_COMPLETED", "ELEMENT_TERMINATED");
+  static final List<String> EXCLUDE_ELEMENT_TYPES = List.of(BpmnElementType.MULTI_INSTANCE_BODY.name());
 
-  @Autowired private ProcessRepository processRepository;
-  @Autowired private ProcessInstanceRepository processInstanceRepository;
-  @Autowired private MessageSubscriptionRepository messageSubscriptionRepository;
-  @Autowired private TimerRepository timerRepository;
+  @Autowired
+  private ProcessRepository processRepository;
+  @Autowired
+  private ProcessInstanceRepository processInstanceRepository;
+  @Autowired
+  private MessageSubscriptionRepository messageSubscriptionRepository;
+  @Autowired
+  private TimerRepository timerRepository;
 
   @GetMapping("/")
   public String index(final Map<String, Object> model, final Pageable pageable) {
@@ -69,7 +71,7 @@ public class ProcessesViewController extends AbstractViewController {
 
     final List<ProcessDto> processes = new ArrayList<>();
     for (final ProcessEntity processEntity : processRepository.findAll(pageable)) {
-      final ProcessDto dto =ProcessDto.from(processEntity, 0, 0);
+      final ProcessDto dto = ProcessDto.from(processEntity, 0, 0);
       processes.add(dto);
     }
 
@@ -87,11 +89,10 @@ public class ProcessesViewController extends AbstractViewController {
   public String processDetail(
       @PathVariable("key") final long key, final Map<String, Object> model, final Pageable pageable) {
 
-    final ProcessEntity process =
-        processRepository
-            .findByKey(key)
-            .orElseThrow(
-                () -> new ResponseStatusException(NOT_FOUND, "No process found with key: " + key));
+    final ProcessEntity process = processRepository
+        .findByKey(key)
+        .orElseThrow(
+            () -> new ResponseStatusException(NOT_FOUND, "No process found with key: " + key));
 
     model.put("process", toDto(process));
     model.put("resource", getProcessResource(process));
@@ -99,34 +100,44 @@ public class ProcessesViewController extends AbstractViewController {
     final List<ElementInstanceState> elementInstanceStates = getElementInstanceStates(key);
     model.put("instance.elementInstances", elementInstanceStates);
 
-    final long count = processInstanceRepository.countByProcessDefinitionKey(key);
+    final long count =10000L;// processInstanceRepository.countByProcessDefinitionKey(key);
 
     final List<ProcessInstanceListDto> instances = new ArrayList<>();
-    for (final ProcessInstanceEntity instanceEntity :
-        processInstanceRepository.findByProcessDefinitionKey(key, pageable)) {
+    for (final ProcessInstanceEntity instanceEntity : processInstanceRepository.findByProcessDefinitionKey(key,
+        pageable)) {
       instances.add(toDto(instanceEntity));
     }
 
     model.put("instances", instances);
     model.put("count", count);
 
-    final List<TimerDto> timers =
-        timerRepository.findByProcessDefinitionKeyAndProcessInstanceKeyIsNull(key).stream()
-            .map(ProcessesViewController::toDto)
-            .collect(Collectors.toList());
+    final List<TimerDto> timers = timerRepository.findByProcessDefinitionKeyAndProcessInstanceKeyIsNull(key).stream()
+        .map(ProcessesViewController::toDto)
+        .collect(Collectors.toList());
     model.put("timers", timers);
 
-    final List<MessageSubscriptionDto> messageSubscriptions =
-        messageSubscriptionRepository
-            .findByProcessDefinitionKeyAndProcessInstanceKeyIsNull(key)
-            .stream()
-            .map(ProcessesViewController::toDto)
-            .collect(Collectors.toList());
+    final List<MessageSubscriptionDto> messageSubscriptions = messageSubscriptionRepository
+        .findByProcessDefinitionKeyAndProcessInstanceKeyIsNull(key)
+        .stream()
+        .map(ProcessesViewController::toDto)
+        .collect(Collectors.toList());
     model.put("messageSubscriptions", messageSubscriptions);
 
-    final var resourceAsStream = new ByteArrayInputStream(process.getResource().getBytes());
-    final var bpmn = Bpmn.readModelFromStream(resourceAsStream);
-    model.put("instance.bpmnElementInfos", getBpmnElementInfos(bpmn));
+    if (process.getResourcetext() != null) {
+
+      final var resourceAsStream = new ByteArrayInputStream(process.getResourcetext().getBytes());
+      final var bpmn = Bpmn.readModelFromStream(resourceAsStream);
+      model.put("instance.bpmnElementInfos", getBpmnElementInfos(bpmn));
+
+    } else {
+
+      final var resourceAsStream = new ByteArrayInputStream(process.getResource().getBytes());
+      final var bpmn = Bpmn.readModelFromStream(resourceAsStream);
+      model.put("instance.bpmnElementInfos", getBpmnElementInfos(bpmn));
+      process.setResourcetext(process.getResource());
+      processRepository.save(process);
+
+    }
 
     addPaginationToModel(model, pageable, count);
     addDefaultAttributesToModel(model);
@@ -137,10 +148,8 @@ public class ProcessesViewController extends AbstractViewController {
   ProcessDto toDto(final ProcessEntity processEntity) {
     final long processDefinitionKey = processEntity.getKey();
 
-    final long running =
-        processInstanceRepository.countByProcessDefinitionKeyAndEndIsNull(processDefinitionKey);
-    final long ended =
-        processInstanceRepository.countByProcessDefinitionKeyAndEndIsNotNull(processDefinitionKey);
+    final long running = processInstanceRepository.countByProcessDefinitionKeyAndEndIsNull(processDefinitionKey);
+    final long ended = processInstanceRepository.countByProcessDefinitionKeyAndEndIsNotNull(processDefinitionKey);
 
     return ProcessDto.from(processEntity, running, ended);
   }
@@ -202,42 +211,42 @@ public class ProcessesViewController extends AbstractViewController {
 
   static String getProcessResource(final ProcessEntity process) {
     final var resource = process.getResource();
-    // replace all backticks because they are used to enclose the content of the BPMN in the HTML
+    // replace all backticks because they are used to enclose the content of the
+    // BPMN in the HTML
     return resource.replaceAll("`", "\"");
   }
 
   private List<ElementInstanceState> getElementInstanceStates(final long key) {
 
-    final List<ElementInstanceStatistics> elementEnteredStatistics =
-        processRepository.getElementInstanceStatisticsByKeyAndIntentIn(
+    final List<ElementInstanceStatistics> elementEnteredStatistics = processRepository
+        .getElementInstanceStatisticsByKeyAndIntentIn(
             key, PROCESS_INSTANCE_ENTERED_INTENTS, EXCLUDE_ELEMENT_TYPES);
 
-    final Map<String, Long> elementCompletedCount =
-        processRepository
-            .getElementInstanceStatisticsByKeyAndIntentIn(
-                key, PROCESS_INSTANCE_COMPLETED_INTENTS, EXCLUDE_ELEMENT_TYPES)
-            .stream()
-            .collect(
-                Collectors.toMap(
-                    ElementInstanceStatistics::getElementId, ElementInstanceStatistics::getCount));
+    final Map<String, Long> elementCompletedCount = processRepository
+        .getElementInstanceStatisticsByKeyAndIntentIn(
+            key, PROCESS_INSTANCE_COMPLETED_INTENTS, EXCLUDE_ELEMENT_TYPES)
+        .stream()
+        .collect(
+            Collectors.toMap(
+                ElementInstanceStatistics::getElementId, ElementInstanceStatistics::getCount));
 
     return elementEnteredStatistics.stream()
-            .map(
-                s -> {
-                  final ElementInstanceState state = new ElementInstanceState();
+        .map(
+            s -> {
+              final ElementInstanceState state = new ElementInstanceState();
 
-                  final String elementId = s.getElementId();
-                  state.setElementId(elementId);
+              final String elementId = s.getElementId();
+              state.setElementId(elementId);
 
-                  final long completedInstances = elementCompletedCount.getOrDefault(elementId, 0L);
-                  final long enteredInstances = s.getCount();
+              final long completedInstances = elementCompletedCount.getOrDefault(elementId, 0L);
+              final long enteredInstances = s.getCount();
 
-                  state.setActiveInstances(enteredInstances - completedInstances);
-                  state.setEndedInstances(completedInstances);
+              state.setActiveInstances(enteredInstances - completedInstances);
+              state.setEndedInstances(completedInstances);
 
-                  return state;
-                })
-            .collect(Collectors.toList());
+              return state;
+            })
+        .collect(Collectors.toList());
   }
 
   static List<BpmnElementInfo> getBpmnElementInfos(final BpmnModelInstance bpmn) {
@@ -292,7 +301,7 @@ public class ProcessesViewController extends AbstractViewController {
                         if (eventDefinition instanceof TimerEventDefinition timerEventDefinition) {
 
                           Optional.<ModelElementInstance>ofNullable(
-                                  timerEventDefinition.getTimeCycle())
+                              timerEventDefinition.getTimeCycle())
                               .or(() -> Optional.ofNullable(timerEventDefinition.getTimeDate()))
                               .or(() -> Optional.ofNullable(timerEventDefinition.getTimeDuration()))
                               .map(ModelElementInstance::getTextContent)

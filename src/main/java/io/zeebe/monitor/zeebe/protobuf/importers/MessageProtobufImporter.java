@@ -28,7 +28,7 @@ public class MessageProtobufImporter {
     newEntity.setName(record.getName());
     newEntity.setCorrelationKey(record.getCorrelationKey());
     newEntity.setMessageId(record.getMessageId());
-    newEntity.setPayload(record.getVariables().toString());
+    //newEntity.setPayload(record.getVariables().toString());
 
     newEntity.setState(intent.name().toLowerCase());
     newEntity.setTimestamp(timestamp);

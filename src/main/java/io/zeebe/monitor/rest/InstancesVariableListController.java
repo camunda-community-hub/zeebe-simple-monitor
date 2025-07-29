@@ -24,7 +24,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 @Controller
 public class InstancesVariableListController extends AbstractInstanceViewController {
 
-  @Autowired private VariableRepository variableRepository;
+  @Autowired
+  private VariableRepository variableRepository;
 
   @GetMapping("/views/instances/{key}")
   @Transactional
@@ -54,9 +55,9 @@ public class InstancesVariableListController extends AbstractInstanceViewControl
       Map<String, Object> model,
       Pageable pageable,
       ProcessInstanceDto dto) {
-    final Map<VariableTuple, List<VariableEntity>> variablesByScopeAndName =
-        variableRepository.findByProcessInstanceKeyOrderByTimestampAscIdAsc(instance.getKey()).stream()
-            .collect(Collectors.groupingBy(v -> new VariableTuple(v.getScopeKey(), v.getName())));
+    final Map<VariableTuple, List<VariableEntity>> variablesByScopeAndName = variableRepository
+        .findByProcessInstanceKeyOrderByTimestampAscIdAsc(instance.getKey()).stream()
+        .collect(Collectors.groupingBy(v -> new VariableTuple(v.getScopeKey(), v.getName())));
     variablesByScopeAndName.forEach(
         (scopeKeyName, variables) -> {
           final VariableEntry variableDto = new VariableEntry();
@@ -68,19 +69,26 @@ public class InstancesVariableListController extends AbstractInstanceViewControl
           variableDto.setName(scopeKeyName.name);
 
           final VariableEntity lastUpdate = variables.get(variables.size() - 1);
-          variableDto.setValue(lastUpdate.getValue());
+          if (lastUpdate.getValueText() != null) {
+            variableDto.setValue(lastUpdate.getValueText());
+          } else {
+            variableDto.setValue(lastUpdate.getValue());
+          }
           variableDto.setTimestamp(Instant.ofEpochMilli(lastUpdate.getTimestamp()).toString());
 
-          final List<VariableUpdateEntry> varUpdates =
-              variables.stream()
-                  .map(
-                      v -> {
-                        final VariableUpdateEntry varUpdate = new VariableUpdateEntry();
-                        varUpdate.setValue(v.getValue());
-                        varUpdate.setTimestamp(Instant.ofEpochMilli(v.getTimestamp()).toString());
-                        return varUpdate;
-                      })
-                  .collect(Collectors.toList());
+          final List<VariableUpdateEntry> varUpdates = variables.stream()
+              .map(
+                  v -> {
+                    final VariableUpdateEntry varUpdate = new VariableUpdateEntry();
+                    if (v.getValueText() != null) {
+                      varUpdate.setValue(v.getValueText());
+                    } else {
+                      varUpdate.setValue(v.getValue());
+                    }
+                    varUpdate.setTimestamp(Instant.ofEpochMilli(v.getTimestamp()).toString());
+                    return varUpdate;
+                  })
+              .collect(Collectors.toList());
           variableDto.setUpdates(varUpdates);
 
           dto.getVariables().add(variableDto);

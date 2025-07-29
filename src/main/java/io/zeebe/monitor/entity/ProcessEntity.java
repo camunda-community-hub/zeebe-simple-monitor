@@ -34,6 +34,9 @@ public class ProcessEntity {
   @Column(name = "RESOURCE_",length= Length.LONG32)
   private String resource;
 
+  @Column(name = "RESOURCETEXT_",length= Length.LONG32)
+  private String resourcetext;
+
   @Column(name = "TIMESTAMP_")
   private long timestamp;
 
@@ -43,6 +46,14 @@ public class ProcessEntity {
 
   public void setResource(final String resource) {
     this.resource = resource;
+  }
+
+  public String getResourcetext() {
+    return resourcetext;
+  }
+
+  public void setResourcetext(final String resourcetext) {
+    this.resourcetext = resourcetext;
   }
 
   public String getBpmnProcessId() {

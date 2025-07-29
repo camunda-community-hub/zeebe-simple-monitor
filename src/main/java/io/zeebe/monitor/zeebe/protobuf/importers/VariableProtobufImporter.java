@@ -19,7 +19,8 @@ public class VariableProtobufImporter {
       newVariable.setTimestamp(record.getMetadata().getTimestamp());
       newVariable.setProcessInstanceKey(record.getProcessInstanceKey());
       newVariable.setName(record.getName());
-      newVariable.setValue(record.getValue());
+      //newVariable.setValue(record.getValue());
+      newVariable.setValueText(record.getValue());
       newVariable.setScopeKey(record.getScopeKey());
       newVariable.setState(record.getMetadata().getIntent().toLowerCase());
       variableRepository.save(newVariable);
