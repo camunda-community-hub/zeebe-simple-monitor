@@ -9,6 +9,7 @@ import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.ElementInstanceEntity;
 import io.zeebe.monitor.entity.ProcessEntity;
 import io.zeebe.monitor.entity.ProcessInstanceEntity;
+import io.zeebe.monitor.entity.ProcessInstanceState;
 import io.zeebe.monitor.repository.ElementInstanceRepository;
 import io.zeebe.monitor.repository.ProcessInstanceRepository;
 import io.zeebe.monitor.repository.ProcessRepository;
@@ -115,7 +116,7 @@ public class ProcessAndElementProtobufImporter {
                 });
 
     if (intent == ProcessInstanceIntent.ELEMENT_ACTIVATED) {
-      entity.setState("Active");
+      entity.setState(ProcessInstanceState.Active);
       entity.setStart(timestamp);
       processInstanceRepository.save(entity);
 
@@ -125,7 +126,7 @@ public class ProcessAndElementProtobufImporter {
       instanceActivatedCounter.increment();
 
     } else if (intent == ProcessInstanceIntent.ELEMENT_COMPLETED) {
-      entity.setState("Completed");
+      entity.setState(ProcessInstanceState.Completed);
       entity.setEnd(timestamp);
       processInstanceRepository.save(entity);
 
@@ -135,7 +136,7 @@ public class ProcessAndElementProtobufImporter {
       instanceCompletedCounter.increment();
 
     } else if (intent == ProcessInstanceIntent.ELEMENT_TERMINATED) {
-      entity.setState("Terminated");
+      entity.setState(ProcessInstanceState.Terminated);
       entity.setEnd(timestamp);
       processInstanceRepository.save(entity);
 
