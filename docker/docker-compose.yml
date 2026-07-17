@@ -73,7 +73,7 @@ services:
       - kafka
 
   kafka:
-    image: docker.io/bitnami/kafka:3.4
+    image: docker.io/soldevelo/kafka:3.4
     ports:
       - "9093:9093"
     environment:
