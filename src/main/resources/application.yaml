@@ -72,11 +72,6 @@ server:
       force-response: true
   allowedOriginsUrls: ""
 
-monitor:
-  display:
-    # IANA timezone used to render timestamps in the UI
-    timezone: UTC
-
 logging:
   level:
     root: ERROR

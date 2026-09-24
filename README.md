@@ -187,29 +187,26 @@ server:
   servlet:
     context-path: /
   allowedOriginsUrls: ""
-
-monitor:
-  display:
-    timezone: UTC
 ```
 
 #### Change the Display Timezone
 
-By default, timestamps are displayed in UTC. To display timestamps in another timezone, set an
-[IANA timezone identifier](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones), for example:
-
-```yaml
-monitor:
-  display:
-    timezone: Asia/Kolkata
-```
-
-When using Docker, the same setting can be provided as an environment variable:
+Timestamps are displayed using the JVM's default timezone. Set it to an
+[IANA timezone identifier](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) using the
+`user.timezone` JVM system property, for example:
 
 ```shell
-MONITOR_DISPLAY_TIMEZONE=Asia/Kolkata
+java -Duser.timezone=Asia/Kolkata -jar zeebe-simple-monitor-{VERSION}.jar
 ```
 
+When using Docker or Docker Compose, set the standard `TZ` environment variable:
+
+```yaml
+environment:
+  TZ: Asia/Kolkata
+```
+
+If neither setting is provided, the JVM uses the operating system's default timezone.
 Timestamps remain stored as epoch milliseconds; this setting changes only how they are displayed.
 The rendered value uses ISO-8601 format and includes the applicable UTC offset. For example,
 `2026-08-23T12:00:00Z` is displayed as `2026-08-23T17:30:00+05:30` in `Asia/Kolkata`.

@@ -13,6 +13,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.querydsl.core.types.Predicate;
 import io.zeebe.monitor.entity.ProcessInstanceEntity;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +85,10 @@ public class ProcessesViewControllerTest extends AbstractViewOrResourceTest {
 
     final var dto = ProcessesViewController.toDto(instance, displayTimeFormatter);
 
-    assertThat(dto.getStartTime()).isEqualTo("2026-08-23T12:00:00Z");
+    final String expectedTimestamp =
+        DateTimeFormatter.ISO_OFFSET_DATE_TIME
+            .withZone(ZoneId.systemDefault())
+            .format(Instant.ofEpochMilli(timestamp));
+    assertThat(dto.getStartTime()).isEqualTo(expectedTimestamp);
   }
 }
