@@ -4,14 +4,15 @@
 
     <groupId>io.zeebe</groupId>
     <artifactId>zeebe-simple-monitor</artifactId>
-    <version>2.9.3</version>
-    <name>${artifactId}-${version}</name>
+    <version>2.9.4</version>
+    <name>Zeebe Simple Monitor</name>
+
     <packaging>jar</packaging>
 
     <parent>
         <groupId>org.camunda</groupId>
         <artifactId>camunda-release-parent</artifactId>
-        <version>4.0.0</version>
+        <version>4.1.1</version>
         <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
         <relativePath />
     </parent>
