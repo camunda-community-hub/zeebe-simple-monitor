@@ -23,7 +23,7 @@ class DisplayTimeFormatterTest {
   }
 
   @Test
-  void shouldFormatTimestampInUtc() {
+  void format_timestamp_in_UTC() {
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     final var formatter = new DisplayTimeFormatter();
     final long timestamp = Instant.parse("2026-08-23T12:00:00.123Z").toEpochMilli();
@@ -32,7 +32,7 @@ class DisplayTimeFormatterTest {
   }
 
   @Test
-  void shouldFormatTimestampInJvmDefaultTimezone() {
+  void format_timestamp_in_JVM_default_timezone() {
     TimeZone.setDefault(TimeZone.getTimeZone("Asia/Kolkata"));
     final var formatter = new DisplayTimeFormatter();
     final long timestamp = Instant.parse("2026-08-23T12:00:00Z").toEpochMilli();
@@ -41,7 +41,7 @@ class DisplayTimeFormatterTest {
   }
 
   @Test
-  void shouldApplyDaylightSavingTimeForRegionTimezone() {
+  void apply_daylight_saving_time_for_region_timezone() {
     TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
     final var formatter = new DisplayTimeFormatter();
     final long winterTimestamp = Instant.parse("2026-01-15T12:00:00Z").toEpochMilli();
