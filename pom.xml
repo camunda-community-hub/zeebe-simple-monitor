@@ -5,7 +5,6 @@
     <groupId>io.zeebe</groupId>
     <artifactId>zeebe-simple-monitor</artifactId>
     <version>2.9.5-SNAPSHOT</version>
-    <name>Zeebe Simple Monitor</name>
 
     <packaging>jar</packaging>
 
