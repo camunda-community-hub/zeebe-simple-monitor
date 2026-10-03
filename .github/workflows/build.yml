@@ -1,6 +1,7 @@
 name: Build project with Maven
 on:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
