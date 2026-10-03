@@ -12,7 +12,7 @@ jobs:
     - name: Java setup
       uses: actions/setup-java@v6
       with:
-        java-version: 17
+        java-version: 21
         distribution: temurin
     - name: Cache
       uses: actions/cache@v6
