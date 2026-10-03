@@ -1,5 +1,3 @@
-version: "3"
-
 networks:
   zeebe_network:
     driver: bridge
@@ -62,7 +60,7 @@ services:
       - redis
 
   zookeeper:
-    image: docker.io/bitnami/zookeeper:3.8
+    image: docker.io/zookeeper:3.8
     ports:
       - "2181:2181"
     environment:
@@ -73,7 +71,7 @@ services:
       - kafka
 
   kafka:
-    image: docker.io/bitnami/kafka:3.4
+    image: docker.io/soldevelo/kafka:3.6
     ports:
       - "9093:9093"
     environment:
