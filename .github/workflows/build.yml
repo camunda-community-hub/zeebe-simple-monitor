@@ -1,22 +1,20 @@
 name: Build project with Maven
 on:
   pull_request:
-  schedule:
-  - cron: '2 2 * * 1-5' # run nightly master builds on weekdays
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
     - name: Java setup
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v6
       with:
         java-version: 17
         distribution: temurin
     - name: Cache
-      uses: actions/cache@v3
+      uses: actions/cache@v6
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
