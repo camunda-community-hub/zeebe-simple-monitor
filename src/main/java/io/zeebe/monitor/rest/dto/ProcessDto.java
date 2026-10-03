@@ -16,7 +16,6 @@
 package io.zeebe.monitor.rest.dto;
 
 import io.zeebe.monitor.entity.ProcessEntity;
-import java.time.Instant;
 
 public class ProcessDto {
 
@@ -30,14 +29,17 @@ public class ProcessDto {
   private long countEnded;
 
   public static ProcessDto from(
-      final ProcessEntity entity, final long countRunning, final long countEnded) {
+      final ProcessEntity entity,
+      final long countRunning,
+      final long countEnded,
+      final String deploymentTime) {
     final ProcessDto dto = new ProcessDto();
 
     dto.processDefinitionKey = entity.getKey();
     dto.bpmnProcessId = entity.getBpmnProcessId();
     dto.version = entity.getVersion();
     dto.resource = entity.getResource();
-    dto.deploymentTime = Instant.ofEpochMilli(entity.getTimestamp()).toString();
+    dto.deploymentTime = deploymentTime;
 
     dto.countRunning = countRunning;
     dto.countEnded = countEnded;

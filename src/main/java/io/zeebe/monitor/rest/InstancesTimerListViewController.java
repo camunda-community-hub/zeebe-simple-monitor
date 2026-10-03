@@ -45,7 +45,7 @@ public class InstancesTimerListViewController extends AbstractInstanceViewContro
       ProcessInstanceDto dto) {
     final List<TimerDto> timers =
         timerRepository.findByProcessInstanceKey(instance.getKey(), pageable).stream()
-            .map(ProcessesViewController::toDto)
+            .map(timer -> ProcessesViewController.toDto(timer, displayTimeFormatter))
             .collect(Collectors.toList());
     dto.setTimers(timers);
 

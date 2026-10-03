@@ -44,7 +44,7 @@ public class InstancesErrorListViewController extends AbstractInstanceViewContro
       ProcessInstanceDto dto) {
     final var errors =
         errorRepository.findByProcessInstanceKey(instance.getKey(), pageable).stream()
-            .map(ErrorsViewController::toDto)
+            .map(error -> ErrorsViewController.toDto(error, displayTimeFormatter))
             .collect(Collectors.toList());
     dto.setErrors(errors);
 

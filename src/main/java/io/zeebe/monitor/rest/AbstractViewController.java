@@ -25,6 +25,7 @@ abstract class AbstractViewController {
   @Autowired private WhitelabelPropertiesMapper whitelabelPropertiesMapper;
   @Autowired private ZeebeStatusKeeper zeebeStatusKeeper;
   @Autowired private Attributes applicationAttributes;
+  @Autowired protected DisplayTimeFormatter displayTimeFormatter;
 
   protected void addPaginationToModel(
       final Map<String, Object> model, final Pageable pageable, final long count) {

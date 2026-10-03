@@ -47,7 +47,7 @@ public class InstancesMessageSubscriptionListViewController extends AbstractInst
             .map(
                 subscription -> {
                   final MessageSubscriptionDto subscriptionDto =
-                      ProcessesViewController.toDto(subscription);
+                      ProcessesViewController.toDto(subscription, displayTimeFormatter);
                   subscriptionDto.setElementId(
                       elementIdsForKeys.getOrDefault(subscriptionDto.getElementInstanceKey(), ""));
 

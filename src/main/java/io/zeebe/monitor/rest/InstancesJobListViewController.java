@@ -48,7 +48,7 @@ public class InstancesJobListViewController extends AbstractInstanceViewControll
         jobRepository.findByProcessInstanceKey(instance.getKey(), pageable).stream()
             .map(
                 job -> {
-                  final JobDto jobDto = JobsViewController.toDto(job);
+                  final JobDto jobDto = JobsViewController.toDto(job, displayTimeFormatter);
                   jobDto.setElementId(
                       elementIdsForKeys.getOrDefault(job.getElementInstanceKey(), ""));
 

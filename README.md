@@ -189,6 +189,28 @@ server:
   allowedOriginsUrls: ""
 ```
 
+#### Change the Display Timezone
+
+Timestamps are displayed using the JVM's default timezone. Set it to an
+[IANA timezone identifier](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) using the
+`user.timezone` JVM system property, for example:
+
+```shell
+java -Duser.timezone=Asia/Kolkata -jar zeebe-simple-monitor-{VERSION}.jar
+```
+
+When using Docker or Docker Compose, set the standard `TZ` environment variable:
+
+```yaml
+environment:
+  TZ: Asia/Kolkata
+```
+
+If neither setting is provided, the JVM uses the operating system's default timezone.
+Timestamps remain stored as epoch milliseconds; this setting changes only how they are displayed.
+The rendered value uses ISO-8601 format and includes the applicable UTC offset. For example,
+`2026-08-23T12:00:00Z` is displayed as `2026-08-23T17:30:00+05:30` in `Asia/Kolkata`.
+
 #### Change the Context-Path
 
 The context-path or base-path of the application can be changed using the following property:

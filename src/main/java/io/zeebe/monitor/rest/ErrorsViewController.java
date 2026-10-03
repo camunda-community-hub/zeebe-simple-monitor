@@ -3,7 +3,6 @@ package io.zeebe.monitor.rest;
 import io.zeebe.monitor.entity.ErrorEntity;
 import io.zeebe.monitor.repository.ErrorRepository;
 import io.zeebe.monitor.rest.dto.ErrorDto;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,7 @@ public class ErrorsViewController extends AbstractViewController {
 
     final List<ErrorDto> dtos = new ArrayList<>();
     for (final ErrorEntity entity : errorRepository.findAll(pageable)) {
-      final var dto = toDto(entity);
+      final var dto = toDto(entity, displayTimeFormatter);
       dtos.add(dto);
     }
 
@@ -37,13 +36,13 @@ public class ErrorsViewController extends AbstractViewController {
     return "error-list-view";
   }
 
-  static ErrorDto toDto(final ErrorEntity entity) {
+  static ErrorDto toDto(final ErrorEntity entity, final DisplayTimeFormatter displayTimeFormatter) {
     final var dto = new ErrorDto();
     dto.setPosition(entity.getPosition());
     dto.setErrorEventPosition(entity.getErrorEventPosition());
     dto.setExceptionMessage(entity.getExceptionMessage());
     dto.setStacktrace(entity.getStacktrace());
-    dto.setTimestamp(Instant.ofEpochMilli(entity.getTimestamp()).toString());
+    dto.setTimestamp(displayTimeFormatter.format(entity.getTimestamp()));
 
     if (entity.getProcessInstanceKey() > 0) {
       dto.setProcessInstanceKey(entity.getProcessInstanceKey());

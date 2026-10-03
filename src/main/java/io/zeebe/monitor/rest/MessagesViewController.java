@@ -3,7 +3,6 @@ package io.zeebe.monitor.rest;
 import io.zeebe.monitor.entity.MessageEntity;
 import io.zeebe.monitor.repository.MessageRepository;
 import io.zeebe.monitor.rest.dto.MessageDto;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +45,7 @@ public class MessagesViewController extends AbstractViewController {
     dto.setMessageId(message.getMessageId());
     dto.setPayload(message.getPayload());
     dto.setState(message.getState());
-    dto.setTimestamp(Instant.ofEpochMilli(message.getTimestamp()).toString());
+    dto.setTimestamp(displayTimeFormatter.format(message.getTimestamp()));
 
     return dto;
   }

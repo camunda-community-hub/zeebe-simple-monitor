@@ -30,7 +30,6 @@ import io.zeebe.monitor.rest.dto.ProcessInstanceListDto;
 import io.zeebe.monitor.rest.dto.TimerDto;
 import jakarta.transaction.Transactional;
 import java.io.ByteArrayInputStream;
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
@@ -138,7 +137,7 @@ public class ProcessesViewController extends AbstractViewController {
     final List<ProcessInstanceListDto> instances = new ArrayList<>();
     for (final ProcessInstanceEntity instanceEntity :
         processInstanceRepository.findByProcessDefinitionKey(key, pageable)) {
-      instances.add(toDto(instanceEntity));
+      instances.add(toDto(instanceEntity, displayTimeFormatter));
     }
 
     model.put("instances", instances);
@@ -146,7 +145,7 @@ public class ProcessesViewController extends AbstractViewController {
 
     final List<TimerDto> timers =
         timerRepository.findByProcessDefinitionKeyAndProcessInstanceKeyIsNull(key).stream()
-            .map(ProcessesViewController::toDto)
+            .map(timer -> toDto(timer, displayTimeFormatter))
             .collect(Collectors.toList());
     model.put("timers", timers);
 
@@ -154,7 +153,7 @@ public class ProcessesViewController extends AbstractViewController {
         messageSubscriptionRepository
             .findByProcessDefinitionKeyAndProcessInstanceKeyIsNull(key)
             .stream()
-            .map(ProcessesViewController::toDto)
+            .map(subscription -> toDto(subscription, displayTimeFormatter))
             .collect(Collectors.toList());
     model.put("messageSubscriptions", messageSubscriptions);
 
@@ -176,10 +175,12 @@ public class ProcessesViewController extends AbstractViewController {
     final long ended =
         processInstanceRepository.countByProcessDefinitionKeyAndEndIsNotNull(processDefinitionKey);
 
-    return ProcessDto.from(processEntity, running, ended);
+    return ProcessDto.from(
+        processEntity, running, ended, displayTimeFormatter.format(processEntity.getTimestamp()));
   }
 
-  static ProcessInstanceListDto toDto(final ProcessInstanceEntity instance) {
+  static ProcessInstanceListDto toDto(
+      final ProcessInstanceEntity instance, final DisplayTimeFormatter displayTimeFormatter) {
 
     final ProcessInstanceListDto dto = new ProcessInstanceListDto();
     dto.setProcessInstanceKey(instance.getKey());
@@ -190,22 +191,22 @@ public class ProcessesViewController extends AbstractViewController {
     final boolean isEnded = instance.getEnd() != null && instance.getEnd() > 0;
     dto.setState(instance.getState());
 
-    dto.setStartTime(Instant.ofEpochMilli(instance.getStart()).toString());
+    dto.setStartTime(displayTimeFormatter.format(instance.getStart()));
 
     if (isEnded) {
-      dto.setEndTime(Instant.ofEpochMilli(instance.getEnd()).toString());
+      dto.setEndTime(displayTimeFormatter.format(instance.getEnd()));
     }
 
     return dto;
   }
 
-  static TimerDto toDto(final TimerEntity timer) {
+  static TimerDto toDto(final TimerEntity timer, final DisplayTimeFormatter displayTimeFormatter) {
     final TimerDto dto = new TimerDto();
 
     dto.setElementId(timer.getTargetElementId());
     dto.setState(timer.getState());
-    dto.setDueDate(Instant.ofEpochMilli(timer.getDueDate()).toString());
-    dto.setTimestamp(Instant.ofEpochMilli(timer.getTimestamp()).toString());
+    dto.setDueDate(displayTimeFormatter.format(timer.getDueDate()));
+    dto.setTimestamp(displayTimeFormatter.format(timer.getTimestamp()));
     dto.setElementInstanceKey(timer.getElementInstanceKey());
 
     final int repetitions = timer.getRepetitions();
@@ -214,7 +215,9 @@ public class ProcessesViewController extends AbstractViewController {
     return dto;
   }
 
-  static MessageSubscriptionDto toDto(final MessageSubscriptionEntity subscription) {
+  static MessageSubscriptionDto toDto(
+      final MessageSubscriptionEntity subscription,
+      final DisplayTimeFormatter displayTimeFormatter) {
     final MessageSubscriptionDto dto = new MessageSubscriptionDto();
 
     dto.setKey(subscription.getId());
@@ -227,7 +230,7 @@ public class ProcessesViewController extends AbstractViewController {
     dto.setElementId(subscription.getTargetFlowNodeId());
 
     dto.setState(subscription.getState());
-    dto.setTimestamp(Instant.ofEpochMilli(subscription.getTimestamp()).toString());
+    dto.setTimestamp(displayTimeFormatter.format(subscription.getTimestamp()));
 
     dto.setOpen(subscription.getState().equalsIgnoreCase(MessageSubscriptionIntent.CREATED.name()));
 

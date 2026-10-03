@@ -20,7 +20,6 @@ import io.zeebe.monitor.rest.dto.ElementInstanceState;
 import io.zeebe.monitor.rest.dto.ProcessInstanceDto;
 import java.io.IOException;
 import java.io.Writer;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -101,9 +100,9 @@ public abstract class AbstractInstanceViewController extends AbstractViewControl
     final boolean isEnded = instance.getEnd() != null && instance.getEnd() > 0;
     dto.setState(instance.getState());
     dto.setRunning(!isEnded);
-    dto.setStartTime(Instant.ofEpochMilli(instance.getStart()).toString());
+    dto.setStartTime(displayTimeFormatter.format(instance.getStart()));
     if (isEnded) {
-      dto.setEndTime(Instant.ofEpochMilli(instance.getEnd()).toString());
+      dto.setEndTime(displayTimeFormatter.format(instance.getEnd()));
     }
     if (instance.getParentElementInstanceKey() > 0) {
       dto.setParentProcessInstanceKey(instance.getParentProcessInstanceKey());

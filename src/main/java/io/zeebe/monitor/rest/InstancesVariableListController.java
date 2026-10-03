@@ -9,7 +9,6 @@ import io.zeebe.monitor.rest.dto.ProcessInstanceDto;
 import io.zeebe.monitor.rest.dto.VariableEntry;
 import io.zeebe.monitor.rest.dto.VariableUpdateEntry;
 import jakarta.transaction.Transactional;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -73,7 +72,7 @@ public class InstancesVariableListController extends AbstractInstanceViewControl
 
           final VariableEntity lastUpdate = variables.get(variables.size() - 1);
           variableDto.setValue(lastUpdate.getValue());
-          variableDto.setTimestamp(Instant.ofEpochMilli(lastUpdate.getTimestamp()).toString());
+          variableDto.setTimestamp(displayTimeFormatter.format(lastUpdate.getTimestamp()));
 
           final List<VariableUpdateEntry> varUpdates =
               variables.stream()
@@ -81,7 +80,7 @@ public class InstancesVariableListController extends AbstractInstanceViewControl
                       v -> {
                         final VariableUpdateEntry varUpdate = new VariableUpdateEntry();
                         varUpdate.setValue(v.getValue());
-                        varUpdate.setTimestamp(Instant.ofEpochMilli(v.getTimestamp()).toString());
+                        varUpdate.setTimestamp(displayTimeFormatter.format(v.getTimestamp()));
                         return varUpdate;
                       })
                   .collect(Collectors.toList());

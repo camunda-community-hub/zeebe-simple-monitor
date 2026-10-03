@@ -3,7 +3,6 @@ package io.zeebe.monitor.rest;
 import io.zeebe.monitor.entity.JobEntity;
 import io.zeebe.monitor.repository.JobRepository;
 import io.zeebe.monitor.rest.dto.JobDto;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +28,7 @@ public class JobsViewController extends AbstractViewController {
     final List<JobDto> dtos = new ArrayList<>();
     for (final JobEntity jobEntity :
         jobRepository.findByStateNotIn(JOB_COMPLETED_INTENTS, pageable)) {
-      final JobDto dto = toDto(jobEntity);
+      final JobDto dto = toDto(jobEntity, displayTimeFormatter);
       dtos.add(dto);
     }
 
@@ -42,7 +41,7 @@ public class JobsViewController extends AbstractViewController {
     return "job-list-view";
   }
 
-  static JobDto toDto(final JobEntity job) {
+  static JobDto toDto(final JobEntity job, final DisplayTimeFormatter displayTimeFormatter) {
     final JobDto dto = new JobDto();
 
     dto.setKey(job.getKey());
@@ -52,7 +51,7 @@ public class JobsViewController extends AbstractViewController {
     dto.setState(job.getState());
     dto.setRetries(job.getRetries());
     Optional.ofNullable(job.getWorker()).ifPresent(dto::setWorker);
-    dto.setTimestamp(Instant.ofEpochMilli(job.getTimestamp()).toString());
+    dto.setTimestamp(displayTimeFormatter.format(job.getTimestamp()));
 
     return dto;
   }

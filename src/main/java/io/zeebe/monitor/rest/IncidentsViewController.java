@@ -6,7 +6,6 @@ import io.zeebe.monitor.querydsl.IncidentEntityPredicatesBuilder;
 import io.zeebe.monitor.repository.IncidentRepository;
 import io.zeebe.monitor.rest.dto.IncidentListDto;
 import jakarta.transaction.Transactional;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -72,10 +71,10 @@ public class IncidentsViewController extends AbstractViewController {
 
     final boolean isResolved = incident.getResolved() != null && incident.getResolved() > 0;
 
-    dto.setCreatedTime(Instant.ofEpochMilli(incident.getCreated()).toString());
+    dto.setCreatedTime(displayTimeFormatter.format(incident.getCreated()));
 
     if (isResolved) {
-      dto.setResolvedTime(Instant.ofEpochMilli(incident.getResolved()).toString());
+      dto.setResolvedTime(displayTimeFormatter.format(incident.getResolved()));
 
       dto.setState("Resolved");
     } else {

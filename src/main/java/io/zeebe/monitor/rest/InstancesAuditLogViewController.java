@@ -11,7 +11,6 @@ import io.zeebe.monitor.rest.dto.AuditLogEntry;
 import io.zeebe.monitor.rest.dto.ProcessInstanceDto;
 import jakarta.transaction.Transactional;
 import java.io.ByteArrayInputStream;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +76,7 @@ public class InstancesAuditLogViewController extends AbstractInstanceViewControl
                   entry.setElementName(flowElements.getOrDefault(e.getElementId(), ""));
                   entry.setBpmnElementType(e.getBpmnElementType());
                   entry.setState(e.getIntent());
-                  entry.setTimestamp(Instant.ofEpochMilli(e.getTimestamp()).toString());
+                  entry.setTimestamp(displayTimeFormatter.format(e.getTimestamp()));
 
                   return entry;
                 })

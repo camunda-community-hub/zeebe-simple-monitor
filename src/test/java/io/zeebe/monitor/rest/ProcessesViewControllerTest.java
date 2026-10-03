@@ -1,6 +1,7 @@
 package io.zeebe.monitor.rest;
 
 import static io.zeebe.monitor.ZeebeSimpleMonitorApp.REPLACEMENT_CHARACTER_QUESTIONMARK;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.mockito.ArgumentMatchers.any;
@@ -10,12 +11,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.querydsl.core.types.Predicate;
+import io.zeebe.monitor.entity.ProcessInstanceEntity;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public class ProcessesViewControllerTest extends AbstractViewOrResourceTest {
+
+  @Autowired private DisplayTimeFormatter displayTimeFormatter;
 
   @BeforeEach
   public void setUp() {
@@ -67,5 +75,20 @@ public class ProcessesViewControllerTest extends AbstractViewOrResourceTest {
     mockMvc
         .perform(get("/views/processes"))
         .andExpect(content().string(not(containsString(REPLACEMENT_CHARACTER_QUESTIONMARK))));
+  }
+
+  @Test
+  void process_instance_uses_default_display_timezone() {
+    final long timestamp = Instant.parse("2026-08-23T12:00:00Z").toEpochMilli();
+    final var instance = new ProcessInstanceEntity();
+    instance.setStart(timestamp);
+
+    final var dto = ProcessesViewController.toDto(instance, displayTimeFormatter);
+
+    final String expectedTimestamp =
+        DateTimeFormatter.ISO_OFFSET_DATE_TIME
+            .withZone(ZoneId.systemDefault())
+            .format(Instant.ofEpochMilli(timestamp));
+    assertThat(dto.getStartTime()).isEqualTo(expectedTimestamp);
   }
 }

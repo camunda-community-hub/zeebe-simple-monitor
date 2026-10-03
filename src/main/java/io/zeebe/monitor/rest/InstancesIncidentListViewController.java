@@ -6,7 +6,6 @@ import io.zeebe.monitor.entity.ProcessInstanceEntity;
 import io.zeebe.monitor.rest.dto.IncidentDto;
 import io.zeebe.monitor.rest.dto.ProcessInstanceDto;
 import jakarta.transaction.Transactional;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -57,9 +56,9 @@ public class InstancesIncidentListViewController extends AbstractInstanceViewCon
                   incidentDto.setErrorMessage(i.getErrorMessage());
                   final boolean isResolved = i.getResolved() != null && i.getResolved() > 0;
                   incidentDto.setResolved(isResolved);
-                  incidentDto.setCreatedTime(Instant.ofEpochMilli(i.getCreated()).toString());
+                  incidentDto.setCreatedTime(displayTimeFormatter.format(i.getCreated()));
                   if (isResolved) {
-                    incidentDto.setResolvedTime(Instant.ofEpochMilli(i.getResolved()).toString());
+                    incidentDto.setResolvedTime(displayTimeFormatter.format(i.getResolved()));
                     incidentDto.setState("Resolved");
                   } else {
                     incidentDto.setState("Created");

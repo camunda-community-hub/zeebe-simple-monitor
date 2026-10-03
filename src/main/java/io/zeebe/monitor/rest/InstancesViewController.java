@@ -23,7 +23,8 @@ public class InstancesViewController extends AbstractViewController {
 
     final List<ProcessInstanceListDto> instances = new ArrayList<>();
     for (final ProcessInstanceEntity instanceEntity : processInstanceRepository.findAll(pageable)) {
-      final ProcessInstanceListDto dto = ProcessesViewController.toDto(instanceEntity);
+      final ProcessInstanceListDto dto =
+          ProcessesViewController.toDto(instanceEntity, displayTimeFormatter);
       instances.add(dto);
     }
 
