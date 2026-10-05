@@ -101,6 +101,10 @@
                 <a class="nav-item nav-link {{#content-incident-list-view}}active{{/content-incident-list-view}}"
                    id="nav-incidents-tab" href="{{context-path}}views/instances/{{instance.processInstanceKey}}/incident-list" role="tab"
                    aria-controls="nav-profile" aria-selected="false">Incidents</a>
+                <a class="nav-item nav-link {{#content-user-tasks-list-view}}active{{/content-user-tasks-list-view}}"
+                   id="nav-user-tasks-tab"
+                   href="{{context-path}}views/instances/{{instance.processInstanceKey}}/user-tasks-list" role="tab"
+                   aria-controls="nav-contact" aria-selected="false">User Tasks</a>
                 <a class="nav-item nav-link {{#content-job-list-view}}active{{/content-job-list-view}}"
                    id="nav-jobs-tab" href="{{context-path}}views/instances/{{instance.processInstanceKey}}/job-list" role="tab"
                    aria-controls="nav-contact" aria-selected="false">Jobs</a>
@@ -134,6 +138,10 @@
             {{#content-incident-list-view}}
                 {{>incident-list}}
             {{/content-incident-list-view}}
+
+            {{#content-user-tasks-list-view}}
+                {{>user-tasks-list}}
+            {{/content-user-tasks-list-view}}
 
             {{#content-job-list-view}}
                 {{>job-list}}

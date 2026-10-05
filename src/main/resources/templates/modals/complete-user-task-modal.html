@@ -1,0 +1,39 @@
+<div class="modal fade" id="completeUserTaskModal-{{processInstanceKey}}-{{key}}" tabindex="-1" role="dialog"
+     aria-labelledby="completeUserTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Complete Task</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <label class="col-form-label">User Task Key</label>
+                    <input class="form-control" type="text" value="{{key}}" readonly/>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-form-label">Variables</label> <button style="float: inline-end; border: none; cursor: pointer;" onclick="prettyPrint({{key}})">Beautify</button>
+                    <textarea id="complete-task-variable-{{key}}" class="form-control" cols=50 rows=10 value=""></textarea>
+                    <small class="form-text text-muted">As JSON string (e.g. `{"name": "John Doe", "age": 30, "married": false}`).</small>
+                    <small class="form-text" style="color: tomato;" id="complete-task-variable-{{key}}-error"></small>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+                <button type="button" class="btn btn-primary"
+                        onclick="completeUserTask({{processInstanceKey}}, {{key}})">Complete
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
