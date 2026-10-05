@@ -1,27 +1,24 @@
 package io.zeebe.monitor.zeebe.protobuf.importers;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.ErrorEntity;
 import io.zeebe.monitor.repository.ErrorRepository;
+import io.zeebe.monitor.zeebe.event.ErrorEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ErrorProtobufImporter {
 
   private final ErrorRepository errorRepository;
-  private final Counter counter;
+  private final ApplicationEventPublisher applicationEventPublisher;
 
   @Autowired
-  public ErrorProtobufImporter(ErrorRepository errorRepository, MeterRegistry meterRegistry) {
+  public ErrorProtobufImporter(
+      ErrorRepository errorRepository, ApplicationEventPublisher applicationEventPublisher) {
     this.errorRepository = errorRepository;
-
-    this.counter =
-        Counter.builder("zeebemonitor_importer_error")
-            .description("number of processed errors")
-            .register(meterRegistry);
+    this.applicationEventPublisher = applicationEventPublisher;
   }
 
   public void importError(final Schema.ErrorRecord record) {
@@ -46,6 +43,6 @@ public class ErrorProtobufImporter {
 
     errorRepository.save(entity);
 
-    counter.increment();
+    applicationEventPublisher.publishEvent(new ErrorEvent());
   }
 }

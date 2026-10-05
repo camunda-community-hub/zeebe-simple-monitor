@@ -2,35 +2,28 @@ package io.zeebe.monitor.zeebe.protobuf.importers;
 
 import io.camunda.zeebe.protocol.record.intent.MessageStartEventSubscriptionIntent;
 import io.camunda.zeebe.protocol.record.intent.MessageSubscriptionIntent;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.MessageSubscriptionEntity;
 import io.zeebe.monitor.repository.MessageSubscriptionRepository;
+import io.zeebe.monitor.zeebe.event.MessageSubscriptionEvent;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MessageSubscriptionProtobufImporter {
 
   private final MessageSubscriptionRepository messageSubscriptionRepository;
-  private final Counter subsCounter;
-  private final Counter eventCounter;
+  private final ApplicationEventPublisher applicationEventPublisher;
 
   @Autowired
   public MessageSubscriptionProtobufImporter(
-      MessageSubscriptionRepository messageSubscriptionRepository, MeterRegistry meterRegistry) {
+      MessageSubscriptionRepository messageSubscriptionRepository,
+      ApplicationEventPublisher applicationEventPublisher) {
     this.messageSubscriptionRepository = messageSubscriptionRepository;
 
-    this.subsCounter =
-        Counter.builder("zeebemonitor_importer_message_subscription")
-            .description("number of processed message subscriptions")
-            .register(meterRegistry);
-    this.eventCounter =
-        Counter.builder("zeebemonitor_importer_message_start_event_subscription")
-            .description("number of processed message start events")
-            .register(meterRegistry);
+    this.applicationEventPublisher = applicationEventPublisher;
   }
 
   public void importMessageSubscription(final Schema.MessageSubscriptionRecord record) {
@@ -59,7 +52,7 @@ public class MessageSubscriptionProtobufImporter {
     entity.setTimestamp(timestamp);
     messageSubscriptionRepository.save(entity);
 
-    subsCounter.increment();
+    applicationEventPublisher.publishEvent(new MessageSubscriptionEvent(false));
   }
 
   public void importMessageStartEventSubscription(
@@ -88,7 +81,7 @@ public class MessageSubscriptionProtobufImporter {
     entity.setTimestamp(timestamp);
     messageSubscriptionRepository.save(entity);
 
-    eventCounter.increment();
+    applicationEventPublisher.publishEvent(new MessageSubscriptionEvent(true));
   }
 
   private String generateId() {

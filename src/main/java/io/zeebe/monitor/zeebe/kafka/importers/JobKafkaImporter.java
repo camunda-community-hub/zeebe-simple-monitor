@@ -5,13 +5,16 @@ import io.camunda.zeebe.protocol.record.RecordValue;
 import io.camunda.zeebe.protocol.record.value.JobRecordValue;
 import io.zeebe.monitor.entity.JobEntity;
 import io.zeebe.monitor.repository.JobRepository;
+import io.zeebe.monitor.zeebe.event.JobEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JobKafkaImporter extends KafkaImporter {
 
   @Autowired private JobRepository jobRepository;
+  @Autowired private ApplicationEventPublisher applicationEventPublisher;
 
   @Override
   public void importRecord(final Record<RecordValue> record) {
@@ -38,5 +41,7 @@ public class JobKafkaImporter extends KafkaImporter {
     entity.setWorker(value.getWorker());
     entity.setRetries(value.getRetries());
     jobRepository.save(entity);
+
+    applicationEventPublisher.publishEvent(new JobEvent());
   }
 }

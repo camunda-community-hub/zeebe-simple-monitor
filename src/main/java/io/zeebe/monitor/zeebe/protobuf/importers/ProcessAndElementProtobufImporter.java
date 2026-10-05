@@ -3,8 +3,6 @@ package io.zeebe.monitor.zeebe.protobuf.importers;
 import io.camunda.zeebe.protocol.Protocol;
 import io.camunda.zeebe.protocol.record.intent.Intent;
 import io.camunda.zeebe.protocol.record.intent.ProcessInstanceIntent;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
 import io.zeebe.exporter.proto.Schema;
 import io.zeebe.monitor.entity.ElementInstanceEntity;
 import io.zeebe.monitor.entity.ProcessEntity;
@@ -13,7 +11,11 @@ import io.zeebe.monitor.repository.ElementInstanceRepository;
 import io.zeebe.monitor.repository.ProcessInstanceRepository;
 import io.zeebe.monitor.repository.ProcessRepository;
 import io.zeebe.monitor.zeebe.ZeebeNotificationService;
+import io.zeebe.monitor.zeebe.event.ProcessElementEvent;
+import io.zeebe.monitor.zeebe.event.ProcessEvent;
+import io.zeebe.monitor.zeebe.event.ProcessInstanceEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,47 +25,20 @@ public class ProcessAndElementProtobufImporter {
   private final ProcessInstanceRepository processInstanceRepository;
   private final ElementInstanceRepository elementInstanceRepository;
   private final ZeebeNotificationService notificationService;
-  private final Counter processCounter;
-  private final Counter instanceActivatedCounter;
-  private final Counter instanceCompletedCounter;
-  private final Counter instanceTerminatedCounter;
-  private final Counter elementInstanceCounter;
+  private final ApplicationEventPublisher applicationEventPublisher;
 
   @Autowired
   public ProcessAndElementProtobufImporter(
       ProcessRepository processRepository,
       ProcessInstanceRepository processInstanceRepository,
       ElementInstanceRepository elementInstanceRepository,
-      MeterRegistry meterRegistry,
-      ZeebeNotificationService notificationService) {
+      ZeebeNotificationService notificationService,
+      ApplicationEventPublisher applicationEventPublisher) {
     this.processRepository = processRepository;
     this.processInstanceRepository = processInstanceRepository;
     this.elementInstanceRepository = elementInstanceRepository;
     this.notificationService = notificationService;
-
-    this.processCounter =
-        Counter.builder("zeebemonitor_importer_process")
-            .description("number of processed processes")
-            .register(meterRegistry);
-    this.instanceActivatedCounter =
-        Counter.builder("zeebemonitor_importer_process_instance")
-            .tag("action", "activated")
-            .description("number of activated process instances")
-            .register(meterRegistry);
-    this.instanceCompletedCounter =
-        Counter.builder("zeebemonitor_importer_process_instance")
-            .tag("action", "activated")
-            .description("number of activated process instances")
-            .register(meterRegistry);
-    this.instanceTerminatedCounter =
-        Counter.builder("zeebemonitor_importer_process_instance")
-            .tag("action", "activated")
-            .description("number of activated process instances")
-            .register(meterRegistry);
-    this.elementInstanceCounter =
-        Counter.builder("zeebemonitor_importer_element_instance")
-            .description("number of processed element_instances")
-            .register(meterRegistry);
+    this.applicationEventPublisher = applicationEventPublisher;
   }
 
   public void importProcess(final Schema.ProcessRecord record) {
@@ -82,7 +57,7 @@ public class ProcessAndElementProtobufImporter {
     entity.setTimestamp(record.getMetadata().getTimestamp());
     processRepository.save(entity);
 
-    processCounter.increment();
+    applicationEventPublisher.publishEvent(new ProcessEvent());
   }
 
   public void importProcessInstance(final Schema.ProcessInstanceRecord record) {
@@ -122,8 +97,8 @@ public class ProcessAndElementProtobufImporter {
       notificationService.sendCreatedProcessInstance(
           record.getProcessInstanceKey(), record.getProcessDefinitionKey());
 
-      instanceActivatedCounter.increment();
-
+      applicationEventPublisher.publishEvent(
+          new ProcessInstanceEvent(ProcessInstanceIntent.ELEMENT_ACTIVATED));
     } else if (intent == ProcessInstanceIntent.ELEMENT_COMPLETED) {
       entity.setState("Completed");
       entity.setEnd(timestamp);
@@ -132,7 +107,8 @@ public class ProcessAndElementProtobufImporter {
       notificationService.sendEndedProcessInstance(
           record.getProcessInstanceKey(), record.getProcessDefinitionKey());
 
-      instanceCompletedCounter.increment();
+      applicationEventPublisher.publishEvent(
+          new ProcessInstanceEvent(ProcessInstanceIntent.ELEMENT_COMPLETED));
 
     } else if (intent == ProcessInstanceIntent.ELEMENT_TERMINATED) {
       entity.setState("Terminated");
@@ -142,11 +118,13 @@ public class ProcessAndElementProtobufImporter {
       notificationService.sendEndedProcessInstance(
           record.getProcessInstanceKey(), record.getProcessDefinitionKey());
 
-      instanceTerminatedCounter.increment();
+      applicationEventPublisher.publishEvent(
+          new ProcessInstanceEvent(ProcessInstanceIntent.ELEMENT_TERMINATED));
     }
   }
 
   private void addElementInstance(final Schema.ProcessInstanceRecord record) {
+
     final ElementInstanceEntity entity = new ElementInstanceEntity();
     entity.setPartitionId(record.getMetadata().getPartitionId());
     entity.setPosition(record.getMetadata().getPosition());
@@ -163,7 +141,12 @@ public class ProcessAndElementProtobufImporter {
       notificationService.sendUpdatedProcessInstance(
           record.getProcessInstanceKey(), record.getProcessDefinitionKey());
 
-      elementInstanceCounter.increment();
+      applicationEventPublisher.publishEvent(
+          new ProcessElementEvent(
+              record.getBpmnProcessId(),
+              entity.getBpmnElementType(),
+              entity.getElementId(),
+              entity.getIntent()));
     }
   }
 }
