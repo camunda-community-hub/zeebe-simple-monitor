@@ -1,12 +1,9 @@
 /*
  * Copyright © 2017 camunda services GmbH (info@camunda.com)
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,28 +12,36 @@
  */
 package io.zeebe.monitor.rest.dto;
 
+import io.zeebe.monitor.entity.UserTaskEntity;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ProcessInstanceDto {
+
   private int partitionId;
 
   private long processInstanceKey;
 
   private String bpmnProcessId;
+
   private long processDefinitionKey;
+
   private int version;
 
   private String state;
+
   private boolean isRunning;
 
   private String startTime = "";
+
   private String endTime = "";
 
   private Long parentProcessInstanceKey;
+
   private String parentBpmnProcessId = "";
 
   private List<VariableEntry> variables = new ArrayList<>();
+
   private List<ActiveScope> activeScopes = new ArrayList<>();
 
   private List<ElementInstanceState> elementInstances = new ArrayList<>();
@@ -44,14 +49,23 @@ public class ProcessInstanceDto {
   private List<AuditLogEntry> auditLogEntries = new ArrayList<>();
 
   private List<String> activeActivities = new ArrayList<>();
+
   private List<String> incidentActivities = new ArrayList<>();
+
   private List<String> takenSequenceFlows = new ArrayList<>();
 
   private List<IncidentDto> incidents = new ArrayList<>();
+
   private List<JobDto> jobs = new ArrayList<>();
+
+  private List<UserTaskEntity> userTasks = new ArrayList<>();
+
   private List<MessageSubscriptionDto> messageSubscriptions = new ArrayList<>();
+
   private List<TimerDto> timers = new ArrayList<>();
+
   private List<CalledProcessInstanceDto> calledProcessInstances = new ArrayList<>();
+
   private List<ErrorDto> errors = new ArrayList<>();
 
   private List<BpmnElementInfo> bpmnElementInfos = new ArrayList<>();
@@ -182,6 +196,14 @@ public class ProcessInstanceDto {
 
   public void setJobs(final List<JobDto> jobs) {
     this.jobs = jobs;
+  }
+
+  public List<UserTaskEntity> getUserTasks() {
+    return userTasks;
+  }
+
+  public void setUserTasks(final List<UserTaskEntity> userTasks) {
+    this.userTasks = userTasks;
   }
 
   public List<MessageSubscriptionDto> getMessageSubscriptions() {

@@ -23,6 +23,7 @@ public class RedisImportService {
   @Autowired private MessageSubscriptionProtobufImporter messageSubscriptionImporter;
   @Autowired private TimerProtobufImporter timerImporter;
   @Autowired private ErrorProtobufImporter errorImporter;
+  @Autowired private UserTaskProtobufImporter userTaskProtobufImporter;
 
   public ZeebeRedis importFrom(final RedisClient redisClient, RedisConfig redisConfig) {
     final var builder =
@@ -88,6 +89,12 @@ public class RedisImportService {
                     record,
                     Schema.MessageStartEventSubscriptionRecord::getMetadata,
                     messageSubscriptionImporter::importMessageStartEventSubscription))
+        .addUserTaskListener(
+            record ->
+                ifEvent(
+                    record,
+                    Schema.UserTaskRecord::getMetadata,
+                    userTaskProtobufImporter::importUserTask))
         .addErrorListener(errorImporter::importError);
   }
 
